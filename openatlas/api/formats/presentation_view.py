@@ -143,7 +143,7 @@ def get_presentation_references(
     references = []
     check_for_duplicates: dict[int, str] = defaultdict(str)
     for link in links_inverse:
-        if link.domain.class_.group['name'] != 'reference' \
+        if link.domain.class_.group.get('name') != 'reference' \
                 or link.range.id not in entity_ids \
                 or check_for_duplicates[link.domain.id] == link.description:
             continue

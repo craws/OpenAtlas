@@ -17,6 +17,10 @@ class EntityNotAnEventError(Exception):
     pass
 
 
+class EntityNotAFileError(Exception):
+    pass
+
+
 class InvalidCidocClassCodeError(Exception):
     pass
 

@@ -175,53 +175,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -269,53 +278,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -443,53 +461,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -578,53 +605,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -739,53 +775,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -900,53 +945,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -1061,53 +1115,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -1214,53 +1277,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -1375,53 +1447,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -1536,53 +1617,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -1697,53 +1787,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -1861,53 +1960,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -1944,53 +2052,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -2030,53 +2147,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -2113,53 +2239,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -2191,53 +2326,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -2272,53 +2416,62 @@
           "200": {
             "description": "Success"
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -2358,53 +2511,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -2444,53 +2606,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -2533,53 +2704,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -2628,53 +2808,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -2711,53 +2900,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -2794,53 +2992,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -2880,53 +3087,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -2963,53 +3179,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -3060,53 +3285,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -3149,53 +3383,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -3244,53 +3487,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -3346,53 +3598,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -3419,7 +3680,7 @@
           "200": {
             "description": "Success",
             "content": {
-              "application/ld+json": {
+              "application/json": {
                 "schema": {
                   "type": "object",
                   "additionalProperties": {
@@ -3450,16 +3711,20 @@
                           "type": "boolean"
                         },
                         "mimetype": {
-                          "type": "string"
+                          "type": "string",
+                          "nullable": true
                         },
                         "url": {
-                          "type": "string"
+                          "type": "string",
+                          "nullable": true
                         },
                         "IIIFManifest": {
-                          "type": "string"
+                          "type": "string",
+                          "nullable": true
                         },
                         "IIIFBasePath": {
-                          "type": "string"
+                          "type": "string",
+                          "nullable": true
                         }
                       },
                       "required": [
@@ -3476,53 +3741,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -3579,53 +3853,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -3667,53 +3950,62 @@
               }
             }
           },
-          "404": {
-            "description": "Some error occurred",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
-                }
-              }
-            }
-          },
           "400": {
-            "description": "URL not valid",
+            "description": "Bad Request",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/BadRequestError"
                 }
               }
             }
           },
-          "405": {
-            "description": "Method not allowed",
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
-                  "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/ErrorModel"
-                    },
-                    {
-                      "$ref": "#/components/schemas/ParameterErrorModel"
-                    }
-                  ]
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
                 }
               }
             }
@@ -3739,7 +4031,12 @@
         "schema": {
           "type": "integer",
           "example": 50505
-        }
+        },
+        "x-examples": [
+          50505,
+          179184,
+          196290
+        ]
       },
       "fileId": {
         "name": "fileId",
@@ -3834,8 +4131,7 @@
             "source",
             "source_translation",
             "stratigraphic_unit",
-            "type",
-            "type_tools"
+            "type"
           ],
           "example": "acquisition"
         }
@@ -3887,7 +4183,7 @@
       },
       "centroid": {
         "name": "centroid",
-        "description": "Will calculate the centerpoint for all polygons and linestrings and *add* them to geometries",
+        "description": "Will calculate the centerpoint for all polygons and linestring and *add* them to geometries",
         "in": "query",
         "schema": {
           "type": "boolean",
@@ -4072,18 +4368,18 @@
                 "relationToID": {
                   "$ref": "#/components/schemas/searchCriteria"
                 }
+              },
+              "example": {
+                "entityName": [
+                  {
+                    "operator": "like",
+                    "values": [
+                      "A"
+                    ],
+                    "logicalOperator": "and"
+                  }
+                ]
               }
-            },
-            "example": {
-              "entityName": [
-                {
-                  "operator": "like",
-                  "values": [
-                    "A"
-                  ],
-                  "logicalOperator": "and"
-                }
-              ]
             }
           }
         }
@@ -4680,6 +4976,7 @@
         "name": "exclude_system_classes",
         "description": "Excludes entities with the selected system classes from the network.",
         "in": "query",
+        "explode": true,
         "schema": {
           "type": "array",
           "items": {
@@ -4707,8 +5004,7 @@
               "source",
               "source_translation",
               "stratigraphic_unit",
-              "type",
-              "type_tools"
+              "type"
             ],
             "example": "place"
           }
@@ -4718,14 +5014,14 @@
         "name": "linked_to_ids",
         "description": "Displays only entities that are linked to the specified IDs.",
         "in": "query",
+        "explode": true,
         "schema": {
           "type": "array",
           "items": {
             "type": "integer"
           },
           "example": 50505
-        },
-        "explode": true
+        }
       },
       "image_size": {
         "name": "image_size",
@@ -7112,47 +7408,52 @@
       },
       "LicensedFileOverviewModel": {
         "type": "object",
-        "required": [
-          "id"
-        ],
-        "properties": {
-          "id": {
-            "type": "object",
-            "required": [
-              "display",
-              "thumbnail",
-              "extension",
-              "license",
-              "licenseHolder",
-              "creator",
-              "publicShareable",
-              "IIIFManifest"
-            ],
-            "properties": {
-              "display": {
-                "type": "string"
-              },
-              "thumbnail": {
-                "type": "string"
-              },
-              "extension": {
-                "type": "string"
-              },
-              "license": {
-                "type": "string"
-              },
-              "licenseHolder": {
-                "type": "string"
-              },
-              "creator": {
-                "type": "string"
-              },
-              "publicShareable": {
-                "type": "boolean"
-              },
-              "IIIFManifest": {
-                "type": "string"
-              }
+        "description": "Dictionary keyed by numerical file IDs",
+        "additionalProperties": {
+          "type": "object",
+          "required": [
+            "display",
+            "thumbnail",
+            "extension",
+            "license",
+            "publicShareable",
+            "IIIFManifest"
+          ],
+          "properties": {
+            "display": {
+              "type": "string",
+              "nullable": true
+            },
+            "thumbnail": {
+              "type": "string",
+              "nullable": true
+            },
+            "extension": {
+              "type": "string",
+              "nullable": true
+            },
+            "mimetype": {
+              "type": "string",
+              "nullable": true
+            },
+            "license": {
+              "type": "string",
+              "nullable": true
+            },
+            "creator": {
+              "type": "string",
+              "nullable": true
+            },
+            "licenseHolder": {
+              "type": "string",
+              "nullable": true
+            },
+            "publicShareable": {
+              "type": "boolean"
+            },
+            "IIIFManifest": {
+              "type": "string",
+              "nullable": true
             }
           }
         }
@@ -7987,48 +8288,179 @@
           }
         }
       },
-      "ErrorModel": {
+      "ApiError": {
         "type": "object",
         "required": [
+          "title",
           "message",
           "status",
           "timestamp",
-          "title",
           "url"
         ],
         "properties": {
+          "title": {
+            "type": "string",
+            "example": "Bad Request"
+          },
           "message": {
-            "type": "string"
+            "type": "string",
+            "example": "The request contains invalid parameters."
           },
           "status": {
             "type": "integer",
-            "format": "int32"
+            "example": 400
           },
           "timestamp": {
             "type": "string",
-            "description": "RFC1123 timestamp string"
-          },
-          "title": {
-            "type": "string"
+            "description": "RFC1123 timestamp",
+            "example": "Tue, 02 Dec 2025 12:45:26 GMT"
           },
           "url": {
             "type": "string",
-            "format": "uri"
+            "format": "uri",
+            "example": "https://demo-dev.openatlas.eu/api/entity/50505"
           }
         },
         "additionalProperties": false
       },
-      "ParameterErrorModel": {
+      "ParameterError": {
         "type": "object",
         "required": [
           "message"
         ],
         "properties": {
           "message": {
-            "type": "string"
+            "type": "string",
+            "example": "The request contains invalid parameters."
           }
         },
         "additionalProperties": false
+      },
+      "BadRequestError": {
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/ApiError"
+          },
+          {
+            "$ref": "#/components/schemas/ParameterError"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "status": {
+                "example": 400
+              },
+              "title": {
+                "example": "Bad Request"
+              }
+            }
+          }
+        ]
+      },
+      "UnauthorizedError": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiError"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "status": {
+                "example": 401
+              },
+              "title": {
+                "example": "Unauthorized"
+              },
+              "message": {
+                "example": "Authentication required."
+              }
+            }
+          }
+        ]
+      },
+      "ForbiddenError": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiError"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "status": {
+                "example": 403
+              },
+              "title": {
+                "example": "Access denied"
+              },
+              "message": {
+                "example": "You do not have access to the API. Please ask the data provider for permission."
+              }
+            }
+          }
+        ]
+      },
+      "NotFoundError": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiError"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "status": {
+                "example": 404
+              },
+              "title": {
+                "example": "Not found"
+              },
+              "message": {
+                "example": "The requested resource does not exist."
+              }
+            }
+          }
+        ]
+      },
+      "ConflictError": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiError"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "status": {
+                "example": 409
+              },
+              "title": {
+                "example": "Conflict"
+              },
+              "message": {
+                "example": "The requested resource is not available due to a conflict."
+              }
+            }
+          }
+        ]
+      },
+      "InternalServerError": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ApiError"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "status": {
+                "example": 500
+              },
+              "title": {
+                "example": "Internal Server Error"
+              },
+              "message": {
+                "example": "An unexpected server error occurred."
+              }
+            }
+          }
+        ]
       }
     }
   }
