@@ -71,3 +71,40 @@ def similar_named(class_: str, ratio: int) -> dict[int, Any]:
                 already_added.add(e.id)
                 similar[sample.id]['entities'].append(e)
     return {item: data for item, data in similar.items() if data['entities']}
+
+
+def link_duplicates() -> list[dict[str, Any]]:
+    return db.link_duplicates()
+
+
+def delete_link_duplicates() -> int:
+    return db.delete_link_duplicates()
+
+
+def invalid_involvement_dates() -> list[Link]:
+    return [
+        Link.get_by_id(row['id'])
+        for row in date.invalid_involvement_dates()]
+
+
+def invalid_preceding_dates() -> list[Link]:
+    return [
+        Link.get_by_id(row['id'])
+        for row in date.invalid_preceding_dates()]
+
+
+def invalid_sub_dates() -> list[Link]:
+    return [Link.get_by_id(row['id']) for row in date.invalid_sub_dates()]
+
+
+def get_invalid_link_dates() -> list[Link]:
+    return [Link.get_by_id(row['id']) for row in date.invalid_link_dates()]
+
+
+def type_orphans() -> list[Entity]:
+    return [
+        node for node in g.types.values()
+        if node.root
+        and node.category not in ['system', 'tools']
+        and node.count < 1
+        and not node.subs]

@@ -20,13 +20,10 @@ from openatlas.display.util import (
 from openatlas.display.util2 import convert_size, is_authorized, manual
 from openatlas.forms.display import display_form
 from openatlas.forms.setting import SimilarForm
+from openatlas.models import checks
 from openatlas.models.annotation import AnnotationImage, AnnotationText
-from openatlas.models.checks import (
-    entities_linked_to_itself, invalid_cidoc_links, invalid_dates,
-    orphaned_subunits, orphans as get_orphans, similar_named,
-    single_type_duplicates)
 from openatlas.models.dates import format_date
-from openatlas.models.entity import Entity, Link
+from openatlas.models.entity import Entity
 from openatlas.models.export import find_duplicates
 
 
@@ -38,7 +35,7 @@ def check_links() -> str:
             'cidoc',
             _('invalid CIDOC links'),
             table=entity_table(
-                invalid_cidoc_links(),
+                checks.invalid_cidoc_links(),
                 columns=['name', 'property', 'range'])),
         'duplicates': Tab(
             'duplicates',
@@ -54,8 +51,10 @@ def check_links() -> str:
         'circular': Tab(
             'circular',
             _('circular dependencies'),
-            table=entity_table(entities_linked_to_itself(), columns=['name']))}
-    for row in single_type_duplicates():
+            table=entity_table(
+                checks.entities_linked_to_itself(),
+                columns=['name']))}
+    for row in checks.single_type_duplicates():
         remove_links = []
         for type_ in row['offending_types']:
             url = url_for(
@@ -68,7 +67,7 @@ def check_links() -> str:
             row['entity'].class_.label,
             link(g.types[row['type'].id]),
             '<br><br>'.join(remove_links)])
-    for row in Link.check_link_duplicates():
+    for row in checks.link_duplicates():
         tabs['duplicates'].table.rows.append([
             link(Entity.get_by_id(row['domain_id'])),
             link(Entity.get_by_id(row['range_id'])),
@@ -111,7 +110,7 @@ def delete_single_type_duplicate(entity_id: int, type_id: int) -> Response:
 @app.route('/delete_link_duplicates')
 @required_group('contributor')
 def delete_link_duplicates() -> Response:
-    count = Link.delete_link_duplicates()
+    count = checks.delete_link_duplicates()
     g.logger.log('info', 'admin', f"Deleted duplicate links: {count}")
     flash(f"{_('deleted links')}: {count}")
     return redirect(url_for('check_links') + '#tab-duplicates')
@@ -126,7 +125,9 @@ def check_similar() -> str:
     table = Table()
     if form.validate_on_submit():
         table = Table(['name', _('count')])
-        for item in similar_named(form.classes.data, form.ratio.data).values():
+        for item in checks.similar_named(
+                form.classes.data,
+                form.ratio.data).values():
             similar = [link(entity) for entity in item['entities']]
             table.rows.append([
                 f"{link(item['entity'])}<br>{'<br>'.join(similar)}",
@@ -150,7 +151,7 @@ def check_dates() -> str:
         'dates': Tab(
             'invalid_dates',
             _('invalid dates'),
-            table=entity_table(invalid_dates())),
+            table=entity_table(checks.invalid_dates())),
         'link_dates': Tab(
             'invalid_link_dates',
             _('invalid link dates'),
@@ -159,21 +160,21 @@ def check_dates() -> str:
             'invalid_involvement_dates',
             _('invalid involvement dates'),
             table=entity_table(
-                Link.invalid_involvement_dates(),
+                checks.invalid_involvement_dates(),
                 columns=['name', 'range', 'type_link', 'description'])),
         'preceding_dates': Tab(
             'invalid_preceding_dates',
             _('invalid preceding dates'),
             table=entity_table(
-                Link.invalid_preceding_dates(),
+                checks.invalid_preceding_dates(),
                 columns=['preceding', 'succeeding'])),
         'sub_dates': Tab(
             'invalid_sub_dates',
             _('invalid sub dates'),
             table=Table(['super', 'sub'], [
                 [link(link_.range), link(link_.domain)]
-                for link_ in Link.invalid_sub_dates()]))}
-    for link_ in Link.get_invalid_link_dates():
+                for link_ in checks.invalid_sub_dates()]))}
+    for link_ in checks.get_invalid_link_dates():
         update_link_ = ''
         domain = link_.domain.class_.name
         for name, relation in g.classes[domain].relations.items():
@@ -220,7 +221,7 @@ def orphans() -> str:
             table=Table(
                 ['name', 'root'],
                 [[link(type_), link(g.types[type_.root[0]])]
-                 for type_ in Entity.get_type_orphans()])),
+                 for type_ in checks.type_orphans()])),
         'missing_files': Tab(
             'missing_files',
             _('missing files'),
@@ -256,10 +257,10 @@ def orphans() -> str:
                     e.class_.label,
                     format_date(e.created),
                     format_date(e.modified),
-                    e.description] for e in orphaned_subunits()]))}
+                    e.description] for e in checks.orphaned_subunits()]))}
     for tab in tabs.values():
         tab.buttons = [manual('admin/data_integrity_checks')]
-    for entity in get_orphans():
+    for entity in checks.orphans():
         tabs[
             'unlinked'
             if entity.class_.group['name'] else 'orphans'].table.rows.append([
