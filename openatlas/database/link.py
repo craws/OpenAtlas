@@ -128,25 +128,14 @@ def check_link_duplicates() -> list[dict[str, int]]:
     g.cursor.execute(
         """
         SELECT COUNT(*) AS count,
-               domain_id,
-               range_id,
-               property_code,
-               description,
-               type_id,
-               begin_from,
-               begin_to,
-               begin_comment,
-               end_from,
-               end_to,
-               end_comment
+            domain_id, range_id, property_code, description, type_id,
+            begin_from, begin_to, begin_comment,
+            end_from, end_to, end_comment
         FROM model.link
         GROUP BY domain_id,
-                 range_id,
-                 property_code,
-                 description,
-                 type_id,
-                 begin_from, begin_to, begin_comment,
-                 end_from, end_to, end_comment
+            range_id, property_code, description, type_id,
+            begin_from, begin_to, begin_comment,
+            end_from, end_to, end_comment
         HAVING COUNT(*) > 1;
         """)
     return list(g.cursor)

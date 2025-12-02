@@ -44,10 +44,9 @@ def check_links() -> str:
             'duplicates',
             _('link duplicates'),
             table=Table([
-                'domain', 'range', 'property_code', 'description', 'type_id',
-                'begin_from', 'begin_to', 'begin_comment', 'end_from',
-                'end_to',
-                'end_comment', 'count'])),
+                'domain', 'range', 'property_code', 'description', 'type',
+                'begin_from', 'begin_to', 'begin_comment',
+                'end_from', 'end_to', 'end_comment', 'count'])),
         'type': Tab(
             'type',
             _('invalid multiple types'),
@@ -83,15 +82,15 @@ def check_links() -> str:
             format_date(row['end_to']),
             row['end_comment'],
             row['count']])
-    for tab in tabs.values():
-        tab.buttons = [manual('admin/data_integrity_checks')]
+    for name, tab in tabs.items():
         if not tab.table.rows:
             tab.content = _('Congratulations, everything looks fine!')
-    if tabs['duplicates'].table.rows:
-        tabs['duplicates'].buttons.append(
-            button(
-                _('delete link duplicates'),
-                url_for('delete_link_duplicates')))
+        tab.buttons = [manual('admin/data_integrity_checks')]
+        if name == 'duplicates' and tab.table.rows:
+            tab.buttons.append(
+                button(
+                    _('delete link duplicates'),
+                    url_for('delete_link_duplicates')))
     return render_template(
         'tabs.html',
         tabs=tabs,
@@ -123,15 +122,14 @@ def delete_link_duplicates() -> Response:
 def check_similar() -> str:
     form = SimilarForm()
     form.classes.choices = [
-        (class_.name, class_.label)
-        for name, class_ in g.classes.items() if class_.group]
+        (c.name, c.label) for c in g.classes.values() if c.group]
     table = Table()
     if form.validate_on_submit():
         table = Table(['name', _('count')])
         for item in similar_named(form.classes.data, form.ratio.data).values():
             similar = [link(entity) for entity in item['entities']]
             table.rows.append([
-                f"{link(item['entity'])}<br><br>{'<br><br>'.join(similar)}",
+                f"{link(item['entity'])}<br>{'<br>'.join(similar)}",
                 len(item['entities']) + 1])
     content = display_form(form, manual_page='admin/data_integrity_checks')
     content += ('<p class="uc-first">' + _('no entries') + '</p>') \

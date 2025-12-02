@@ -39,8 +39,8 @@ def orphaned_subunits() -> list[Entity]:
     return [Entity.get_by_id(x['id']) for x in db.get_orphaned_subunits()]
 
 
-def entities_linked_to_itself() -> list[Entity]:
-    return [Entity.get_by_id(row['domain_id']) for row in db.get_circular()]
+def entities_linked_to_itself() -> list[Link]:
+    return [Link.get_by_id(id_) for id_ in db.get_circular()]
 
 
 def invalid_cidoc_links() -> list[Link]:
@@ -61,11 +61,13 @@ def similar_named(class_: str, ratio: int) -> dict[int, Any]:
     similar: dict[int, Any] = {}
     already_added: set[int] = set()
     entities = Entity.get_by_class(class_)
-    for sample in [e for e in entities if e.id not in already_added]:
+    for sample in entities:
+        if sample.id in already_added:
+            continue
+        already_added.add(sample.id)
         similar[sample.id] = {'entity': sample, 'entities': []}
         for e in entities:
             if e.id != sample.id and fuzz.ratio(sample.name, e.name) >= ratio:
-                already_added.add(sample.id)
                 already_added.add(e.id)
                 similar[sample.id]['entities'].append(e)
     return {item: data for item, data in similar.items() if data['entities']}

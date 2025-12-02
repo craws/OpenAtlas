@@ -45,10 +45,9 @@ def get_orphans() -> list[dict[str, Any]]:
     return list(g.cursor)
 
 
-def get_circular() -> list[dict[str, Any]]:
-    g.cursor.execute(
-        'SELECT domain_id FROM model.link WHERE domain_id = range_id;')
-    return list(g.cursor)
+def get_circular() -> list[int]:
+    g.cursor.execute('SELECT id FROM model.link WHERE domain_id = range_id;')
+    return [row[0] for row in list(g.cursor)]
 
 
 def get_cidoc_links() -> list[dict[str, Any]]:
