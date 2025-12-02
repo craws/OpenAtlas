@@ -171,23 +171,23 @@ def check_dates() -> str:
         'sub_dates': Tab(
             'invalid_sub_dates',
             _('invalid sub dates'),
-            table=Table(['super', 'sub'], [
-                [link(link_.range), link(link_.domain)]
-                for link_ in checks.invalid_sub_dates()]))}
+            table=entity_table(
+                checks.invalid_sub_dates(),
+                columns=['super', 'sub']))}
     for link_ in checks.get_invalid_link_dates():
-        update_link_ = ''
+        url = ''
         domain = link_.domain.class_.name
         for name, relation in g.classes[domain].relations.items():
             if relation.property == link_.property.code \
                     and link_.range.class_.name in relation.classes:
-                update_link_ = url_for(
+                url = url_for(
                     'link_update',
                     id_=link_.id,
                     origin_id=link_.domain.id,
                     name=name)
                 break
         tabs['link_dates'].table.rows.append([
-            link(link_.property.name, update_link_),
+            link(link_.property.name, url),
             link(link_.domain),
             link(link_.range)])
     for tab in tabs.values():
@@ -214,8 +214,12 @@ def orphans() -> str:
         'updated',
         'description']
     tabs = {
-        'orphans': Tab('orphans', _('orphans'), table=Table(columns)),
-        'unlinked': Tab('unlinked', _('unlinked'), table=Table(columns)),
+        'orphans': Tab(
+            'orphans',
+            _('orphans'),
+            table=entity_table(
+                checks.orphans(),
+                columns=['name', 'class', 'type', 'description'])),
         'types': Tab(
             'type',
             table=Table(
@@ -260,18 +264,6 @@ def orphans() -> str:
                     e.description] for e in checks.orphaned_subunits()]))}
     for tab in tabs.values():
         tab.buttons = [manual('admin/data_integrity_checks')]
-    for entity in checks.orphans():
-        tabs[
-            'unlinked'
-            if entity.class_.group['name'] else 'orphans'].table.rows.append([
-                link(entity),
-                link(entity.class_),
-                link(entity.standard_type),
-                entity.class_.label,
-                format_date(entity.created),
-                format_date(entity.modified),
-                entity.description])
-
     entity_file_ids = []
     for entity in Entity.get_by_class('file', types=True):
         entity_file_ids.append(entity.id)

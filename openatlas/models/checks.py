@@ -32,7 +32,8 @@ def invalid_dates() -> list[Entity]:
 
 
 def orphans() -> list[Entity]:
-    return [Entity.get_by_id(row['id']) for row in db.get_orphans()]
+    return [
+        Entity.get_by_id(row['id'], types=True) for row in db.get_orphans()]
 
 
 def orphaned_subunits() -> list[Entity]:
