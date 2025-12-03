@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.11h",
+    "version": "0.4.11i",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -636,6 +636,34 @@
             }
           },
           "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
+                }
+              }
+            }
             "description": "Resource not found",
             "content": {
               "application/json": {
@@ -3078,7 +3106,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Success",
+            "description": "Successful response returning subunits for one or more entities.",
             "content": {
               "application/json": {
                 "schema": {
@@ -3159,7 +3187,13 @@
         "operationId": "GetChainedEvents",
         "parameters": [
           {
-            "$ref": "#/components/parameters/entityId"
+            "name": "entityId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 196290
+            }
           }
         ],
         "security": [
@@ -3839,16 +3873,14 @@
           "200": {
             "description": "Success",
             "content": {
-              "image/jpeg": {
+              "application/json": {
                 "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              },
-              "image/png": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
+                  "type": "object",
+                  "description": "IIIF Presentation API v2 manifest",
+                  "externalDocs": {
+                    "url": "http://iiif.io/api/presentation/2.1/"
+                  },
+                  "additionalProperties": true
                 }
               }
             }
@@ -4131,7 +4163,8 @@
             "source",
             "source_translation",
             "stratigraphic_unit",
-            "type"
+            "type",
+            "type_tools"
           ],
           "example": "acquisition"
         }
@@ -5004,7 +5037,8 @@
               "source",
               "source_translation",
               "stratigraphic_unit",
-              "type"
+              "type",
+              "type_tools"
             ],
             "example": "place"
           }
@@ -5167,6 +5201,7 @@
                 },
                 "descriptions": {
                   "type": "array",
+                  "nullable": true,
                   "items": {
                     "type": "object",
                     "properties": {
@@ -5418,6 +5453,7 @@
         }
       },
       "GeoJSONModel": {
+        "nullable": true,
         "type": "object",
         "required": [
           "features",
@@ -6049,19 +6085,24 @@
           ],
           "properties": {
             "systemClass": {
-              "type": "string"
+              "type": "string",
+              "nullable": true
             },
             "crmClass": {
-              "type": "string"
+              "type": "string",
+              "nullable": true
             },
             "view": {
-              "type": "string"
+              "type": "string",
+              "nullable": true
             },
             "icon": {
-              "type": "string"
+              "type": "string",
+              "nullable": true
             },
             "en": {
-              "type": "string"
+              "type": "string",
+              "nullable": true
             }
           }
         }
@@ -6094,10 +6135,12 @@
                   "type": "string"
                 },
                 "view": {
-                  "type": "string"
+                  "type": "string",
+                  "nullable": true
                 },
                 "icon": {
-                  "type": "string"
+                  "type": "string",
+                  "nullable": true
                 }
               }
             }
@@ -6980,117 +7023,275 @@
         }
       },
       "SubunitsModel": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "required": [
-            "id",
-            "parentId",
-            "rootId",
-            "openatlasClassName",
-            "crmClass",
-            "created",
-            "modified",
-            "latestModRec",
-            "geometry",
-            "children",
-            "properties"
-          ],
-          "properties": {
-            "id": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "parentId": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "rootId": {
-              "type": "integer",
-              "format": "int32"
-            },
-            "openatlasClassName": {
-              "type": "string"
-            },
-            "crmClass": {
-              "type": "string"
-            },
-            "created": {
-              "type": "string"
-            },
-            "modified": {
-              "type": "string"
-            },
-            "latestModRec": {
-              "type": "string"
-            },
-            "geometry": {
-              "type": "object",
-              "properties": {
-                "type": {
-                  "type": "string"
-                },
-                "coordinates": {
-                  "type": "array",
-                  "items": {
-                    "type": "number"
-                  }
-                },
-                "title": {
-                  "type": "string"
-                },
-                "description": {
-                  "type": "string"
-                },
-                "shapeType": {
-                  "type": "string"
-                }
-              }
-            },
-            "children": {
-              "type": "array",
-              "items": {
-                "type": "integer",
-                "format": "int32"
-              }
-            },
+        "type": "object",
+        "description": "A map of entity IDs (e.g., '50505') to an array of their subunit objects.",
+        "additionalProperties": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/SubunitItemModel"
+          }
+        }
+      },
+      "SubunitItemModel": {
+        "type": "object",
+        "required": [
+          "id",
+          "parentId",
+          "rootId",
+          "openatlasClassName",
+          "crmClass",
+          "created",
+          "modified",
+          "latestModRec",
+          "geometry",
+          "children",
+          "properties"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "parentId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rootId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "openatlasClassName": {
+            "type": "string"
+          },
+          "crmClass": {
+            "type": "string"
+          },
+          "created": {
+            "type": "string"
+          },
+          "modified": {
+            "type": "string"
+          },
+          "latestModRec": {
+            "type": "string"
+          },
+          "geometry": {
+            "type": "object",
             "properties": {
-              "type": "object",
-              "required": [
-                "name",
-                "aliases",
-                "description",
-                "standardType",
-                "timespan",
-                "externalReferences",
-                "references",
-                "files",
-                "types"
-              ],
-              "properties": {
-                "name": {
-                  "type": "string"
-                },
-                "aliases": {
-                  "type": "string",
-                  "nullable": true
-                },
-                "description": {
-                  "type": "string"
-                },
-                "standardType": {
+              "type": {
+                "type": "string"
+              },
+              "coordinates": {
+                "type": "array",
+                "items": {
+                  "type": "number"
+                }
+              },
+              "title": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "shapeType": {
+                "type": "string"
+              }
+            }
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          "properties": {
+            "type": "object",
+            "required": [
+              "name",
+              "aliases",
+              "description",
+              "standardType",
+              "timespan",
+              "externalReferences",
+              "references",
+              "files",
+              "types"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "aliases": {
+                "type": "string",
+                "nullable": true
+              },
+              "description": {
+                "type": "string"
+              },
+              "standardType": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "id",
+                  "rootId",
+                  "path",
+                  "externalReferences"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "rootId": {
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "externalReferences": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "type",
+                        "identifier",
+                        "referenceSystem",
+                        "resolverURL",
+                        "referenceURL",
+                        "id"
+                      ],
+                      "properties": {
+                        "type": {
+                          "type": "string"
+                        },
+                        "identifier": {
+                          "type": "string"
+                        },
+                        "referenceSystem": {
+                          "type": "string"
+                        },
+                        "resolverURL": {
+                          "type": "string"
+                        },
+                        "referenceURL": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "timespan": {
+                "type": "object",
+                "required": [
+                  "earliestBegin",
+                  "latestBegin",
+                  "earliestEnd",
+                  "latestEnd"
+                ],
+                "properties": {
+                  "earliestBegin": {
+                    "type": "string"
+                  },
+                  "latestBegin": {
+                    "type": "string"
+                  },
+                  "earliestEnd": {
+                    "type": "string"
+                  },
+                  "latestEnd": {
+                    "type": "string"
+                  }
+                }
+              },
+              "externalReferences": {
+                "type": "array",
+                "items": {
                   "type": "object",
                   "required": [
-                    "name",
+                    "type",
+                    "identifier",
+                    "referenceSystem",
+                    "resolverURL",
+                    "referenceURL",
+                    "id"
+                  ],
+                  "properties": {
+                    "type": {
+                      "type": "string"
+                    },
+                    "identifier": {
+                      "type": "string"
+                    },
+                    "referenceSystem": {
+                      "type": "string"
+                    },
+                    "resolverURL": {
+                      "type": "string"
+                    },
+                    "referenceURL": {
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "references": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "abbreviation",
+                    "title",
+                    "pages"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "abbreviation": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "pages": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  }
+                }
+              },
+              "files": {
+                "type": "string",
+                "nullable": true
+              },
+              "types": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
                     "id",
                     "rootId",
+                    "name",
                     "path",
+                    "value",
+                    "unit",
                     "externalReferences"
                   ],
                   "properties": {
-                    "name": {
-                      "type": "string"
-                    },
                     "id": {
                       "type": "integer",
                       "format": "int32"
@@ -7099,21 +7300,24 @@
                       "type": "integer",
                       "format": "int32"
                     },
+                    "name": {
+                      "type": "string"
+                    },
                     "path": {
                       "type": "string"
+                    },
+                    "value": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "unit": {
+                      "type": "string",
+                      "nullable": true
                     },
                     "externalReferences": {
                       "type": "array",
                       "items": {
                         "type": "object",
-                        "required": [
-                          "type",
-                          "identifier",
-                          "referenceSystem",
-                          "resolverURL",
-                          "referenceURL",
-                          "id"
-                        ],
                         "properties": {
                           "type": {
                             "type": "string"
@@ -7137,160 +7341,6 @@
                       }
                     }
                   }
-                },
-                "timespan": {
-                  "type": "object",
-                  "required": [
-                    "earliestBegin",
-                    "latestBegin",
-                    "earliestEnd",
-                    "latestEnd"
-                  ],
-                  "properties": {
-                    "earliestBegin": {
-                      "type": "string"
-                    },
-                    "latestBegin": {
-                      "type": "string"
-                    },
-                    "earliestEnd": {
-                      "type": "string"
-                    },
-                    "latestEnd": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "externalReferences": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "required": [
-                      "type",
-                      "identifier",
-                      "referenceSystem",
-                      "resolverURL",
-                      "referenceURL",
-                      "id"
-                    ],
-                    "properties": {
-                      "type": {
-                        "type": "string"
-                      },
-                      "identifier": {
-                        "type": "string"
-                      },
-                      "referenceSystem": {
-                        "type": "string"
-                      },
-                      "resolverURL": {
-                        "type": "string"
-                      },
-                      "referenceURL": {
-                        "type": "string"
-                      },
-                      "id": {
-                        "type": "string"
-                      }
-                    }
-                  }
-                },
-                "references": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "required": [
-                      "id",
-                      "abbreviation",
-                      "title",
-                      "pages"
-                    ],
-                    "properties": {
-                      "id": {
-                        "type": "integer",
-                        "format": "int32"
-                      },
-                      "abbreviation": {
-                        "type": "string"
-                      },
-                      "title": {
-                        "type": "string"
-                      },
-                      "pages": {
-                        "type": "string",
-                        "nullable": true
-                      }
-                    }
-                  }
-                },
-                "files": {
-                  "type": "string",
-                  "nullable": true
-                },
-                "types": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "required": [
-                      "id",
-                      "rootId",
-                      "name",
-                      "path",
-                      "value",
-                      "unit",
-                      "externalReferences"
-                    ],
-                    "properties": {
-                      "id": {
-                        "type": "integer",
-                        "format": "int32"
-                      },
-                      "rootId": {
-                        "type": "integer",
-                        "format": "int32"
-                      },
-                      "name": {
-                        "type": "string"
-                      },
-                      "path": {
-                        "type": "string"
-                      },
-                      "value": {
-                        "type": "string",
-                        "nullable": true
-                      },
-                      "unit": {
-                        "type": "string",
-                        "nullable": true
-                      },
-                      "externalReferences": {
-                        "type": "array",
-                        "items": {
-                          "type": "object",
-                          "properties": {
-                            "type": {
-                              "type": "string"
-                            },
-                            "identifier": {
-                              "type": "string"
-                            },
-                            "referenceSystem": {
-                              "type": "string"
-                            },
-                            "resolverURL": {
-                              "type": "string"
-                            },
-                            "referenceURL": {
-                              "type": "string"
-                            },
-                            "id": {
-                              "type": "string"
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
                 }
               }
             }
@@ -7298,12 +7348,14 @@
         }
       },
       "GeometricEntitiesModel": {
+        "nullable": true,
         "type": "object",
         "properties": {
           "type": {
             "type": "string"
           },
           "features": {
+            "nullable": true,
             "type": "array",
             "items": {
               "type": "object",
@@ -7312,6 +7364,7 @@
                   "type": "string"
                 },
                 "geometry": {
+                  "nullable": true,
                   "type": "object",
                   "properties": {
                     "coordinates": {
@@ -7333,10 +7386,12 @@
                       "format": "int32"
                     },
                     "name": {
-                      "type": "string"
+                      "type": "string",
+                      "nullable": true
                     },
                     "description": {
-                      "type": "string"
+                      "type": "string",
+                      "nullable": true
                     },
                     "locationId": {
                       "type": "integer",
@@ -7347,13 +7402,16 @@
                       "format": "int32"
                     },
                     "objectDescription": {
-                      "type": "string"
+                      "type": "string",
+                      "nullable": true
                     },
                     "objectName": {
-                      "type": "string"
+                      "type": "string",
+                      "nullable": true
                     },
                     "objectType": {
-                      "type": "string"
+                      "type": "string",
+                      "nullable": true
                     },
                     "shapeType": {
                       "type": "string"
@@ -7449,7 +7507,8 @@
               "nullable": true
             },
             "publicShareable": {
-              "type": "boolean"
+              "type": "boolean",
+              "nullable": true
             },
             "IIIFManifest": {
               "type": "string",
@@ -7584,6 +7643,10 @@
                   "nullable": true
                 },
                 "publicShareable": {
+                  "nullable": true,
+                  "type": "boolean"
+                },
+                "fromSuperEntity": {
                   "nullable": true,
                   "type": "boolean"
                 },
@@ -7988,7 +8051,7 @@
           "name",
           "id",
           "system_class",
-          "geometry",
+          "geometries",
           "children"
         ],
         "properties": {
@@ -8001,7 +8064,7 @@
           "system_class": {
             "type": "string"
           },
-          "geometry": {
+          "geometries": {
             "nullable": true,
             "oneOf": [
               {
@@ -8070,8 +8133,7 @@
       "Position": {
         "type": "array",
         "items": {
-          "type": "number",
-          "format": "double"
+          "type": "number"
         },
         "minItems": 2,
         "description": "A single position represented as an array of numbers.\nThe first two elements MUST be longitude and latitude (in that order).\nAn optional third element represents altitude. More elements are discouraged.\nExample: [10.9787, 49.7606] or [10.9787, 49.7606, 150.5]"
@@ -8317,7 +8379,6 @@
           },
           "url": {
             "type": "string",
-            "format": "uri",
             "example": "https://demo-dev.openatlas.eu/api/entity/50505"
           }
         },

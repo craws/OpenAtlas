@@ -136,11 +136,11 @@ class GetQuery(Resource):
         if parser is None:
             parser = query.parse_args()
         if not any([
-            parser['entities'],
-            parser['cidoc_classes'],
-            parser['view_classes'],
-            parser['system_classes'],
-            parser['linked_entities']]):
+                parser['entities'],
+                parser['cidoc_classes'],
+                parser['view_classes'],
+                parser['system_classes'],
+                parser['linked_entities']]):
             raise QueryEmptyError
         entities = []
         if parser['entities']:

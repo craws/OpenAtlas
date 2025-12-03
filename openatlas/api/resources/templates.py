@@ -215,8 +215,7 @@ def presentation_template() -> dict[str, Any]:
         'type': fields.String,
         'typeId': fields.Integer,
         'citation': fields.String,
-        'pages': fields.String
-    }
+        'pages': fields.String}
     files = {
         'id': fields.Integer,
         'title': fields.String,
@@ -226,6 +225,7 @@ def presentation_template() -> dict[str, Any]:
         'publicShareable': fields.Boolean,
         'mimetype': fields.String,
         'url': fields.String,
+        'fromSuperEntity': fields.Boolean,
         'IIIFManifest': fields.String,
         'IIIFBasePath': fields.String,
         'overlay': fields.String}

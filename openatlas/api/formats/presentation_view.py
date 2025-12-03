@@ -50,7 +50,8 @@ def get_presentation_types(
 
 def get_file_dict(
         link: Link,
-        overlay: Optional[Overlay] = None) -> dict[str, Any]:
+        overlay: Optional[Overlay] = None,
+        root: Optional[bool] = False) -> dict[str, str]:
     path = get_file_path(link.domain.id)
     mime_type = None
     if path:
@@ -63,6 +64,7 @@ def get_file_dict(
         'licenseHolder': link.domain.license_holder,
         'publicShareable': link.domain.public,
         'mimetype': mime_type,
+        'fromSuperEntity': root,
         'url': url_for(
             'api.display',
             filename=path.stem,
@@ -91,7 +93,7 @@ def get_presentation_files(
                 and parser.map_overlay \
                 and link_.range.id in root_ids:
             if overlay := overlays.get(link_.domain.id):
-                files.append(get_file_dict(link_, overlay))
+                files.append(get_file_dict(link_, overlay, root=True))
         elif link_.range.id == entity.id:
             files.append(
                 get_file_dict(link_, overlays.get(link_.domain.id)))
@@ -174,8 +176,9 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
                 'P46',
                 inverse=True)
             root_id = root_ids[-1] if root_ids else entity.id
-            place_hierarchy = Entity.get_linked_entity_ids_recursive(root_id,
-                                                                     'P46')
+            place_hierarchy = Entity.get_linked_entity_ids_recursive(
+                root_id,
+                'P46')
             place_hierarchy.extend(root_ids)
             ids.extend(place_hierarchy)
 
