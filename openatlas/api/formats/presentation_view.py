@@ -51,7 +51,7 @@ def get_presentation_types(
 def get_file_dict(
         link: Link,
         overlay: Optional[Overlay] = None,
-        root: Optional[bool] = False) -> dict[str, str]:
+        root: Optional[bool] = False) -> dict[str, Any]:
     path = get_file_path(link.domain.id)
     mime_type = None
     if path:

@@ -308,62 +308,64 @@ def orphans() -> str:
 @app.route('/check_files/<arche>')
 @required_group('contributor')
 def check_files(arche: Optional[str] = None) -> str:
-    columns = ['name', 'type', 'created', 'updated', 'description']
+    entities: list[Entity] = Entity.get_by_class('file', types=True)
+    result: dict[str, list[Entity]] = {
+        'missing_files': [],
+        'not_public': [],
+        'no_creator': [],
+        'no_license_holder': [],
+        'no_license': []}
+    for entity in entities:
+        if not get_file_path(entity):
+            result['missing_files'].append(entity)
+        if not entity.public:
+            result['not_public'].append(entity)
+        if not entity.creator:
+            result['no_creator'].append(entity)
+        if not entity.license_holder:
+            result['no_license_holder'].append(entity)
+        if not entity.standard_type:
+            result['no_license'].append(entity)
     tabs = {
-        'no_creator': Tab('no_creator', _('no creator'), table=Table(columns)),
+        'no_creator': Tab(
+            'no_creator',
+            _('no creator'),
+            table=entity_table(result['no_creator'])),
         'no_license_holder': Tab(
             'no_license_holder',
             _('no license holder'),
-            table=Table(columns)),
-        'not_public': Tab('not_public', _('not public'), table=Table(columns)),
-        'no_license': Tab('no_license', _('no license'), table=Table(columns)),
+            table=entity_table(result['no_license_holder'])),
+        'not_public': Tab(
+            'not_public',
+            _('not public'),
+            table=entity_table(result['not_public'])),
+        'no_license': Tab(
+            'no_license',
+            _('no license'),
+            table=entity_table(result['no_license'])),
         'missing_files': Tab(
             'missing_files',
             _('missing files'),
-            table=Table(columns)),
-        'duplicated_files': Tab(
-            'duplicated_files',
+            table=entity_table(result['missing_files'])),
+        'duplicates': Tab(
+            'duplicates',
             _('duplicated files'),
             table=Table(['domain', 'range']))}
-
     for tab in tabs.values():
         tab.buttons = [manual('admin/data_integrity_checks')]
-
-    entities: list[Entity] = Entity.get_by_class('file', types=True)
     if arche:
         type_ids = app.config['ARCHE_METADATA'].get('typeIds')
         if type_ids:
             entities = filter_by_type(entities, type_ids)
-    for entity in entities:
-        entity_for_table = [
-            link(entity),
-            link(entity.standard_type),
-            format_date(entity.created),
-            format_date(entity.modified),
-            entity.description]
-        if not get_file_path(entity):
-            tabs['missing_files'].table.rows.append(entity_for_table)
-        if not entity.public:
-            tabs['not_public'].table.rows.append(entity_for_table)
-        if not entity.creator:
-            tabs['no_creator'].table.rows.append(entity_for_table)
-        if not entity.license_holder:
-            tabs['no_license_holder'].table.rows.append(entity_for_table)
-        if not entity.standard_type:
-            tabs['no_license'].table.rows.append(entity_for_table)
-
-    duplicated_files = find_duplicates({e.id for e in entities})
-    all_duplicate_ids = set().union(*duplicated_files)
-    duplicate_entities = Entity.get_by_ids(list(all_duplicate_ids))
-    duplicate_entity_map = {e.id: e for e in duplicate_entities}
-    for duplicate_group in duplicated_files:
-        entity1 = duplicate_entity_map.get(duplicate_group[0])
-        entity2 = duplicate_entity_map.get(duplicate_group[1])
-        if entity1 and entity2:
-            tabs['duplicated_files'].table.rows.append([
-                link(entity1),
-                link(entity2)])
-
+    duplicates = find_duplicates({e.id for e in entities})
+    duplicate_ids = set().union(*duplicates)
+    mapping = {e.id: e for e in Entity.get_by_ids(list(duplicate_ids))}
+    for values in duplicates:
+        if entity1 := mapping.get(values[0]):
+            if entity2 := mapping.get(values[1]):
+                tabs['duplicates'].table.rows.append([
+                    link(entity1),
+                    link(entity2)])
     return render_template(
         'tabs.html',
         tabs=tabs,

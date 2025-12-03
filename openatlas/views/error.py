@@ -116,7 +116,7 @@ def entity_not_an_event(_e: Exception) -> tuple[Any, int]:
 
 
 @app.errorhandler(EntityNotAFileError)
-def entity_not_an_event(_e: Exception) -> tuple[Any, int]:
+def entity_not_a_file(_e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'Entity is not a file',
         'message': 'The requested entity has to be a file.',
