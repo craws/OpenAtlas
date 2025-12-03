@@ -3,11 +3,11 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.11i",
+    "version": "0.4.11j",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
-      "email": "bernhard.koschicek-krombholz@oeaw.ac.at"
+      "email": "bernhard.koschicek-krombhosedlz@oeaw.ac.at"
     },
     "license": {
       "name": "GPL-2.0",
