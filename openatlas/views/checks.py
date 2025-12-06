@@ -133,8 +133,8 @@ def check_similar() -> str:
                 f"{link(item['entity'])}<br>{'<br>'.join(similar)}",
                 len(item['entities']) + 1])
     content = display_form(form, manual_page='admin/data_integrity_checks')
-    content += ('<p class="uc-first">' + _('no entries') + '</p>') \
-        if table and not table.rows else ''
+    if not table.rows:  # pragma: no cover
+        content += '<p class="uc-first">' + _('no entries') + '</p>'
     return render_template(
         'tabs.html',
         tabs={'similar': Tab('similar', content=content, table=table)},
