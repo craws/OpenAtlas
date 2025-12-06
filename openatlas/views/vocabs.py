@@ -1,12 +1,13 @@
-from typing import Optional
+from typing import Any, Optional
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import BooleanField, SelectField, SelectMultipleField, widgets
-from wtforms.validators import InputRequired
+from wtforms import (
+    BooleanField, SelectField, SelectMultipleField, StringField, widgets)
+from wtforms.validators import InputRequired, URL
 
 from openatlas import app
 from openatlas.api.import_scripts.vocabs import (
@@ -19,7 +20,6 @@ from openatlas.display.util import button, display_info, link, required_group
 from openatlas.display.util2 import is_authorized, manual
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
-from openatlas.forms.form import get_vocabs_form
 from openatlas.models.entity import Entity
 from openatlas.models.settings import Settings
 
@@ -48,10 +48,22 @@ def vocabs_index() -> str:
             'VOCABS'])
 
 
+def vocabs_form() -> Any:
+    class Form(FlaskForm):
+        base_url = StringField(
+            _('base URL'),
+            validators=[InputRequired(), URL()])
+        endpoint = StringField(_('endpoint'), validators=[InputRequired()])
+        vocabs_user = StringField(_('user'))
+        save = SubmitField(_('save'))
+
+    return Form()
+
+
 @app.route('/vocabs/update', methods=['GET', 'POST'])
 @required_group('manager')
 def vocabs_update() -> str | Response:
-    form = get_vocabs_form()
+    form = vocabs_form()
     if form.validate_on_submit():
         Settings.update({
             'vocabs_base_url': form.base_url.data,

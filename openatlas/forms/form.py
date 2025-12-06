@@ -6,15 +6,15 @@ from flask import g, request
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import HiddenField, SelectMultipleField, StringField, widgets
+from wtforms import HiddenField, SelectMultipleField, widgets
 from wtforms.fields.simple import TextAreaField
-from wtforms.validators import InputRequired, URL
+from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.display.table import entity_table
 from openatlas.display.util2 import uc_first
 from openatlas.forms.add_fields import (
-    add_date_fields, add_type, filter_entities)
+    add_additional_link_fields, add_type, filter_entities)
 from openatlas.forms.field import (
     LinkTableField, SubmitField, TableCidocField, TableField, TableMultiField,
     TreeField)
@@ -47,26 +47,6 @@ def annotate_image_form(
             entity))
     setattr(Form, 'save', SubmitField(_('save')))
     return Form()
-
-
-def add_additional_link_fields(
-        form: Any,
-        relation: Relation,
-        link_: Optional[Link] = None) -> None:
-    for item in relation.additional_fields:
-        match item:
-            case 'dates':
-                add_date_fields(form, link_)
-            case 'description':
-                setattr(
-                    form,
-                    'description',
-                    TextAreaField(_(item), render_kw={'rows': 8}))
-            case 'page':
-                setattr(
-                    form,
-                    'description',
-                    StringField(_(item), render_kw={'rows': 8}))
 
 
 def link_form(origin: Entity, relation: Relation) -> Any:
@@ -188,24 +168,13 @@ def move_form(type_: Entity) -> Any:
                 choices.append((entity.id, place.name))
     elif root.name in app.config['PROPERTY_TYPES']:
         for row in Link.get_links_by_type(type_):
-            domain = Entity.get_by_id(row['domain_id'])
-            range_ = Entity.get_by_id(row['range_id'])
-            choices.append((row['id'], domain.name + ' - ' + range_.name))
+            choices.append((
+                row['id'],
+                Entity.get_by_id(row['domain_id']).name + ' - ' +
+                Entity.get_by_id(row['range_id']).name))
     else:
         for entity in type_.get_linked_entities('P2', inverse=True):
             choices.append((entity.id, entity.name))
     form = Form(obj=type_)
     form.selection.choices = choices
     return form
-
-
-def get_vocabs_form() -> Any:  # pragma: no cover
-    class Form(FlaskForm):
-        base_url = StringField(
-            _('base URL'),
-            validators=[InputRequired(), URL()])
-        endpoint = StringField(_('endpoint'), validators=[InputRequired()])
-        vocabs_user = StringField(_('user'))
-        save = SubmitField(_('save'))
-
-    return Form()
