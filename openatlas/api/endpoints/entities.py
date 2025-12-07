@@ -36,7 +36,6 @@ class GetBySystemClass(Resource):
             entity_.parse_args()).resolve()
 
 
-
 class GetByViewClass(Resource):
     @staticmethod
     def get(class_: str) -> tuple[Resource, int] | Response | dict[str, Any]:
@@ -119,6 +118,7 @@ class GetTypeEntitiesAll(Resource):
                 types=True,
                 aliases=True)
         return Endpoint(entities, entity_.parse_args()).resolve()
+
 
 class GetTableRows(Resource):
     @staticmethod

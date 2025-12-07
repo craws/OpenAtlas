@@ -44,7 +44,7 @@ def _expand_curie(curie: str) -> str:  # pragma: no cover
 
 def _resolve_predicate(
         key: str,
-        data_type: str | None = None) -> URIRef | None: # pragma: no cover
+        data_type: str | None = None) -> URIRef | None:  # pragma: no cover
     ctx = _linked_art_context.get("@context", {})
 
     if data_type and data_type in ctx:
@@ -107,7 +107,7 @@ def _add_triples_from_linked_art(
         graph: Graph,
         data: list[dict[str, Any]] | dict[str, Any],
         parent_subject: URIRef | BNode | None = None,
-        parent_predicate: URIRef | None = None) -> None: # pragma: no cover
+        parent_predicate: URIRef | None = None) -> None:  # pragma: no cover
     if not isinstance(data, dict):  # pragma: no cover - mypy
         return
 

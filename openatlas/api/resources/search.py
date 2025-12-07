@@ -99,7 +99,7 @@ def search_entity(entity: Entity, param: dict[str, Any]) -> bool:
     return found
 
 
-def value_to_be_searched(entity: Entity, param: dict[str, Any])  -> Any:
+def value_to_be_searched(entity: Entity, param: dict[str, Any]) -> Any:
     value: Any = []
     match param['category']:
         case "entityID" | "relationToID":

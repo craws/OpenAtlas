@@ -77,6 +77,7 @@ def check_type_count_needed(entity_id: int) -> bool:
         {'entity_id': entity_id})
     return bool(g.cursor.rowcount)
 
+
 def link_duplicates() -> list[dict[str, int]]:
     g.cursor.execute(
         """

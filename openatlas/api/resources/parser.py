@@ -259,7 +259,6 @@ query.add_argument(
     location='args')
 
 
-
 gis = default.copy()
 gis.add_argument(
     'geometry',
