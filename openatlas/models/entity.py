@@ -418,42 +418,35 @@ class Entity:
             'multiple': multiple})
         db.add_classes_to_hierarchy(self.id, classes)
 
-    def move_entities(self, new_type_id: int, checkbox_values: str) -> None:
-        Transaction.begin()
+    def change_type(self, new_type_id: int, checkbox_values: str) -> None:
         root = g.types[self.root[0]]
         entity_ids = ast.literal_eval(checkbox_values)
         delete_ids = []
-        try:
-            if new_type_id:  # A new type was selected
-                if root.multiple:
-                    cleaned_entity_ids = []
-                    for e in Entity.get_by_ids(entity_ids, types=True):
-                        if any(type_.id == int(new_type_id)
-                               for type_ in e.types):
-                            delete_ids.append(e.id)
-                            continue
-                        cleaned_entity_ids.append(e.id)
-                    entity_ids = cleaned_entity_ids
-                if entity_ids:
-                    data = {
-                        'old_type_id': self.id,
-                        'new_type_id': new_type_id,
-                        'entity_ids': tuple(entity_ids)}
-                    if root.name in app.config['PROPERTY_TYPES']:
-                        db.move_link_type(data)
-                    else:
-                        db.move_entity_type(data)
-            else:
-                delete_ids = entity_ids  # No type selected so delete all links
-            if delete_ids:
+        if new_type_id:  # A new type was selected
+            if root.multiple:
+                cleaned_entity_ids = []
+                for e in Entity.get_by_ids(entity_ids, types=True):
+                    if any(type_.id == int(new_type_id) for type_ in e.types):
+                        delete_ids.append(e.id)
+                        continue
+                    cleaned_entity_ids.append(e.id)
+                entity_ids = cleaned_entity_ids
+            if entity_ids:
+                data = {
+                    'old_type_id': self.id,
+                    'new_type_id': new_type_id,
+                    'entity_ids': tuple(entity_ids)}
                 if root.name in app.config['PROPERTY_TYPES']:
-                    db.remove_link_type(self.id, delete_ids)
+                    db.move_link_type(data)
                 else:
-                    db.remove_entity_type(self.id, delete_ids)
-            Transaction.commit()
-        except Exception as e:  # pragma: no cover
-            g.logger.log('error', 'database', 'type move failed', e)
-            raise e from None
+                    db.move_entity_type(data)
+        else:
+            delete_ids = entity_ids  # No type selected so delete all links
+        if delete_ids:
+            if root.name in app.config['PROPERTY_TYPES']:
+                db.remove_link_type(self.id, delete_ids)
+            else:
+                db.remove_entity_type(self.id, delete_ids)
 
     @staticmethod
     def get_file_info() -> dict[int, Any]:

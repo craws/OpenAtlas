@@ -170,7 +170,7 @@ class Display:
                                     button(
                                         _('move entities'),
                                         url_for(
-                                            'type_move_entities',
+                                            'change_type',
                                             id_=self.entity.id)))
                         case 'remove_reference_system_class' if not items \
                                 and is_authorized('manager'):

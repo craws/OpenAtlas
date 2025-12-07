@@ -69,7 +69,7 @@ class ActorTests(TestBaseCase):
         assert b'An entry has been created' in rv.data
 
         rv = c.post(
-            url_for('type_move_entities', id_=sex.subs[0]),
+            url_for('change_type', id_=sex.subs[0]),
             data={
                 sex.id: sex.subs[1],
                 'selection': [actor_id],

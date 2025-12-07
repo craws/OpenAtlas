@@ -202,7 +202,7 @@ class PlaceTest(TestBaseCase):
         assert b'https://d-nb.info' in rv.data
 
         rv = c.post(
-            url_for('type_move_entities', id_=unit_type.subs[0]),
+            url_for('change_type', id_=unit_type.subs[0]),
             data={
                 unit_type.id: unit_type.subs[1],
                 'selection': location.id,
@@ -211,7 +211,7 @@ class PlaceTest(TestBaseCase):
         assert b'Entities were updated' in rv.data
 
         rv = c.post(
-            url_for('type_move_entities', id_=unit_type.subs[1]),
+            url_for('change_type', id_=unit_type.subs[1]),
             data={
                 unit_type.id: unit_type.subs[0],
                 'selection': location.id,
