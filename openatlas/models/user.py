@@ -137,10 +137,6 @@ class User(UserMixin):
         return db.insert(data)
 
     @staticmethod
-    def get_users_for_form() -> list[tuple[int, str]]:
-        return db.get_users_for_form()
-
-    @staticmethod
     def toggle_bookmark(entity_id: int) -> str:
         if entity_id in current_user.bookmarks:
             db.delete_bookmark(current_user.id, entity_id)

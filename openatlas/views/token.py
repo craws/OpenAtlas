@@ -61,7 +61,8 @@ class ListTokenForm(FlaskForm):
 @required_group('admin')
 def api_token(user_id: int = 0) -> str | Response:
     form = ListTokenForm()
-    form.user.choices = [(0, _('all'))] + User.get_users_for_form()
+    form.user.choices = \
+        [(0, _('all'))] + [(u.id, u.username) for u in User.get_all()]
     user_id = user_id or 0
     revoked = 'all'
     valid = 'all'
@@ -151,7 +152,7 @@ def get_token_valid_column(token: dict[str, Any], user: User) -> str:
 @required_group('admin')
 def generate_token() -> str | Response:
     form = GenerateTokenForm()
-    form.user.choices = User.get_users_for_form()
+    form.user.choices = [(u.id, u.username) for u in User.get_all()]
     if form.validate_on_submit():
         user_ = User.get_by_id_without_bookmarks(int(form.user.data))
         token = ''

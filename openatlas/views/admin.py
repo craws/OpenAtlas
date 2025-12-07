@@ -385,7 +385,8 @@ def admin_file_iiif_delete(filename: str) -> Response:
 @required_group('admin')
 def log() -> str:
     form = LogForm()
-    form.user.choices = [(0, _('all'))] + User.get_users_for_form()
+    form.user.choices = \
+        [(0, _('all'))] + [(u.id, u.username) for u in User.get_all()]
     table = Table(
         ['date', 'priority', 'type', 'message', 'user', 'info'],
         order=[[0, 'desc']])

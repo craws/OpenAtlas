@@ -80,8 +80,7 @@ def get_overview_counts(classes: list[str]) -> dict[str, int]:
         SELECT openatlas_class_name AS name, COUNT(openatlas_class_name)
         FROM model.entity
         WHERE openatlas_class_name IN %(classes)s
-        GROUP BY openatlas_class_name
-        ORDER BY openatlas_class_name;
+        GROUP BY openatlas_class_name;
         """,
         {'classes': tuple(classes)})
     return {row['name']: row['count'] for row in list(g.cursor)}
@@ -108,8 +107,8 @@ def get_latest(classes: list[str], limit: int) -> list[dict[str, Any]]:
         """
         WHERE e.openatlas_class_name IN %(codes)s
         GROUP BY e.id
-        ORDER BY e.created
-        DESC LIMIT %(limit)s;
+        ORDER BY e.created DESC
+        LIMIT %(limit)s;
         """,
         {'codes': tuple(classes), 'limit': limit})
     return list(g.cursor)
@@ -300,8 +299,7 @@ def search(
             AND (
                 UNACCENT(LOWER(e.name)) LIKE UNACCENT(LOWER(%(term)s))
                 {description_clause if desc else ''})
-        GROUP BY e.id
-        ORDER BY e.name;
+        GROUP BY e.id;
         """,
         {'term': f'%{term}%', 'user_id': user_id, 'classes': tuple(classes)})
     return list(g.cursor)
