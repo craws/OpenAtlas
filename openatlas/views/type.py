@@ -7,7 +7,6 @@ from wtforms import BooleanField
 from wtforms.validators import InputRequired
 
 from openatlas import app
-from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table, entity_table
 from openatlas.display.util import (
@@ -83,12 +82,13 @@ def type_move_entities(id_: int) -> str | Response:
         abort(403)
     form = move_form(type_)
     if form.validate_on_submit():
-        Transaction.begin()
-        type_.move_entities(
-            getattr(form, str(root.id)).data,
-            form.checkbox_values.data)
-        Transaction.commit()
-        flash(_('Entities were updated'), 'success')
+        try:
+            type_.move_entities(
+                getattr(form, str(root.id)).data,
+                form.checkbox_values.data)
+            flash(_('Entities were updated'), 'success')
+        except Exception:  # pragma: no cover
+            flash(_('error transaction'), 'error')
         return redirect(
             f"{url_for('index', group='type')}"
             f"#menu-tab-{type_.category}_collapse-{root.id}")

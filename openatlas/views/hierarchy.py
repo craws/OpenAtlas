@@ -25,21 +25,15 @@ def hierarchy_insert(category: str) -> str | Response:
             form.name.errors.append(_('error name exists'))
         else:
             try:
-                Transaction.begin()
-                hierarchy = process_form(hierarchy, form)
                 Entity.insert_hierarchy(
-                    hierarchy,
+                    process_form(hierarchy, form),
                     category,
                     form.classes.data,
                     bool(
                         category == 'value' or (
                             hasattr(form, 'multiple')
                             and form.multiple.data)))
-                g.logger.log_user(hierarchy.id, 'insert')
-                Transaction.commit()
-            except Exception as e:  # pragma: no cover
-                Transaction.rollback()
-                g.logger.log('error', 'database', 'transaction failed', e)
+            except Exception:  # pragma: no cover
                 flash(_('error transaction'), 'error')
                 abort(418)
             flash(_('entity created'))

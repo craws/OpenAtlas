@@ -19,7 +19,6 @@ from wtforms import StringField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app
-from openatlas.database.connect import Transaction
 from openatlas.display.image_processing import create_resized_images
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
@@ -264,15 +263,11 @@ def settings(category: str) -> str | Response:
             if field.type == 'BooleanField':
                 value = 'True' if field.data else ''
             data[field.name] = value
-        Transaction.begin()
         try:
             Settings.update(data)
             g.logger.log('info', 'settings', 'Settings updated')
-            Transaction.commit()
             flash(_('info update'))
-        except Exception as e:  # pragma: no cover
-            Transaction.rollback()
-            g.logger.log('error', 'database', 'transaction failed', e)
+        except Exception:  # pragma: no cover
             flash(_('error transaction'), 'error')
         return redirect(redirect_url)
     if request.method == 'GET':

@@ -9,6 +9,7 @@ from werkzeug.exceptions import abort
 
 from openatlas import app
 from openatlas.database import entity as db, link as db_link
+from openatlas.database.connect import Transaction
 from openatlas.display.util2 import convert_size, sanitize
 from openatlas.models.annotation import AnnotationText
 from openatlas.models.dates import Dates
@@ -418,35 +419,41 @@ class Entity:
         db.add_classes_to_hierarchy(self.id, classes)
 
     def move_entities(self, new_type_id: int, checkbox_values: str) -> None:
+        Transaction.begin()
         root = g.types[self.root[0]]
         entity_ids = ast.literal_eval(checkbox_values)
         delete_ids = []
-        if new_type_id:  # A new type was selected
-            if root.multiple:
-                cleaned_entity_ids = []
-                for e in Entity.get_by_ids(entity_ids, types=True):
-                    if any(type_.id == int(new_type_id) for type_ in e.types):
-                        delete_ids.append(e.id)
-                        continue
-                    cleaned_entity_ids.append(e.id)
-                entity_ids = cleaned_entity_ids
-            if entity_ids:
-                data = {
-                    'old_type_id': self.id,
-                    'new_type_id': new_type_id,
-                    'entity_ids': tuple(entity_ids)}
-                if root.name in app.config['PROPERTY_TYPES']:
-                    db.move_link_type(data)
-                else:
-                    db.move_entity_type(data)
-        else:
-            delete_ids = entity_ids  # No new type selected so delete all links
-
-        if delete_ids:
-            if root.name in app.config['PROPERTY_TYPES']:
-                db.remove_link_type(self.id, delete_ids)
+        try:
+            if new_type_id:  # A new type was selected
+                if root.multiple:
+                    cleaned_entity_ids = []
+                    for e in Entity.get_by_ids(entity_ids, types=True):
+                        if any(type_.id == int(new_type_id)
+                               for type_ in e.types):
+                            delete_ids.append(e.id)
+                            continue
+                        cleaned_entity_ids.append(e.id)
+                    entity_ids = cleaned_entity_ids
+                if entity_ids:
+                    data = {
+                        'old_type_id': self.id,
+                        'new_type_id': new_type_id,
+                        'entity_ids': tuple(entity_ids)}
+                    if root.name in app.config['PROPERTY_TYPES']:
+                        db.move_link_type(data)
+                    else:
+                        db.move_entity_type(data)
             else:
-                db.remove_entity_type(self.id, delete_ids)
+                delete_ids = entity_ids  # No type selected so delete all links
+            if delete_ids:
+                if root.name in app.config['PROPERTY_TYPES']:
+                    db.remove_link_type(self.id, delete_ids)
+                else:
+                    db.remove_entity_type(self.id, delete_ids)
+            Transaction.commit()
+        except Exception as e:  # pragma: no cover
+            g.logger.log('error', 'database', 'type move failed', e)
+            raise e from None
 
     @staticmethod
     def get_file_info() -> dict[int, Any]:
@@ -750,16 +757,24 @@ class Entity:
 
     @staticmethod
     def insert_hierarchy(
-            type_: Entity,
+            hierarchy: Entity,
             category: str,
             classes: list[str],
             multiple: bool) -> None:
-        db.insert_hierarchy({
-            'id': type_.id,
-            'name': type_.name,
-            'multiple': multiple,
-            'category': category})
-        db.add_classes_to_hierarchy(type_.id, classes)
+        Transaction.begin()
+        try:
+            db.insert_hierarchy({
+                'id': hierarchy.id,
+                'name': hierarchy.name,
+                'multiple': multiple,
+                'category': category})
+            db.add_classes_to_hierarchy(hierarchy.id, classes)
+            g.logger.log_user(hierarchy.id, 'insert')
+            Transaction.commit()
+        except Exception as e:  # pragma: no cover
+            Transaction.rollback()
+            g.logger.log('error', 'database', 'transaction failed', e)
+            raise e from None
 
     @staticmethod
     def reference_system_counts() -> dict[str, int]:

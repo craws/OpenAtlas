@@ -23,9 +23,9 @@ from openatlas.forms.util import get_form_settings, set_form_settings
 
 
 class PasswordForm(FlaskForm):
-    password_old = PasswordField(_('old password'), [InputRequired()])
-    password = PasswordField(_('password'), [InputRequired()])
-    password2 = PasswordField(_('repeat password'), [InputRequired()])
+    password_old: Any = PasswordField(_('old password'), [InputRequired()])
+    password: Any = PasswordField(_('password'), [InputRequired()])
+    password2: Any = PasswordField(_('repeat password'), [InputRequired()])
     generate_password = generate_password_field()
     show_passwords = BooleanField(_('show passwords'))
     save = SubmitField(_('save'))
