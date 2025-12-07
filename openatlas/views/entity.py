@@ -346,7 +346,9 @@ def index(group: str) -> str | Response:
             crumbs=[_('type')])
 
     classes = ['place'] if group == 'place' else \
-        g.class_groups[group].get('classes', [group])
+        g.class_groups.get(group, {}).get('classes', [group])
+    if classes[0] not in g.classes:
+        abort(404)
     if group == 'reference_system':
         entities = list(g.reference_systems.values())
         counts = Entity.reference_system_counts()
