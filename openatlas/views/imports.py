@@ -20,7 +20,6 @@ from openatlas.api.import_scripts.util import (
     get_match_types, get_reference_system_by_name)
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.error import EntityDoesNotExistError
-from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
@@ -288,7 +287,6 @@ def import_data(project_id: int, class_: str) -> str:
                 checked_data,
                 project)
         except Exception as e:
-            g.logger.log('error', 'import', 'import check failed', e)
             flash(_('error at import'), 'error')
             return render_template(
                 'import_data.html',
@@ -301,19 +299,14 @@ def import_data(project_id: int, class_: str) -> str:
                     [_('import'), url_for('import_index')],
                     project,
                     class_label])
-
-        if not form.preview.data and checked_data and (
-                not file_data['backup_too_old'] or app.testing):
-            Transaction.begin()
+        if not form.preview.data \
+                and checked_data \
+                and (not file_data['backup_too_old'] or app.testing):
             try:
                 import_data_(project, class_, checked_data)
-                Transaction.commit()
-                g.logger.log('info', 'import', f'import: {len(checked_data)}')
                 flash(f"{_('import of')}: {len(checked_data)}")
                 imported = True
-            except Exception as e:  # pragma: no cover
-                Transaction.rollback()
-                g.logger.log('error', 'import', 'import failed', e)
+            except Exception:  # pragma: no cover
                 flash(_('error transaction'), 'error')
     return render_template(
         'import_data.html',

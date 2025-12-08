@@ -13,7 +13,6 @@ from openatlas import app
 from openatlas.api.import_scripts.vocabs import (
     fetch_top_concept_details, fetch_top_group_details,
     fetch_vocabulary_details, get_vocabularies, import_vocabs_data)
-from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import button, display_info, link, required_group
@@ -178,7 +177,6 @@ def vocabulary_import_view(category: str, id_: str) -> str | Response:
         try:
             results = import_vocabs_data(id_, form_data, details, category)
             count = len(results[0])
-            Transaction.commit()
             g.logger.log('info', 'import', f'import: {count} top concepts')
             import_str = f"{_('import of')}: {count} {_('top concepts')}"
             if results[1]:
@@ -190,7 +188,6 @@ def vocabulary_import_view(category: str, id_: str) -> str | Response:
                         f'Did not import "{duplicate}", duplicate.')
             flash(import_str)
         except Exception as e:  # pragma: no cover
-            Transaction.rollback()
             g.logger.log('error', 'import', 'import failed', e)
             flash(_('error transaction'), 'error')
         return redirect(f"{url_for('index', group='type')}#menu-tab-custom")

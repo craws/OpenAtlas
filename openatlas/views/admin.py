@@ -263,12 +263,9 @@ def settings(category: str) -> str | Response:
             if field.type == 'BooleanField':
                 value = 'True' if field.data else ''
             data[field.name] = value
-        try:
-            Settings.update(data)
-            g.logger.log('info', 'settings', 'Settings updated')
-            flash(_('info update'))
-        except Exception:  # pragma: no cover
-            flash(_('error transaction'), 'error')
+        Settings.update(data)
+        g.logger.log('info', 'settings', 'Settings updated')
+        flash(_('info update'))
         return redirect(redirect_url)
     if request.method == 'GET':
         set_form_settings(form)

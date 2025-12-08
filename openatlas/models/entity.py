@@ -756,20 +756,12 @@ class Entity:
             category: str,
             classes: list[str],
             multiple: bool) -> None:
-        Transaction.begin()
-        try:
-            db.insert_hierarchy({
-                'id': hierarchy.id,
-                'name': hierarchy.name,
-                'multiple': multiple,
-                'category': category})
-            db.add_classes_to_hierarchy(hierarchy.id, classes)
-            g.logger.log_user(hierarchy.id, 'insert')
-            Transaction.commit()
-        except Exception as e:  # pragma: no cover
-            Transaction.rollback()
-            g.logger.log('error', 'database', 'transaction failed', e)
-            raise e from None
+        db.insert_hierarchy({
+            'id': hierarchy.id,
+            'name': hierarchy.name,
+            'multiple': multiple,
+            'category': category})
+        db.add_classes_to_hierarchy(hierarchy.id, classes)
 
     @staticmethod
     def reference_system_counts() -> dict[str, int]:
