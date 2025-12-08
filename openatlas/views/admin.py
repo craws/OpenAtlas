@@ -184,8 +184,7 @@ def get_newsletter_button(users: list[User]) -> str:
 def get_user_table(users: list[User]) -> Table:
     table = Table([
         'username', 'name', 'group', 'email', 'newsletter', 'created',
-        'last login', 'entities'],
-        defs=[{'className': 'dt-body-right', 'targets': 7}])
+        'last login', 'entities'])
     if is_authorized('manager'):
         table.columns.append(_('info'))
     for user in users:

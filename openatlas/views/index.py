@@ -62,16 +62,11 @@ def overview() -> str:
         'notes': Tab(
             'notes',
             _('notes'),
-            table=Table(
-                ['date', _('visibility'), 'entity', 'class', _('note')]))}
+            table=Table(['date', _('visibility'), 'entity', 'class', 'note']))}
     tables: dict[str, Table] = {
-        'overview': Table(
-            [_('class'), _('count')],
-            paging=False,
-            defs=[{'className': 'dt-body-right', 'targets': 1}]),
-        'latest': Table([
-                _('latest'), _('name'), _('class'), _('begin'), _('end'),
-                _('user')],
+        'overview': Table([_('class'), _('count')], paging=False),
+        'latest': Table(
+            [_('latest'), 'name', 'class', 'begin', 'end', 'user'],
             paging=False,
             order=[[0, 'desc']])}
     for entity_id in current_user.bookmarks:

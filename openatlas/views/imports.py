@@ -286,7 +286,7 @@ def import_data(project_id: int, class_: str) -> str:
                 checks,
                 checked_data,
                 project)
-        except Exception as e:
+        except Exception:
             flash(_('error at import'), 'error')
             return render_template(
                 'import_data.html',

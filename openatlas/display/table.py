@@ -32,7 +32,6 @@ class Table:
     columns: list[str] = field(default_factory=list)
     rows: list[Any] = field(default_factory=list)
     order: list[Any] = field(default_factory=list)
-    defs: list[Any] = field(default_factory=list)
     paging: bool = True
 
     def display(self, name: str = 'default') -> str:
@@ -46,24 +45,34 @@ class Table:
                 'title':
                     uc_first(
                         _(name.replace('type_link', 'type').replace('_', ' ')))
-                    if name and name not in no_title else '',
-                'className':
-                    'dt-body-right' if name in ['count', 'size'] else ''}
+                    if name and name not in no_title else ''}
                     for name in self.columns] + [
                         {'title': '', 'className': ''} for _item in
                         range(len(self.rows[0]) - len(self.columns))],
             'paging': self.paging,
+            'columnDefs': self.table_defs(),
+            'order': self.order or '',
             'pageLength': current_user.settings['table_rows'],
             'autoWidth': 'false'}
-        if self.order:
-            data['order'] = self.order
-        if self.defs:
-            data['columnDefs'] = self.defs
         return render_template(
             'util/table.html',
             table=self,
             name=name,
             data=json.dumps(data))
+
+    def table_defs(self) -> list[dict[str, Any]]:
+        defs = []
+        for i, column in enumerate(self.columns):
+            match column:
+                case 'checkbox':
+                    defs += [{"orderDataType": "dom-checkbox", "targets": i}]
+                case 'code' | 'CIDOC class' | 'domain code' | 'range code':
+                    defs += [
+                        {'orderDataType': 'cidoc-model', 'targets': i},
+                        {'sType': 'numeric', 'targets': i}]
+                case 'count' | 'entities' | 'size' | 'value':
+                    defs += [{'className': 'dt-body-right', 'targets': i}]
+        return defs
 
 
 def entity_table(
@@ -85,7 +94,6 @@ def entity_table(
             default_columns = item.range.class_.group['table_columns']
     else:
         default_columns = item.class_.group['table_columns']
-    defs = []
     forms = forms or {}
     columns = (columns or default_columns) + (additional_columns or [])
 
@@ -93,7 +101,6 @@ def entity_table(
     if forms.get('checkbox'):
         columns.insert(0, 'checkbox')
         order = [[0, 'desc'], [1, 'asc']]
-        defs = [{"orderDataType": "dom-checkbox", "targets": 0}]
     elif columns[0] == 'created':
         order = [[0, "desc"]]
 
@@ -106,7 +113,7 @@ def entity_table(
 
     overlays = Overlay.get_by_object(origin) \
         if origin and 'overlay' in columns else {}
-    table = Table(columns, order=order, defs=defs)
+    table = Table(columns, order=order)
     for item in items:
         range_ = None
         if isinstance(item, Link):
