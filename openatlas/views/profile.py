@@ -12,7 +12,6 @@ from wtforms import BooleanField, PasswordField
 from wtforms.validators import InputRequired
 
 from openatlas import app
-from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.util import button, display_info
 from openatlas.display.util2 import manual, uc_first
@@ -121,17 +120,9 @@ def profile_settings(category: str) -> str | Response:
                 if field.type == 'BooleanField':
                     value = 'True' if value else ''
                 settings[field.name] = value
-        Transaction.begin()
-        try:
-            current_user.update()
-            current_user.update_settings(settings)
-            Transaction.commit()
-            session['language'] = current_user.settings['language']
-            flash(_('info update'))
-        except Exception as e:  # pragma: no cover
-            Transaction.rollback()
-            g.logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
+        current_user.update(settings)
+        session['language'] = current_user.settings['language']
+        flash(_('info update'))
         return redirect(f"{url_for('profile_index')}#tab-{category}")
     set_form_settings(form, True)
     return render_template(

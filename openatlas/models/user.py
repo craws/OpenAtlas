@@ -37,7 +37,7 @@ class User(UserMixin):
         self.created = row['created']
         self.modified = row['modified']
 
-    def update(self) -> None:
+    def update(self, settings: Optional[dict[str, Any]] = None) -> None:
         db.update({
             'id': self.id,
             'username': sanitize(self.username),
@@ -53,15 +53,14 @@ class User(UserMixin):
             'unsubscribe_code': self.unsubscribe_code,
             'password_reset_code': self.password_reset_code,
             'password_reset_date': self.password_reset_date})
+        if settings:
+            for name, value in settings.items():
+                db.update_settings(self.id, name, value)
+                if name == 'language':
+                    current_user.settings['language'] = value
 
     def delete(self) -> None:
         db.delete(self.id)
-
-    def update_settings(self, settings: dict[str, Any]) -> None:
-        for name, value in settings.items():
-            db.update_settings(self.id, name, value)
-            if name == 'language':
-                current_user.settings['language'] = value
 
     def remove_newsletter(self) -> None:
         db.remove_newsletter(self.id)

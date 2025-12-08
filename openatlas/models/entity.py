@@ -422,6 +422,7 @@ class Entity:
         root = g.types[self.root[0]]
         entity_ids = ast.literal_eval(checkbox_values)
         delete_ids = []
+        Transaction.begin()
         if new_type_id:  # A new type was selected
             if root.multiple:
                 cleaned_entity_ids = []
@@ -437,16 +438,17 @@ class Entity:
                     'new_type_id': new_type_id,
                     'entity_ids': tuple(entity_ids)}
                 if root.name in app.config['PROPERTY_TYPES']:
-                    db.move_link_type(data)
+                    db.change_link_type(data)
                 else:
-                    db.move_entity_type(data)
+                    db.change_type(data)
         else:
             delete_ids = entity_ids  # No type selected so delete all links
         if delete_ids:
             if root.name in app.config['PROPERTY_TYPES']:
                 db.remove_link_type(self.id, delete_ids)
             else:
-                db.remove_entity_type(self.id, delete_ids)
+                db.remove_type(self.id, delete_ids)
+        Transaction.commit()
 
     @staticmethod
     def get_file_info() -> dict[int, Any]:
