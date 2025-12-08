@@ -95,7 +95,7 @@ class TypeTest(TestBaseCase):
                 'superType': actor_type.id})
         assert rv.data.isdigit()
 
-        rv = c.get(url_for('ajax_get_type_tree', root_id=actor_type.id))
+        rv = c.get(url_for('ajax_type_tree', root_id=actor_type.id))
         assert b'New dynamic' in rv.data
 
         rv = c.post(url_for('update', id_=actor_type.id), data=data)

@@ -220,7 +220,7 @@ function ajaxBookmark(entityId) {
 async function ajaxAddEntity(data) {
   const newEntityId = await $.ajax({
     type: 'post',
-    url: '/ajax/add_entity',
+    url: '/ajax/entity/add',
     data: data,
   });
   return newEntityId;
@@ -229,7 +229,7 @@ async function ajaxAddEntity(data) {
 async function ajaxWikidataInfo(data) {
   $.ajax({
     type: 'post',
-    url: '/ajax/wikidata_info',
+    url: '/ajax/info/wikidata',
     data: 'id_=' + data,
     success: function (info) {
       $('#wikidata-info-div').html(info);
@@ -241,7 +241,7 @@ async function ajaxWikidataInfo(data) {
 async function ajaxGeonamesInfo(data) {
   $.ajax({
     type: 'post',
-    url: '/ajax/geonames_info',
+    url: '/ajax/info/geonames',
     data: 'id_=' + data,
     success: function (info) {
       $('#geonames-info-div').html(info);
@@ -253,7 +253,7 @@ async function ajaxGeonamesInfo(data) {
 async function ajaxGndInfo(data) {
   $.ajax({
     type: 'post',
-    url: '/ajax/gnd_info',
+    url: '/ajax/info/gnd',
     data: 'id_=' + data,
     success: function (info) {
       $('#gnd-info-div').html(info);
@@ -265,7 +265,7 @@ async function ajaxGndInfo(data) {
 async function ajaxAddType(data, fieldId, typeId, multiple=false) {
   const newTypeId = await $.ajax({
     type: 'post',
-    url: '/ajax/addtype',
+    url: '/ajax/type/add',
     data: data,
   });
   const typeTree = await getTypeTree(typeId);
@@ -286,7 +286,7 @@ async function ajaxAddType(data, fieldId, typeId, multiple=false) {
 }
 
 function getTypeTree(rootId){
-  return $.ajax({type: 'get', url: `/ajax/get_type_tree/${rootId}`});
+  return $.ajax({type: 'get', url: `/ajax/type/tree/${rootId}`});
 }
 
 function updateTree(id, d, refreshCallback) {
