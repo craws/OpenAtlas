@@ -51,7 +51,7 @@ class Table:
                         range(len(self.rows[0]) - len(self.columns))],
             'paging': self.paging,
             'columnDefs': self.table_defs(),
-            'order': self.order or '',
+            'order': self.order or [],
             'pageLength': current_user.settings['table_rows'],
             'autoWidth': 'false'}
         return render_template(
