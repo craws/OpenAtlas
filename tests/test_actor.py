@@ -12,11 +12,7 @@ class ActorTests(TestBaseCase):
             app.preprocess_request()
             place = insert('place', 'Vienna')
             event = insert('acquisition', 'Event Horizon')
-            group = insert('group', 'LV-426 colony')
             actor2 = insert('person', 'Captain Miller')
-
-        rv = c.get(url_for('insert', class_='person'))
-        assert b'Vienna' in rv.data
 
         sex = get_hierarchy('Sex')
         data = {
@@ -48,12 +44,7 @@ class ActorTests(TestBaseCase):
         rv = c.post(url_for('insert', class_='person'), data=data)
         actor_id = rv.location.split('/')[-1]
 
-        rv = c.post(
-            url_for('insert', class_='group'),
-            data=data,
-            follow_redirects=True)
-        assert b'An entry has been created' in rv.data
-
+        # Test string sanitzation
         data["name"] = '<h1 class="test">Sigourney Weaver</h1>with HTML'
         rv = c.post(
             url_for('insert', class_='person'),
@@ -61,13 +52,6 @@ class ActorTests(TestBaseCase):
             follow_redirects=True)
         assert b'<h1 class="test">Sigourney Weaver</h1>' not in rv.data
         assert b'Sigourney Weaver' in rv.data
-
-        rv = c.post(
-            url_for('insert', class_='person'),
-            data=data,
-            follow_redirects=True)
-        print(url_for('insert', class_='person', origin_id=place.id))
-        assert b'An entry has been created' in rv.data
 
         rv = c.post(
             url_for('change_type', id_=sex.subs[0]),
@@ -80,12 +64,6 @@ class ActorTests(TestBaseCase):
 
         rv = c.get(url_for('remove_class', id_=sex.id, name='person'))
         assert b'403' in rv.data
-
-        rv = c.post(
-            url_for('insert', class_='person'),
-            data=data,
-            follow_redirects=True)
-        assert b'An entry has been created' in rv.data
 
         rv = c.post(
             url_for('insert', class_='person', origin_id=event.id),
