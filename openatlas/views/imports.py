@@ -139,7 +139,7 @@ def import_index() -> str:
             format_number(project.count),
             project.description])
     buttons = [manual('admin/import')]
-    if is_authorized('admin'):
+    if is_authorized('manager'):
         buttons.append(button(_('project'), url_for('import_project_insert')))
     return render_template(
         'content.html',
