@@ -62,6 +62,12 @@ def reference_systems(entity: Entity) -> str:
         system = g.reference_systems[link_.domain.id]
         show_info_button = ''
         info_div = ''
+        logo = f"""
+            <div
+                class="circle bg-body-secondary fw-bold text-black-50"
+                style="height: 16px; font-size: 12px;">
+                        {system.name.upper()[0]}
+                    </div>"""
         if system.name in ['GeoNames', 'GND', 'Wikidata']:
             name = system.name.lower()
             show_info_button += (
@@ -70,10 +76,13 @@ def reference_systems(entity: Entity) -> str:
                 f'onclick="ajax{uc_first(name)}Info'
                 f'(\'{link_.description}\')">' + _('show info') + '</button>')
             info_div = f'<div id="{name}-info-div" class="bg-gray"></div>'
+            logo = f"""<img src="/static/images/logos/{system.name}.svg" alt=""
+                class="rounded-circle object-fit-cover my-1" width="16"/>"""
 
         entry = f"""
             <li class="list-group-item bg-transparent">
-                <div class="d-flex gap-2 align-items-start">
+                <div class="d-flex gap-2 align-items-center">
+                {logo}
                 <span>
                     <b>{link(link_.domain)}</b>{
                         f": {link_.description}"
