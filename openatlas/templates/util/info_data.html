@@ -1,8 +1,9 @@
-<table class="table table-no-style">
+<div class="border p-2">
+<table class="table table-sm table-no-style mb-0">
   {% for label, value in data.items() %}
     {% if value or value == 0 %}
       <tr>
-        <td class="text-nowrap fit-width">{{ label|uc_first }}</td>
+        <td class="text-nowrap fit-width fw-bold">{{ label|uc_first }}</td>
         <td class="table-cell">
           {% if value is iterable and value is not string %}
             {{ '<br>'.join(value)|safe }}
@@ -14,3 +15,4 @@
     {% endif %}
   {% endfor %}
 </table>
+</div>

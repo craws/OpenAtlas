@@ -70,12 +70,16 @@ def reference_systems(entity: Entity) -> str:
                     </div>"""
         if system.name in ['GeoNames', 'GND', 'Wikidata']:
             name = system.name.lower()
+            show_info = f"<span id='show'>{_('show info')}</span>"
+            hide_info = f"""<span id='hide' class='d-none'>
+                                {_('hide info')}
+                            </span>"""
             show_info_button += (
                 f' <button id="{name}-switch" class="uc-first mt-1 me-1 '
                 f'{app.config["CSS"]["button"]["secondary"]}"'
                 f'onclick="ajax{uc_first(name)}Info'
-                f'(\'{link_.description}\')">' + _('show info') + '</button>')
-            info_div = f'<div id="{name}-info-div" class="bg-gray"></div>'
+                f'(\'{link_.description}\')">{show_info}{hide_info}</button>')
+            info_div = f'<div id="{name}-info-div" class="mt-2"></div>'
             logo = f"""<img src="/static/images/logos/{system.name}.svg" alt=""
                 class="rounded-circle object-fit-cover my-1" width="16"/>"""
 
@@ -105,23 +109,6 @@ def reference_systems(entity: Entity) -> str:
             </li>
             """
         html += entry
-        # system = g.reference_systems[link_.domain.id]
-        # html += link(
-        #     f'{system.resolver_url}{link_.description}',
-        #     f'{system.resolver_url}{link_.description}',
-        #     external=True) if system.resolver_url else link_.description
-        # html += \
-        #     f' ({g.types[link_.type.id].name} ' + _('at') + \
-        #     f' {link(link_.domain)})'
-        # if system.name in ['GeoNames', 'GND', 'Wikidata']:
-        #     name = system.name.lower()
-        #     html += (
-        #         f' <span id="{name}-switch" class="uc-first '
-        #         f'{app.config["CSS"]["button"]["secondary"]}"'
-        #         f'onclick="ajax{uc_first(name)}Info'
-        #         f'(\'{link_.description}\')">' + _('show') + '</span>'
-        #         f'<div id="{name}-info-div" class="bg-gray"></div>')
-        # html += '<br>'
     html += '</ul>'
     return html
 
