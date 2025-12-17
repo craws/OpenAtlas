@@ -177,7 +177,7 @@ class Display:
         if empty_tabs:
             self.tabs['additional'] = Tab(
                 'additional',
-                '+ ' + uc_first(_('relation')))
+                '+ ' + uc_first(_('add')))
             self.tabs['additional'].content = ''
             for name in empty_tabs:
                 if self.tabs[name].buttons:
