@@ -64,7 +64,7 @@ def reference_systems(entity: Entity) -> str:
         info_div = ''
         logo = f"""
             <div
-                class="circle bg-body-secondary fw-bold text-black-50"
+                class="circle bg-gray fw-bold text-black-50"
                 style="height: 16px; font-size: 12px;">
                         {system.name.upper()[0]}
                     </div>"""
@@ -88,9 +88,7 @@ def reference_systems(entity: Entity) -> str:
                 <div class="d-flex gap-2 align-items-center">
                 {logo}
                 <span>
-                    <b>{link(link_.domain)}</b>{
-                        f": {link_.description}"
-                        if system.resolver_url else "" }
+                    <b>{link(link_.domain)}</b>: {link_.description}
                 </span>
                 <span class="badge badge-pill rounded-pill
                     badge-secondary bg-secondary">
@@ -104,7 +102,7 @@ def reference_systems(entity: Entity) -> str:
                 external=True,
                 icon='fa-external-link-alt',
                 class_="btn btn-sm btn-outline-primary mt-1")
-                if system.resolver_url else link_.description}
+                if system.resolver_url else ''}
                 {info_div}
             </li>
             """
