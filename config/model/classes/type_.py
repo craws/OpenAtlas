@@ -12,13 +12,13 @@ type_ = {
     'relations': {
         'super': {
             'label': _('super'),
-            'classes': 'type',
+            'classes': ['type'],
             'property': 'P127',
             'mode': 'direct',
             'required': True},
         'subs': {
             'label': _('subs'),
-            'classes': 'type',
+            'classes': ['type'],
             'property': 'P127',
             'multiple': True,
             'inverse': True,
@@ -52,13 +52,13 @@ administrative_unit = {
     'relations': {
         'super': {
             'label': _('super'),
-            'classes': 'administrative_unit',
+            'classes': ['administrative_unit'],
             'property': 'P89',
             'mode': 'direct',
             'required': True},
         'subs': {
             'label': _('subs'),
-            'classes': 'administrative_unit',
+            'classes': ['administrative_unit'],
             'property': 'P89',
             'multiple': True,
             'inverse': True,
@@ -67,7 +67,7 @@ administrative_unit = {
                 'columns': ['name', 'count', 'description']}},
         'entities': {
             'label': _('entities'),
-            'classes': 'object_location',
+            'classes': ['object_location'],
             'property': 'P89',
             'inverse': True,
             'multiple': True,

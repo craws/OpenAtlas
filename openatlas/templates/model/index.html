@@ -54,5 +54,15 @@
         </div>
       </div>
     </div>
+    <div class="row">
+      <div class="col m-2">
+        <p style="font-weight: bold">{{ _('relations')|uc_first }}</p>
+        {{ tables.model_relations.display('relations')|safe }}
+      </div>
+      <div class="col m-2">
+        <p style="font-weight: bold">{{ _('invalid relations')|uc_first }}</p>
+        {{ tables.invalid_relations.display('invalid')|safe }}
+      </div>
+    </div>
   </div>
 {% endblock %}

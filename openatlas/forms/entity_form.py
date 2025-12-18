@@ -22,7 +22,6 @@ from openatlas.forms.validation import file, validate
 from openatlas.models.dates import Dates, form_to_datetime64
 from openatlas.models.entity import Entity, insert
 from openatlas.models.gis import InvalidGeomException
-from openatlas.models.openatlas_class import get_reverse_relation
 
 
 def get_entity_form(
@@ -36,7 +35,7 @@ def get_entity_form(
 
     add_name_fields(Form, entity)
     add_class_types(Form, entity.class_)
-    add_relations(Form, entity, origin)
+    add_relations(Form, entity, origin, relation)
     add_reference_systems(Form, entity.class_)
     for key, value in entity.class_.attributes.items():
         match key:
@@ -208,7 +207,10 @@ def process_relations(
         if entity.class_.group['name'] == 'type' \
                 and relation.name == 'super' \
                 and not ids:
-            ids = [entity.root[0] if entity.root else origin.id]
+            if entity.root:
+                ids.append(entity.root[0])
+            elif origin:
+                ids.append(origin.id)
         if ids:
             entities = Entity.get_by_ids(ids)
             if 'object_location' in relation.classes:
@@ -217,19 +219,15 @@ def process_relations(
                     locations.append(place.get_linked_entity_safe('P53'))
                 entities = locations
             entity.link(relation.property, entities, inverse=relation.inverse)
-
     if origin and relation_name:
         origin_relation = origin.class_.relations[relation_name]
-        if not origin.class_.relations[relation_name].additional_fields:
-            reverse_relation = get_reverse_relation(
-                origin.class_,
-                origin_relation,
-                entity.class_)
-            if not reverse_relation or reverse_relation.mode != 'direct':
-                origin.link(
-                    origin_relation.property,
-                    entity,
-                    inverse=origin_relation.inverse)
+        if not origin_relation.additional_fields and (
+                not origin_relation.reverse_relation
+                or origin_relation.reverse_relation.mode != 'direct'):
+            origin.link(
+                origin_relation.property,
+                entity,
+                inverse=origin_relation.inverse)
 
 
 def delete_links(entity: Entity) -> None:
@@ -287,12 +285,15 @@ def process_dates(form: Any) -> dict[str, Any]:
     return dates.to_timestamp()
 
 
-def process_files(
+def process_form(
+        entity: Entity,
         form: Any,
-        origin: Entity | None,
-        relation: str | None) -> Entity | None:
+        origin: Optional[Entity] = None,
+        relation: Optional[str] = None) -> Entity:
+    if not hasattr(form, 'file'):
+        return process_form_data(entity, form, origin, relation)
     filenames = []
-    entity = None
+    entity = Entity({'openatlas_class_name': 'file'})
     try:
         entity_name = form.name.data.strip()
         for count, file_ in enumerate(form.file.data):

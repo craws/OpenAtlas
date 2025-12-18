@@ -62,16 +62,11 @@ def overview() -> str:
         'notes': Tab(
             'notes',
             _('notes'),
-            table=Table(
-                ['date', _('visibility'), 'entity', 'class', _('note')]))}
-    tables = {
-        'overview': Table(
-            [_('class'), _('count')],
-            paging=False,
-            defs=[{'className': 'dt-body-right', 'targets': 1}]),
-        'latest': Table([
-                _('latest'), _('name'), _('class'), _('begin'), _('end'),
-                _('user')],
+            table=Table(['date', _('visibility'), 'entity', 'class', 'note']))}
+    tables: dict[str, Table] = {
+        'overview': Table([_('class'), _('count')], paging=False),
+        'latest': Table(
+            [_('latest'), 'name', 'class', 'begin', 'end', 'user'],
             paging=False,
             order=[[0, 'desc']])}
     for entity_id in current_user.bookmarks:
@@ -153,7 +148,7 @@ def index_feedback() -> str | Response:
                 form.subject.data + f" from {g.settings['site_name']}",
                 body,
                 g.settings['mail_recipients_feedback']):
-            flash(_('info feedback thanks'), 'info')
+            flash(_('info feedback thanks'))
         else:
             flash(_('error mail send'), 'error')  # pragma: no cover
         return redirect(url_for('overview'))

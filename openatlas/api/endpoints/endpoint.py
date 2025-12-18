@@ -15,7 +15,7 @@ from openatlas.api.formats.csv import (
 from openatlas.api.formats.linked_places import (
     get_lp_file, get_lp_links, get_lp_time)
 from openatlas.api.formats.loud import get_loud_entities
-from openatlas.api.formats.rdf import rdf_output
+from openatlas.api.formats.rdf import rdf_output  # type: ignore
 from openatlas.api.resources.resolve_endpoints import (
     download, parse_loud_context)
 from openatlas.api.resources.templates import (
@@ -105,10 +105,14 @@ class Endpoint:
         self.get_pagination()
         self.reduce_entities_to_limit()
         if self.parser.format == 'table_row':
+            forms = {'checkbox': True, 'selection_ids': []}
+            if self.parser.checked:
+                forms['selection_ids'] = self.parser.checked
             return {
                 "results": entity_table(
                     items=self.entities,
-                    columns=self.parser.table_columns).rows,
+                    columns=self.parser.table_columns,
+                    forms=forms).rows,
                 "pagination": {
                     'entitiesPerPage': int(self.parser.limit),
                     'entities': self.pagination['count'],
@@ -227,10 +231,14 @@ class Endpoint:
     def sort_entities(self) -> None:
         if 'latest' in request.path:
             return
+
+        def safe_key(entity: Entity) -> tuple[str, str | int, str]:
+            return self.parser.get_key(entity)
+
         self.entities = sorted(
             self.entities,
-            key=self.parser.get_key,
-            reverse=bool(self.parser.sort == 'desc'))
+            key=safe_key,
+            reverse=bool(self.parser.sort == "desc"))
 
     def remove_duplicates(self) -> None:
         exists: set[int] = set()
@@ -320,16 +328,18 @@ class Endpoint:
         items = []
         for links_ in inverse_l:
             if links_.property.code == 'P134':
-                items.append({
-                    "name": links_.domain.name,
-                    "id": links_.domain.id,
-                    "system_class": links_.domain.class_.name,
-                    "geometries":
-                        self.entities_with_links[links_.domain.id]['geometry'],
-                    "children":
-                        self.walk_event_tree(
+                items.append(
+                    {
+                        "name": links_.domain.name,
+                        "id": links_.domain.id,
+                        "system_class": links_.domain.class_.name,
+                        "geometries":
                             self.entities_with_links[links_.domain.id][
-                                'links_inverse'])})
+                                'geometry'],
+                        "children":
+                            self.walk_event_tree(
+                                self.entities_with_links[links_.domain.id][
+                                    'links_inverse'])})
         return items
 
     def prepare_rdf_export_data(self) -> Iterator[dict[str, Any]]:

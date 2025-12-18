@@ -36,7 +36,6 @@ class GetBySystemClass(Resource):
             entity_.parse_args()).resolve()
 
 
-
 class GetByViewClass(Resource):
     @staticmethod
     def get(class_: str) -> tuple[Resource, int] | Response | dict[str, Any]:
@@ -120,6 +119,7 @@ class GetTypeEntitiesAll(Resource):
                 aliases=True)
         return Endpoint(entities, entity_.parse_args()).resolve()
 
+
 class GetTableRows(Resource):
     @staticmethod
     def get() -> tuple[Resource, int] | Response | dict[str, Any]:
@@ -136,11 +136,11 @@ class GetQuery(Resource):
         if parser is None:
             parser = query.parse_args()
         if not any([
-            parser['entities'],
-            parser['cidoc_classes'],
-            parser['view_classes'],
-            parser['system_classes'],
-            parser['linked_entities']]):
+                parser['entities'],
+                parser['cidoc_classes'],
+                parser['view_classes'],
+                parser['system_classes'],
+                parser['linked_entities']]):
             raise QueryEmptyError
         entities = []
         if parser['entities']:

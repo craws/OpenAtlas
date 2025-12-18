@@ -356,7 +356,7 @@ INSERT INTO web.hierarchy (id, name, category, multiple, directional) VALUES
   ((SELECT id FROM model.entity WHERE name='License'), 'License', 'standard', False, False),
   ((SELECT id FROM model.entity WHERE name='Place'), 'Place', 'standard', False, False),
   ((SELECT id FROM model.entity WHERE name='Radiocarbon'), 'Radiocarbon', 'tools', False, False),
-  ((SELECT id FROM model.entity WHERE name='Sex'), 'Sex', 'custom', False, False),
+  ((SELECT id FROM model.entity WHERE name='Sex'), 'Sex', 'custom', True, False),
   ((SELECT id FROM model.entity WHERE name='Source'), 'Source', 'standard', False, False),
   ((SELECT id FROM model.entity WHERE name='Source translation'), 'Source translation', 'standard', False, False),
   ((SELECT id FROM model.entity WHERE name='Stratigraphic unit'), 'Stratigraphic unit', 'standard', False, False);

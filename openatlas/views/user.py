@@ -100,7 +100,8 @@ class ActivityForm(FlaskForm):
 @required_group('readonly')
 def user_activity(user_id: int = 0, entity_id: Optional[int] = None) -> str:
     form = ActivityForm()
-    form.user.choices = [(0, _('all'))] + User.get_users_for_form()
+    form.user.choices = \
+        [(0, _('all'))] + [(u.id, u.username) for u in User.get_all()]
     limit = 100
     user_id = user_id or 0
     action = 'all'
@@ -192,7 +193,7 @@ def user_delete(id_: int) -> Response:
             or (user.group == 'admin' and not is_authorized('admin')):
         abort(403)
     user.delete()
-    flash(_('user deleted'), 'info')
+    flash(_('user deleted'))
     return redirect(f"{url_for('admin_index')}#tab-user")
 
 
@@ -240,7 +241,7 @@ def user_update(id_: int) -> str | Response:
         user.description = form.description.data
         user.group = form.group.data
         user.update()
-        flash(_('info update'), 'info')
+        flash(_('info update'))
         return redirect(url_for('user_view', id_=id_))
     if user.id == current_user.id:
         del form.active
@@ -272,7 +273,7 @@ def user_insert() -> str | Response:
             'password': bcrypt.hashpw(
                 form.password.data.encode('utf-8'),
                 bcrypt.gensalt()).decode('utf-8')})
-        flash(_('user created'), 'info')
+        flash(_('user created'))
         if g.settings['mail'] and form.send_info.data:
             subject = _(
                 'Your account information for %(sitename)s',
@@ -287,8 +288,7 @@ def user_insert() -> str | Response:
             if send_mail(subject, body, form.email.data, False):
                 flash(
                     _('Sent account information mail to %(email)s.',
-                      email=form.email.data),
-                    'info')
+                      email=form.email.data))
             else:  # pragma: no cover
                 flash(
                     _('Failed to send account details to %(email)s.',
@@ -330,7 +330,7 @@ def first_admin() -> str | Response:
             'password': bcrypt.hashpw(
                 form.password.data.encode('utf-8'),
                 bcrypt.gensalt()).decode('utf-8')})
-        flash(_('user created'), 'info')
+        flash(_('user created'))
         return redirect(url_for('login'))
     return render_template(
         'content.html',

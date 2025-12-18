@@ -26,7 +26,7 @@ class PlaceTest(TestBaseCase):
             f'reference_system_id_{g.geonames.id}':
                 ['123456', self.precision_type.subs[0]]}
         rv = c.post(
-            url_for('insert', class_='place', origin_id=reference.id),
+            url_for('insert', class_='place'),
             data=data,
             follow_redirects=True)
         assert b'Asgard' in rv.data and b'An entry has been' in rv.data
@@ -126,7 +126,7 @@ class PlaceTest(TestBaseCase):
         with open(Path(app.root_path) / 'static' / 'images' / 'layout'
                   / 'logo.png', 'rb') as img:
             rv = c.post(
-                url_for('insert', class_='file', origin_id=place.id),
+                url_for('insert', class_='file'),
                 data={'name': 'X-Files', 'file': img},
                 follow_redirects=True)
         assert b'An entry has been created' in rv.data
@@ -197,23 +197,10 @@ class PlaceTest(TestBaseCase):
             url_for('link_insert', origin_id=reference.id, name='place'))
         assert b'Val-hall' in rv.data
 
-        rv = c.get(
-            url_for('link_insert', origin_id=place.id, name='reference'))
-        assert b'https://d-nb.info' in rv.data
-
         rv = c.post(
-            url_for('type_move_entities', id_=unit_type.subs[0]),
+            url_for('change_type', id_=unit_type.subs[0]),
             data={
                 unit_type.id: unit_type.subs[1],
-                'selection': location.id,
-                'checkbox_values': str([location.id])},
-            follow_redirects=True)
-        assert b'Entities were updated' in rv.data
-
-        rv = c.post(
-            url_for('type_move_entities', id_=unit_type.subs[1]),
-            data={
-                unit_type.id: unit_type.subs[0],
                 'selection': location.id,
                 'checkbox_values': str([location.id])},
             follow_redirects=True)
@@ -231,38 +218,44 @@ class PlaceTest(TestBaseCase):
         rv = c.post(url_for('insert', class_='feature'), data=data)
         feat_id = rv.location.split('/')[-1]
 
-        rv = c.get(url_for('update', id_=feat_id))
-        assert b'Val-hall' in rv.data
-
         data['continue_'] = 'sub'
-        rv = c.get(
-            url_for('insert', class_='stratigraphic_unit', origin_id=feat_id),
+
+        rv = c.post(
+            url_for(
+                'insert',
+                class_='feature',
+                origin_id=place.id,
+                relation='feature'),
+            follow_redirects=True,
             data=data)
-        assert b'insert and add human remains' in rv.data
+        assert b'An entry has been created' in rv.data
+
+        rv = c.post(
+            url_for(
+                'insert',
+                class_='stratigraphic_unit',
+                origin_id=feat_id,
+                relation='stratigraphic_unit'),
+            data=data,
+            follow_redirects=True)
+        assert b'An entry has been created' in rv.data
 
         data['name'] = "I'm a stratigraphic unit"
         data['super'] = feat_id
         del data['continue_']
-        rv = c.post(
-            url_for('insert', class_='stratigraphic_unit', origin_id=feat_id),
-            data=data)
+        rv = c.post(url_for('insert', class_='stratigraphic_unit'), data=data)
         strati_id = rv.location.split('/')[-1]
-
-        rv = c.get(url_for('update', id_=strati_id))
-        assert b'a stratigraphic unit' in rv.data
 
         data = {
             'name': 'You never find me',
             'super': strati_id,
             get_hierarchy('Dimensions').subs[0]: 50}
-        rv = c.post(
-            url_for('insert', class_='artifact', origin_id=strati_id),
-            data=data)
+        rv = c.post(url_for('insert', class_='artifact'), data=data)
         find_id = rv.location.split('/')[-1]
 
         # Create a second artifact to test siblings pager
         rv = c.post(
-            url_for('insert', class_='artifact', origin_id=strati_id),
+            url_for('insert', class_='artifact'),
             data=data,
             follow_redirects=True)
         assert b'An entry has been created' in rv.data
@@ -272,7 +265,7 @@ class PlaceTest(TestBaseCase):
 
         remains_type = get_hierarchy('Human remains')
         rv = c.post(
-            url_for('insert', class_='human_remains', origin_id=strati_id),
+            url_for('insert', class_='human_remains'),
             data={
                 'name': 'My human remains',
                 'actor': actor.id,
@@ -287,12 +280,6 @@ class PlaceTest(TestBaseCase):
                 origin_id=strati_id,
                 relation='artifact'))
         assert b'exists' in rv.data
-
-        rv = c.get(url_for('update', id_=human_remains_id))
-        assert b'My human remains' in rv.data
-
-        rv = c.get('/')
-        assert b'My human remains' in rv.data
 
         rv = c.get(url_for('view', id_=remains_type.subs[0]))
         assert b'My human remains' in rv.data
@@ -347,17 +334,5 @@ class PlaceTest(TestBaseCase):
         rv = c.get(url_for('sex_delete', id_=strati_id), follow_redirects=True)
         assert b'tools' in rv.data
 
-        rv = c.post(
-            url_for('update', id_=strati_id),
-            data={'name': 'New name', 'super': feat_id},
-            follow_redirects=True)
-        assert b'Changes have been saved' in rv.data
-
         rv = c.get(url_for('view', id_=feat_id))
         assert b'not a bug' in rv.data
-
-        rv = c.get(url_for('view', id_=find_id))
-        assert b'You never' in rv.data
-
-        rv = c.get(url_for('delete', id_=place.id), follow_redirects=True)
-        assert b'403' in rv.data

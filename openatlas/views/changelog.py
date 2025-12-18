@@ -20,7 +20,13 @@ versions = {
         'features': {
             '2464': 'OpenAtlas major version 9.0.0',
             '2634': 'Removal of creation and event class, changed acquisition',
-            '2657': 'API: 4.11.0'}}],
+            '2675': 'New tab layout',
+            '2649': 'New buttons layout',
+            '2442': 'Text annotation: show orphans',
+            '2589': 'Color coding for map',
+            '2657': 'API: 4.11.0',
+            '2478': 'API: Format for tables',
+            '2681': 'API: Additional columns for sorting'}}],
     '8.15.1': ['2025-11-17', {
         'fix': {
             '2679': 'API: Duplicated operationId in OpenAPI',

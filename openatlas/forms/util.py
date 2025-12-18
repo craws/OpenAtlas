@@ -10,6 +10,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField
 
 from openatlas import app
+from openatlas.display.util2 import is_authorized
+from openatlas.models.entity import Entity
 
 
 def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
@@ -80,3 +82,29 @@ class GlobalSearchForm(FlaskForm):
 @app.context_processor
 def inject_template_functions() -> dict[str, str | GlobalSearchForm]:
     return {'search_form': GlobalSearchForm(prefix='global')}
+
+
+def deletion_possible(entity: Entity) -> bool:
+    if not is_authorized(entity.class_.write_access):
+        return False
+    if current_user.group == 'contributor':
+        info = g.logger.get_log_info(entity.id)
+        if not info['creator'] or info['creator'].id != current_user.id:
+            return False
+    match entity.class_.group['name']:
+        case 'reference_system' if entity.system or entity.classes:
+            return False
+        case 'type':
+            if entity.category == 'system' \
+                    or (entity.category == 'standard' and not entity.root):
+                return False
+            return True
+    for relation in entity.class_.relations.values():
+        if relation.reverse_relation \
+                and relation.reverse_relation.required \
+                and entity.get_linked_entities(
+                    relation.property,
+                    relation.classes,
+                    relation.inverse):
+            return False
+    return True

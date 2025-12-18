@@ -9,9 +9,9 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import get_file_path, link, required_group
 from openatlas.display.util2 import is_authorized, manual
-from openatlas.models.dates import format_date
 from openatlas.forms.form import annotate_image_form
 from openatlas.models.annotation import AnnotationImage
+from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity
 
 
@@ -29,7 +29,7 @@ def annotation_image_insert(id_: int) -> str | Response:
             entity_id=form.entity.data,
             text=form.text.data)
         return redirect(url_for('annotation_image_insert', id_=image.id))
-    table = None
+    table = Table()
     if annotations := AnnotationImage.get_by_file_id(image.id):
         rows = []
         for annotation in annotations:
@@ -91,6 +91,6 @@ def annotation_image_update(id_: int) -> str | Response:
 def annotation_image_delete(id_: int) -> Response:
     annotation = AnnotationImage.get_by_id(id_)
     annotation.delete()
-    flash(_('annotation deleted'), 'info')
+    flash(_('annotation deleted'))
     return redirect(
         url_for('annotation_image_insert', id_=annotation.image_id))

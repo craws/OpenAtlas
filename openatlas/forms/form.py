@@ -6,49 +6,22 @@ from flask import g, request
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import HiddenField, SelectMultipleField, StringField, widgets
+from wtforms import HiddenField, SelectMultipleField, widgets
 from wtforms.fields.simple import TextAreaField
-from wtforms.validators import InputRequired, URL
+from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.display.table import entity_table
 from openatlas.display.util2 import uc_first
-from openatlas.forms.add_fields import add_date_fields, add_type
+from openatlas.forms.add_fields import (
+    add_additional_link_fields, add_type, filter_entities)
 from openatlas.forms.field import (
     LinkTableField, SubmitField, TableCidocField, TableField, TableMultiField,
     TreeField)
 from openatlas.forms.populate import populate_dates
 from openatlas.forms.validation import validate
-from openatlas.models.entity import Entity, Link, get_entity_ids_with_links
-from openatlas.models.openatlas_class import Relation, get_reverse_relation
-
-
-def filter_entities(
-        entity: Entity,
-        items: list[Entity],
-        relation: Relation,
-        is_link_form: bool = False) -> list[Entity]:
-    filter_ids = [entity.id]
-    if relation.name in ['subs', 'super']:
-        filter_ids += [
-            e.id for e in entity.get_linked_entities_recursive(
-                relation.property,
-                relation.name == 'subs')]
-    if is_link_form:
-        reverse_relation = get_reverse_relation(
-            entity.class_,
-            relation,
-            g.classes[relation.classes[0]])
-        if reverse_relation and not reverse_relation.multiple:
-            filter_ids += get_entity_ids_with_links(
-                relation.property,
-                relation.classes,
-                relation.inverse)
-        filter_ids += [
-            e.id for e in entity.get_linked_entities(
-                relation.property,
-                inverse=relation.inverse)]
-    return [item for item in items if item.id not in filter_ids]
+from openatlas.models.entity import Entity, Link
+from openatlas.models.openatlas_class import Relation
 
 
 def annotate_image_form(
@@ -67,26 +40,13 @@ def annotate_image_form(
         Form,
         'entity',
         TableField(
-            Entity.get_by_id(image_id).get_linked_entities('P67', sort=True),
+            Entity.get_by_id(image_id).get_linked_entities(
+                'P67',
+                aliases=True,
+                sort=True),
             entity))
     setattr(Form, 'save', SubmitField(_('save')))
     return Form()
-
-
-def add_additional_link_fields(
-        form: Any,
-        relation: Relation,
-        link_: Optional[Link] = None) -> None:
-    for item in relation.additional_fields:
-        match item:
-            case 'dates':
-                add_date_fields(form, link_)
-            case 'description':
-                setattr(form, 'description', TextAreaField(_(item)))
-            case 'page':
-                setattr(form, 'description', StringField(_(item)))
-            case 'Actor relation' | 'Actor function' | 'Involvement':
-                add_type(form, Entity.get_hierarchy(item))
 
 
 def link_form(origin: Entity, relation: Relation) -> Any:
@@ -113,14 +73,14 @@ def link_detail_form(
 
     selection = Entity.get_by_id(selection_id) if selection_id else None
     validators = [InputRequired()]
-    if 'domain' in relation.additional_fields:
+    if 'actor' in relation.additional_fields:
         entities = Entity.get_by_class(
             origin.class_.name,
             types=True,
             aliases=current_user.settings['table_show_aliases'])
         setattr(
             Form,
-            'domain',
+            'actor',
             TableField(entities, selection=origin, validators=validators))
     if relation.type:
         add_type(Form, Entity.get_hierarchy(relation.type))
@@ -204,29 +164,17 @@ def move_form(type_: Entity) -> Any:
                 'P89',
                 inverse=True,
                 sort=True):
-            place = entity.get_linked_entity('P53', inverse=True)
-            if place:
+            if place := entity.get_linked_entity('P53', inverse=True):
                 choices.append((entity.id, place.name))
     elif root.name in app.config['PROPERTY_TYPES']:
         for row in Link.get_links_by_type(type_):
-            domain = Entity.get_by_id(row['domain_id'])
-            range_ = Entity.get_by_id(row['range_id'])
-            choices.append((row['id'], domain.name + ' - ' + range_.name))
+            choices.append((
+                row['id'],
+                Entity.get_by_id(row['domain_id']).name + ' - ' +
+                Entity.get_by_id(row['range_id']).name))
     else:
         for entity in type_.get_linked_entities('P2', inverse=True):
             choices.append((entity.id, entity.name))
     form = Form(obj=type_)
     form.selection.choices = choices
     return form
-
-
-def get_vocabs_form() -> Any:  # pragma: no cover
-    class Form(FlaskForm):
-        base_url = StringField(
-            _('base URL'),
-            validators=[InputRequired(), URL()])
-        endpoint = StringField(_('endpoint'), validators=[InputRequired()])
-        vocabs_user = StringField(_('user'))
-        save = SubmitField(_('save'))
-
-    return Form()

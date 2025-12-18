@@ -9,7 +9,6 @@ from wtforms import IntegerField, SelectField, StringField
 from wtforms.validators import InputRequired
 
 from openatlas import app
-from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
     button, display_info, link, remove_link, required_group)
@@ -123,16 +122,9 @@ def sex(id_: int) -> str | Response:
 
 @app.route('/tools/sex/delete/<int:id_>')
 @required_group('contributor')
-def sex_delete(id_: int) -> str | Response:
-    try:
-        Transaction.begin()
-        for dict_ in get_sex_types(id_):
-            Link.delete_(dict_['link_id'])
-        Transaction.commit()
-    except Exception as e:  # pragma: no cover
-        Transaction.rollback()
-        g.logger.log('error', 'database', 'transaction failed', e)
-        flash(_('error transaction'), 'error')
+def sex_delete(id_: int) -> Response:
+    for dict_ in get_sex_types(id_):
+        Link.delete_(dict_['link_id'])
     return redirect(url_for('tools_index', id_=id_))
 
 
@@ -163,14 +155,7 @@ def sex_update(id_: int) -> str | Response:
         data = form.data
         data.pop('save', None)
         data.pop('csrf_token', None)
-        try:
-            Transaction.begin()
-            SexEstimation.save(entity, data)
-            Transaction.commit()
-        except Exception as e:  # pragma: no cover
-            Transaction.rollback()
-            g.logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
+        SexEstimation.save(entity, data)
         return redirect(url_for('sex', id_=entity.id))
 
     for item in get_sex_types(entity.id):
@@ -250,7 +235,7 @@ def carbon_update(id_: int) -> str | Response:
                 'range': form.range.data,
                 'timeScale': 'BP'},
             link_=carbon_link)
-        flash(_('info update'), 'info')
+        flash(_('info update'))
         return redirect(url_for('tools_index', id_=entity.id))
     if request.method == 'GET' and carbon_link:
         data = json.loads(carbon_link.description)

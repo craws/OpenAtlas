@@ -60,7 +60,7 @@ def note_set_private(id_: int) -> str | Response:
         abort(403)
     note = User.get_note_by_id(id_)
     User.update_note(note['id'], note['text'], False)
-    flash(_('note updated'), 'info')
+    flash(_('note updated'))
     return redirect(f"{url_for('view', id_=note['entity_id'])}#tab-note")
 
 
@@ -75,7 +75,7 @@ def note_insert(entity_id: int) -> str | Response:
             current_user.id,
             form.description.data,
             form.public.data)
-        flash(_('note added'), 'info')
+        flash(_('note added'))
         return redirect(f"{url_for('view', id_=entity.id)}#tab-note")
     return render_template(
         'content.html',
@@ -95,7 +95,7 @@ def note_update(id_: int) -> str | Response:
     form = NoteForm()
     if form.validate_on_submit():
         User.update_note(note['id'], form.description.data, form.public.data)
-        flash(_('note updated'), 'info')
+        flash(_('note updated'))
         return redirect(f"{url_for('view', id_=note['entity_id'])}#tab-note")
     form.save.label.text = _('save')
     form.description.data = note['text']
@@ -114,5 +114,5 @@ def note_delete(id_: int) -> Response:
     if note['user_id'] != current_user.id:
         abort(403)
     User.delete_note(note['id'])
-    flash(_('note deleted'), 'info')
+    flash(_('note deleted'))
     return redirect(f"{url_for('view', id_=note['entity_id'])}#tab-note")

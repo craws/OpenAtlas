@@ -1,10 +1,7 @@
 from typing import Any, Optional
 
 from openatlas.database import (
-    cidoc_class as db_class,
-    cidoc_property as db_property,
-    entity as db_entity,
-    link as db_link)
+    cidoc as db, entity as db_entity, link as db_link)
 
 
 def get_all_entities_as_dict() -> list[dict[str, Any]]:
@@ -16,19 +13,19 @@ def get_all_links_as_dict() -> list[dict[str, Any]]:
 
 
 def get_properties() -> list[dict[str, Any]]:
-    return db_property.get_properties()
+    return db.cidoc_properties()
 
 
 def get_property_hierarchy() -> list[dict[str, Any]]:
-    return db_property.get_hierarchy()
+    return db.property_hierarchy()
 
 
 def get_classes() -> list[dict[str, Any]]:
-    return db_class.get_classes()
+    return db.cidoc_classes()
 
 
 def get_cidoc_hierarchy() -> list[dict[str, Any]]:
-    return db_class.get_hierarchy()
+    return db.class_hierarchy()
 
 
 def get_all_links_for_network(

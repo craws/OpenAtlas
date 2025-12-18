@@ -22,7 +22,7 @@ class FileTest(TestBaseCase):
             app.root_path) / 'static' / 'images' / 'layout' / 'logo.png'
         with open(logo, 'rb') as img_1, open(logo, 'rb') as img_2:
             rv: Any = c.post(
-                url_for('insert', class_='file', origin_id=place.id),
+                url_for('insert', class_='file'),
                 data={
                     'name': 'OpenAtlas logo',
                     'public': True,
@@ -283,8 +283,8 @@ class FileTest(TestBaseCase):
 
         rv = c.get(
             url_for(
-                'admin_annotation_relink',
-                image_id=iiif_id,
+                'admin_annotation_image_relink',
+                origin_id=iiif_id,
                 entity_id=place.id),
             follow_redirects=True)
         assert b'Entities relinked' in rv.data
@@ -295,7 +295,7 @@ class FileTest(TestBaseCase):
 
         rv = c.get(
             url_for(
-                'admin_annotation_remove_entity',
+                'admin_annotation_image_remove_entity',
                 annotation_id=1,
                 entity_id=place.id),
             follow_redirects=True)
@@ -324,7 +324,7 @@ class FileTest(TestBaseCase):
             iiif_file.delete_links('P67', classes=['file', 'place'])
 
         rv = c.get(
-            url_for('admin_annotation_delete', id_=2),
+            url_for('admin_annotation_image_delete', id_=2),
             follow_redirects=True)
         assert b'Annotation deleted' in rv.data
 

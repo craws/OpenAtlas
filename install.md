@@ -152,7 +152,7 @@ application.
 ## Tests
 Install required packages:
 
-    sudo apt install python3-coverage python3-pytest python3-pytes-cov
+    sudo apt install python3-coverage python3-pytest python3-pytest-cov
 
 As postgres:
 

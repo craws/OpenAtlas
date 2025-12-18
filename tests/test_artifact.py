@@ -15,7 +15,12 @@ class ArtifactTest(TestBaseCase):
             place = insert('place', 'Home')
             sub_artifact = insert('artifact', 'Sub artifact')
 
-        rv = c.get(url_for('insert', class_='artifact', origin_id=place.id))
+        rv = c.get(
+            url_for(
+                'insert',
+                class_='artifact',
+                origin_id=place.id,
+                relation='artifact'))
         assert b'+ Artifact' in rv.data
 
         rv = c.post(
@@ -63,11 +68,16 @@ class ArtifactTest(TestBaseCase):
             follow_redirects=True)
         assert b'Necronomicon' in rv.data
 
-        rv = c.get(url_for('insert', class_='move', origin_id=artifact_id))
+        rv = c.get(
+            url_for(
+                'insert',
+                class_='move',
+                origin_id=artifact_id,
+                relation='move'))
         assert b'A little hate' in rv.data
 
         rv = c.post(
-            url_for('insert', class_='move', origin_id=artifact_id),
+            url_for('insert', class_='move'),
             data={'name': 'Event Zero', 'moved_artifact': [artifact_id]},
             follow_redirects=True)
         assert b'Event Zero' in rv.data
@@ -75,9 +85,7 @@ class ArtifactTest(TestBaseCase):
         rv = c.get(url_for('insert', class_='artifact', origin_id=actor.id))
         assert b'Conan' in rv.data
 
-        rv = c.get(
-            url_for('delete', id_=artifact_id),
-            follow_redirects=True)
+        rv = c.get(url_for('delete', id_=artifact_id), follow_redirects=True)
         assert b'The entry has been deleted' in rv.data
 
         rv = c.get(url_for('user_view', id_=self.alice_id))

@@ -26,6 +26,7 @@ class Api(ApiTestCase):
                     'public': True},
                 follow_redirects=True)
 
+        c.get(url_for('logout'))
         with app.test_request_context():
             app.preprocess_request()
             for entity in ApiEntity.get_by_cidoc_classes(['all']):
@@ -514,22 +515,40 @@ class Api(ApiTestCase):
             assert rv['properties']['@id']
             assert rv['properties']['systemClass']
 
-        for rv in [c.get(
-                url_for(
-                    'api_04.query',
-                    cidoc_classes='E18',
-                    view_classes='artifact',
-                    system_classes='person',
-                    format='table_row')),
-            c.get(
-                url_for(
-                    'api_04.table_rows',
-                    cidoc_classes='E18',
-                    view_classes='artifact',
-                    system_classes='person'))]:
+        for rv in [
+                c.get(
+                    url_for(
+                        'api_04.query',
+                        cidoc_classes='E18',
+                        view_classes='artifact',
+                        system_classes='person',
+                        format='table_row')),
+                c.get(
+                    url_for(
+                        'api_04.table_rows',
+                        cidoc_classes='E18',
+                        view_classes='artifact',
+                        system_classes='person'))]:
             rv = rv.get_json()['results']
             assert 'Bar' in rv[0][0]
             assert 'The One Ring' in rv[-1][0]
+
+        # Just test if not filter not crashes. Can be more detailed.
+        columns = [
+            "id", "name", "cidoc_class", "system_class", "type", "checkbox",
+            "class", "created", "creator", "content", "description",
+            "extension", "icon", "group", "license_holder", "license",
+            "public", "size", "begin_from", "begin_to", "end_from", "end_to",
+            "begin", "end"]
+        for column in columns:
+            checked = [place.id] if column == 'checkbox' else []
+            with c.get(
+                    url_for(
+                        'api_04.table_rows',
+                        system_classes=['file', 'place', 'person', 'group'],
+                        column=column,
+                        checked=checked)) as rv:
+                assert '1' in str(rv.get_json()['pagination']['totalPages'])
 
         # Test entities with Linked Open Usable Data Format
         rv = c.get(
@@ -967,6 +986,12 @@ class Api(ApiTestCase):
         rv = c.get(url_for('api_04.display', filename=f'{file_not_public.id}'))
         assert 'Not public' in rv.get_json()['title']
         assert b'Endpoint not found' in c.get('/api/entity2').data
+
+        rv = c.get(url_for('api_04.display', filename='some_string'))
+        assert 'Filename is not an integer' in rv.get_json()['title']
+
+        rv = c.get(url_for('api_04.display', filename=place.id))
+        assert 'Entity is not a file' in rv.get_json()['title']
 
         c.get(url_for('logout'))
         app.config['ALLOWED_IPS'] = []

@@ -2,7 +2,8 @@ from typing import Any
 
 from flask import g, url_for
 
-from tests.base import TestBaseCase, get_hierarchy
+from openatlas import app
+from tests.base import TestBaseCase, get_hierarchy, insert
 
 
 class HierarchyTest(TestBaseCase):
@@ -28,10 +29,10 @@ class HierarchyTest(TestBaseCase):
         assert b'The name is already in use' in rv.data
 
         hierarchy = get_hierarchy('Geronimo')
-        data[f'reference_system_id_{g.wikidata.id}'] \
-            = ['Q123', self.precision_type.subs[0]]
         data['classes'] = ['acquisition']
         data['entity_id'] = hierarchy.id
+        data[f'reference_system_id_{g.wikidata.id}'] \
+            = ['Q123', self.precision_type.subs[0]]
         rv = c.post(
             url_for('hierarchy_update', id_=hierarchy.id),
             data=data,
@@ -68,8 +69,17 @@ class HierarchyTest(TestBaseCase):
             data={'name': 'Secret type', 'description': 'Very important!'})
         type_id = rv.location.split('/')[-1]
 
+        with app.test_request_context():
+            app.preprocess_request()
+            insert('person', 'x').link(
+                'P2',
+                [g.types[sex.subs[0]], g.types[sex.subs[1]]])
+
+        rv = c.get(url_for('hierarchy_update', id_=sex.id))
+        assert b'checked class="" id="multiple"' not in rv.data
+
         rv = c.get(
-            url_for('remove_class', id_=hierarchy.id, name='person'),
+            url_for('remove_class', id_=hierarchy.id, name='source'),
             follow_redirects=True)
         assert b'Changes have been saved' in rv.data
 

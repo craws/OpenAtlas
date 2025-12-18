@@ -10,14 +10,17 @@ from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import entity_table
 from openatlas.display.util import (
-    bookmark_toggle, button, button_bar, description,
-    display_annotation_text_links, format_entity_date, get_appearance,
-    get_chart_data, get_file_path, get_system_data, link, reference_systems)
+    bookmark_toggle, button, button_bar, description, format_entity_date,
+    get_appearance, get_chart_data, get_file_path, get_system_data, link,
+    reference_systems)
 from openatlas.display.util2 import (
-    display_bool, is_authorized, manual, uc_first)
+    display_bool, is_authorized, manual, sanitize, uc_first)
+from openatlas.forms.util import deletion_possible
+from openatlas.models.annotation import AnnotationText
 from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
+from openatlas.models.openatlas_class import Relation
 from openatlas.models.user import User
 from openatlas.views.tools import carbon_result, sex_result
 
@@ -88,7 +91,7 @@ class Display:
                 label = self.entity.class_.attributes['description']['label']
             if 'annotated' in self.entity.class_.attributes['description'] \
                     and self.entity.class_.attributes['description']:
-                description_ = display_annotation_text_links(self.entity)
+                description_ = annotation_text_links(self.entity)
         if self.entity.category != 'value':
             text += description(description_, label)
 
@@ -106,12 +109,15 @@ class Display:
 
     def add_tabs(self) -> None:
         self.tabs = {'info': Tab('info')}
-
         for name, relation in self.entity.class_.relations.items():
             if not relation.mode == 'tab':
                 continue
             entity_for_links = self.entity
-            if relation.via_location and self.entity.class_.name == 'place':
+            if self.entity.class_.name == 'place' \
+                    and self.entity.location \
+                    and relation.reverse_relation \
+                    and relation.reverse_relation.classes \
+                    == ['object_location']:
                 entity_for_links = self.entity.location
             items = []
             for item in entity_for_links.get_links(
@@ -124,55 +130,13 @@ class Display:
                         inverse=True,
                         types=True)
                 items.append(item)
-            buttons = [link_] if (link_ := manual(f'entity/{name}')) else []
-            if is_authorized('contributor'):
-                for button_name in relation.tab['buttons']:
-                    match button_name:
-                        case 'link':
-                            buttons.append(
-                                button(
-                                    _('link'),
-                                    url_for(
-                                        'link_insert_detail'
-                                        if relation.additional_fields
-                                        else 'link_insert',
-                                        origin_id=self.entity.id,
-                                        name=name)))
-                        case 'insert':
-                            for class_ in relation.classes:
-                                buttons.append(
-                                    button(
-                                        g.classes[class_].label,
-                                        url_for(
-                                            'insert',
-                                            class_=class_,
-                                            origin_id=self.entity.id,
-                                            relation=name),
-                                        tooltip_text=g.classes[class_].
-                                        display['tooltip']))
-                        case 'move' if items:
-                            root = g.types[self.entity.root[0]]
-                            if root.category not in ['system', 'value']:
-                                buttons.append(
-                                    button(
-                                        _('move entities'),
-                                        url_for(
-                                            'type_move_entities',
-                                            id_=self.entity.id)))
-                        case 'remove_reference_system_class' if not items \
-                                and is_authorized('manager'):
-                            buttons.append(
-                                button(
-                                    _('remove'),
-                                    url_for(
-                                        'reference_system_remove_class',
-                                        system_id=self.entity.id,
-                                        name=name)))
-                        case 'show_all_iiif':
-                            buttons.append(
-                                button(
-                                    _('view all IIIF images'),
-                                    url_for('view_iiif', id_=self.entity.id)))
+            if relation.name == 'relative':
+                for item in entity_for_links.get_links(
+                        relation.property,
+                        relation.classes,
+                        not relation.inverse):
+                    item.range = item.domain
+                    items.append(item)
             columns = relation.tab['columns']
             if self.entity.category == 'value' and relation.name == 'entities':
                 columns = ['name', 'value', 'class', 'description']
@@ -182,6 +146,12 @@ class Display:
                 items = [
                     Link.get_by_id(row['id']) for row in
                     Link.get_links_by_type(self.entity)]
+            buttons = self.get_buttons(name, relation, items) \
+                if is_authorized('contributor') else []
+            if relation.classes:
+                group = g.classes[relation.classes[0]].group.get('name')
+                if buttons and group and (link_ := manual(f'entity/{group}')):
+                    buttons.insert(0, link_)
             self.tabs[name] = Tab(
                 name,
                 relation.label,
@@ -207,14 +177,66 @@ class Display:
         if empty_tabs:
             self.tabs['additional'] = Tab(
                 'additional',
-                '+ ' + uc_first(_('relation')),
-                '')
+                '+ ' + uc_first(_('add')))
+            self.tabs['additional'].content = ''
             for name in empty_tabs:
                 if self.tabs[name].buttons:
                     self.tabs['additional'].content += \
                         f"<h2>{self.tabs[name].label}</h2>" + \
                         button_bar(self.tabs[name].buttons)
                 del self.tabs[name]
+
+    def get_buttons(
+            self,
+            name: str,
+            relation: Relation,
+            items: list[Any]) -> list[str]:
+        buttons = []
+        for button_name in relation.tab['buttons']:
+            match button_name:
+                case 'link':
+                    buttons.append(
+                        button(
+                            _('link'),
+                            url_for(
+                                'link_insert_detail' if
+                                relation.additional_fields else 'link_insert',
+                                origin_id=self.entity.id,
+                                name=name)))
+                case 'insert':
+                    for class_ in relation.classes:
+                        buttons.append(
+                            button(
+                                g.classes[class_].label,
+                                url_for(
+                                    'insert',
+                                    class_=class_,
+                                    origin_id=self.entity.id,
+                                    relation=name),
+                                tooltip_text=g.classes[class_].
+                                display['tooltip']))
+                case 'move' if items:
+                    root = g.types[self.entity.root[0]]
+                    if root.category not in ['system', 'value']:
+                        buttons.append(
+                            button(
+                                _('move entities'),
+                                url_for('change_type', id_=self.entity.id)))
+                case 'remove_reference_system_class' \
+                        if not items and is_authorized('manager'):
+                    buttons.append(
+                        button(
+                            _('remove'),
+                            url_for(
+                                'reference_system_remove_class',
+                                system_id=self.entity.id,
+                                name=name)))
+                case 'show_all_iiif':
+                    buttons.append(
+                        button(
+                            _('view all IIIF images'),
+                            url_for('view_iiif', id_=self.entity.id)))
+        return buttons
 
     def add_note_tab(self) -> None:
         buttons = [manual('tools/notes')]
@@ -237,10 +259,7 @@ class Display:
         self.buttons = []
         if manual_link := manual(f"entity/{self.entity.class_.group['name']}"):
             self.buttons.append(manual_link)
-        if self.entity.class_.name == 'source_translation':
-            self.buttons = [manual('entity/source')]
         self.add_button_update()
-        self.add_button_delete()
         for item in self.entity.class_.display['buttons']:
             match item:
                 case 'copy' if is_authorized(self.entity.class_.write_access):
@@ -250,8 +269,9 @@ class Display:
                             url_for(
                                 'update',
                                 id_=self.entity.id,
-                                copy='copy_')))
-
+                                copy='copy_'),
+                            icon_name='fa-clone',
+                            css_class='me-2'))
                 case 'download':
                     if path := get_file_path(self.entity.id):
                         self.buttons.append(
@@ -269,17 +289,21 @@ class Display:
                             url_for(
                                 'network',
                                 dimensions=0,
-                                id_=self.entity.id)))
+                                id_=self.entity.id),
+                            icon_name="fa-project-diagram"))
                 case 'selectable' if is_authorized('editor'):
                     self.add_button_selectable()
                 case 'stratigraphic_tools' if is_authorized('editor'):
                     self.buttons.append(
                         button(
                             _('tools'),
-                            url_for('tools_index', id_=self.entity.id)))
-        self.buttons.append(bookmark_toggle(self.entity.id))
+                            url_for('tools_index', id_=self.entity.id),
+                            icon_name="fa-tools"))
+
         self.buttons.append(
             render_template('util/api_links.html', entity=self.entity))
+        self.buttons.append(bookmark_toggle(self.entity.id))
+        self.add_button_delete()
 
     def add_button_selectable(self) -> None:
         if not self.entity.selectable:
@@ -294,23 +318,28 @@ class Display:
                     url_for('type_unset_selectable', id_=self.entity.id)))
 
     def add_button_delete(self) -> None:
-        from openatlas.views.entity import deletion_possible
         if not deletion_possible(self.entity):
             return
         msg = _(
             'Delete %(name)s?',
             name=escape(self.entity.name.replace('\'', '')))
-        self.buttons.append(button(
-            _('delete'),
-            url_for('delete', id_=self.entity.id),
-            onclick=f"return confirm('{msg}')"))
+        self.buttons.append(
+            button(
+                _('delete'),
+                url_for('delete', id_=self.entity.id),
+                onclick=f"return confirm('{msg}')",
+                icon_name='fa-trash',
+                variant='danger'))
 
     def add_button_update(self) -> None:
         if not is_authorized(self.entity.class_.write_access) \
                 or self.problematic_type:
             return
         self.buttons.append(
-            button(_('edit'), url_for('update', id_=self.entity.id)))
+            button(
+                _('edit'),
+                url_for('update', id_=self.entity.id),
+                icon_name='fa-pen'))
 
     def add_button_sibling_pager(self) -> None:
         prev_id = None
@@ -395,3 +424,26 @@ class Display:
                     self.data[_('selectable')] = display_bool(
                         self.entity.selectable)
                     self.data[_('ID for imports')] = self.entity.id
+
+
+def annotation_text_links(entity: Entity) -> str:
+    offset = 0
+    text = entity.description or ''
+    for annotation in AnnotationText.get_by_source_id(entity.id):
+        if not annotation.text and not annotation.entity_id:
+            continue  # pragma: no cover
+        title = f'title="{sanitize(annotation.text)}"' \
+            if annotation.text else ''
+        if annotation.entity_id:
+            tag_open = f'<a href="/entity/{annotation.entity_id}" {title}>'
+            tag_close = '</a>'
+        else:
+            tag_open = f'<span style="color:green;" {title}>'
+            tag_close = '</span>'
+        position = annotation.link_start + offset
+        text = text[:position] + tag_open + text[position:]
+        offset += len(tag_open)
+        position = annotation.link_end + offset
+        text = text[:position] + tag_close + text[position:]
+        offset += len(tag_close)
+    return text

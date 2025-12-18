@@ -20,13 +20,13 @@ from openatlas.api.import_scripts.util import (
     get_match_types, get_reference_system_by_name)
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.error import EntityDoesNotExistError
-from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, button_bar, description, link, required_group)
+    button, button_bar, description, get_backup_file_data, link,
+    required_group)
 from openatlas.display.util2 import (
-    get_backup_file_data, is_authorized,
+    is_authorized,
     manual, uc_first)
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
@@ -75,7 +75,7 @@ class ProjectForm(FlaskForm):
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
 
-    def validate(self, extra_validators: validators = None) -> bool:
+    def validate(self, extra_validators: Any = None) -> bool:
         valid = FlaskForm.validate(self)
         name = Project.get_by_id(self.project_id).name \
             if self.project_id else ''
@@ -139,7 +139,7 @@ def import_index() -> str:
             format_number(project.count),
             project.description])
     buttons = [manual('admin/import')]
-    if is_authorized('admin'):
+    if is_authorized('manager'):
         buttons.append(button(_('project'), url_for('import_project_insert')))
     return render_template(
         'content.html',
@@ -157,7 +157,7 @@ def import_project_insert() -> str | Response:
     form = ProjectForm()
     if form.validate_on_submit():
         id_ = Project.insert(form.name.data, form.description.data)
-        flash(_('project inserted'), 'info')
+        flash(_('project inserted'))
         return redirect(url_for('import_project_view', id_=id_))
     return render_template(
         'content.html',
@@ -232,7 +232,7 @@ def import_project_update(id_: int) -> str | Response:
         project.name = form.name.data
         project.description = form.description.data
         project.update()
-        flash(_('project updated'), 'info')
+        flash(_('project updated'))
         return redirect(url_for('import_project_view', id_=project.id))
     return render_template(
         'content.html',
@@ -249,7 +249,7 @@ def import_project_update(id_: int) -> str | Response:
 @required_group('manager')
 def import_project_delete(id_: int) -> Response:
     Project.delete(id_)
-    flash(_('project deleted'), 'info')
+    flash(_('project deleted'))
     return redirect(url_for('import_index'))
 
 
@@ -259,7 +259,7 @@ class ImportForm(FlaskForm):
     duplicate = BooleanField(_('check for duplicates'), default=True)
     save = SubmitField(_('import'))
 
-    def validate(self, extra_validators: validators = None) -> bool:
+    def validate(self, extra_validators: Any = None) -> bool:
         valid = FlaskForm.validate(self)
         if Path(str(request.files['file'].filename)).suffix.lower() != '.csv':
             self.file.errors.append(_('file type not allowed'))
@@ -286,8 +286,7 @@ def import_data(project_id: int, class_: str) -> str:
                 checks,
                 checked_data,
                 project)
-        except Exception as e:
-            g.logger.log('error', 'import', 'import check failed', e)
+        except Exception:
             flash(_('error at import'), 'error')
             return render_template(
                 'import_data.html',
@@ -300,19 +299,14 @@ def import_data(project_id: int, class_: str) -> str:
                     [_('import'), url_for('import_index')],
                     project,
                     class_label])
-
-        if not form.preview.data and checked_data and (
-                not file_data['backup_too_old'] or app.testing):
-            Transaction.begin()
+        if not form.preview.data \
+                and checked_data \
+                and (not file_data['backup_too_old'] or app.testing):
             try:
                 import_data_(project, class_, checked_data)
-                Transaction.commit()
-                g.logger.log('info', 'import', f'import: {len(checked_data)}')
-                flash(f"{_('import of')}: {len(checked_data)}", 'info')
+                flash(f"{_('import of')}: {len(checked_data)}")
                 imported = True
-            except Exception as e:  # pragma: no cover
-                Transaction.rollback()
-                g.logger.log('error', 'import', 'import failed', e)
+            except Exception:  # pragma: no cover
                 flash(_('error transaction'), 'error')
     return render_template(
         'import_data.html',
@@ -599,7 +593,7 @@ def check_cell_value(
         case 'openatlas_class' if value:
             if (value.lower().replace(' ', '_') not in (
                     g.class_groups['place']['classes'] +
-                    g.class_groups['artifact']['classes']+
+                    g.class_groups['artifact']['classes'] +
                     g.class_groups['type']['classes'])):
                 value = error_span(value)
                 checks.set_warning('invalid_openatlas_class', id_)

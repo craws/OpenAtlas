@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import ast
+import re
 from collections import defaultdict
 from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g, json
 
+from openatlas import app
 from openatlas.database import gis as db
 from openatlas.display.util2 import sanitize
 
@@ -97,8 +99,16 @@ class Gis:
                     if row['name'] else '',
                     'description': description,
                     'shapeType': row['type']}}
+            color_map = app.config['MAP_TYPE_COLOR']
+            item["properties"]["color"] = color_map.get('default')
             if 'types' in row and row['types']:
                 type_ids = ast.literal_eval(f"[{row['types']}]")
+                for id_, color in color_map.items():
+                    if id_ != 'default' \
+                            and int(id_) in type_ids \
+                            and re.match(r"^(#)?[A-Fa-f0-9]+$", color):
+                        item["properties"]["color"] = color  # pragma: no cover
+                        break  # pragma: no cover
                 for type_id in list(set(type_ids)):
                     type_ = g.types[type_id]
                     if type_.root and g.types[type_.root[0]].name == 'Place':

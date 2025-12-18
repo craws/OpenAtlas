@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from flask import (
-    flash, g, make_response, redirect, render_template, request, url_for)
+    flash, make_response, redirect, render_template, request, url_for)
 from flask_babel import lazy_gettext as _
 from flask_login import login_required
 from flask_wtf import FlaskForm
@@ -14,7 +14,6 @@ from wtforms.fields.numeric import IntegerField
 from wtforms.fields.simple import HiddenField
 
 from openatlas import app
-from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import button, link, required_group
@@ -61,7 +60,8 @@ class ListTokenForm(FlaskForm):
 @required_group('admin')
 def api_token(user_id: int = 0) -> str | Response:
     form = ListTokenForm()
-    form.user.choices = [(0, _('all'))] + User.get_users_for_form()
+    form.user.choices = \
+        [(0, _('all'))] + [(u.id, u.username) for u in User.get_all()]
     user_id = user_id or 0
     revoked = 'all'
     valid = 'all'
@@ -151,22 +151,14 @@ def get_token_valid_column(token: dict[str, Any], user: User) -> str:
 @required_group('admin')
 def generate_token() -> str | Response:
     form = GenerateTokenForm()
-    form.user.choices = User.get_users_for_form()
+    form.user.choices = [(u.id, u.username) for u in User.get_all()]
     if form.validate_on_submit():
         user_ = User.get_by_id_without_bookmarks(int(form.user.data))
-        token = ''
-        Transaction.begin()
-        try:
-            token = Token.generate_token(
-                form.expiration.data,
-                form.token_name.data,
-                user_)
-            Transaction.commit()
-            flash(f"{_('token stored for')}: {user_.username}", 'info')
-        except Exception as e:  # pragma: no cover
-            Transaction.rollback()
-            g.logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
+        token = Token.generate_token(
+            form.expiration.data,
+            form.token_name.data,
+            user_)
+        flash(f"{_('token stored for')}: {user_.username}")
         response = make_response(redirect(url_for('generate_token')))
         response.set_cookie(
             'jwt_token',
@@ -190,7 +182,7 @@ def generate_token() -> str | Response:
 @login_required
 def revoke_token(id_: int) -> str | Response:
     Token.revoke_jwt_token(id_)
-    flash(_('token revoked'), 'info')
+    flash(_('token revoked'))
     return redirect(f"{url_for('api_token')}")
 
 
@@ -198,7 +190,7 @@ def revoke_token(id_: int) -> str | Response:
 @login_required
 def authorize_token(id_: int) -> str | Response:
     Token.authorize_jwt_token(id_)
-    flash(_('token authorized'), 'info')
+    flash(_('token authorized'))
     return redirect(f"{url_for('api_token')}")
 
 
@@ -206,7 +198,7 @@ def authorize_token(id_: int) -> str | Response:
 @login_required
 def delete_token(id_: int) -> str | Response:
     Token.delete_token(id_)
-    flash(_('token deleted'), 'info')
+    flash(_('token deleted'))
     return redirect(f"{url_for('api_token')}")
 
 
@@ -214,7 +206,7 @@ def delete_token(id_: int) -> str | Response:
 @login_required
 def delete_revoked_tokens() -> str | Response:
     Token.delete_all_revoked_tokens()
-    flash(_('tokens deleted'), 'info')
+    flash(_('tokens deleted'))
     return redirect(f"{url_for('api_token')}")
 
 
@@ -222,7 +214,7 @@ def delete_revoked_tokens() -> str | Response:
 @login_required
 def delete_invalid_tokens() -> str | Response:
     Token.delete_invalid_tokens()
-    flash(_('tokens deleted'), 'info')
+    flash(_('tokens deleted'))
     return redirect(f"{url_for('api_token')}")
 
 
@@ -230,7 +222,7 @@ def delete_invalid_tokens() -> str | Response:
 @login_required
 def revoke_all_tokens() -> str | Response:
     Token.revoke_all_tokens()
-    flash(_('all tokens revoked'), 'info')
+    flash(_('all tokens revoked'))
     return redirect(f"{url_for('api_token')}")
 
 
@@ -238,5 +230,5 @@ def revoke_all_tokens() -> str | Response:
 @login_required
 def authorize_all_tokens() -> str | Response:
     Token.authorize_all_tokens()
-    flash(_('all tokens authorized'), 'info')
+    flash(_('all tokens authorized'))
     return redirect(f"{url_for('api_token')}")

@@ -4,7 +4,7 @@
     {{ form.csrf_token }}
     {{ form.checkbox_values }}
     <p>
-      {{ root.name }} {{ form[root.id|string] }}
+      <strong>{{ _('type')|uc_first }}</strong> {{ form[root.id|string] }}
     </p>
     <div class="toolbar">
       {{ _('select all')|button(id_='select-all')|safe }}

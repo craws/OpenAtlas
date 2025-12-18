@@ -1,20 +1,18 @@
 import ast
 from typing import Optional
 
-from flask import flash, g, render_template, request, url_for
+from flask import flash, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.util import hierarchy_crumbs, link, required_group
 from openatlas.display.util2 import uc_first
 from openatlas.forms.display import display_form
 from openatlas.forms.entity_form import process_dates
-from openatlas.forms.form import (
-    link_detail_form, link_form, link_update_form)
+from openatlas.forms.form import link_detail_form, link_form, link_update_form
 from openatlas.models.entity import Entity, Link
 
 
@@ -22,7 +20,7 @@ from openatlas.models.entity import Entity, Link
 @required_group('contributor')
 def link_delete(id_: int, origin_id: int) -> Response:
     Link.delete_(id_)
-    flash(_('link removed'), 'info')
+    flash(_('link removed'))
     return redirect(url_for('view', id_=origin_id))
 
 
@@ -76,15 +74,23 @@ def link_insert_detail(
         if relation.type:
             hierarchy = Entity.get_hierarchy(relation.type)
             type_id = getattr(form, str(hierarchy.id)).data or None
-        origin.link(
-            relation.property,
-            Entity.get_by_ids(ids),
-            form.description.data if 'description' in form else None,
-            relation.inverse,
-            type_id,
-            dates=process_dates(form))
-        return redirect(
-            f"{url_for('view', id_=origin.id)}#tab-" + name.replace('_', '-'))
+        form_valid = True
+        if relation.name == 'relative':
+            origin = Entity.get_by_id(form.actor.data)
+            if ids[0] == int(form.actor.data):
+                form_valid = False
+                flash(_("Can't link to itself"), 'error')
+        if form_valid:
+            origin.link(
+                relation.property,
+                Entity.get_by_ids(ids),
+                form.description.data if 'description' in form else None,
+                relation.inverse,
+                type_id,
+                dates=process_dates(form))
+            return redirect(
+                url_for('view', id_=origin.id) +
+                "#tab-" + name.replace('_', '-'))
     return render_template(
         'content.html',
         entity=origin,
@@ -115,13 +121,8 @@ def link_update(id_: int, origin_id: int, name: str) -> str | Response:
                 form,
                 str(hierarchy.id)).data or None
         data.update(process_dates(form))
-        try:
-            link_.update(data)
-            flash(_('info update'), 'info')
-        except Exception as e:  # pragma: no cover
-            Transaction.rollback()
-            g.logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
+        link_.update(data)
+        flash(_('info update'))
         return redirect(
             f"{url_for('view', id_=origin.id)}#tab-" + name.replace('_', '-'))
     return render_template(

@@ -1,4 +1,5 @@
 import importlib
+from typing import Any
 
 import bcrypt
 from flask import flash, g, render_template, session, url_for
@@ -7,11 +8,10 @@ from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import BooleanField, PasswordField, validators
+from wtforms import BooleanField, PasswordField
 from wtforms.validators import InputRequired
 
 from openatlas import app
-from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.util import button, display_info
 from openatlas.display.util2 import manual, uc_first
@@ -22,14 +22,14 @@ from openatlas.forms.util import get_form_settings, set_form_settings
 
 
 class PasswordForm(FlaskForm):
-    password_old = PasswordField(_('old password'), [InputRequired()])
-    password = PasswordField(_('password'), [InputRequired()])
-    password2 = PasswordField(_('repeat password'), [InputRequired()])
+    password_old: Any = PasswordField(_('old password'), [InputRequired()])
+    password: Any = PasswordField(_('password'), [InputRequired()])
+    password2: Any = PasswordField(_('repeat password'), [InputRequired()])
     generate_password = generate_password_field()
     show_passwords = BooleanField(_('show passwords'))
     save = SubmitField(_('save'))
 
-    def validate(self, extra_validators: validators = None) -> bool:
+    def validate(self, extra_validators: Any = None) -> bool:
         valid = FlaskForm.validate(self)
         hash_ = bcrypt.hashpw(
             self.password_old.data.encode('utf-8'),
@@ -120,17 +120,9 @@ def profile_settings(category: str) -> str | Response:
                 if field.type == 'BooleanField':
                     value = 'True' if value else ''
                 settings[field.name] = value
-        Transaction.begin()
-        try:
-            current_user.update()
-            current_user.update_settings(settings)
-            Transaction.commit()
-            session['language'] = current_user.settings['language']
-            flash(_('info update'), 'info')
-        except Exception as e:  # pragma: no cover
-            Transaction.rollback()
-            g.logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
+        current_user.update(settings)
+        session['language'] = current_user.settings['language']
+        flash(_('info update'))
         return redirect(f"{url_for('profile_index')}#tab-{category}")
     set_form_settings(form, True)
     return render_template(
@@ -151,7 +143,7 @@ def profile_password() -> str | Response:
             form.password.data.encode('utf-8'),
             bcrypt.gensalt()).decode('utf-8')
         current_user.update()
-        flash(_('info password updated'), 'info')
+        flash(_('info password updated'))
         return redirect(url_for('profile_index'))
     return render_template(
         'tabs.html',

@@ -19,7 +19,7 @@ from openatlas import app
 from openatlas.api.endpoints.endpoint import Endpoint
 from openatlas.api.external.arche import add_arche_file_metadata_to_graph
 from openatlas.api.external.arche_class import ArcheFileMetadata
-from openatlas.api.formats.rdf import rdf_export_to_file
+from openatlas.api.formats.rdf import rdf_export_to_file  # type: ignore
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.util import filter_by_type, get_reference_systems
 from openatlas.models.entity import Entity
@@ -193,7 +193,7 @@ def get_place_and_actor_relations(
     places_and_actors: dict[int, dict[str, Any]] = {}
     for link in linked_entities:
         if (link.range.class_.group['name'] == 'actor'
-                or link.range.class_.group['name']  == 'place'):
+                or link.range.class_.group['name'] == 'place'):
             places_and_actors[link.range.id] = {
                 'entity': link.range,
                 'links_inverse': [],

@@ -17,6 +17,10 @@ class EntityNotAnEventError(Exception):
     pass
 
 
+class EntityNotAFileError(Exception):
+    pass
+
+
 class InvalidCidocClassCodeError(Exception):
     pass
 
@@ -102,7 +106,17 @@ class ValueNotIntegerError(Exception):
     pass
 
 
+class FileIdNotInteger(Exception):
+    pass
+
+
 class UrlNotValid(Exception):
     def __init__(self, url: str) -> None:
+        super().__init__()
+        self.url = url
+
+
+class IIIFMetadataNotFound(Exception):
+    def __init__(self, url: str) -> None:  # pragma: no cover
         super().__init__()
         self.url = url

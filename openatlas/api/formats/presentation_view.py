@@ -14,7 +14,7 @@ from openatlas.api.resources.util import (
     get_reference_systems, get_value_for_types, to_camel_case)
 from openatlas.database.overlay import get_by_object
 from openatlas.display.util import get_file_path
-from openatlas.models.cidoc_property import CidocProperty
+from openatlas.models.cidoc import CidocProperty
 from openatlas.models.dates import Dates
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
@@ -50,7 +50,8 @@ def get_presentation_types(
 
 def get_file_dict(
         link: Link,
-        overlay: Optional[Overlay] = None) -> dict[str, Any]:
+        overlay: Optional[Overlay] = None,
+        root: Optional[bool] = False) -> dict[str, Any]:
     path = get_file_path(link.domain.id)
     mime_type = None
     if path:
@@ -63,6 +64,7 @@ def get_file_dict(
         'licenseHolder': link.domain.license_holder,
         'publicShareable': link.domain.public,
         'mimetype': mime_type,
+        'fromSuperEntity': root,
         'url': url_for(
             'api.display',
             filename=path.stem,
@@ -91,7 +93,7 @@ def get_presentation_files(
                 and parser.map_overlay \
                 and link_.range.id in root_ids:
             if overlay := overlays.get(link_.domain.id):
-                files.append(get_file_dict(link_, overlay))
+                files.append(get_file_dict(link_, overlay, root=True))
         elif link_.range.id == entity.id:
             files.append(
                 get_file_dict(link_, overlays.get(link_.domain.id)))
@@ -143,7 +145,7 @@ def get_presentation_references(
     references = []
     check_for_duplicates: dict[int, str] = defaultdict(str)
     for link in links_inverse:
-        if link.domain.class_.group['name'] != 'reference' \
+        if link.domain.class_.group.get('name') != 'reference' \
                 or link.range.id not in entity_ids \
                 or check_for_duplicates[link.domain.id] == link.description:
             continue
@@ -174,8 +176,9 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
                 'P46',
                 inverse=True)
             root_id = root_ids[-1] if root_ids else entity.id
-            place_hierarchy = Entity.get_linked_entity_ids_recursive(root_id,
-                                                                     'P46')
+            place_hierarchy = Entity.get_linked_entity_ids_recursive(
+                root_id,
+                'P46')
             place_hierarchy.extend(root_ids)
             ids.extend(place_hierarchy)
 

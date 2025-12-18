@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from typing import Any
 
 from flask import g
@@ -10,57 +11,49 @@ from config.model.model import model
 from openatlas.database import openatlas_class as db
 
 
+@dataclass
 class OpenatlasClass:
-    def __init__(
-            self,
-            name: str,
-            cidoc_class: str | None,
-            hierarchies: list[int],
-            reference_system_ids: list[int],
-            new_types_allowed: bool,
-            standard_type_id: int | None,
-            write_access: str | None,
-            model_: dict[str, Any]) -> None:
-        self.name = name
-        self.cidoc_class = g.cidoc_classes[cidoc_class] \
-            if cidoc_class else None
-        self.hierarchies = hierarchies
-        self.standard_type_id = standard_type_id
-        self.write_access = write_access or 'contributor'
-        self.reference_systems = reference_system_ids
-        self.new_types_allowed = new_types_allowed
+    name: str
+    cidoc_class: str
+    hierarchies: list[int]
+    reference_systems: list[int]
+    new_types_allowed: bool
+    standard_type_id: int | None
+    write_access: str
+    attributes: dict[str, Any]
+    relations: dict[str, Relation]
+    display: dict[str, Any]
+    extra: dict[str, Any]
+
+    def __post_init__(self) -> None:
         self.group = {}
         for data in g.class_groups.values():
-            if name in data['classes']:
+            if self.name in data['classes']:
                 self.group = data
-        label = model_.get('label', _(name.replace('_', ' ')))
-        self.label = str(label)[0].upper() + str(label)[1:]
-        self.attributes = model_['attributes']
-        self.relations = {}
-        for name_, relation in model_['relations'].items():
-            self.relations[name_] = Relation(name_, relation)
-        self.display = model_['display']
-        self.extra = model_['extra']
+        self.label = _(self.name.replace('_', ' '))
+        self.label = str(self.label)[0].upper() + str(self.label)[1:]
 
 
+@dataclass
 class Relation:
-    def __init__(self, name: str, data: dict[str, Any]) -> None:
-        self.name = name
-        self.property = data['property']
-        self.classes = data['classes'] if isinstance(data['classes'], list) \
-            else [data['classes']]
-        self.inverse = data.get('inverse', False)
-        self.multiple = data.get('multiple', False)
-        self.required = data.get('required', False)
-        self.label = data.get('label', _(self.name.replace('_', ' ')))
-        self.mode = data.get('mode', 'tab')
-        self.add_dynamic = data.get('add_dynamic', False)
-        self.tooltip = data.get('tooltip')
-        self.additional_fields = data.get('additional_fields', [])
-        self.via_location = data.get('via_location', False)
-        self.type = data.get('type')
+    name: str
+    property: str
+    classes: list[str]
+    inverse: bool = False
+    multiple: bool = False
+    required: bool = False
+    label: str = ''
+    mode: str = 'tab'
+    add_dynamic: bool = False
+    tooltip: str | None = None
+    additional_fields: list[str] = field(default_factory=list)
+    type: str | None = None
+    reverse_relation: Relation | None = None
+    tab: dict[str, Any] = field(default_factory=dict)
+
+    def __post_init__(self) -> None:
+        self.label = self.label or _(self.name.replace('_', ' '))
         if self.mode == 'tab':
-            self.tab = data.get('tab', {})
             self.tab['additional_columns'] = \
                 self.tab.get('additional_columns', [])
             self.tab['buttons'] = self.tab.get('buttons', [])
@@ -76,16 +69,41 @@ def get_classes() -> dict[str, OpenatlasClass]:
     g.class_groups = class_groups
     classes = {}
     for row in db.get_classes():
+        model_ = get_model(row['name'])
+        relations = {}
+        for name_, relation in model_['relations'].items():
+            relations[name_] = Relation(name_, **relation)
         classes[row['name']] = OpenatlasClass(
             name=row['name'],
-            model_=get_model(row['name']),
-            cidoc_class=row['cidoc_class_code'],
+            cidoc_class=g.cidoc_classes[row['cidoc_class_code']],
             standard_type_id=row['standard_type_id'],
-            reference_system_ids=row['system_ids']
+            reference_systems=row['system_ids']
             if row['system_ids'] else [],
             new_types_allowed=row['new_types_allowed'],
             write_access=row['write_access_group_name'],
-            hierarchies=row['hierarchies'])
+            hierarchies=row['hierarchies'],
+            attributes=model_['attributes'],
+            relations=relations,
+            display=model_['display'],
+            extra=model_['extra'])
+    for class_ in classes.values():
+        for relation in class_.relations.values():
+            if not relation.classes:
+                continue
+            related_class = classes[
+                relation.classes[0].replace('object_location', 'place')]
+            for relation2 in related_class.relations.values():
+                if class_.name in relation2.classes \
+                        and relation.property == relation2.property \
+                        and relation.inverse != relation2.inverse:
+                    relation.reverse_relation = relation2
+                    break
+                if class_.name == 'place' and 'object_location' \
+                        in relation2.classes \
+                        and relation.property == relation2.property \
+                        and relation.inverse != relation2.inverse:
+                    relation.reverse_relation = relation2
+                    break
     return classes
 
 
@@ -109,13 +127,21 @@ def get_model(class_name: str) -> dict[str, Any]:
     return data
 
 
-def get_reverse_relation(
-        class_: OpenatlasClass,
-        relation: Relation,
-        reverse_class: OpenatlasClass) -> Relation | None:
-    for reverse_relation in reverse_class.relations.values():
-        if class_.name in reverse_relation.classes \
-                and relation.property == reverse_relation.property \
-                and relation.inverse != reverse_relation.inverse:
-            return reverse_relation
-    return None
+def get_db_relations() -> list[dict[str, Any]]:
+    return db.get_db_relations()
+
+
+def get_model_relations() -> dict[str, Any]:
+    relations: dict[str, Any] = {}
+    for name, data in model.items():
+        for relation in data['relations'].values():
+            for range_ in relation['classes']:
+                domain = range_ if relation.get('inverse') else name
+                range_ = name if relation.get('inverse') else range_
+                relations[domain] = relations.get(domain, {})
+                relations[domain][range_] = relations[domain].get(range_, {})
+                if relation['property'] not in relations[domain][range_]:
+                    relations[domain][range_][relation['property']] = 1
+                else:
+                    relations[domain][range_][relation['property']] += 1
+    return relations

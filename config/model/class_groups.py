@@ -11,16 +11,16 @@ class_groups = {
         'name': 'artifact',
         'label': _('artifact'),
         'classes': ['artifact', 'human_remains'],
-        'table_columns': [
-            'name', 'class', 'type', 'begin', 'end', 'description'],
+        'table_columns':
+            ['name', 'class', 'type', 'begin', 'end', 'description'],
         'icon': 'mdi-shapes'},
     'event': {
         'name': 'event',
         'label': _('event'),
         'classes': [
             'activity', 'acquisition', 'modification', 'move', 'production'],
-        'table_columns': [
-            'name', 'class', 'type', 'begin', 'end', 'description'],
+        'table_columns':
+            ['name', 'class', 'type', 'begin', 'end', 'description'],
         'icon': 'mdi-calendar'},
     'file': {
         'name': 'file',
@@ -82,7 +82,7 @@ standard_relations = {
             'columns': ['name', 'class', 'type', 'page', 'description'],
             'buttons': ['link', 'insert']}},
     'source': {
-        'classes': 'source',
+        'classes': ['source'],
         'property': 'P67',
         'inverse': True,
         'multiple': True,

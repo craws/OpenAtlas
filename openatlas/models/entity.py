@@ -8,17 +8,12 @@ from flask import g, request
 from werkzeug.exceptions import abort
 
 from openatlas import app
-from openatlas.database import date, entity as db, link as db_link
+from openatlas.database import entity as db, link as db_link
+from openatlas.database.connect import Transaction
 from openatlas.display.util2 import convert_size, sanitize
 from openatlas.models.annotation import AnnotationText
 from openatlas.models.dates import Dates
 from openatlas.models.gis import Gis
-
-app.config['PROPERTY_TYPES'] = [
-    'Actor relation',
-    'Actor function',
-    'External reference match',
-    'Involvement']
 
 
 class Entity:
@@ -115,6 +110,7 @@ class Entity:
             classes: Optional[list[str]] = None,
             inverse: bool = False,
             types: bool = False,
+            aliases: bool = False,
             sort: bool = False) -> list[Entity]:
         return Entity.get_linked_entities_static(
             self.id,
@@ -122,6 +118,7 @@ class Entity:
             classes,
             inverse=inverse,
             types=types,
+            aliases=aliases,
             sort=sort)
 
     def get_linked_entities_recursive(
@@ -133,13 +130,14 @@ class Entity:
             db.get_linked_entities_recursive(self.id, codes, inverse),
             types=types)
 
-    def link(self,
-             code: str,
-             range_: Entity | list[Entity],
-             description: Optional[str] = None,
-             inverse: bool = False,
-             type_id: Optional[int] = None,
-             dates: Optional[dict[str, Any]] = None) -> list[int]:
+    def link(
+            self,
+            code: str,
+            range_: Entity | list[Entity],
+            description: Optional[str] = None,
+            inverse: bool = False,
+            type_id: Optional[int] = None,
+            dates: Optional[dict[str, Any]] = None) -> list[int]:
         property_ = g.properties[code]
         entities = range_ if isinstance(range_, list) else [range_]
         new_link_ids = []
@@ -420,10 +418,11 @@ class Entity:
             'multiple': multiple})
         db.add_classes_to_hierarchy(self.id, classes)
 
-    def move_entities(self, new_type_id: int, checkbox_values: str) -> None:
+    def change_type(self, new_type_id: int, checkbox_values: str) -> None:
         root = g.types[self.root[0]]
         entity_ids = ast.literal_eval(checkbox_values)
         delete_ids = []
+        Transaction.begin()
         if new_type_id:  # A new type was selected
             if root.multiple:
                 cleaned_entity_ids = []
@@ -439,17 +438,17 @@ class Entity:
                     'new_type_id': new_type_id,
                     'entity_ids': tuple(entity_ids)}
                 if root.name in app.config['PROPERTY_TYPES']:
-                    db.move_link_type(data)
+                    db.change_link_type(data)
                 else:
-                    db.move_entity_type(data)
+                    db.change_type(data)
         else:
-            delete_ids = entity_ids  # No new type selected so delete all links
-
+            delete_ids = entity_ids  # No type selected so delete all links
         if delete_ids:
             if root.name in app.config['PROPERTY_TYPES']:
                 db.remove_link_type(self.id, delete_ids)
             else:
-                db.remove_entity_type(self.id, delete_ids)
+                db.remove_type(self.id, delete_ids)
+        Transaction.commit()
 
     @staticmethod
     def get_file_info() -> dict[int, Any]:
@@ -611,12 +610,14 @@ class Entity:
             classes: Optional[list[str]] = None,
             inverse: bool = False,
             types: bool = False,
+            aliases: bool = False,
             sort: bool = False) -> list[Entity]:
         codes = codes if isinstance(codes, list) else [codes]
         entities = Entity.get_by_ids(
             db.get_linked_entities_inverse(id_, codes, classes) if inverse
             else db.get_linked_entities(id_, codes, classes),
-            types=types)
+            types=types,
+            aliases=aliases)
         if sort and entities:
             entities.sort(key=lambda x: x.name)
         return entities
@@ -751,25 +752,16 @@ class Entity:
 
     @staticmethod
     def insert_hierarchy(
-            type_: Entity,
+            hierarchy: Entity,
             category: str,
             classes: list[str],
             multiple: bool) -> None:
         db.insert_hierarchy({
-            'id': type_.id,
-            'name': type_.name,
+            'id': hierarchy.id,
+            'name': hierarchy.name,
             'multiple': multiple,
             'category': category})
-        db.add_classes_to_hierarchy(type_.id, classes)
-
-    @staticmethod
-    def get_type_orphans() -> list[Entity]:
-        return [
-            node for key, node in g.types.items()
-            if node.root
-            and node.category not in ['system', 'tools']
-            and node.count < 1
-            and not node.subs]
+        db.add_classes_to_hierarchy(hierarchy.id, classes)
 
     @staticmethod
     def reference_system_counts() -> dict[str, int]:
@@ -884,34 +876,6 @@ class Link:
     @staticmethod
     def delete_(id_: int) -> None:
         db_link.delete_(id_)
-
-    @staticmethod
-    def invalid_involvement_dates() -> list[Link]:
-        return [
-            Link.get_by_id(row['id'])
-            for row in date.invalid_involvement_dates()]
-
-    @staticmethod
-    def invalid_preceding_dates() -> list[Link]:
-        return [
-            Link.get_by_id(row['id'])
-            for row in date.invalid_preceding_dates()]
-
-    @staticmethod
-    def invalid_sub_dates() -> list[Link]:
-        return [Link.get_by_id(row['id']) for row in date.invalid_sub_dates()]
-
-    @staticmethod
-    def get_invalid_link_dates() -> list[Link]:
-        return [Link.get_by_id(row['id']) for row in date.invalid_link_dates()]
-
-    @staticmethod
-    def check_link_duplicates() -> list[dict[str, Any]]:
-        return db_link.check_link_duplicates()
-
-    @staticmethod
-    def delete_link_duplicates() -> int:
-        return db_link.delete_link_duplicates()
 
 
 def get_entity_ids_with_links(

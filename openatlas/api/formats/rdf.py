@@ -1,3 +1,4 @@
+# type: ignore
 from __future__ import annotations
 
 import os
@@ -22,7 +23,7 @@ def _add_namespaces(graph: Graph, context: dict[str, Any]) -> None:
     for prefix, uri in context["@context"].items():
         if isinstance(uri, str):
             if uri.endswith('/') or uri.endswith('#'):
-                graph.bind(prefix, Namespace(uri))  # type: ignore
+                graph.bind(prefix, Namespace(uri))
 
     graph.bind("crm", Namespace("http://www.cidoc-crm.org/cidoc-crm/"))
     graph.bind("la", Namespace("https://linked.art/ns/terms/"))
@@ -43,7 +44,7 @@ def _expand_curie(curie: str) -> str:  # pragma: no cover
 
 def _resolve_predicate(
         key: str,
-        data_type: str | None = None) -> URIRef | None: # pragma: no cover
+        data_type: str | None = None) -> URIRef | None:  # pragma: no cover
     ctx = _linked_art_context.get("@context", {})
 
     if data_type and data_type in ctx:
@@ -75,7 +76,7 @@ def _get_subject(
     if subject_uri:
         return URIRef(subject_uri)
 
-    subject = BNode()  # type: ignore
+    subject = BNode()
     if parent_subject is not None and parent_predicate is not None:
         graph.add((parent_subject, parent_predicate, subject))
     return subject
@@ -106,7 +107,7 @@ def _add_triples_from_linked_art(
         graph: Graph,
         data: list[dict[str, Any]] | dict[str, Any],
         parent_subject: URIRef | BNode | None = None,
-        parent_predicate: URIRef | None = None) -> None: # pragma: no cover
+        parent_predicate: URIRef | None = None) -> None:  # pragma: no cover
     if not isinstance(data, dict):  # pragma: no cover - mypy
         return
 

@@ -68,7 +68,8 @@ CSS = {
     'string_field': 'form-control form-control-sm',
     'button': {
         'primary': 'btn btn-outline-primary btn-sm',
-        'secondary': 'btn btn-outline-secondary btn-sm'}}
+        'secondary': 'btn btn-outline-secondary btn-sm',
+        'danger': 'btn btn-outline-danger btn-sm'}}
 
 # Tests
 LOAD_WINDOWS_TEST_SQL = False
@@ -99,3 +100,16 @@ ARCHE_METADATA = {
     'relatedDiscipline': [],
     'typeIds': [],
     'excludeReferenceSystems': []}
+
+# Configure map point colors
+# Defined colors for type_ids override the default, top ones are prioritised
+MAP_TYPE_COLOR = {
+    'default': '#007bd9',
+    '123': '#007bd9'}
+
+# These are special types because they are used for links instead of entities
+PROPERTY_TYPES = [
+    'Actor relation',
+    'Actor function',
+    'External reference match',
+    'Involvement']

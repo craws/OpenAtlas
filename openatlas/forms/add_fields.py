@@ -19,8 +19,33 @@ from openatlas.forms.field import (
     TableField, TableMultiField, TextAnnotationField, TreeField,
     TreeMultiField, ValueTypeField, ValueTypeRootField)
 from openatlas.models.dates import check_if_entity_has_time
-from openatlas.models.entity import Entity, Link
+from openatlas.models.entity import Entity, Link, get_entity_ids_with_links
 from openatlas.models.openatlas_class import OpenatlasClass, Relation
+
+
+def filter_entities(
+        entity: Entity,
+        items: list[Entity],
+        relation: Relation,
+        is_link_form: bool = False) -> list[Entity]:
+    filter_ids = [entity.id] if relation.name != 'relative' else []
+    if relation.name in ['subs', 'super']:
+        filter_ids += [
+            e.id for e in entity.get_linked_entities_recursive(
+                relation.property,
+                relation.name == 'subs')]
+    if is_link_form:
+        if relation.reverse_relation \
+                and not relation.reverse_relation.multiple:
+            filter_ids += get_entity_ids_with_links(
+                relation.property,
+                relation.classes,
+                relation.inverse)
+        filter_ids += [
+            e.id for e in entity.get_linked_entities(
+                relation.property,
+                inverse=relation.inverse)]
+    return [item for item in items if item.id not in filter_ids]
 
 
 def add_name_fields(form: Any, entity: Entity) -> None:
@@ -65,7 +90,6 @@ def add_reference_systems(form: Any, class_: OpenatlasClass) -> None:
                     for id_ in g.reference_match_type.subs],
                 reference_system_id=system.id,
                 default={
-                    'value': '',
                     'precision': str(next(iter(system.types)).id)
                     if system.types else None}))
 
@@ -75,7 +99,10 @@ def add_description(
         entity: Entity,
         origin: Optional[Entity] = None) -> None:
     attribute_description = entity.class_.attributes['description']
-    if entity.category == 'value':
+    if (entity.category == 'value' and entity.root) or (
+            entity.class_.name == 'type'
+            and origin
+            and origin.category == 'value'):
         setattr(form, 'description', StringField(_('unit')))
         return
     if 'annotated' not in attribute_description:
@@ -140,8 +167,11 @@ def add_type(form: Any, type_: Entity) -> None:
         add_value_type_fields(form, type_.subs)
 
 
-def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
-    from openatlas.forms.form import filter_entities
+def add_relations(
+        form: Any,
+        entity: Entity,
+        origin: Entity | None,
+        origin_relation: str | None) -> None:
     entities = {}  # Collect entities per class to prevent multiple fetching
     for name, relation in entity.class_.relations.items():
         if relation.mode != 'direct':
@@ -184,7 +214,7 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                     relation.property,
                     relation.classes,
                     inverse=relation.inverse)
-            elif origin and origin.class_.name in relation.classes:
+            elif selection_available(origin, relation, origin_relation):
                 selection = [origin]
             setattr(
                 form,
@@ -202,7 +232,7 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                     relation.property,
                     relation.classes,
                     relation.inverse)
-            elif origin and origin.class_.name in relation.classes:
+            elif selection_available(origin, relation, origin_relation):
                 selection = origin
             if selection and selection.class_.name == 'object_location':
                 selection = selection.get_linked_entity_safe('P53', True)
@@ -221,6 +251,22 @@ def add_relations(form: Any, entity: Entity, origin: Entity | None) -> None:
                     description=relation.tooltip,
                     validators=validators,
                     add_dynamic=add_dynamic))
+
+
+def selection_available(
+        origin: Entity | None,
+        relation: Relation,
+        origin_relation: str | None) -> bool:
+    if not origin:
+        return False
+    if origin.class_.name not in relation.classes \
+            and origin.class_.name.replace('place', 'object_location') \
+            not in relation.classes:
+        return False
+    if relation.reverse_relation and \
+            relation.reverse_relation.name == origin_relation:
+        return True
+    return False
 
 
 def add_date_fields(
@@ -446,3 +492,23 @@ def add_buttons(form: Any, entity: Entity, relation: Relation) -> None:
                         item,
                         SubmitField(
                             _('insert and add') + ' ' + _('human remains')))
+
+
+def add_additional_link_fields(
+        form: Any,
+        relation: Relation,
+        link_: Optional[Link] = None) -> None:
+    for item in relation.additional_fields:
+        match item:
+            case 'dates':
+                add_date_fields(form, link_)
+            case 'description':
+                setattr(
+                    form,
+                    'description',
+                    TextAreaField(_(item), render_kw={'rows': 8}))
+            case 'page':
+                setattr(
+                    form,
+                    'description',
+                    StringField(_(item), render_kw={'rows': 8}))
