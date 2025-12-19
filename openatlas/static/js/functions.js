@@ -254,17 +254,17 @@ async function ajaxAPICall(props, id){
 
 async function ajaxWikidataInfo(data) {
   ajaxAPICall({
-        type: 'post',
-        url: '/ajax/info/wikidata',
-        data: 'id_=' + data
+    type: 'post',
+    url: '/ajax/info/wikidata',
+    data: 'id_=' + data
   }, "wikidata")
 }
 
 async function ajaxGeonamesInfo(data) {
   ajaxAPICall({
-        type: 'post',
-        url: '/ajax/info/geonames',
-        data: 'id_=' + data,
+    type: 'post',
+    url: '/ajax/info/geonames',
+    data: 'id_=' + data,
   }, "geonames")
 }
 

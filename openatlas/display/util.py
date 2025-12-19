@@ -64,31 +64,26 @@ def reference_systems(entity: Entity) -> str:
         logo = f"""
             <div
                 class="circle bg-gray fw-bold text-black-50"
-                style="height: 16px; font-size: 12px;">
-                        {system.name.upper()[0]}
-                    </div>"""
+                style="height: 16px; font-size: 12px;">{system.name.upper()[0]}
+            </div>"""
         if system.name in ['GeoNames', 'GND', 'Wikidata']:
             name = system.name.lower()
-            show_info = f"<span id='show'>{_('show info')}</span>"
-            hide_info = f"""<span id='hide' class='d-none'>
-                                {_('hide info')}
-                            </span>"""
+            show = '<span id="show">' + uc_first(_('show info')) + '</span>'
+            hide = '<span id="hide" class="d-none">' + \
+                uc_first(_('hide info')) + '</span>'
             show_info_button += (
                 f' <button id="{name}-switch" class="uc-first mt-1 me-1 '
                 f'{app.config["CSS"]["button"]["secondary"]}"'
                 f'onclick="ajax{uc_first(name)}Info'
-                f'(\'{link_.description}\')">{show_info}{hide_info}</button>')
+                f'(\'{link_.description}\')">{show}{hide}</button>')
             info_div = f'<div id="{name}-info-div" class="mt-2"></div>'
             logo = f"""<img src="/static/images/logos/{system.name}.svg" alt=""
                 class="rounded-circle object-fit-cover my-1" width="16"/>"""
-
         entry = f"""
             <li class="list-group-item bg-transparent">
                 <div class="d-flex gap-2 align-items-center">
                 {logo}
-                <span>
-                    <b>{link(link_.domain)}</b>: {link_.description}
-                </span>
+                <span><b>{link(link_.domain)}</b>: {link_.description}</span>
                 <span class="badge badge-pill rounded-pill
                     badge-secondary bg-secondary">
                     {g.types[link_.type.id].name}
@@ -106,8 +101,7 @@ def reference_systems(entity: Entity) -> str:
             </li>
             """
         html += entry
-    html += '</ul>'
-    return html
+    return html + '</ul>'
 
 
 def get_appearance(entity: Entity) -> tuple[str, str]:
@@ -253,9 +247,9 @@ def menu(entity: Optional[Entity]) -> str:
 
 @app.template_filter()
 def profile_image(
-    entity: Entity,
-    link_image: Optional[bool] = True,
-    max_width_100: Optional[bool] = False) -> str:
+        entity: Entity,
+        link_image: Optional[bool] = True,
+        max_width_100: Optional[bool] = False) -> str:
     if not entity.image_id or not (path := get_file_path(entity.image_id)):
         return ''
     file_id = entity.image_id
@@ -287,8 +281,8 @@ def profile_image(
     max_width = f"{width}px"
     if max_width_100:
         max_width = "100%"
-    html = f'''<img style="max-width:{max_width}"
-                alt="{entity.name}" src="{src}">'''
+    html =  \
+        f'<img style="max-width:{max_width}" alt="{entity.name}" src="{src}">'
     if not link_image:
         return html
     html = link(html, url, external=external)
@@ -480,8 +474,7 @@ def link(
         if uc_first_ and not str(object_).startswith('http'):
             object_ = uc_first(object_)
         class_ = f' class="{class_.strip()}"' if class_ else ''
-        icon_ = (f'<i class="ms-2 fas {icon}"></i>'
-                if icon else '')
+        icon_ = f'<i class="ms-2 fas {icon}"></i>' if icon else ''
         html = f'<a href="{url}"{class_}{js}{ext}>{object_}{icon_}</a>'
     elif isinstance(object_, Entity) and index:
         html = link(
