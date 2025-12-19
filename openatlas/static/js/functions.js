@@ -545,7 +545,7 @@ function processUcFirst(){
 function toggleMapWidth(element){
   const parent = element.parentElement
   parent.classList.toggle("col-lg-3")
-  parent.classList.toggle("col-lg-7")
+  parent.classList.toggle("col-lg-6")
   element.classList.toggle("rotate-180")
 }
 

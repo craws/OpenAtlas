@@ -252,7 +252,10 @@ def menu(entity: Optional[Entity]) -> str:
 
 
 @app.template_filter()
-def profile_image(entity: Entity, link_image: Optional[bool] = True) -> str:
+def profile_image(
+    entity: Entity,
+    link_image: Optional[bool] = True,
+    max_width_100: Optional[bool] = False) -> str:
     if not entity.image_id or not (path := get_file_path(entity.image_id)):
         return ''
     file_id = entity.image_id
@@ -281,7 +284,11 @@ def profile_image(entity: Entity, link_image: Optional[bool] = True) -> str:
             return '<p class="uc-first">' + _('no preview available') + '</p>'
     else:
         url = url_for('view', id_=entity.image_id)
-    html = f'<img style="max-width:{width}px" alt="{entity.name}" src="{src}">'
+    max_width = f"{width}px"
+    if max_width_100:
+        max_width = "100%"
+    html = f'''<img style="max-width:{max_width}"
+                alt="{entity.name}" src="{src}">'''
     if not link_image:
         return html
     html = link(html, url, external=external)

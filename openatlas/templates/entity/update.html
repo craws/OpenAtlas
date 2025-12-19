@@ -5,17 +5,17 @@
     <div class="row">
       {% if entity.image_id %}
         <div class="col-lg-1">
-          {{ entity|profile_image(False)|safe }}
+          {{ entity|profile_image(False, max_width_100=True)|safe }}
         </div>
       {% endif %}
-      <div class="col-lg-6">
+      <div class="col">
         <div class="row g-1">
           {{ form|display_form(manual_page='entity/' + entity.class_.group['name'])|safe }}
           {{ entity.class_.group['name']|citation_example|safe }}
         </div>
       </div>
       {% if entity.class_.attributes.get('location'): %}
-        <div class="col-lg-5 d-flex align-items-stretch">
+        <div class="col-lg-6 d-flex align-items-stretch">
           <div onclick="toggleMapWidth(this)" class="d-none btn btn-light d-lg-flex align-items-center"><i
               class="fas fa-chevron-right"></i></div>
           <div id="map" class="map"></div>
