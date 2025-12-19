@@ -104,6 +104,7 @@ def insert(
         writable=os.access(app.config['UPLOAD_PATH'], os.W_OK),
         overlays=get_overlays(origin) if origin else None,
         title=_(entity.class_.group['name']),
+        geonames_module=entity.class_.name in g.geonames.classes,
         crumbs=crumbs_for_insert(entity, origin, structure))
 
 
@@ -154,6 +155,7 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         gis_data=gis_data,
         overlays=get_overlays(entity),
         title=entity.name,
+        geonames_module=entity.class_.name in g.geonames.classes,
         crumbs=hierarchy_crumbs(entity) +
         [entity, _('copy') if copy else _('edit')])
 
