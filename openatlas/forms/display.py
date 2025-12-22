@@ -4,7 +4,7 @@ from typing import Any, Optional
 
 from flask import g, render_template
 from flask_babel import LazyString, lazy_gettext as _
-from wtforms import Field, FileField, IntegerField, SelectField, StringField
+from wtforms import FileField, IntegerField, SelectField, StringField
 from wtforms.validators import Email
 
 from openatlas import app
@@ -42,8 +42,8 @@ def html_form(
                 reference_systems_added = True
                 html += add_row(
                     label=_('reference system'),
-                    value=\
-                    '<span id="reference-system-switcher" class="uc-first '
+                    value='<span id="reference-system-switcher" '
+                    'class="uc-first '
                     f'{app.config["CSS"]["button"]["secondary"]}">'
                     + _('show') + '</span>')
             html += add_row(field, row_css="d-none")
@@ -93,9 +93,9 @@ def html_form(
 
 
 def add_row(
-        field: Optional[Field] = None,
+        field: Optional[Any] = None,
         value: Optional[str] = None,
-        label: Optional[str | LazyString] = None,
+        label: Optional[str] = None,
         form_id: Optional[str] = None,
         row_css: Optional[str] = None) -> str:
     row_css = row_css or ''

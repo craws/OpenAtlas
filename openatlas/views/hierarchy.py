@@ -4,7 +4,6 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.database.connect import Transaction
 from openatlas.display.table import Table
 from openatlas.display.util import (
     get_entities_linked_to_type_recursive, link, required_group)
@@ -24,24 +23,14 @@ def hierarchy_insert(category: str) -> str | Response:
         if Entity.check_hierarchy_exists(form.name.data):
             form.name.errors.append(_('error name exists'))
         else:
-            try:
-                Transaction.begin()
-                hierarchy = process_form(hierarchy, form)
-                Entity.insert_hierarchy(
-                    hierarchy,
-                    category,
-                    form.classes.data,
-                    bool(
-                        category == 'value' or (
-                            hasattr(form, 'multiple')
-                            and form.multiple.data)))
-                g.logger.log_user(hierarchy.id, 'insert')
-                Transaction.commit()
-            except Exception as e:  # pragma: no cover
-                Transaction.rollback()
-                g.logger.log('error', 'database', 'transaction failed', e)
-                flash(_('error transaction'), 'error')
-                abort(418)
+            Entity.insert_hierarchy(
+                process_form(hierarchy, form),
+                category,
+                form.classes.data,
+                bool(
+                    category == 'value'
+                    or (hasattr(form, 'multiple') and form.multiple.data)))
+            g.logger.log_user(hierarchy.id, 'insert')
             flash(_('entity created'))
             return redirect(
                 f"{url_for('index', group='type')}#menu-tab-{category}")
@@ -73,23 +62,15 @@ def hierarchy_update(id_: int) -> str | Response:
                 and Entity.check_hierarchy_exists(form.name.data):
             form.name.errors.append(_('error name exists'))
         else:
-            Transaction.begin()
-            try:
-                hierarchy.update_hierarchy(
-                    form.name.data,
-                    form.classes.data,
-                    multiple=(
-                        hierarchy.category == 'value'
-                        or (hasattr(form, 'multiple') and form.multiple.data)
-                        or has_multiple_links))
-                process_form(hierarchy, form)
-                g.logger.log_user(hierarchy.id, 'update')
-                Transaction.commit()
-            except Exception as e:  # pragma: no cover
-                Transaction.rollback()
-                g.logger.log('error', 'database', 'transaction failed', e)
-                flash(_('error transaction'), 'error')
-                abort(418)
+            hierarchy.update_hierarchy(
+                form.name.data,
+                form.classes.data,
+                multiple=(
+                    hierarchy.category == 'value'
+                    or (hasattr(form, 'multiple') and form.multiple.data)
+                    or has_multiple_links))
+            process_form(hierarchy, form)
+            g.logger.log_user(hierarchy.id, 'update')
             flash(_('info update'))
             return redirect(
                 f"{url_for('index', group='type')}"

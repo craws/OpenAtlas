@@ -1,13 +1,12 @@
 import ast
 from typing import Optional
 
-from flask import flash, g, render_template, request, url_for
+from flask import flash, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.util import hierarchy_crumbs, link, required_group
 from openatlas.display.util2 import uc_first
@@ -122,13 +121,8 @@ def link_update(id_: int, origin_id: int, name: str) -> str | Response:
                 form,
                 str(hierarchy.id)).data or None
         data.update(process_dates(form))
-        try:
-            link_.update(data)
-            flash(_('info update'))
-        except Exception as e:  # pragma: no cover
-            Transaction.rollback()
-            g.logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
+        link_.update(data)
+        flash(_('info update'))
         return redirect(
             f"{url_for('view', id_=origin.id)}#tab-" + name.replace('_', '-'))
     return render_template(

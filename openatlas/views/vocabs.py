@@ -1,25 +1,24 @@
-from typing import Optional
+from typing import Any, Optional
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import BooleanField, SelectField, SelectMultipleField, widgets
-from wtforms.validators import InputRequired
+from wtforms import (
+    BooleanField, SelectField, SelectMultipleField, StringField, widgets)
+from wtforms.validators import InputRequired, URL
 
 from openatlas import app
 from openatlas.api.import_scripts.vocabs import (
     fetch_top_concept_details, fetch_top_group_details,
     fetch_vocabulary_details, get_vocabularies, import_vocabs_data)
-from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import button, display_info, link, required_group
 from openatlas.display.util2 import is_authorized, manual
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
-from openatlas.forms.form import get_vocabs_form
 from openatlas.models.entity import Entity
 from openatlas.models.settings import Settings
 
@@ -48,10 +47,22 @@ def vocabs_index() -> str:
             'VOCABS'])
 
 
+def vocabs_form() -> Any:
+    class Form(FlaskForm):
+        base_url = StringField(
+            _('base URL'),
+            validators=[InputRequired(), URL()])
+        endpoint = StringField(_('endpoint'), validators=[InputRequired()])
+        vocabs_user = StringField(_('user'))
+        save = SubmitField(_('save'))
+
+    return Form()
+
+
 @app.route('/vocabs/update', methods=['GET', 'POST'])
 @required_group('manager')
 def vocabs_update() -> str | Response:
-    form = get_vocabs_form()
+    form = vocabs_form()
     if form.validate_on_submit():
         Settings.update({
             'vocabs_base_url': form.base_url.data,
@@ -166,7 +177,6 @@ def vocabulary_import_view(category: str, id_: str) -> str | Response:
         try:
             results = import_vocabs_data(id_, form_data, details, category)
             count = len(results[0])
-            Transaction.commit()
             g.logger.log('info', 'import', f'import: {count} top concepts')
             import_str = f"{_('import of')}: {count} {_('top concepts')}"
             if results[1]:
@@ -178,7 +188,6 @@ def vocabulary_import_view(category: str, id_: str) -> str | Response:
                         f'Did not import "{duplicate}", duplicate.')
             flash(import_str)
         except Exception as e:  # pragma: no cover
-            Transaction.rollback()
             g.logger.log('error', 'import', 'import failed', e)
             flash(_('error transaction'), 'error')
         return redirect(f"{url_for('index', group='type')}#menu-tab-custom")

@@ -9,7 +9,7 @@ class ReferenceSystemTest(TestBaseCase):
 
     def test_reference_system(self) -> None:
         c = self.client
-        rv = c.post(url_for('ajax_wikidata_info'), data={'id_': 'Q304037'})
+        rv = c.post(url_for('ajax_info_wikidata'), data={'id_': 'Q304037'})
         assert b'National Library of Austria' in rv.data
 
         rv = c.post(url_for('ajax_geonames_info'), data={'id_': '747712'})

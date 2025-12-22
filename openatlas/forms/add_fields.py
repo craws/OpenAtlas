@@ -492,3 +492,23 @@ def add_buttons(form: Any, entity: Entity, relation: Relation) -> None:
                         item,
                         SubmitField(
                             _('insert and add') + ' ' + _('human remains')))
+
+
+def add_additional_link_fields(
+        form: Any,
+        relation: Relation,
+        link_: Optional[Link] = None) -> None:
+    for item in relation.additional_fields:
+        match item:
+            case 'dates':
+                add_date_fields(form, link_)
+            case 'description':
+                setattr(
+                    form,
+                    'description',
+                    TextAreaField(_(item), render_kw={'rows': 8}))
+            case 'page':
+                setattr(
+                    form,
+                    'description',
+                    StringField(_(item), render_kw={'rows': 8}))

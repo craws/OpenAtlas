@@ -9,13 +9,14 @@ from flask import g
 from flask_login import current_user
 from shapely import wkt
 from shapely.errors import ShapelyError
-from shapely.geometry import Point, Polygon, mapping, LineString
+from shapely.geometry import LineString, Point, Polygon, mapping
 
 from openatlas.api.import_scripts.util import (
     get_match_types, get_reference_system_by_name)
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.error import EntityDoesNotExistError
 from openatlas.database import imports as db
+from openatlas.database.connect import Transaction
 from openatlas.display.util2 import sanitize
 from openatlas.models.entity import Entity, insert
 
@@ -100,84 +101,79 @@ def check_single_type_duplicates(type_ids: list[str]) -> list[str]:
 
 def import_data_(project: Project, class_: str, data: list[Any]) -> None:
     entities: dict[str | int, dict[str, Any]] = {}
-    for row in data:
+    Transaction.begin()
+    try:
+        for row in data:
+            if value := row.get('openatlas_class'):
+                if value.lower().replace(' ', '_') in (
+                        g.class_groups['place']['classes'] +
+                        g.class_groups['artifact']['classes']):
+                    class_ = value.lower().replace(' ', '_')
+            description = row.get('description')
+            insert_data = {
+                'name': row['name'],
+                'openatlas_class_name': class_,
+                'description': description,
+                'begin_from': row.get('begin_from', None),
+                'begin_to': row.get('begin_to', None),
+                'begin_comment': row.get('begin_comment', None),
+                'end_from': row.get('end_from', None),
+                'end_to': row.get('end_to', None),
+                'end_comment': row.get('end_comment', None)}
+            if class_ in ['place', 'person', 'group'] and row.get('alias'):
+                insert_data['alias'] = row.get('alias').split(";")
+            if class_ in g.class_groups['place']['classes'] \
+                    + g.class_groups['artifact']['classes']:
+                gis_data = {'point': '[]', 'line': '[]', 'polygon': '[]'}
+                if coordinates := row.get('wkt'):
+                    gis_data = get_coordinates_from_wkt(coordinates)
+                insert_data['gis'] = gis_data
+            tmp_entity = insert(insert_data)
+            entity = Entity.get_by_id(tmp_entity.id, with_location=True)
+            db.import_data(
+                project.id,
+                entity.id,
+                current_user.id,
+                origin_id=row.get('id'))
+            if entity.class_ != 'type':
+                link_types(entity, row, class_, project)
+            link_references(entity, row, class_, project)
+            if entity.location:
+                link_admin_units(entity.location, row)
+            entities[row.get('id')] = {
+                'entity': entity,
+                'parent_id': row.get('parent_id'),
+                'openatlas_parent_id': row.get('openatlas_parent_id')}
 
-        if value := row.get('openatlas_class'):
-            if value.lower().replace(' ', '_') in (
+        for entry in entities.values():
+            if entry['entity'].class_.name in (
                     g.class_groups['place']['classes'] +
                     g.class_groups['artifact']['classes']):
-                class_ = value.lower().replace(' ', '_')
-        if row.get('id') == 'strati_1':
-            print('here 0')
-        description = row.get('description')
-        insert_data = {
-            'name': row['name'],
-            'openatlas_class_name': class_,
-            'description': description,
-            'begin_from': row.get('begin_from', None),
-            'begin_to': row.get('begin_to', None),
-            'begin_comment': row.get('begin_comment', None),
-            'end_from': row.get('end_from', None),
-            'end_to': row.get('end_to', None),
-            'end_comment': row.get('end_comment', None)}
-        if row.get('id') == 'strati_1':
-            print('here 1')
-        if class_ in ['place', 'person', 'group'] and row.get('alias'):
-            insert_data['alias'] = row.get('alias').split(";")
-        if row.get('id') == 'strati_1':
-            print('here 2')
-        if class_ in g.class_groups['place']['classes'] \
-                + g.class_groups['artifact']['classes']:
-            gis_data = {'point': '[]', 'line': '[]', 'polygon': '[]'}
-            if coordinates := row.get('wkt'):
-                gis_data = get_coordinates_from_wkt(coordinates)
-            insert_data['gis'] = gis_data
-        if row.get('id') == 'strati_1':
-            print('here 4')
-        tmp_entity = insert(insert_data)
-        if row.get('id') == 'strati_1':
-            print('here 5')
-
-        # Get entity locations
-        entity = Entity.get_by_id(tmp_entity.id, with_location=True)
-        db.import_data(
-            project.id,
-            entity.id,
-            current_user.id,
-            origin_id=row.get('id'))
-        if entity.class_ != 'type':
-            link_types(entity, row, class_, project)
-        link_references(entity, row, class_, project)
-        if entity.location:
-            link_admin_units(entity.location, row)
-        entities[row.get('id')] = {
-            'entity': entity,
-            'parent_id': row.get('parent_id'),
-            'openatlas_parent_id': row.get('openatlas_parent_id')}
-
-    for entry in entities.values():
-        if entry['entity'].class_.name in (
-                g.class_groups['place']['classes'] +
-                g.class_groups['artifact']['classes']):
-            if entry['parent_id']:
-                entities[entry['parent_id']]['entity'].link(
-                    'P46',
-                    entry['entity'])
-            elif entry['openatlas_parent_id']:
-                Entity.get_by_id(entry['openatlas_parent_id']).link(
-                    'P46',
-                    entry['entity'])
-        if entry['entity'].class_.name == 'type':
-            if entry['parent_id']:
-                entities[entry['parent_id']]['entity'].link(
-                    'P127',
-                    entry['entity'],
-                    inverse=True)
-            elif entry['openatlas_parent_id']:
-                Entity.get_by_id(entry['openatlas_parent_id']).link(
-                    'P127',
-                    entry['entity'],
-                    inverse=True)
+                if entry['parent_id']:
+                    entities[entry['parent_id']]['entity'].link(
+                        'P46',
+                        entry['entity'])
+                elif entry['openatlas_parent_id']:
+                    Entity.get_by_id(entry['openatlas_parent_id']).link(
+                        'P46',
+                        entry['entity'])
+            if entry['entity'].class_.name == 'type':
+                if entry['parent_id']:
+                    entities[entry['parent_id']]['entity'].link(
+                        'P127',
+                        entry['entity'],
+                        inverse=True)
+                elif entry['openatlas_parent_id']:
+                    Entity.get_by_id(entry['openatlas_parent_id']).link(
+                        'P127',
+                        entry['entity'],
+                        inverse=True)
+        Transaction.commit()
+        g.logger.log('info', 'import', f'import: {len(data)}')
+    except Exception as e:  # pragma: no cover
+        Transaction.rollback()
+        g.logger.log('error', 'import', 'import failed', e)
+        raise e from None
 
 
 def link_types(

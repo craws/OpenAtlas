@@ -213,12 +213,14 @@ presentation.add_argument(
     location='args')
 presentation.add_argument(
     'place_hierarchy',
+    case_sensitive=False,
     type=str,
     default='false',
     choices=('true', 'false'),
     location='args')
 presentation.add_argument(
     'map_overlay',
+    case_sensitive=False,
     type=str,
     default='false',
     choices=('true', 'false'),
@@ -255,7 +257,6 @@ query.add_argument(
     action='append',
     help="{error_msg}",
     location='args')
-
 
 
 gis = default.copy()

@@ -21,7 +21,7 @@ class OpenatlasClass:
     standard_type_id: int | None
     write_access: str
     attributes: dict[str, Any]
-    relations: dict[str, Any]
+    relations: dict[str, Relation]
     display: dict[str, Any]
     extra: dict[str, Any]
 

@@ -987,6 +987,12 @@ class Api(ApiTestCase):
         assert 'Not public' in rv.get_json()['title']
         assert b'Endpoint not found' in c.get('/api/entity2').data
 
+        rv = c.get(url_for('api_04.display', filename='some_string'))
+        assert 'Filename is not an integer' in rv.get_json()['title']
+
+        rv = c.get(url_for('api_04.display', filename=place.id))
+        assert 'Entity is not a file' in rv.get_json()['title']
+
         c.get(url_for('logout'))
         app.config['ALLOWED_IPS'] = []
 

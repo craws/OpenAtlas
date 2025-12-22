@@ -270,3 +270,11 @@ img.schema_image {
 .tooltip-inner {
     text-align: left;
 }
+
+.circle {
+  aspect-ratio: 1/1;
+  border-radius: 100%;
+  line-height: normal;
+  align-content: center;
+  text-align: center;
+}

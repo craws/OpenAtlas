@@ -100,7 +100,8 @@ class ActivityForm(FlaskForm):
 @required_group('readonly')
 def user_activity(user_id: int = 0, entity_id: Optional[int] = None) -> str:
     form = ActivityForm()
-    form.user.choices = [(0, _('all'))] + User.get_users_for_form()
+    form.user.choices = \
+        [(0, _('all'))] + [(u.id, u.username) for u in User.get_all()]
     limit = 100
     user_id = user_id or 0
     action = 'all'

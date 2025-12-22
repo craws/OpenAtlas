@@ -45,6 +45,9 @@ class IndexTests(TestBaseCase):
         rv = c.get('/static/non_existing_file.js')
         assert b'The site does not exist.' in rv.data
 
+        rv = c.get('/index/non_existing_class')
+        assert b'404' in rv.data
+
         rv = c.get(url_for('logout'), follow_redirects=True)
         assert b'Password' in rv.data
 
