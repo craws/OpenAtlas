@@ -164,10 +164,11 @@ def get_test_mail_form() -> str:
             'This test mail was sent by %(username)s',
             username=current_user.username) +
                 ' ' + _('at') + ' ' + request.headers['Host'])
-        if send_mail(subject, body, form.receiver.data):
-            flash(_(
-                'A test mail was sent to %(email)s.',
-                email=form.receiver.data), 'info')
+        if send_mail(subject, body, form.receiver.data):  # type: ignore
+            flash(
+                str(_('A test mail was sent to %(email)s.',
+                    email=form.receiver.data)),
+                'info')
     elif request.method == 'GET':
         form.receiver.data = current_user.email
     return display_form(form)
@@ -217,7 +218,7 @@ def admin_content(item: str) -> str | Response:
             ContentForm,
             language,
             TextAreaField(render_kw={'class': 'tinymce'}))
-    setattr(ContentForm, 'save', SubmitField(_('save')))
+    setattr(ContentForm, 'save', SubmitField(str(_('save'))))
     form = ContentForm()
     if form.validate_on_submit():
         data = []
@@ -227,7 +228,7 @@ def admin_content(item: str) -> str | Response:
                 'language': language,
                 'text': getattr(form, language).data or ''})
         update_content(data)
-        flash(_('info update'))
+        flash(str(_('info update')))
         return redirect(f"{url_for('admin_index')}#tab-content")
     for language in app.config['LANGUAGES']:
         getattr(form, language).data = get_content()[item][language]
@@ -264,7 +265,7 @@ def settings(category: str) -> str | Response:
             data[field.name] = value
         Settings.update(data)
         g.logger.log('info', 'settings', 'Settings updated')
-        flash(_('info update'))
+        flash(str(_('info update')))
         return redirect(redirect_url)
     if request.method == 'GET':
         set_form_settings(form)
@@ -285,7 +286,7 @@ def admin_file_delete(filename: str) -> Response:
             flash(f"{filename} {_('was deleted')}")
         except Exception as e:
             g.logger.log('error', 'file', f'deletion of {filename} failed', e)
-            flash(_('error file delete'), 'error')
+            flash(str(_('error file delete')), 'error')
         return redirect(f"{url_for('orphans')}#tab-orphaned-files")
 
     # Delete all files with no corresponding entity
@@ -298,7 +299,7 @@ def admin_file_delete(filename: str) -> Response:
                 except Exception as e:
                     g.logger.log(
                         'error', 'file', f'deletion of {f.name} failed', e)
-                    flash(_('error file delete'), 'error')
+                    flash(str(_('error file delete')), 'error')
     return redirect(
         f"{url_for('orphans')}#tab-orphaned-files")  # pragma: no cover
 
@@ -308,7 +309,7 @@ def admin_file_delete(filename: str) -> Response:
 def admin_annotation_image_delete(id_: int) -> Response:
     annotation = AnnotationImage.get_by_id(id_)
     annotation.delete()
-    flash(_('annotation deleted'))
+    flash(str(_('annotation deleted')))
     return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
 
 
@@ -316,7 +317,7 @@ def admin_annotation_image_delete(id_: int) -> Response:
 @required_group('editor')
 def admin_annotation_text_delete(id_: int) -> Response:
     AnnotationText.delete_annotations_text(id_)
-    flash(_('annotation deleted'), 'info')
+    flash(str(_('annotation deleted')), 'info')
     return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
 
 
@@ -325,7 +326,7 @@ def admin_annotation_text_delete(id_: int) -> Response:
 def admin_annotation_image_relink(origin_id: int, entity_id: int) -> Response:
     image = Entity.get_by_id(origin_id)
     image.link('P67', Entity.get_by_id(entity_id))
-    flash(_('entities relinked'), 'info')
+    flash(str(_('entities relinked')), 'info')
     return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
 
 
@@ -334,7 +335,7 @@ def admin_annotation_image_relink(origin_id: int, entity_id: int) -> Response:
 def admin_annotation_text_relink(origin_id: int, entity_id: int) -> Response:
     source = Entity.get_by_id(origin_id)
     source.link('P67', Entity.get_by_id(entity_id))
-    flash(_('entities relinked'))
+    flash(str(_('entities relinked')))
     return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
 
 
@@ -345,7 +346,7 @@ def admin_annotation_image_remove_entity(
         annotation_id: int,
         entity_id: int) -> Response:
     AnnotationImage.remove_entity_from_annotation(annotation_id, entity_id)
-    flash(_('entity removed from annotation'))
+    flash(str(_('entity removed from annotation')))
     return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
 
 
@@ -356,7 +357,7 @@ def admin_annotation_text_remove_entity(
         annotation_id: int,
         entity_id: int) -> Response:
     AnnotationText.remove_entity_from_annotation(annotation_id, entity_id)
-    flash(_('entity removed from annotation'), 'info')
+    flash(str(_('entity removed from annotation')), 'info')
     return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
 
 
@@ -368,14 +369,14 @@ def admin_file_iiif_delete(filename: str) -> Response:
         flash(f"{filename} {_('was deleted')}")
     except Exception as e:
         g.logger.log('error', 'file', f'deletion of IIIF {filename} failed', e)
-        flash(_('error file delete'), 'error')
+        flash(str(_('error file delete')), 'error')
     return redirect(f"{url_for('orphans')}#tab-orphaned-iiif-files")
 
 
 @app.route('/log', methods=['GET', 'POST'])
 @required_group('admin')
 def log() -> str:
-    form = LogForm()
+    form: Any = LogForm()
     form.user.choices = \
         [(0, _('all'))] + [(u.id, u.username) for u in User.get_all()]
     table = Table(
@@ -417,7 +418,7 @@ def log() -> str:
 @required_group('admin')
 def log_delete() -> Response:
     g.logger.delete_all_system_logs()
-    flash(_('Logs deleted'))
+    flash(str(_('Logs deleted')))
     return redirect(url_for('log'))
 
 
@@ -486,7 +487,7 @@ def newsletter() -> str | Response:
 @required_group('admin')
 def resize_images() -> Response:
     create_resized_images()
-    flash(_('images were created'))
+    flash(str(_('images were created')))
     return redirect(url_for('admin_index') + '#tab-data')
 
 

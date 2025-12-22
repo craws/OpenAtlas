@@ -22,8 +22,8 @@ class SearchForm(FlaskForm):
         'search',
         [InputRequired()],
         render_kw={'autofocus': True})
-    own = BooleanField(_('Only entities edited by me'))
-    desc = BooleanField(_('Also search in description'))
+    own = BooleanField(str(_('Only entities edited by me')))
+    desc = BooleanField(str(_('Also search in description')))
     # noinspection PyTypeChecker
     classes = SelectMultipleField(
         _('classes'),
@@ -31,7 +31,7 @@ class SearchForm(FlaskForm):
         choices=(),
         option_widget=widgets.CheckboxInput(),
         widget=widgets.ListWidget(prefix_label=False))
-    search = SubmitField(_('search'))
+    search = SubmitField(str(_('search')))
     validator_day = [Optional(), NumberRange(min=1, max=31)]
     validator_month = [Optional(), NumberRange(min=1, max=12)]
     validator_year = [
@@ -56,7 +56,7 @@ class SearchForm(FlaskForm):
     end_day = IntegerField(
         render_kw={'placeholder': 31},
         validators=validator_day)
-    include_dateless = BooleanField(_('Include dateless entities'))
+    include_dateless = BooleanField(str(_('Include dateless entities')))
 
     def validate(self, extra_validators: Any = None) -> bool:
         valid = FlaskForm.validate(self)
@@ -70,8 +70,8 @@ class SearchForm(FlaskForm):
             self.end_day.data,
             to_date=True)
         if from_date and to_date and from_date > to_date:
-            self.begin_year.errors.append(
-                _('Begin dates cannot start after end dates.'))
+            self.begin_year.errors.append(  # type: ignore
+                str(_('Begin dates cannot start after end dates.')))
             valid = False
         return valid
 

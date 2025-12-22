@@ -26,40 +26,40 @@ from openatlas.models.user import User
 
 class GenerateTokenForm(FlaskForm):
     expiration = IntegerField(
-        _('expiration'),
+        str(_('expiration')),
         default=30,
         description=_('expiration in days')
         + ', 0 = ' + _("no expiration date"))
     token_name = StringField(
-        _('name'),
+        str(_('name')),
         default=f"Token_{datetime.today().strftime('%Y-%m-%d')}")
-    user = SelectField(_('user'), choices=(), default=0, coerce=int)
+    user = SelectField(str(_('user')), choices=(), default=0, coerce=int)
     token_text = HiddenField()
-    save = SubmitField(_('generate'))
+    save = SubmitField(str(_('generate')))
 
 
 class ListTokenForm(FlaskForm):
-    user = SelectField(_('user'), choices=(), default=0, coerce=int)
+    user = SelectField(str(_('user')), choices=(), default=0, coerce=int)
     revoked = SelectField(
-        _('revoked'),
+        str(_('revoked')),
         choices=(
-            ('all', _('all')),
-            ('true', _('revoked')),
-            ('false', _('not revoked'))))
+            ('all', str(_('all'))),
+            ('true', str(_('revoked'))),
+            ('false', str(_('not revoked')))))
     valid = SelectField(
-        _('valid'),
+        str(_('valid')),
         choices=(
-            ('all', _('all')),
-            ('>', _('valid')),
-            ('<', _('not valid'))))
-    save = SubmitField(_('apply'))
+            ('all', str(_('all'))),
+            ('>', str(_('valid'))),
+            ('<', str(_('not valid')))))
+    save = SubmitField(str(_('apply')))
 
 
 @app.route('/admin/api_token', methods=['GET', 'POST'])
 @app.route('/admin/api_token/<int:user_id>', methods=['GET', 'POST'])
 @required_group('admin')
 def api_token(user_id: int = 0) -> str | Response:
-    form = ListTokenForm()
+    form: Any = ListTokenForm()
     form.user.choices = \
         [(0, _('all'))] + [(u.id, u.username) for u in User.get_all()]
     user_id = user_id or 0
@@ -150,7 +150,7 @@ def get_token_valid_column(token: dict[str, Any], user: User) -> str:
 @app.route('/admin/api_token/generate_token', methods=['GET', 'POST'])
 @required_group('admin')
 def generate_token() -> str | Response:
-    form = GenerateTokenForm()
+    form: Any = GenerateTokenForm()
     form.user.choices = [(u.id, u.username) for u in User.get_all()]
     if form.validate_on_submit():
         user_ = User.get_by_id_without_bookmarks(int(form.user.data))
@@ -182,7 +182,7 @@ def generate_token() -> str | Response:
 @login_required
 def revoke_token(id_: int) -> str | Response:
     Token.revoke_jwt_token(id_)
-    flash(_('token revoked'))
+    flash(str(_('token revoked')))
     return redirect(f"{url_for('api_token')}")
 
 
@@ -190,7 +190,7 @@ def revoke_token(id_: int) -> str | Response:
 @login_required
 def authorize_token(id_: int) -> str | Response:
     Token.authorize_jwt_token(id_)
-    flash(_('token authorized'))
+    flash(str(_('token authorized')))
     return redirect(f"{url_for('api_token')}")
 
 
@@ -198,7 +198,7 @@ def authorize_token(id_: int) -> str | Response:
 @login_required
 def delete_token(id_: int) -> str | Response:
     Token.delete_token(id_)
-    flash(_('token deleted'))
+    flash(str(_('token deleted')))
     return redirect(f"{url_for('api_token')}")
 
 
@@ -206,7 +206,7 @@ def delete_token(id_: int) -> str | Response:
 @login_required
 def delete_revoked_tokens() -> str | Response:
     Token.delete_all_revoked_tokens()
-    flash(_('tokens deleted'))
+    flash(str(_('tokens deleted')))
     return redirect(f"{url_for('api_token')}")
 
 
@@ -214,7 +214,7 @@ def delete_revoked_tokens() -> str | Response:
 @login_required
 def delete_invalid_tokens() -> str | Response:
     Token.delete_invalid_tokens()
-    flash(_('tokens deleted'))
+    flash(str(_('tokens deleted')))
     return redirect(f"{url_for('api_token')}")
 
 
@@ -222,7 +222,7 @@ def delete_invalid_tokens() -> str | Response:
 @login_required
 def revoke_all_tokens() -> str | Response:
     Token.revoke_all_tokens()
-    flash(_('all tokens revoked'))
+    flash(str(_('all tokens revoked')))
     return redirect(f"{url_for('api_token')}")
 
 
@@ -230,5 +230,5 @@ def revoke_all_tokens() -> str | Response:
 @login_required
 def authorize_all_tokens() -> str | Response:
     Token.authorize_all_tokens()
-    flash(_('all tokens authorized'))
+    flash(str(_('all tokens authorized')))
     return redirect(f"{url_for('api_token')}")

@@ -63,7 +63,7 @@ def add_name_fields(form: Any, entity: Entity) -> None:
 
 
 def get_validators(item: dict[str, Any]) -> list[Any]:
-    validators = []
+    validators: list[Any] = []
     if item['required']:
         validators.append(InputRequired())
     if item.get('format') == 'url':
@@ -103,14 +103,14 @@ def add_description(
             entity.class_.name == 'type'
             and origin
             and origin.category == 'value'):
-        setattr(form, 'description', StringField(_('unit')))
+        setattr(form, 'description', StringField(str(_('unit'))))
         return
     if 'annotated' not in attribute_description:
         setattr(
             form,
             'description',
             TextAreaField(
-                _('description'),
+                str(_('description')),
                 render_kw={'rows': 8},
                 validators=get_validators(attribute_description)))
         return
@@ -145,19 +145,19 @@ def add_type(form: Any, type_: Entity) -> None:
         class AddDynamicType(FlaskForm):
             pass
 
-        setattr(AddDynamicType, 'name-dynamic', StringField(_('name')))
+        setattr(AddDynamicType, 'name-dynamic', StringField(str(_('name'))))
         setattr(
             AddDynamicType,
             f'{type_.id}-dynamic',
-            TreeField(_('super'), type_id=type_.id, is_type_form=True))
+            TreeField(str(_('super')), type_id=type_.id, is_type_form=True))
         setattr(
             AddDynamicType,
             'description-dynamic',
-            TextAreaField(_('description')))
+            TextAreaField(str(_('description'))))
         add_form = AddDynamicType()
     validators = [InputRequired()] if type_.required else []
     if type_.category == 'value':
-        field = ValueTypeRootField(type_.name, type_.id)
+        field: Any = ValueTypeRootField(type_.name, type_.id)
     elif type_.multiple:
         field = TreeMultiField(str(type_.id), validators, form=add_form)
     else:
@@ -194,12 +194,15 @@ def add_relations(
                         filter_ids=[entity.id] if entity else [],
                         is_type_form=True))
                 if root.directional:
-                    setattr(form, 'name_inverse', StringField(_('inverse')))
+                    setattr(
+                        form,
+                        'name_inverse',
+                        StringField(str(_('inverse'))))
             else:  # It's a root type (hierarchy)
                 if entity.category == 'custom':
                     form.multiple = BooleanField(
-                        _('multiple'),
-                        description=_('tooltip hierarchy multiple'))
+                        str(_('multiple')),
+                        description=str(_('tooltip hierarchy multiple')))
                 # noinspection PyTypeChecker
                 form.classes = SelectMultipleField(
                     _('classes'),
@@ -457,12 +460,12 @@ def add_value_type_fields(form_class: FlaskForm, subs: list[int]) -> None:
         add_value_type_fields(form_class, sub.subs)
 
 
-def add_buttons(form: Any, entity: Entity, relation: Relation) -> None:
-    field = SubmitField
+def add_buttons(form: Any, entity: Entity, relation: Relation | None) -> None:
+    field: Any = SubmitField
     if 'description' in entity.class_.attributes \
             and 'annotated' in entity.class_.attributes['description']:
         field = SubmitAnnotationField
-    setattr(form, 'save', field(_('save') if entity.id else _('insert')))
+    setattr(form, 'save', field(str(_('save')) if entity.id else _('insert')))
     if not entity.id:
         for item in entity.class_.display['form_buttons']:
             match item:
@@ -471,7 +474,7 @@ def add_buttons(form: Any, entity: Entity, relation: Relation) -> None:
                     setattr(
                         form,
                         item,
-                        field(_('insert and continue')))
+                        field(str(_('insert and continue'))))
                     setattr(form, 'continue_', HiddenField())
                 case 'insert_continue_sub':
                     label = 'unknown'
@@ -506,9 +509,9 @@ def add_additional_link_fields(
                 setattr(
                     form,
                     'description',
-                    TextAreaField(_(item), render_kw={'rows': 8}))
+                    TextAreaField(str(_(item)), render_kw={'rows': 8}))
             case 'page':
                 setattr(
                     form,
                     'description',
-                    StringField(_(item), render_kw={'rows': 8}))
+                    StringField(str(_(item)), render_kw={'rows': 8}))

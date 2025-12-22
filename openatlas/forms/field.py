@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-# pylint: disable=too-few-public-methods
+# pylint: disable=too-few-public-methods, not useful with inheritance
+# mypy: ignore-errors, too much trouble to mypy check form elements
 import ast
 from typing import Any, Optional
 
@@ -234,7 +235,7 @@ class TableSelect(HiddenInput):
 
         def get_form(class_name_: str) -> Any:
             class SimpleEntityForm(FlaskForm):
-                name_dynamic = StringField(_('name'))
+                name_dynamic = StringField(str(_('name')))
 
             if class_name_ in g.classes \
                     and g.classes[class_name_].hierarchies \
@@ -249,7 +250,7 @@ class TableSelect(HiddenInput):
             setattr(
                 SimpleEntityForm,
                 'description_dynamic',
-                TextAreaField(_('description')))
+                TextAreaField(str(_('description'))))
             return SimpleEntityForm()
 
         field.forms = {}

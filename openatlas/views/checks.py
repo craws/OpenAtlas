@@ -103,7 +103,7 @@ def check_links() -> str:
 @required_group('contributor')
 def delete_single_type_duplicate(entity_id: int, type_id: int) -> Response:
     g.types[type_id].remove_entity_links(entity_id)
-    flash(_('link removed'))
+    flash(str(_('link removed')))
     return redirect(url_for('check_links') + '#tab-type')
 
 
@@ -127,7 +127,7 @@ def check_similar() -> str:
         table = Table(['name', _('count')])
         for item in checks.similar_named(
                 form.classes.data,
-                form.ratio.data).values():
+                form.ratio.data if form.ratio.data else 100).values():
             similar = [link(entity) for entity in item['entities']]
             table.rows.append([
                 f"{link(item['entity'])}<br>{'<br>'.join(similar)}",
@@ -381,7 +381,7 @@ def check_files(arche: Optional[str] = None) -> str:
 @required_group('admin')
 def admin_delete_orphaned_resized_images() -> Response:
     delete_orphaned_resized_images()
-    flash(_('resized orphaned images were deleted'))
+    flash(str(_('resized orphaned images were deleted')))
     return redirect(url_for('admin_index') + '#tab-data')
 
 

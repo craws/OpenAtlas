@@ -31,7 +31,7 @@ def populate_update(form: Any, entity: Entity) -> None:
 
     type_data: dict[int, list[int]] = {}
     for type_, value in entity.types.items():
-        root = g.types[type_.root[0]] if type_.root else type
+        root: Entity = g.types[type_.root[0]] if type_.root else type_
         if root.id not in type_data:
             type_data[root.id] = []
         type_data[root.id].append(type_.id)
@@ -49,7 +49,7 @@ def populate_reference_systems(form: Any, entity: Entity) -> None:
     for link_ in entity.get_links('P67', ['reference_system'], inverse=True):
         getattr(form, f'reference_system_id_{link_.domain.id}').data = {
             'value': link_.description,
-            'precision': str(link_.type.id)}
+            'precision': str(link_.type.id) if link_.type else None}
 
 
 def populate_dates(form: Any, dates: Dates) -> None:

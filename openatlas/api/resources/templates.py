@@ -131,7 +131,7 @@ def linked_places_template(parser: Parser) -> dict[str, Type[String]]:
         'when': fields.Nested(when)}
     if parser.format == 'lpx':
         relations['relationTypeLabel'] = fields.String
-    feature = {
+    feature: dict[str, Any] = {
         '@id': fields.String,
         'type': fields.String,
         'crmClass': fields.String,
@@ -152,7 +152,7 @@ def linked_places_template(parser: Parser) -> dict[str, Type[String]]:
         feature['links'] = fields.List(fields.Nested(links))
     if 'depictions' in show:
         feature['depictions'] = fields.List(fields.Nested(depictions))
-    feature['geometry'] = fields.Raw  # type: ignore
+    feature['geometry'] = fields.Raw
 
     return {
         '@context': fields.String,
@@ -248,7 +248,7 @@ def presentation_template() -> dict[str, Any]:
             'title': fields.String}),
         'relationTypes': fields.List(fields.Nested(relation_types))}
 
-    def get_relations() -> fields:
+    def get_relations() -> Any:
         dict_ = {}
         for name in g.classes:
             if name in app.config['API_PRESENTATION_EXCLUDE_RELATION']:

@@ -29,13 +29,15 @@ def annotate_image_form(
         entity: Optional[Entity] = None,
         insert: Optional[bool] = True) -> Any:
     class Form(FlaskForm):
-        text = TextAreaField(_('annotation'))
+        text = TextAreaField(str(_('annotation')))
 
     if insert:
         setattr(
             Form,
             'coordinate',
-            HiddenField(_('coordinates'), validators=[InputRequired()]))
+            HiddenField(
+                str(_('coordinates')),
+                validators=[InputRequired()]))
     setattr(
         Form,
         'entity',
@@ -45,7 +47,7 @@ def annotate_image_form(
                 aliases=True,
                 sort=True),
             entity))
-    setattr(Form, 'save', SubmitField(_('save')))
+    setattr(Form, 'save', SubmitField(str(_('save'))))
     return Form()
 
 
@@ -60,7 +62,7 @@ def link_form(origin: Entity, relation: Relation) -> Any:
     setattr(Form, 'checkbox_values', HiddenField())
     setattr(Form, relation.name, LinkTableField(table=table, label=''))
     if table.rows:
-        setattr(Form, 'save', SubmitField(_('save')))
+        setattr(Form, 'save', SubmitField(str(_('save'))))
     return Form('checkbox-form')
 
 
@@ -90,7 +92,7 @@ def link_detail_form(
         aliases=current_user.settings['table_show_aliases'])
     entities = filter_entities(origin, entities, relation)
     if relation.multiple:
-        table = TableMultiField(
+        table: Any = TableMultiField(
             entities,
             selection=[selection] if selection else None,
             validators=validators)
@@ -101,7 +103,7 @@ def link_detail_form(
             validators=validators)
     setattr(Form, relation.name, table)
     add_additional_link_fields(Form, relation)
-    setattr(Form, 'save', SubmitField(_('insert')))
+    setattr(Form, 'save', SubmitField(str(_('insert'))))
     return Form()
 
 
@@ -114,7 +116,7 @@ def link_update_form(link_: Link, relation: Relation) -> Any:
         hierarchy = Entity.get_hierarchy(relation.type)
         add_type(Form, hierarchy)
     add_additional_link_fields(Form, relation, link_)
-    setattr(Form, 'save', SubmitField(_('save')))
+    setattr(Form, 'save', SubmitField(str(_('save'))))
     form = Form()
     if request.method == 'GET':
         if hierarchy:
@@ -140,7 +142,7 @@ def cidoc_form() -> Any:
             TableCidocField(
                 g.properties.values() if name == 'property'
                 else g.cidoc_classes.values()))
-    setattr(Form, 'save', SubmitField(_('test')))
+    setattr(Form, 'save', SubmitField(str(_('test'))))
     return Form()
 
 
@@ -158,7 +160,7 @@ def move_form(type_: Entity) -> Any:
 
     root = g.types[type_.root[0]]
     setattr(Form, str(root.id), TreeField(str(root.id)))
-    choices = []
+    choices: list[Any] = []
     if root.class_.name == 'administrative_unit':
         for entity in type_.get_linked_entities(
                 'P89',

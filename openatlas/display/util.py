@@ -86,7 +86,7 @@ def reference_systems(entity: Entity) -> str:
                 <span><b>{link(link_.domain)}</b>: {link_.description}</span>
                 <span class="badge badge-pill rounded-pill
                     badge-secondary bg-secondary">
-                    {g.types[link_.type.id].name}
+                    {g.types[link_.type.id].name if link_.type else ''}
                 </span>
                 </div>
                 {show_info_button}
@@ -362,13 +362,14 @@ def send_mail(
                     g.settings['mail_transport_username'],
                     app.config['MAIL_PASSWORD'])
             for recipient in recipients:
-                msg = MIMEText(text, _charset='utf-8')
+                msg: Any = MIMEText(text, _charset='utf-8')
                 msg['From'] = from_
                 msg['To'] = recipient.strip()
                 msg['Subject'] = Header(subject.encode('utf-8'), 'utf-8')
                 smtp.sendmail(
                     g.settings['mail_from_email'],
-                    recipient, msg.as_string())
+                    recipient,
+                    msg.as_string())
             log_text = \
                 f'Mail from {from_} to {", ".join(recipients)} ' \
                 f'Subject: {subject}'
@@ -379,14 +380,14 @@ def send_mail(
             'error',
             'mail',
             f"Error mail login for {g.settings['mail_transport_username']}", e)
-        flash(_('error mail login'), 'error')
+        flash(str(_('error mail login')), 'error')
         return False
     except Exception as e:  # pragma: no cover
         g.logger.log(
             'error',
             'mail',
             f"Error send mail for {g.settings['mail_transport_username']}", e)
-        flash(_('error mail send'), 'error')
+        flash(str(_('error mail send')), 'error')
         return False  # pragma: no cover
     return True  # pragma: no cover
 
