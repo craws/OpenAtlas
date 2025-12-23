@@ -151,15 +151,15 @@ class User(UserMixin):
             'newsletter': False,
             'table_show_aliases': True,
             'show_email': False}
-        for setting in g.settings:
-            if setting in [
+        for key, value in g.settings.items():
+            if key in [
                     'frontend_website_url',
                     'frontend_resolver_url',
                     'map_zoom_max',
                     'map_zoom_default',
                     'table_rows'] \
-                    or setting.startswith('module_'):
-                settings[setting] = g.settings[setting]
+                    or key.startswith('module_'):
+                settings[key] = value
         for row in db.get_settings(user_id):
             settings[row['name']] = row['value']
             if row['name'] in ['table_rows']:
@@ -168,10 +168,9 @@ class User(UserMixin):
 
     @staticmethod
     def generate_password(length: Optional[int] = None) -> str:
-        length = length or g.settings['random_password_length']
         return ''.join(
-            secrets.choice(
-                string.ascii_uppercase + string.digits) for _ in range(length))
+            secrets.choice(string.ascii_uppercase + string.digits)
+            for _ in range(length or g.settings['random_password_length']))
 
     @staticmethod
     def insert_note(

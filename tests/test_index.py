@@ -17,9 +17,8 @@ class IndexTests(TestBaseCase):
         rv = c.get(url_for('index_changelog'))
         assert b'is needed but current version is' not in rv.data
 
-        with app.app_context():
-            rv = c.get(url_for('login'), follow_redirects=True)
-            assert b'first' in rv.data
+        rv = c.get(url_for('login'), follow_redirects=True)
+        assert b'first' in rv.data
 
         rv = c.get(
             url_for('set_locale', language='non_existing_locale'),
@@ -27,12 +26,7 @@ class IndexTests(TestBaseCase):
         assert b'Source' in rv.data
 
         rv = c.get(url_for('set_locale', language='de'), follow_redirects=True)
-        # Todo: set_locale works in browser, don't know why the test doesn't
-        #   change the menu language.
-        # assert b'Quelle' in rv.data
         assert b'messages_de.js' in rv.data
-
-        c.get(url_for('set_locale', language='en'))
 
         g.writable_paths.append(Path(app.root_path) / 'error')
         app.config['DATABASE_VERSION'] = 'error'

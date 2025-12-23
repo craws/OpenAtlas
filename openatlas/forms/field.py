@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-# pylint: disable=too-few-public-methods, not useful with inheritance
+# pylint: disable=too-few-public-methods
 # mypy: ignore-errors, too much trouble to mypy check form elements
 import ast
 from typing import Any, Optional

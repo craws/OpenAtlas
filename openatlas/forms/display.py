@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Optional
 
 from flask import g, render_template
-from flask_babel import LazyString, lazy_gettext as _
+from flask_babel import gettext as _
 from wtforms import FileField, IntegerField, SelectField, StringField
 from wtforms.validators import Email
 

@@ -9,7 +9,7 @@ from openatlas.models.dates import form_to_datetime64
 
 
 def file(_form: FlaskForm, field: Any) -> None:
-    for file_ in request.files.getlist('file'):
+    for file_ in request.files.getlist('file'):  # pylint: disable=no-member
         if not file_ \
                 or Path(str(file_.filename)).suffix[1:].lower() not in [
                     i.lower() for i in

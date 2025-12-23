@@ -17,7 +17,7 @@ def get_tokens(
         WHERE TRUE
             {'AND user_id = %(user_id)s' if int(user_id) else ''}
             {'AND revoked = %(revoked)s' if revoked != 'all' else ''}
-            {'AND valid_until ' + valid + ' timestamp %(timestamp)s' 
+            {'AND valid_until ' + valid + ' timestamp %(timestamp)s'
             if valid != 'all' else ''};
         """, {
             'user_id': user_id,

@@ -1,4 +1,4 @@
-# pylint: disable=C,R
+# pylint: disable-all
 #
 # This script is for developing purposes and not needed to install OpenAtlas.
 #
