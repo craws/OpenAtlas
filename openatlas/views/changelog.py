@@ -19,11 +19,13 @@ versions = {
     '9.0.0': ['TBA', {
         'features': {
             '2464': 'OpenAtlas major version 9.0.0',
+            '2343': 'Update OpenAtlas software to Debian 13 (Trixie)',
             '2634': 'Removal of creation and event class, changed acquisition',
             '2675': 'New tab layout',
             '2649': 'New buttons layout',
-            '2442': 'Text annotation: show orphans',
             '2589': 'Color coding for map',
+            '2640': 'Improved layout to display reference systems',
+            '2442': 'Text annotation: show orphans',
             '2657': 'API: 4.11.0',
             '2478': 'API: Format for tables',
             '2681': 'API: Additional columns for sorting'}}],
