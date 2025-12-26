@@ -185,7 +185,7 @@ def carbon(id_: int) -> str | Response:
             button(_('edit'), url_for('carbon_update', id_=entity.id)))
         if link_ := get_carbon_link(entity):
             buttons.append(
-                str(remove_link(_('radiocarbon dating'), link_, entity)))
+                button(remove_link(_('radiocarbon dating'), link_, entity)))
     return render_template(
         'tabs.html',
         entity=entity,

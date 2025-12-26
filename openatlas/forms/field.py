@@ -6,7 +6,7 @@ import ast
 from typing import Any, Optional
 
 from flask import g, render_template, request
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from flask_wtf import FlaskForm
 from markupsafe import Markup
 from wtforms import (
@@ -235,7 +235,7 @@ class TableSelect(HiddenInput):
 
         def get_form(class_name_: str) -> Any:
             class SimpleEntityForm(FlaskForm):
-                name_dynamic = StringField(str(_('name')))
+                name_dynamic = StringField(_('name'))
 
             if class_name_ in g.classes \
                     and g.classes[class_name_].hierarchies \
@@ -250,7 +250,7 @@ class TableSelect(HiddenInput):
             setattr(
                 SimpleEntityForm,
                 'description_dynamic',
-                TextAreaField(str(_('description'))))
+                TextAreaField(_('description')))
             return SimpleEntityForm()
 
         field.forms = {}

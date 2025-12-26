@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Any
 
 from flask import g, request
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from flask_wtf import FlaskForm
 
 from openatlas.models.dates import form_to_datetime64

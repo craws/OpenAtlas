@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Optional
 
 from flask import g, request
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import HiddenField, SelectMultipleField, widgets
@@ -29,15 +29,13 @@ def annotate_image_form(
         entity: Optional[Entity] = None,
         insert: Optional[bool] = True) -> Any:
     class Form(FlaskForm):
-        text = TextAreaField(str(_('annotation')))
+        text = TextAreaField(_('annotation'))
 
     if insert:
         setattr(
             Form,
             'coordinate',
-            HiddenField(
-                str(_('coordinates')),
-                validators=[InputRequired()]))
+            HiddenField(_('coordinates'), validators=[InputRequired()]))
     setattr(
         Form,
         'entity',
@@ -47,7 +45,7 @@ def annotate_image_form(
                 aliases=True,
                 sort=True),
             entity))
-    setattr(Form, 'save', SubmitField(str(_('save'))))
+    setattr(Form, 'save', SubmitField(_('save')))
     return Form()
 
 
@@ -62,7 +60,7 @@ def link_form(origin: Entity, relation: Relation) -> Any:
     setattr(Form, 'checkbox_values', HiddenField())
     setattr(Form, relation.name, LinkTableField(table=table, label=''))
     if table.rows:
-        setattr(Form, 'save', SubmitField(str(_('save'))))
+        setattr(Form, 'save', SubmitField(_('save')))
     return Form('checkbox-form')
 
 
@@ -103,7 +101,7 @@ def link_detail_form(
             validators=validators)
     setattr(Form, relation.name, table)
     add_additional_link_fields(Form, relation)
-    setattr(Form, 'save', SubmitField(str(_('insert'))))
+    setattr(Form, 'save', SubmitField(_('insert')))
     return Form()
 
 
@@ -116,7 +114,7 @@ def link_update_form(link_: Link, relation: Relation) -> Any:
         hierarchy = Entity.get_hierarchy(relation.type)
         add_type(Form, hierarchy)
     add_additional_link_fields(Form, relation, link_)
-    setattr(Form, 'save', SubmitField(str(_('save'))))
+    setattr(Form, 'save', SubmitField(_('save')))
     form = Form()
     if request.method == 'GET':
         if hierarchy:
@@ -142,7 +140,7 @@ def cidoc_form() -> Any:
             TableCidocField(
                 g.properties.values() if name == 'property'
                 else g.cidoc_classes.values()))
-    setattr(Form, 'save', SubmitField(str(_('test'))))
+    setattr(Form, 'save', SubmitField(_('test')))
     return Form()
 
 

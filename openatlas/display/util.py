@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 from flask import flash, g, render_template, request, url_for
-from flask_babel import LazyString, lazy_gettext as _
+from flask_babel import LazyString, gettext as _
 from flask_login import current_user
 from jinja2 import pass_context
 from werkzeug.exceptions import abort
@@ -380,14 +380,14 @@ def send_mail(
             'error',
             'mail',
             f"Error mail login for {g.settings['mail_transport_username']}", e)
-        flash(str(_('error mail login')), 'error')
+        flash(_('error mail login'), 'error')
         return False
     except Exception as e:  # pragma: no cover
         g.logger.log(
             'error',
             'mail',
             f"Error send mail for {g.settings['mail_transport_username']}", e)
-        flash(str(_('error mail send')), 'error')
+        flash(_('error mail send'), 'error')
         return False  # pragma: no cover
     return True  # pragma: no cover
 
@@ -517,7 +517,7 @@ def link(
 
 @app.template_filter()
 def button(
-        label: str | LazyString,
+        label: str,
         url: Optional[str] = None,
         id_: Optional[str] = None,
         onclick: Optional[str] = None,
@@ -568,7 +568,7 @@ def citation_example(code: str) -> str:
 
 
 @app.template_filter()
-def display_info(data: dict[str | LazyString, Any]) -> str:
+def display_info(data: dict[str, Any]) -> str:
     return render_template('util/info_data.html', data=data)
 
 

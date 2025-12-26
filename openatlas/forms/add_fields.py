@@ -4,7 +4,7 @@ from collections import OrderedDict
 from typing import Any, Optional
 
 from flask import g
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
@@ -103,14 +103,14 @@ def add_description(
             entity.class_.name == 'type'
             and origin
             and origin.category == 'value'):
-        setattr(form, 'description', StringField(str(_('unit'))))
+        setattr(form, 'description', StringField(_('unit')))
         return
     if 'annotated' not in attribute_description:
         setattr(
             form,
             'description',
             TextAreaField(
-                str(_('description')),
+                _('description'),
                 render_kw={'rows': 8},
                 validators=get_validators(attribute_description)))
         return
@@ -145,15 +145,15 @@ def add_type(form: Any, type_: Entity) -> None:
         class AddDynamicType(FlaskForm):
             pass
 
-        setattr(AddDynamicType, 'name-dynamic', StringField(str(_('name'))))
+        setattr(AddDynamicType, 'name-dynamic', StringField(_('name')))
         setattr(
             AddDynamicType,
             f'{type_.id}-dynamic',
-            TreeField(str(_('super')), type_id=type_.id, is_type_form=True))
+            TreeField(_('super'), type_id=type_.id, is_type_form=True))
         setattr(
             AddDynamicType,
             'description-dynamic',
-            TextAreaField(str(_('description'))))
+            TextAreaField(_('description')))
         add_form = AddDynamicType()
     validators = [InputRequired()] if type_.required else []
     if type_.category == 'value':
@@ -197,12 +197,12 @@ def add_relations(
                     setattr(
                         form,
                         'name_inverse',
-                        StringField(str(_('inverse'))))
+                        StringField(_('inverse')))
             else:  # It's a root type (hierarchy)
                 if entity.category == 'custom':
                     form.multiple = BooleanField(
-                        str(_('multiple')),
-                        description=str(_('tooltip hierarchy multiple')))
+                        _('multiple'),
+                        description=_('tooltip hierarchy multiple'))
                 # noinspection PyTypeChecker
                 form.classes = SelectMultipleField(
                     _('classes'),
@@ -465,7 +465,7 @@ def add_buttons(form: Any, entity: Entity, relation: Relation | None) -> None:
     if 'description' in entity.class_.attributes \
             and 'annotated' in entity.class_.attributes['description']:
         field = SubmitAnnotationField
-    setattr(form, 'save', field(str(_('save')) if entity.id else _('insert')))
+    setattr(form, 'save', field(_('save') if entity.id else _('insert')))
     if not entity.id:
         for item in entity.class_.display['form_buttons']:
             match item:
@@ -474,7 +474,7 @@ def add_buttons(form: Any, entity: Entity, relation: Relation | None) -> None:
                     setattr(
                         form,
                         item,
-                        field(str(_('insert and continue'))))
+                        field(_('insert and continue')))
                     setattr(form, 'continue_', HiddenField())
                 case 'insert_continue_sub':
                     label = 'unknown'
@@ -509,9 +509,9 @@ def add_additional_link_fields(
                 setattr(
                     form,
                     'description',
-                    TextAreaField(str(_(item)), render_kw={'rows': 8}))
+                    TextAreaField(_(item), render_kw={'rows': 8}))
             case 'page':
                 setattr(
                     form,
                     'description',
-                    StringField(str(_(item)), render_kw={'rows': 8}))
+                    StringField(_(item), render_kw={'rows': 8}))

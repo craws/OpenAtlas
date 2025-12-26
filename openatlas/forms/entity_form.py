@@ -2,7 +2,7 @@ from subprocess import call
 from typing import Any, Optional
 
 from flask import g, request
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import secure_filename
 from wtforms import (

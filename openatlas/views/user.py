@@ -28,26 +28,22 @@ from openatlas.models.user import User
 
 class UserForm(FlaskForm):
     user_id: Optional[int] = None
-    active = BooleanField(str(_('active')), default=True)
+    active = BooleanField(_('active'), default=True)
     username: Any = StringField(
-        str(_('username')),
+        _('username'),
         [InputRequired()],
         render_kw={'autofocus': True})
-    group = SelectField(str(_('group')), choices=[])
-    email: Any = StringField(str(_('email')), [InputRequired(), Email()])
-    password: Any = PasswordField(str(_('password')), [InputRequired()])
-    password2: Any = PasswordField(
-        str(_('repeat password')),
-        [InputRequired()])
+    group = SelectField(_('group'), choices=[])
+    email: Any = StringField(_('email'), [InputRequired(), Email()])
+    password: Any = PasswordField(_('password'), [InputRequired()])
+    password2: Any = PasswordField(_('repeat password'), [InputRequired()])
     generate_password = generate_password_field()
-    show_passwords = BooleanField(str(_('show passwords')))
-    real_name = StringField(
-        str(_('full name')),
-        description=str(_('tooltip full name')))
-    description = TextAreaField(str(_('info')))
-    send_info = BooleanField(str(_('send account information')))
-    save = SubmitField(str(_('save')))
-    insert_and_continue = SubmitField(str(_('insert and continue')))
+    show_passwords = BooleanField(_('show passwords'))
+    real_name = StringField(_('full name'), description=_('tooltip full name'))
+    description = TextAreaField(_('info'))
+    send_info = BooleanField(_('send account information'))
+    save = SubmitField(_('save'))
+    insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
 
     def validate(self, extra_validators: Any = None) -> bool:
@@ -78,24 +74,24 @@ class UserForm(FlaskForm):
 
 class ActivityForm(FlaskForm):
     limit = SelectField(
-        str(_('limit')),
-        choices=((0, str(_('all'))), (100, 100), (500, 500)),  # type: ignore
+        _('limit'),
+        choices=((0, _('all')), (100, 100), (500, 500)),  # type: ignore
         default=100,
         coerce=int)
     user = SelectField(
-        str(_('user')),
-        choices=([(0, str(_('all')))]),
+        _('user'),
+        choices=([(0, _('all'))]),
         default=0,
         coerce=int)
     action = SelectField(
-        str(_('action')),
+        _('action'),
         choices=(
-            ('all', str(_('all'))),
-            ('insert', str(_('insert'))),
-            ('update', str(_('update'))),
-            ('delete', str(_('delete')))),
+            ('all', _('all')),
+            ('insert', _('insert')),
+            ('update', _('update')),
+            ('delete', _('delete'))),
         default='all')
-    save = SubmitField(str(_('apply')))
+    save = SubmitField(_('apply'))
 
 
 @app.route('/user/activity', methods=['GET', 'POST'])
@@ -199,7 +195,7 @@ def user_delete(id_: int) -> Response:
             or (user.group == 'admin' and not is_authorized('admin')):
         abort(403)
     user.delete()
-    flash(str(_('user deleted')))
+    flash(_('user deleted'))
     return redirect(f"{url_for('admin_index')}#tab-user")
 
 
@@ -247,7 +243,7 @@ def user_update(id_: int) -> str | Response:
         user.description = form.description.data
         user.group = form.group.data
         user.update()
-        flash(str(_('info update')))
+        flash(_('info update'))
         return redirect(url_for('user_view', id_=id_))
     if user.id == current_user.id:
         del form.active
@@ -279,7 +275,7 @@ def user_insert() -> str | Response:
             'password': bcrypt.hashpw(
                 form.password.data.encode('utf-8'),
                 bcrypt.gensalt()).decode('utf-8')})
-        flash(str(_('user created')))
+        flash(_('user created'))
         if g.settings['mail'] and form.send_info.data:
             subject = _(
                 'Your account information for %(sitename)s',
@@ -293,12 +289,12 @@ def user_insert() -> str | Response:
                 f"{uc_first(_('password'))}: {form.password.data}\n"
             if send_mail(subject, body, form.email.data, False):
                 flash(
-                    str(_('Sent account information mail to %(email)s.',
-                        email=form.email.data)))
+                    _('Sent account information mail to %(email)s.',
+                        email=form.email.data))
             else:  # pragma: no cover
                 flash(
-                    str(_('Failed to send account details to %(email)s.',
-                        email=form.email.data)),
+                    _('Failed to send account details to %(email)s.',
+                        email=form.email.data),
                     'error')
         if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             return redirect(url_for('user_insert'))
@@ -336,7 +332,7 @@ def first_admin() -> str | Response:
             'password': bcrypt.hashpw(
                 form.password.data.encode('utf-8'),
                 bcrypt.gensalt()).decode('utf-8')})
-        flash(str(_('user created')))
+        flash(_('user created'))
         return redirect(url_for('login'))
     return render_template(
         'content.html',

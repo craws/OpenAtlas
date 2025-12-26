@@ -154,7 +154,7 @@ def get_table_cell_content(
                     data-entity-name="{sanitize(e.name)}"
                     value="{e.id}"
                     {"checked" if e.id in forms.get('selection_ids', [])
-                    else ""}>"""
+                     else ""}>"""
         case 'class':
             html = e.class_.label
         case 'created':
