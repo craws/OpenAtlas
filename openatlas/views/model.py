@@ -2,7 +2,7 @@ import re
 from typing import Optional
 
 from flask import g, render_template, url_for
-from flask_babel import format_number, lazy_gettext as _
+from flask_babel import format_number, gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
     BooleanField, IntegerField, SelectField, SelectMultipleField, StringField,

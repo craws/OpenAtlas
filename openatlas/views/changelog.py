@@ -1,7 +1,8 @@
 from flask import render_template
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 
 from openatlas import app
+# pylint: disable=too-many-lines
 
 
 @app.route('/changelog')
@@ -12,8 +13,6 @@ def index_changelog() -> str:
         crumbs=[_('changelog')],
         versions=versions)
 
-
-# pylint: disable=too-many-lines
 
 versions = {
     '9.0.0': ['TBA', {

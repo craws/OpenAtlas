@@ -1,7 +1,7 @@
 from typing import Optional
 
 from flask import Response, g, jsonify, request
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 
 from openatlas import app
 from openatlas.api.external.geonames import fetch_geonames

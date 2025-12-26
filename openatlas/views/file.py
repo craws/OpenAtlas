@@ -2,7 +2,7 @@ from typing import Any, Optional
 
 from flask import (
     abort, flash, g, render_template, request, send_from_directory, url_for)
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 

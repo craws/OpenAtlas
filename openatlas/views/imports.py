@@ -4,7 +4,7 @@ from typing import Any, Optional
 
 import pandas as pd
 from flask import flash, g, render_template, request, url_for
-from flask_babel import format_number, lazy_gettext as _
+from flask_babel import format_number, gettext as _
 from flask_wtf import FlaskForm
 from pandas import DataFrame, Series
 from shapely import wkt
@@ -331,7 +331,7 @@ def check_data_for_table_representation(
     file_ = request.files['file']
     file_path = app.config['TMP_PATH'] / secure_filename(str(file_.filename))
     file_.save(str(file_path))
-    data_frame = pd.read_csv(
+    data_frame: Any = pd.read_csv(
         file_path,
         dtype=str,
         skipinitialspace=True,

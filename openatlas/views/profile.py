@@ -3,7 +3,7 @@ from typing import Any
 
 import bcrypt
 from flask import flash, g, render_template, session, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
@@ -61,10 +61,10 @@ def profile_index() -> str:
             content=display_info({
                 _('name'): current_user.real_name,
                 _('email'): current_user.email,
-                _('show email'): str(_('on'))
-                if current_user.settings['show_email'] else str(_('off')),
-                _('newsletter'): str(_('on'))
-                if current_user.settings['newsletter'] else str(_('off'))}),
+                _('show email'): _('on')
+                if current_user.settings['show_email'] else _('off'),
+                _('newsletter'): _('on')
+                if current_user.settings['newsletter'] else _('off')}),
             buttons=[manual('tools/profile')]),
         'modules': Tab(
             'modules',

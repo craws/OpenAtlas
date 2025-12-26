@@ -149,7 +149,7 @@ def sex_update(id_: int) -> str | Response:
                choices=choices,
                default='Not preserved',
                description=description))
-    setattr(Form, 'save', SubmitField(_('save')))
+    setattr(Form, 'save', SubmitField(str(_('save'))))
     form = Form()
     if form.validate_on_submit():
         data = form.data
@@ -185,7 +185,7 @@ def carbon(id_: int) -> str | Response:
             button(_('edit'), url_for('carbon_update', id_=entity.id)))
         if link_ := get_carbon_link(entity):
             buttons.append(
-                str(remove_link(_('radiocarbon dating'), link_, entity)))
+                str(remove_link(str(_('radiocarbon dating')), link_, entity)))
     return render_template(
         'tabs.html',
         entity=entity,
@@ -213,14 +213,14 @@ def carbon_update(id_: int) -> str | Response:
             [InputRequired()],
             render_kw={'placeholder': '23432A'})
         radiocarbon_year = IntegerField(
-            _('radiocarbon year'),
+            str(_('radiocarbon year')),
             [InputRequired()],
             render_kw={'placeholder': '2040'})
         range = IntegerField(
-            _('range'),
+            str(_('range')),
             [InputRequired()],
             render_kw={'placeholder': '30'})
-        save = SubmitField(_('save'))
+        save = SubmitField(str(_('save')))
 
     entity = Entity.get_by_id(id_)
     form = Form()
@@ -235,7 +235,7 @@ def carbon_update(id_: int) -> str | Response:
                 'range': form.range.data,
                 'timeScale': 'BP'},
             link_=carbon_link)
-        flash(_('info update'))
+        flash(str(_('info update')))
         return redirect(url_for('tools_index', id_=entity.id))
     if request.method == 'GET' and carbon_link:
         data = json.loads(carbon_link.description)

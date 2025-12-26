@@ -1,5 +1,5 @@
 from flask import flash, render_template, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response

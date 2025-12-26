@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 from flask import flash, g, render_template, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from werkzeug import Response
 from werkzeug.utils import redirect
 
@@ -103,7 +103,7 @@ def check_links() -> str:
 @required_group('contributor')
 def delete_single_type_duplicate(entity_id: int, type_id: int) -> Response:
     g.types[type_id].remove_entity_links(entity_id)
-    flash(str(_('link removed')))
+    flash(_('link removed'))
     return redirect(url_for('check_links') + '#tab-type')
 
 
@@ -381,7 +381,7 @@ def check_files(arche: Optional[str] = None) -> str:
 @required_group('admin')
 def admin_delete_orphaned_resized_images() -> Response:
     delete_orphaned_resized_images()
-    flash(str(_('resized orphaned images were deleted')))
+    flash(_('resized orphaned images were deleted'))
     return redirect(url_for('admin_index') + '#tab-data')
 
 

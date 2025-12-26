@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 from flask import flash, g, render_template, send_from_directory, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
