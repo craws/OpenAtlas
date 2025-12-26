@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Any, Optional
 
 from flask import flash, g, render_template, request, url_for
-from flask_babel import format_number, lazy_gettext as _
+from flask_babel import format_number, gettext as _
 from flask_login import current_user
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
