@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2025-12-27 16:23+0100\n"
-"PO-Revision-Date: 2025-12-27 16:41+0100\n"
+"PO-Revision-Date: 2025-12-27 17:21+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language-Team: de <LL@li.org>\n"
 "Language: de\n"
@@ -292,7 +292,7 @@ msgstr "Bewegung vom Ort"
 
 #: config/model/classes/place.py:62
 msgid "move to location"
-msgstr "Bewegen zum Ort"
+msgstr "Bewegung zum Ort"
 
 #: config/model/classes/place.py:99
 msgid "feature"
