@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from typing import Any, Optional
 
 from flask import g, json, render_template, url_for
-from flask_babel import LazyString, format_number, lazy_gettext as _
+from flask_babel import LazyString, format_number, gettext as _
 from flask_login import current_user
 
 from openatlas import app
@@ -19,12 +19,13 @@ from openatlas.models.entity import Entity, Link
 from openatlas.models.openatlas_class import Relation
 from openatlas.models.overlay import Overlay
 
-# Needed for translations
+# For table translations
 _('previous')
 _('next')
 _('show')
 _('entries')
 _('showing %(first)s to %(last)s of %(all)s entries', first=1, last=25, all=38)
+_('value')  # For table column label
 
 
 @dataclass
