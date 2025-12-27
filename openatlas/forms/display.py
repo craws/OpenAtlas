@@ -44,8 +44,8 @@ def html_form(
                     label=_('reference system'),
                     value='<span id="reference-system-switcher" '
                     'class="uc-first '
-                    f'{app.config["CSS"]["button"]["secondary"]}">'
-                    + _('show') + '</span>')
+                    f'{app.config["CSS"]["button"]["secondary"]}">{_('show')}'
+                    '</span>')
             html += add_row(field, row_css="d-none")
             continue
         if field.id.split('_', 1)[0] in ('begin', 'end'):

@@ -55,7 +55,7 @@ def reference_systems(entity: Entity) -> str:
             ['reference_system'],
             inverse=True)):
         return ''
-    html = '<h2 class="uc-first">' + _("external reference systems") + '</h2>'
+    html = f'<h2 class="uc-first">{_("external reference systems")}</h2>'
     html += '<ul class="list-group list-group-flush bg-none">'
     for link_ in links:
         system = g.reference_systems[link_.domain.id]
@@ -116,7 +116,7 @@ def get_appearance(entity: Entity) -> tuple[str, str]:
             inverse=True):
         event = link_.domain
         actor = link_.range
-        html = ' ' + _('at an') + ' ' + \
+        html = f" {_('at an')} " + \
             link(_('event'), url_for('view', id_=event.id))
         if not actor.dates.first:
             if link_.dates.first and (
@@ -275,7 +275,7 @@ def profile_image(
     if entity.class_.group['name'] == 'file':
         external = True
         if path.suffix.lower() not in g.display_file_ext:
-            return '<p class="uc-first">' + _('no preview available') + '</p>'
+            return f'<p class="uc-first">{_('no preview available')}</p>'
     else:
         url = url_for('view', id_=entity.image_id)
     max_width = f"{width}px"
@@ -413,8 +413,8 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
 def check_write_access(path: Path, warnings: list[str]) -> list[str]:
     if not os.access(path, os.W_OK):
         warnings.append(
-            '<p class="uc-first">' + _('directory not writable') +
-            f" {str(path).replace(app.root_path, '')}</p>")
+            f'<p class="uc-first">{_('directory not writable')}'
+            f"{str(path).replace(app.root_path, '')}</p>")
     return warnings
 
 
@@ -563,7 +563,7 @@ def button_bar(buttons: list[Any]) -> str:
 def citation_example(code: str) -> str:
     html = ''
     if code == 'reference' and (text := get_translation('citation_example')):
-        html = '<h1 class="uc-first">' + _('citation_example') + f'</h1>{text}'
+        html = f'<h1 class="uc-first">{_('citation_example')}</h1>{text}'
     return html
 
 

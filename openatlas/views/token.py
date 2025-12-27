@@ -95,7 +95,7 @@ def api_token(user_id: int = 0) -> str | Response:
         delete_link = link(
             _('delete'),
             url_for('delete_token', id_=token['id']),
-            js="return confirm('" + _('delete') + "?')")
+            js=f"return confirm('{_('delete')}?')")
         revoke_link = link(
             _('revoke'),
             url_for('revoke_token', id_=token['id']))
@@ -141,7 +141,7 @@ def generate_token() -> str | Response:
             _('expiration'),
             default=30,
             description=_('expiration in days')
-            + ', 0 = ' + _("no expiration date"))
+            + f', 0 = {_("no expiration date")}')
         token_name = StringField(
             _('name'),
             default=f"Token_{datetime.today().strftime('%Y-%m-%d')}")

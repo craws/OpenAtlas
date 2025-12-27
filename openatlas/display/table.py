@@ -37,7 +37,7 @@ class Table:
 
     def display(self, name: str = 'default') -> str:
         if not self.rows:
-            return '<p class="uc-first">' + _('no entries') + '</p>'
+            return f'<p class="uc-first">{_('no entries')}</p>'
         no_title = ['checkbox', 'remove', 'set logo', 'update']
         data = {
             'data': self.rows,

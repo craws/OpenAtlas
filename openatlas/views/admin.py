@@ -163,7 +163,7 @@ def get_test_mail_form() -> str:
         body = (_(
             'This test mail was sent by %(username)s',
             username=current_user.username) +
-                ' ' + _('at') + ' ' + request.headers['Host'])
+            f' {_('at')} {request.headers['Host']}')
         if send_mail(subject, body, form.receiver.data):  # type: ignore
             flash(
                 _('A test mail was sent to %(email)s.',

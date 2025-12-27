@@ -147,7 +147,7 @@ def reset_password() -> str | Response:
         flash(_('error non existing email'), 'error')
     return render_template(
         'content.html',
-        content='<p>' + _('info password reset') + f'</p>{display_form(form)}',
+        content=f'<p>{_('info password reset')}</p>{display_form(form)}',
         crumbs=[[_('login'), url_for('login')], _('Forgot your password?')])
 
 

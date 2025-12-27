@@ -311,7 +311,7 @@ def user_insert() -> str | Response:
         title=_('user'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-user"],
-            '+&nbsp;<span class="uc-first d-inline-block">' + _('user')
+            f'+&nbsp;<span class="uc-first d-inline-block">{_('user')}'
             + '</span>'])
 
 

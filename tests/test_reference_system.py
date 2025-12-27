@@ -71,7 +71,7 @@ class ReferenceSystemTest(TestBaseCase):
         assert b'The entry has been deleted' in rv.data
 
         rv = c.get(url_for('update', id_=g.geonames.id))
-        assert b'website url' in rv.data
+        assert b'website URL' in rv.data
 
         rv = c.post(
             url_for('insert', class_='person'),

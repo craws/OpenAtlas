@@ -47,7 +47,7 @@ def sex_result(entity: Entity) -> str:
     if calculation is None:
         return ''
     return \
-        '<h1 class="uc-first">' + _('sex estimation') + '</h1>' \
+        f'<h1 class="uc-first">{_('sex estimation')}</h1>' \
         'Ferembach et al. 1979: ' \
         f'<span class="anthro-result">{calculation}</span> - ' + \
         _('corresponds to') + f' "{name_result(calculation)}"'
@@ -55,7 +55,7 @@ def sex_result(entity: Entity) -> str:
 
 def carbon_result(entity: Entity) -> str:
     if link_ := get_carbon_link(entity):
-        return '<h1 class="uc-first">' + _('radiocarbon dating') + '</h1>' + \
+        return f'<h1 class="uc-first">{_('radiocarbon dating')}</h1>' + \
             display_info(json.loads(link_.description))
     return ''
 
@@ -93,7 +93,7 @@ def sex(id_: int) -> str | Response:
             buttons.append(button(
                 _('delete'),
                 url_for('sex_delete', id_=id_),
-                onclick="return confirm('" + _('delete') + "?')"))
+                onclick=f"return confirm('{_('delete')}?')"))
     data = []
     for item in types:
         type_ = g.types[item['id']]

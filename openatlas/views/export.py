@@ -119,7 +119,7 @@ def export_arche() -> str:
                 content=display_info(info_content),
                 buttons=[manual('admin/export'),
                          button(
-                             'ARCHE ' + _('file checker'),
+                             f'ARCHE {_('file checker')}',
                              url_for('check_files', arche='arche'))]),
             'export': Tab(
                 'export',

@@ -488,13 +488,13 @@ def add_buttons(form: Any, entity: Entity, relation: Relation | None) -> None:
                     setattr(
                         form,
                         item,
-                        SubmitField(_('insert and add') + ' ' + _(label)))
+                        SubmitField(f'{_('insert and add')} {_(label)}'))
                 case 'insert_continue_human_remains':
                     setattr(
                         form,
                         item,
                         SubmitField(
-                            _('insert and add') + ' ' + _('human remains')))
+                            f'{_('insert and add')} {_('human remains')}'))
 
 
 def add_additional_link_fields(

@@ -166,7 +166,7 @@ def import_project_insert() -> str | Response:
         crumbs=[
             [_('admin'), url_for('admin_index') + '#tab-data'],
             [_('import'), url_for('import_index')],
-            '+ <span class="uc-first">' + _('project') + '</span>'])
+            f'+ <span class="uc-first">{_('project')}</span>'])
 
 
 @app.route('/import/project/view/<int:id_>')

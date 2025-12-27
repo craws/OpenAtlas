@@ -134,7 +134,7 @@ def check_similar() -> str:
                 len(item['entities']) + 1])
     content = display_form(form, manual_page='admin/data_integrity_checks')
     if not table.rows:  # pragma: no cover
-        content += '<p class="uc-first">' + _('no entries') + '</p>'
+        content += f'<p class="uc-first">{_('no entries')}</p>'
     return render_template(
         'tabs.html',
         tabs={'similar': Tab('similar', content=content, table=table)},

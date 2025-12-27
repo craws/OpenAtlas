@@ -358,7 +358,7 @@ class Display:
         if next_id:
             self.buttons.append(button('>', url_for('view', id_=next_id)))
         self.buttons.append(
-            f'{position} ' + _('of') + f" {len(self.structure['siblings'])}")
+            f"{position} {_('of')} {len(self.structure['siblings'])}")
 
     def add_data(self) -> None:
         self.data = {
@@ -388,8 +388,7 @@ class Display:
                                 and not self.entity.standard_type:
                             value += (
                                 ' <span class="error">'
-                                + _('but license is missing ')
-                                + '</span>')
+                                f"{_('but license is missing ')}</span>")
                     elif attribute.get('format') == 'url':
                         value = link(value, value, external=True)
                     self.data[attribute['label']] = str(value)
