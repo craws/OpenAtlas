@@ -6,6 +6,7 @@ from flask_babel import gettext as _
 from flask_login import current_user
 from markupsafe import escape
 
+from config.model.class_groups import class_groups
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import entity_table
@@ -33,7 +34,7 @@ class Display:
     def __init__(self, entity: Entity) -> None:
         self.entity = entity
         self.events: list[Entity] = []
-        self.linked_places: list[Entity] = []
+        self.linked_places: dict[int, Entity] = {}
         self.structure: dict[str, list[Entity]] = {}
         self.gis_data: dict[str, Any] = {}
         self.problematic_type = self.entity.check_too_many_single_type_links()
@@ -65,7 +66,7 @@ class Display:
             self.structure = self.entity.get_structure()
             self.gis_data = Gis.get_all([self.entity], self.structure)
         elif self.linked_places:
-            self.gis_data = Gis.get_all(self.linked_places)
+            self.gis_data = Gis.get_all(list(self.linked_places.values()))
         resolver_url = g.settings['frontend_resolver_url']
         if hasattr(current_user, 'settings'):
             self.data |= get_system_data(self.entity)
@@ -95,7 +96,6 @@ class Display:
         if self.entity.category != 'value':
             text += description(description_, label)
 
-        reference_systems_display = reference_systems(self.entity)
         self.tabs['info'].content = render_template(
             'entity/view.html',
             entity=self.entity,
@@ -103,7 +103,7 @@ class Display:
             info_data=self.data,
             gis_data=self.gis_data,
             chart_data=get_chart_data(self.entity),
-            reference_systems=reference_systems_display,
+            reference_systems=reference_systems(self.entity),
             description_html=text,
             problematic_type=self.problematic_type)
 
@@ -166,9 +166,13 @@ class Display:
                 tooltip=relation.tab['tooltip'])
 
         for name in self.entity.class_.display['additional_tabs']:
-            if name == 'note':
-                self.add_note_tab()
-                continue
+            match name:
+                case 'note':
+                    self.add_note_tab()
+                case 'person_place':
+                    self.add_person_place_tab()
+                case 'place_person':
+                    self.add_place_person_tab()
 
         empty_tabs = []
         for name, tab in self.tabs.items():
@@ -254,6 +258,35 @@ class Display:
                 note['text'],
                 link(_('view'), url_for('note_view', id_=note['id']))]
             self.tabs['note'].table.rows.append(data)
+
+    def add_person_place_tab(self) -> None:
+        for event in self.entity.get_linked_entities(
+                ['P11', 'P14', 'P22', 'P23', 'P25'],
+                class_groups['event']['classes'],
+                inverse=True):
+            for location in event.get_linked_entities(
+                    ['P7', 'P26', 'P27'],
+                    ['object_location']):
+                place = location.get_linked_entity_safe('P53', inverse=True)
+                self.linked_places[place.id] = place
+        self.tabs['place'] = Tab(
+            'place',
+            table=entity_table(list(self.linked_places.values()), self.entity))
+
+    def add_place_person_tab(self) -> None:
+        persons = {}
+        location = self.entity.get_linked_entity_safe('P53')
+        for event in location.get_linked_entities(
+                ['P7', 'P26', 'P27'],
+                class_groups['event']['classes'],
+                inverse=True):
+            for person in event.get_linked_entities(
+                    ['P11', 'P14', 'P22', 'P23', 'P25'],
+                    ['person']):
+                persons[person.id] = person
+        self.tabs['person'] = Tab(
+            'person',
+            table=entity_table(list(persons.values()), self.entity))
 
     def add_buttons(self) -> None:
         self.buttons = []
@@ -401,7 +434,7 @@ class Display:
                         relation.inverse):
                     if e.class_.name == 'object_location':
                         e = e.get_linked_entity_safe('P53', True)
-                        self.linked_places.append(e)
+                        self.linked_places[e.id] = e
                     if name == 'place_from':
                         self.data['begin'] = \
                             format_entity_date(self.entity.dates, 'begin', e)

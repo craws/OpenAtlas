@@ -98,7 +98,7 @@ def entity_table(
     forms = forms or {}
     columns = (columns or default_columns) + (additional_columns or [])
 
-    order = []
+    order = [[0, "asc"]]
     if forms.get('checkbox'):
         columns.insert(0, 'checkbox')
         order = [[0, 'desc'], [1, 'asc']]

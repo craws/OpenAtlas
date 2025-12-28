@@ -128,7 +128,9 @@ group: dict[str, Any] = {
     'display': {
         'buttons': ['copy', 'network'],
         'form_buttons': ['insert_and_continue'],
-        'additional_tabs': {'note': {}},
+        'additional_tabs': {
+            'person_place': {},
+            'note': {}},
         'network_color': '#34623C'}}
 
 person = copy.deepcopy(group)

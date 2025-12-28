@@ -91,7 +91,9 @@ place: dict[str, Any] = {
     'display': {
         'buttons': ['copy', 'network', ],
         'form_buttons': ['insert_and_continue', 'insert_continue_sub'],
-        'additional_tabs': {'note': {}},
+        'additional_tabs': {
+            'place_person': {},
+            'note': {}},
         'network_color': '#FF0000'}}
 place['relations']['file']['tab']['additional_columns'] += ['overlay']
 
