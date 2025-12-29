@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2025-12-27 16:23+0100\n"
-"PO-Revision-Date: 2025-12-27 16:29+0100\n"
+"PO-Revision-Date: 2025-12-29 18:32+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language-Team: en <LL@li.org>\n"
 "Language: en\n"
@@ -328,7 +328,7 @@ msgstr "website URL"
 
 #: config/model/classes/reference_system.py:15 openatlas/forms/setting.py:110
 msgid "resolver url"
-msgstr "resolver url"
+msgstr "resolver URL"
 
 #: config/model/classes/reference_system.py:18
 #, fuzzy
