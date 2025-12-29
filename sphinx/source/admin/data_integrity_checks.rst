@@ -15,20 +15,26 @@ when importing data from other projects or deleting files outside of the
 application, etc. Therefore, functions to check possible inconsistencies were
 implemented and are described in detail below.
 
+Similar names
+-------------
+This test will search for similar entity names. Depending on selection
+and data volume this might take some time. The following options are given:
+
+* **Classes** - select the class you want to search for similar names
+* **Ratio** - select how similar the names should be, 100 is the default and
+  means 100% identical
+
+The function uses the `fuzzywuzzy <https://pypi.org/project/fuzzywuzzy/>`_
+package which uses the
+`Levenshtein Distance <https://en.wikipedia.org/wiki/Levenshtein_distance>`_.
+
 Orphans
 -------
+This function is used to find entities with missing connections. The result
+is shown in the following tabs:
 
 Orphans
 *******
-Here unlinked data are shown. These so called orphans could be artifacts
-from imports or results of bugs and can be deleted. If orphans seem to appear
-regularly (without data imports or known bugs) please report this issue to the
-OpenAtlas team e.g. via the
-`OpenAtlas redmine <https://redmine.openatlas.eu/>`_.
-
-
-Entities without links
-**********************
 Entries shown have no relation to other entities. Of course that can be
 part of the normal data set, but should be check if correct. An unlinked
 entity could be artifacts of an import or were not linked by accident.
@@ -66,17 +72,6 @@ Orphaned subunits
 Subunits without a link to the level above, e.g. a feature
 with no connection to a place.
 
-Circular dependencies
-*********************
-It can be checked if an entity is linked to itself. This could happen, for
-example, if a person has been entered as is married to themself or a type
-has itself as super. It shouldn't be possible to create circular
-dependencies within the application but nevertheless it's useful to
-check the database as this can happen through data imports or bugs. If you
-find circular dependencies in your dataset regularly with a previous report
-or known bugs, please report the issue e.g. via the
-`OpenAtlas redmine <https://redmine.openatlas.eu/>`_.
-
 Dates
 -----
 In this view various results of invalid or inconsistent dates are shown.
@@ -107,51 +102,41 @@ Invalid sub dates
 This tab shows incompatible dates for hierarchical events. Example: A
 sub event begins before the super event began.
 
-Check links
------------
-Here, every link will be checked for its CIDOC validity. Depending on the
-amount of data this can take some time. While data entered by using the
-OpenAtlas user interface should always be CIDOC conform, imported
-data should be check after import. If invalid links are
+Links
+-----
+Depending on the amount of data, checking links can take some time.
+
+Invalid CIDOC links
+*******************
+While data entered by using the OpenAtlas user interface should always be
+CIDOC conform, imported data should be check after import. If invalid links are
 found the problem should be resolved in the original data source.
 
-Check link duplicates
----------------------
-Two tests are combined:
+Link duplicates
+***************
+Shows duplicate links that are identically. The duplicates can be deleted by
+clicking the **Delete link duplicates** button.
 
-The first test checks for duplicate links that are identically. These links
-can be afterwards by clicking the *Delete link duplicates* button.
-
-In case the first test found no duplicate links the dataset will be checked
-for entities that were connected to a single use type multiple times.
-Example: A place has been linked to types castle and city. Only one of the
-types will be displayed in the user interface, the other one would be
-deleted automatically if the entry is updated by anyone.
+Invalid multiple types
+**********************
+Shows entities that were connected to a single use type multiple times.
+Example: A place has been linked to types castle and city.
 You are then given the option to have a look at the links and to remove the
-wrong ones by clicking the **Remove** link next to the entries in the
+them by clicking the **Remove** link next to the entries in the
 last column.
 
-By using the OpenAtlas interface link duplicates should be avoided
-automatically but can happen due to data import or bugs. If this is a
-reoccuring issue for your dataset, please report e.g. via the
-`OpenAtlas redmine <https://redmine.openatlas.eu/>`_.
-
-Check similar names
--------------------
-This test will search for similar entity names. Depending on selection
-and data volume this might take some time. The following options are given:
-
-* **Classes** - select the class you want to search for similar names
-* **Ratio** - select how similar the names should be, 100 is the default and
-  means 100% identical
-
-The function uses the `fuzzywuzzy <https://pypi.org/project/fuzzywuzzy/>`_
-package which uses the
-`Levenshtein Distance <https://en.wikipedia.org/wiki/Levenshtein_distance>`_.
+Circular dependencies
+*********************
+Shows entities is linked to themselves. This could happen, for
+example, if a person has been entered as is married to themself or a type
+has itself as super. It shouldn't be possible to create circular
+dependencies within the application but nevertheless it's useful to
+check the database as this can happen through data imports or bugs. If you
+find circular dependencies in your dataset regularly please report the issue
+e.g. via the `OpenAtlas Redmine <https://redmine.openatlas.eu/>`_.
 
 Check files
 -----------
-
 In this section, all files are checked for completeness and consistency.
 Further information about file entities can be found in the manual under
 :doc:`/entity/file`.

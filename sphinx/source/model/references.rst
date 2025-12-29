@@ -5,7 +5,6 @@ References
 
 References
 ----------
-
 OpenAtlas uses :cidoc_property:`P67<P67-refers-to>` ("refers to") in order to
 link various entities to references.
 References can be:
@@ -37,7 +36,6 @@ a whole refers to the entity, no delimiter is necessary.
 
 Reference Systems
 -----------------
-
 Reference systems include sources such as vocabularies, gazetteers, etc.
 They are considered authority documents
 (:cidoc_entity:`E32<E32-Authority-Document>`).
@@ -92,7 +90,6 @@ For more information on reference systems see the following links:
 
 References and Files
 --------------------
-
 Various entities can be connected to files. This is mapped as:
 
 :cidoc_entity:`E31<E31-Document>` (Document = file) - refers to

@@ -21,8 +21,6 @@ Form fields
 Can be linked via tabs to
 -------------------------
 * :doc:`source` - use, if a feature is referenced in it
-* :doc:`event` - use only for new events. For already existing events link
-  the location in the event form
 * :doc:`reference`
 * :doc:`artifact`
 * :doc:`stratigraphic_unit` is used to link a subunit of a feature (e.g. a

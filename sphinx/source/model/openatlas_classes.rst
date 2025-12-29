@@ -8,10 +8,8 @@ These special classes are used within the software to further refine
 While OpenAtlas uses the CIDOC CRM within the application, a finer grained
 model is needed to deal with contextual differences in the user
 interface. Therefore,
-:cidoc_entity:`E33 - Lingustic Object<e33-linguistic-object>` is used as class
+:cidoc_entity:`E33 - Linguistic Object<e33-linguistic-object>` is used as class
 for sources as well as source translations with different user interface forms.
-An overview of the internal mapping and CIDOC CRM classes can be found
-`here <https://github.com/craws/OpenAtlas/tree/main/install/crm>`_.
 
 All of these so called OpenAtlas classes can be mapped directly to the
 corresponding CIDOC CRM class. For all available classes and properties of

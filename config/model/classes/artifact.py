@@ -15,6 +15,12 @@ artifact: dict[str, Any] = {
         'location': {}},
     'extra': ['reference_system'],
     'relations': {
+        'super': {
+            'label': _('super'),
+            'classes': ['artifact'] + class_groups['place']['classes'],
+            'property': 'P46',
+            'inverse': True,
+            'mode': 'direct'},
         'actor': {
             'label': _('owned by'),
             'classes': class_groups['actor']['classes'],
@@ -23,12 +29,6 @@ artifact: dict[str, Any] = {
             'add_dynamic': True,
             'tab': {
                 'buttons': ['insert']}},
-        'super': {
-            'label': _('super'),
-            'classes': ['artifact'] + class_groups['place']['classes'],
-            'property': 'P46',
-            'inverse': True,
-            'mode': 'direct'},
         'source': standard_relations['source'],
         'subs': {
             'label': _('subs'),
