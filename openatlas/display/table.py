@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from typing import Any, Optional
 
 from flask import g, json, render_template, url_for
-from flask_babel import LazyString, format_number, lazy_gettext as _
+from flask_babel import LazyString, format_number, gettext as _
 from flask_login import current_user
 
 from openatlas import app
@@ -19,12 +19,13 @@ from openatlas.models.entity import Entity, Link
 from openatlas.models.openatlas_class import Relation
 from openatlas.models.overlay import Overlay
 
-# Needed for translations
+# For table translations
 _('previous')
 _('next')
 _('show')
 _('entries')
 _('showing %(first)s to %(last)s of %(all)s entries', first=1, last=25, all=38)
+_('value')  # For table column label
 
 
 @dataclass
@@ -32,12 +33,11 @@ class Table:
     columns: list[str | LazyString] = field(default_factory=list)
     rows: list[Any] = field(default_factory=list)
     order: list[Any] = field(default_factory=list)
-    defs: list[Any] = field(default_factory=list)
     paging: bool = True
 
     def display(self, name: str = 'default') -> str:
         if not self.rows:
-            return '<p class="uc-first">' + _('no entries') + '</p>'
+            return f'<p class="uc-first">{_('no entries')}</p>'
         no_title = ['checkbox', 'remove', 'set logo', 'update']
         data = {
             'data': self.rows,
@@ -46,24 +46,34 @@ class Table:
                 'title':
                     uc_first(
                         _(name.replace('type_link', 'type').replace('_', ' ')))
-                    if name and name not in no_title else '',
-                'className':
-                    'dt-body-right' if name in ['count', 'size'] else ''}
+                    if name and name not in no_title else ''}
                     for name in self.columns] + [
                         {'title': '', 'className': ''} for _item in
                         range(len(self.rows[0]) - len(self.columns))],
             'paging': self.paging,
+            'columnDefs': self.table_defs(),
+            'order': self.order or [],
             'pageLength': current_user.settings['table_rows'],
             'autoWidth': 'false'}
-        if self.order:
-            data['order'] = self.order
-        if self.defs:
-            data['columnDefs'] = self.defs
         return render_template(
             'util/table.html',
             table=self,
             name=name,
             data=json.dumps(data))
+
+    def table_defs(self) -> list[dict[str, Any]]:
+        defs = []
+        for i, column in enumerate(self.columns):
+            match column:
+                case 'checkbox':
+                    defs += [{"orderDataType": "dom-checkbox", "targets": i}]
+                case 'code' | 'CIDOC class' | 'domain code' | 'range code':
+                    defs += [
+                        {'orderDataType': 'cidoc-model', 'targets': i},
+                        {'sType': 'numeric', 'targets': i}]
+                case 'count' | 'entities' | 'size' | 'value':
+                    defs += [{'className': 'dt-body-right', 'targets': i}]
+        return defs
 
 
 def entity_table(
@@ -85,15 +95,13 @@ def entity_table(
             default_columns = item.range.class_.group['table_columns']
     else:
         default_columns = item.class_.group['table_columns']
-    defs = []
     forms = forms or {}
     columns = (columns or default_columns) + (additional_columns or [])
 
-    order = []
+    order = [[0, "asc"]]
     if forms.get('checkbox'):
         columns.insert(0, 'checkbox')
         order = [[0, 'desc'], [1, 'asc']]
-        defs = [{"orderDataType": "dom-checkbox", "targets": 0}]
     elif columns[0] == 'created':
         order = [[0, "desc"]]
 
@@ -106,7 +114,7 @@ def entity_table(
 
     overlays = Overlay.get_by_object(origin) \
         if origin and 'overlay' in columns else {}
-    table = Table(columns, order=order, defs=defs)
+    table = Table(columns, order=order)
     for item in items:
         range_ = None
         if isinstance(item, Link):
@@ -147,7 +155,7 @@ def get_table_cell_content(
                     data-entity-name="{sanitize(e.name)}"
                     value="{e.id}"
                     {"checked" if e.id in forms.get('selection_ids', [])
-                    else ""}>"""
+                     else ""}>"""
         case 'class':
             html = e.class_.label
         case 'created':
@@ -183,7 +191,7 @@ def get_table_cell_content(
             html = g.file_info.get(e.id, {}).get('license_holder')
         case 'main_image' if origin:
             html = profile_image_table_link(origin, e)
-        case 'name' | 'preceding':
+        case 'name' | 'preceding' | 'super':
             html = format_name_and_aliases(e, str(table_id), forms)
         case 'page':
             html = str(item.description)
@@ -206,11 +214,13 @@ def get_table_cell_content(
                             'overlay_insert',
                             image_id=e.id,
                             place_id=origin.id))
+        case 'property' if isinstance(item, Link):
+            html = item.property.code
         case 'public':
             html = ''
             if g.file_info.get(e.id):
                 html = display_bool(g.file_info[e.id]['public'], False)
-        case 'range' | 'succeeding':
+        case 'range' | 'sub' | 'succeeding':
             html = link(range_)
         case 'remove' if origin and isinstance(item, Link):
             html = ''

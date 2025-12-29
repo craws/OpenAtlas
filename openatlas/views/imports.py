@@ -4,7 +4,7 @@ from typing import Any, Optional
 
 import pandas as pd
 from flask import flash, g, render_template, request, url_for
-from flask_babel import format_number, lazy_gettext as _
+from flask_babel import format_number, gettext as _
 from flask_wtf import FlaskForm
 from pandas import DataFrame, Series
 from shapely import wkt
@@ -20,7 +20,6 @@ from openatlas.api.import_scripts.util import (
     get_match_types, get_reference_system_by_name)
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.error import EntityDoesNotExistError
-from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
@@ -140,7 +139,7 @@ def import_index() -> str:
             format_number(project.count),
             project.description])
     buttons = [manual('admin/import')]
-    if is_authorized('admin'):
+    if is_authorized('manager'):
         buttons.append(button(_('project'), url_for('import_project_insert')))
     return render_template(
         'content.html',
@@ -167,7 +166,7 @@ def import_project_insert() -> str | Response:
         crumbs=[
             [_('admin'), url_for('admin_index') + '#tab-data'],
             [_('import'), url_for('import_index')],
-            '+ <span class="uc-first">' + _('project') + '</span>'])
+            f'+ <span class="uc-first">{_('project')}</span>'])
 
 
 @app.route('/import/project/view/<int:id_>')
@@ -287,8 +286,7 @@ def import_data(project_id: int, class_: str) -> str:
                 checks,
                 checked_data,
                 project)
-        except Exception as e:
-            g.logger.log('error', 'import', 'import check failed', e)
+        except Exception:
             flash(_('error at import'), 'error')
             return render_template(
                 'import_data.html',
@@ -301,19 +299,14 @@ def import_data(project_id: int, class_: str) -> str:
                     [_('import'), url_for('import_index')],
                     project,
                     class_label])
-
-        if not form.preview.data and checked_data and (
-                not file_data['backup_too_old'] or app.testing):
-            Transaction.begin()
+        if not form.preview.data \
+                and checked_data \
+                and (not file_data['backup_too_old'] or app.testing):
             try:
                 import_data_(project, class_, checked_data)
-                Transaction.commit()
-                g.logger.log('info', 'import', f'import: {len(checked_data)}')
                 flash(f"{_('import of')}: {len(checked_data)}")
                 imported = True
-            except Exception as e:  # pragma: no cover
-                Transaction.rollback()
-                g.logger.log('error', 'import', 'import failed', e)
+            except Exception:  # pragma: no cover
                 flash(_('error transaction'), 'error')
     return render_template(
         'import_data.html',
@@ -338,7 +331,7 @@ def check_data_for_table_representation(
     file_ = request.files['file']
     file_path = app.config['TMP_PATH'] / secure_filename(str(file_.filename))
     file_.save(str(file_path))
-    data_frame = pd.read_csv(
+    data_frame: Any = pd.read_csv(
         file_path,
         dtype=str,
         skipinitialspace=True,

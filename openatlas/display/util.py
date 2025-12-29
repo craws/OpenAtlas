@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any, Optional
 
 from flask import flash, g, render_template, request, url_for
-from flask_babel import LazyString, lazy_gettext as _
+from flask_babel import LazyString, gettext as _
 from flask_login import current_user
 from jinja2 import pass_context
 from werkzeug.exceptions import abort
@@ -55,26 +55,53 @@ def reference_systems(entity: Entity) -> str:
             ['reference_system'],
             inverse=True)):
         return ''
-    html = '<h2 class="uc-first">' + _("external reference systems") + '</h2>'
+    html = f'<h2 class="uc-first">{_("external reference systems")}</h2>'
+    html += '<ul class="list-group list-group-flush bg-none">'
     for link_ in links:
         system = g.reference_systems[link_.domain.id]
-        html += link(
-            f'{system.resolver_url}{link_.description}',
-            f'{system.resolver_url}{link_.description}',
-            external=True) if system.resolver_url else link_.description
-        html += \
-            f' ({g.types[link_.type.id].name} ' + _('at') + \
-            f' {link(link_.domain)})'
+        show_info_button = ''
+        info_div = ''
+        logo = f"""
+            <div
+                class="circle bg-gray fw-bold text-black-50"
+                style="height: 16px; font-size: 12px;">{system.name.upper()[0]}
+            </div>"""
         if system.name in ['GeoNames', 'GND', 'Wikidata']:
             name = system.name.lower()
-            html += (
-                f' <span id="{name}-switch" class="uc-first '
+            show = '<span id="show">' + uc_first(_('show info')) + '</span>'
+            hide = '<span id="hide" class="d-none">' + \
+                uc_first(_('hide info')) + '</span>'
+            show_info_button += (
+                f' <button id="{name}-switch" class="uc-first mt-1 me-1 '
                 f'{app.config["CSS"]["button"]["secondary"]}"'
                 f'onclick="ajax{uc_first(name)}Info'
-                f'(\'{link_.description}\')">' + _('show') + '</span>'
-                f'<div id="{name}-info-div" class="bg-gray"></div>')
-        html += '<br>'
-    return html
+                f'(\'{link_.description}\')">{show}{hide}</button>')
+            info_div = f'<div id="{name}-info-div" class="mt-2"></div>'
+            logo = f"""<img src="/static/images/logos/{system.name}.svg" alt=""
+                class="rounded-circle object-fit-cover my-1" width="16"/>"""
+        entry = f"""
+            <li class="list-group-item bg-transparent">
+                <div class="d-flex gap-2 align-items-center">
+                {logo}
+                <span><b>{link(link_.domain)}</b>: {link_.description}</span>
+                <span class="badge badge-pill rounded-pill
+                    badge-secondary bg-secondary">
+                    {g.types[link_.type.id].name if link_.type else ''}
+                </span>
+                </div>
+                {show_info_button}
+                {link(
+                _('show on %(system_name)s', system_name=link_.domain.name),
+                f'{system.resolver_url}{link_.description}',
+                external=True,
+                icon='fa-external-link-alt',
+                class_="btn btn-sm btn-outline-primary mt-1")
+                if system.resolver_url else ''}
+                {info_div}
+            </li>
+            """
+        html += entry
+    return html + '</ul>'
 
 
 def get_appearance(entity: Entity) -> tuple[str, str]:
@@ -89,7 +116,7 @@ def get_appearance(entity: Entity) -> tuple[str, str]:
             inverse=True):
         event = link_.domain
         actor = link_.range
-        html = ' ' + _('at an') + ' ' + \
+        html = f" {_('at an')} " + \
             link(_('event'), url_for('view', id_=event.id))
         if not actor.dates.first:
             if link_.dates.first and (
@@ -219,7 +246,10 @@ def menu(entity: Optional[Entity]) -> str:
 
 
 @app.template_filter()
-def profile_image(entity: Entity, link_image: Optional[bool] = True) -> str:
+def profile_image(
+        entity: Entity,
+        link_image: Optional[bool] = True,
+        max_width_100: Optional[bool] = False) -> str:
     if not entity.image_id or not (path := get_file_path(entity.image_id)):
         return ''
     file_id = entity.image_id
@@ -245,10 +275,14 @@ def profile_image(entity: Entity, link_image: Optional[bool] = True) -> str:
     if entity.class_.group['name'] == 'file':
         external = True
         if path.suffix.lower() not in g.display_file_ext:
-            return '<p class="uc-first">' + _('no preview available') + '</p>'
+            return f'<p class="uc-first">{_('no preview available')}</p>'
     else:
         url = url_for('view', id_=entity.image_id)
-    html = f'<img style="max-width:{width}px" alt="{entity.name}" src="{src}">'
+    max_width = f"{width}px"
+    if max_width_100:
+        max_width = "100%"
+    html =  \
+        f'<img style="max-width:{max_width}" alt="{entity.name}" src="{src}">'
     if not link_image:
         return html
     html = link(html, url, external=external)
@@ -328,13 +362,14 @@ def send_mail(
                     g.settings['mail_transport_username'],
                     app.config['MAIL_PASSWORD'])
             for recipient in recipients:
-                msg = MIMEText(text, _charset='utf-8')
+                msg: Any = MIMEText(text, _charset='utf-8')
                 msg['From'] = from_
                 msg['To'] = recipient.strip()
                 msg['Subject'] = Header(subject.encode('utf-8'), 'utf-8')
                 smtp.sendmail(
                     g.settings['mail_from_email'],
-                    recipient, msg.as_string())
+                    recipient,
+                    msg.as_string())
             log_text = \
                 f'Mail from {from_} to {", ".join(recipients)} ' \
                 f'Subject: {subject}'
@@ -378,8 +413,8 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
 def check_write_access(path: Path, warnings: list[str]) -> list[str]:
     if not os.access(path, os.W_OK):
         warnings.append(
-            '<p class="uc-first">' + _('directory not writable') +
-            f" {str(path).replace(app.root_path, '')}</p>")
+            f'<p class="uc-first">{_('directory not writable')}'
+            f"{str(path).replace(app.root_path, '')}</p>")
     return warnings
 
 
@@ -431,6 +466,7 @@ def link(
         uc_first_: Optional[bool] = True,
         js: Optional[str] = None,
         external: bool = False,
+        icon: Optional[str] = None,
         index: bool = False) -> str:
     html = ''
     if isinstance(object_, (str, LazyString)):
@@ -439,7 +475,8 @@ def link(
         if uc_first_ and not str(object_).startswith('http'):
             object_ = uc_first(object_)
         class_ = f' class="{class_.strip()}"' if class_ else ''
-        html = f'<a href="{url}"{class_}{js}{ext}>{object_}</a>'
+        icon_ = f'<i class="ms-2 fas {icon}"></i>' if icon else ''
+        html = f'<a href="{url}"{class_}{js}{ext}>{object_}{icon_}</a>'
     elif isinstance(object_, Entity) and index:
         html = link(
             object_.class_.group['label'] + (
@@ -480,7 +517,7 @@ def link(
 
 @app.template_filter()
 def button(
-        label: str | LazyString,
+        label: str,
         url: Optional[str] = None,
         id_: Optional[str] = None,
         onclick: Optional[str] = None,
@@ -526,12 +563,12 @@ def button_bar(buttons: list[Any]) -> str:
 def citation_example(code: str) -> str:
     html = ''
     if code == 'reference' and (text := get_translation('citation_example')):
-        html = '<h1 class="uc-first">' + _('citation_example') + f'</h1>{text}'
+        html = f'<h1 class="uc-first">{_('citation_example')}</h1>{text}'
     return html
 
 
 @app.template_filter()
-def display_info(data: dict[str | LazyString, Any]) -> str:
+def display_info(data: dict[str, Any]) -> str:
     return render_template('util/info_data.html', data=data)
 
 

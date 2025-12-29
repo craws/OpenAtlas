@@ -4,8 +4,8 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from flask import (
-    flash, g, make_response, redirect, render_template, request, url_for)
-from flask_babel import lazy_gettext as _
+    flash, make_response, redirect, render_template, request, url_for)
+from flask_babel import gettext as _
 from flask_login import login_required
 from flask_wtf import FlaskForm
 from werkzeug.wrappers import Response
@@ -14,7 +14,6 @@ from wtforms.fields.numeric import IntegerField
 from wtforms.fields.simple import HiddenField
 
 from openatlas import app
-from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import button, link, required_group
@@ -25,43 +24,29 @@ from openatlas.models.token import Token
 from openatlas.models.user import User
 
 
-class GenerateTokenForm(FlaskForm):
-    expiration = IntegerField(
-        _('expiration'),
-        default=30,
-        description=_('expiration in days')
-        + ', 0 = ' + _("no expiration date"))
-    token_name = StringField(
-        _('name'),
-        default=f"Token_{datetime.today().strftime('%Y-%m-%d')}")
-    user = SelectField(_('user'), choices=(), default=0, coerce=int)
-    token_text = HiddenField()
-    save = SubmitField(_('generate'))
-
-
-class ListTokenForm(FlaskForm):
-    user = SelectField(_('user'), choices=(), default=0, coerce=int)
-    revoked = SelectField(
-        _('revoked'),
-        choices=(
-            ('all', _('all')),
-            ('true', _('revoked')),
-            ('false', _('not revoked'))))
-    valid = SelectField(
-        _('valid'),
-        choices=(
-            ('all', _('all')),
-            ('>', _('valid')),
-            ('<', _('not valid'))))
-    save = SubmitField(_('apply'))
-
-
 @app.route('/admin/api_token', methods=['GET', 'POST'])
 @app.route('/admin/api_token/<int:user_id>', methods=['GET', 'POST'])
 @required_group('admin')
 def api_token(user_id: int = 0) -> str | Response:
-    form = ListTokenForm()
-    form.user.choices = [(0, _('all'))] + User.get_users_for_form()
+    class ListTokenForm(FlaskForm):
+        user = SelectField(_('user'), choices=(), default=0, coerce=int)
+        revoked = SelectField(
+            _('revoked'),
+            choices=(
+                ('all', _('all')),
+                ('true', _('revoked')),
+                ('false', _('not revoked'))))
+        valid = SelectField(
+            _('valid'),
+            choices=(
+                ('all', _('all')),
+                ('>', _('valid')),
+                ('<', _('not valid'))))
+        save = SubmitField(_('apply'))
+
+    form: Any = ListTokenForm()
+    form.user.choices = \
+        [(0, _('all'))] + [(u.id, u.username) for u in User.get_all()]
     user_id = user_id or 0
     revoked = 'all'
     valid = 'all'
@@ -110,7 +95,7 @@ def api_token(user_id: int = 0) -> str | Response:
         delete_link = link(
             _('delete'),
             url_for('delete_token', id_=token['id']),
-            js="return confirm('" + _('delete') + "?')")
+            js=f"return confirm('{_('delete')}?')")
         revoke_link = link(
             _('revoke'),
             url_for('revoke_token', id_=token['id']))
@@ -150,23 +135,29 @@ def get_token_valid_column(token: dict[str, Any], user: User) -> str:
 @app.route('/admin/api_token/generate_token', methods=['GET', 'POST'])
 @required_group('admin')
 def generate_token() -> str | Response:
-    form = GenerateTokenForm()
-    form.user.choices = User.get_users_for_form()
+
+    class GenerateTokenForm(FlaskForm):
+        expiration = IntegerField(
+            _('expiration'),
+            default=30,
+            description=_('expiration in days')
+            + f', 0 = {_("no expiration date")}')
+        token_name = StringField(
+            _('name'),
+            default=f"Token_{datetime.today().strftime('%Y-%m-%d')}")
+        user = SelectField(_('user'), choices=(), default=0, coerce=int)
+        token_text = HiddenField()
+        save = SubmitField(_('generate'))
+
+    form: Any = GenerateTokenForm()
+    form.user.choices = [(u.id, u.username) for u in User.get_all()]
     if form.validate_on_submit():
         user_ = User.get_by_id_without_bookmarks(int(form.user.data))
-        token = ''
-        Transaction.begin()
-        try:
-            token = Token.generate_token(
-                form.expiration.data,
-                form.token_name.data,
-                user_)
-            Transaction.commit()
-            flash(f"{_('token stored for')}: {user_.username}")
-        except Exception as e:  # pragma: no cover
-            Transaction.rollback()
-            g.logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
+        token = Token.generate_token(
+            form.expiration.data,
+            form.token_name.data,
+            user_)
+        flash(f"{_('token stored for')}: {user_.username}")
         response = make_response(redirect(url_for('generate_token')))
         response.set_cookie(
             'jwt_token',

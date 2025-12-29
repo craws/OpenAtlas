@@ -17,6 +17,10 @@ class EntityNotAnEventError(Exception):
     pass
 
 
+class EntityNotAFileError(Exception):
+    pass
+
+
 class InvalidCidocClassCodeError(Exception):
     pass
 
@@ -99,6 +103,10 @@ class TypeIDError(Exception):
 
 
 class ValueNotIntegerError(Exception):
+    pass
+
+
+class FileIdNotInteger(Exception):
     pass
 
 

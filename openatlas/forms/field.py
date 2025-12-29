@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 # pylint: disable=too-few-public-methods
+# mypy: ignore-errors, too much trouble to mypy check form elements
 import ast
 from typing import Any, Optional
 
 from flask import g, render_template, request
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from flask_wtf import FlaskForm
 from markupsafe import Markup
 from wtforms import (
@@ -16,6 +17,7 @@ from wtforms.widgets import FileInput, HiddenInput, Input, TextInput
 
 from openatlas import app
 from openatlas.display.table import Table, entity_table
+from openatlas.display.util import link
 from openatlas.display.util2 import is_authorized
 from openatlas.forms.util import convert
 from openatlas.models.entity import Entity
@@ -313,16 +315,11 @@ class TableCidocField(HiddenField):
 
 
 def table_cidoc(table_id: str, items: list[Any]) -> Table:
-    table_ = Table(
-        ['code', 'name'],
-        defs=[
-            {'orderDataType': 'cidoc-model', 'targets': [0]},
-            {'sType': 'numeric', 'targets': [0]}])
+    table_ = Table(['code', 'name'])
     for i in items:
-        onclick = f'''
-            onclick="selectFromTable(this,
-            '{table_id}', '{i.code}', '{i.code} {i.name}');"'''
-        table_.rows.append([f'<a href="#" {onclick}>{i.code}</a>', i.name])
+        js = "selectFromTable(" \
+            + f"this, '{table_id}', '{i.code}', '{i.code} {i.name}');"
+        table_.rows.append([link(i.code, '#', js=js), i.name])
     return table_
 
 

@@ -1,7 +1,7 @@
 from typing import Any
 
 from flask import flash, g, json, render_template, request, url_for
-from flask_babel import LazyString, lazy_gettext as _
+from flask_babel import gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -9,7 +9,6 @@ from wtforms import IntegerField, SelectField, StringField
 from wtforms.validators import InputRequired
 
 from openatlas import app
-from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
     button, display_info, link, remove_link, required_group)
@@ -21,7 +20,7 @@ from openatlas.models.tools import (
     SexEstimation, get_carbon_link, get_sex_types, update_carbon)
 
 
-def name_result(result: float) -> str | LazyString:
+def name_result(result: float) -> str:
     # Needed for translations
     _('female')
     _('likely female')
@@ -48,7 +47,7 @@ def sex_result(entity: Entity) -> str:
     if calculation is None:
         return ''
     return \
-        '<h1 class="uc-first">' + _('sex estimation') + '</h1>' \
+        f'<h1 class="uc-first">{_('sex estimation')}</h1>' \
         'Ferembach et al. 1979: ' \
         f'<span class="anthro-result">{calculation}</span> - ' + \
         _('corresponds to') + f' "{name_result(calculation)}"'
@@ -56,7 +55,7 @@ def sex_result(entity: Entity) -> str:
 
 def carbon_result(entity: Entity) -> str:
     if link_ := get_carbon_link(entity):
-        return '<h1 class="uc-first">' + _('radiocarbon dating') + '</h1>' + \
+        return f'<h1 class="uc-first">{_('radiocarbon dating')}</h1>' + \
             display_info(json.loads(link_.description))
     return ''
 
@@ -94,7 +93,7 @@ def sex(id_: int) -> str | Response:
             buttons.append(button(
                 _('delete'),
                 url_for('sex_delete', id_=id_),
-                onclick="return confirm('" + _('delete') + "?')"))
+                onclick=f"return confirm('{_('delete')}?')"))
     data = []
     for item in types:
         type_ = g.types[item['id']]
@@ -123,16 +122,9 @@ def sex(id_: int) -> str | Response:
 
 @app.route('/tools/sex/delete/<int:id_>')
 @required_group('contributor')
-def sex_delete(id_: int) -> str | Response:
-    try:
-        Transaction.begin()
-        for dict_ in get_sex_types(id_):
-            Link.delete_(dict_['link_id'])
-        Transaction.commit()
-    except Exception as e:  # pragma: no cover
-        Transaction.rollback()
-        g.logger.log('error', 'database', 'transaction failed', e)
-        flash(_('error transaction'), 'error')
+def sex_delete(id_: int) -> Response:
+    for dict_ in get_sex_types(id_):
+        Link.delete_(dict_['link_id'])
     return redirect(url_for('tools_index', id_=id_))
 
 
@@ -163,14 +155,7 @@ def sex_update(id_: int) -> str | Response:
         data = form.data
         data.pop('save', None)
         data.pop('csrf_token', None)
-        try:
-            Transaction.begin()
-            SexEstimation.save(entity, data)
-            Transaction.commit()
-        except Exception as e:  # pragma: no cover
-            Transaction.rollback()
-            g.logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
+        SexEstimation.save(entity, data)
         return redirect(url_for('sex', id_=entity.id))
 
     for item in get_sex_types(entity.id):
@@ -200,7 +185,7 @@ def carbon(id_: int) -> str | Response:
             button(_('edit'), url_for('carbon_update', id_=entity.id)))
         if link_ := get_carbon_link(entity):
             buttons.append(
-                str(remove_link(_('radiocarbon dating'), link_, entity)))
+                button(remove_link(_('radiocarbon dating'), link_, entity)))
     return render_template(
         'tabs.html',
         entity=entity,

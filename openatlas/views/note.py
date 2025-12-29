@@ -1,5 +1,5 @@
 from flask import flash, render_template, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from werkzeug.exceptions import abort
@@ -79,7 +79,7 @@ def note_insert(entity_id: int) -> str | Response:
         return redirect(f"{url_for('view', id_=entity.id)}#tab-note")
     return render_template(
         'content.html',
-        content='<p>' + _('notes info') + '</p>' +
+        content=f'<p>{_('notes info')}</p>' +
         display_form(form, manual_page='tools/notes'),
         entity=entity,
         crumbs=[link(entity, index=True), entity, '+ ' + uc_first(_('note'))])

@@ -1,5 +1,5 @@
 from flask import abort, flash, g, render_template, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -7,7 +7,6 @@ from wtforms import BooleanField
 from wtforms.validators import InputRequired
 
 from openatlas import app
-from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table, entity_table
 from openatlas.display.util import (
@@ -74,25 +73,21 @@ def type_delete_recursive(id_: int) -> str | Response:
     return render_template('tabs.html', tabs=tabs, crumbs=crumbs)
 
 
-@app.route('/type/move/<int:id_>', methods=['GET', 'POST'])
+@app.route('/type/change/<int:id_>', methods=['GET', 'POST'])
 @required_group('editor')
-def type_move_entities(id_: int) -> str | Response:
+def change_type(id_: int) -> str | Response:
     type_ = g.types[id_]
     root = g.types[type_.root[0]]
     if root.category in ['system', 'value']:
         abort(403)
     form = move_form(type_)
+    type_field = getattr(form, str(root.id))
     if form.validate_on_submit():
-        Transaction.begin()
-        type_.move_entities(
-            getattr(form, str(root.id)).data,
-            form.checkbox_values.data)
-        Transaction.commit()
+        type_.change_type(type_field.data, form.checkbox_values.data)
         flash(_('Entities were updated'), 'success')
         return redirect(
             f"{url_for('index', group='type')}"
             f"#menu-tab-{type_.category}_collapse-{root.id}")
-    getattr(form, str(root.id)).data = type_.id
     return render_template(
         'type/move.html',
         table=Table(

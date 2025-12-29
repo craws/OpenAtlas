@@ -95,7 +95,7 @@ class TypeTest(TestBaseCase):
                 'superType': actor_type.id})
         assert rv.data.isdigit()
 
-        rv = c.get(url_for('ajax_get_type_tree', root_id=actor_type.id))
+        rv = c.get(url_for('ajax_type_tree', root_id=actor_type.id))
         assert b'New dynamic' in rv.data
 
         rv = c.post(url_for('update', id_=actor_type.id), data=data)
@@ -158,7 +158,7 @@ class TypeTest(TestBaseCase):
         rv = c.get(url_for('update', id_=place.id))
         assert b'422' in rv.data
 
-        rv = c.post(url_for('type_move_entities', id_=dimension_type.subs[0]))
+        rv = c.post(url_for('change_type', id_=dimension_type.subs[0]))
         assert b'403' in rv.data
 
         rv = c.get(url_for('show_multiple_linked_entities', id_=place_type.id))

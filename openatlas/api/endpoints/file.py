@@ -10,7 +10,8 @@ from openatlas import app
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.database_mapper import get_links_by_id_network
 from openatlas.api.resources.error import (
-    DisplayFileNotFoundError, NoLicenseError, NotPublicError)
+    DisplayFileNotFoundError, EntityNotAFileError, FileIdNotInteger,
+    NoLicenseError, NotPublicError)
 from openatlas.api.resources.parser import files, image
 from openatlas.api.resources.resolve_endpoints import download
 from openatlas.api.resources.templates import licensed_file_template
@@ -26,9 +27,13 @@ from openatlas.models.overlay import Overlay
 class DisplayImage(Resource):
     @staticmethod
     def get(filename: str) -> Response:
-        entity = ApiEntity.get_by_id(
-            int(Pathlib_path(filename).stem),
-            types=True)
+        try:
+            id_ = int(Pathlib_path(filename).stem)
+        except ValueError as e:
+            raise FileIdNotInteger from e
+        entity = ApiEntity.get_by_id(id_, types=True)
+        if entity.class_.group.get('name') != 'file':
+            raise EntityNotAFileError
         if not entity.public:
             raise NotPublicError
         if not get_license_name(entity):
@@ -102,8 +107,8 @@ class EntityFiles(Resource):
         links = get_links_by_id_network(set(file_ids))
         entity_file_dict = defaultdict(list)
         for link_ in links:
-            if link_['property_code'] != 'P67' or link_[
-                    'domain_system_class'] != 'file':
+            if link_['property_code'] != 'P67' \
+                    or link_['domain_system_class'] != 'file':
                 continue
             entity_file_dict[link_['range_id']].append(
                 files_dict.get(link_['domain_id']))

@@ -73,14 +73,9 @@ class UserForm(FlaskForm):
 
 
 class ActivityForm(FlaskForm):
-    action_choices = (
-        ('all', _('all')),
-        ('insert', _('insert')),
-        ('update', _('update')),
-        ('delete', _('delete')))
     limit = SelectField(
         _('limit'),
-        choices=((0, _('all')), (100, 100), (500, 500)),
+        choices=((0, _('all')), (100, 100), (500, 500)),  # type: ignore
         default=100,
         coerce=int)
     user = SelectField(
@@ -88,7 +83,14 @@ class ActivityForm(FlaskForm):
         choices=([(0, _('all'))]),
         default=0,
         coerce=int)
-    action = SelectField(_('action'), choices=action_choices, default='all')
+    action = SelectField(
+        _('action'),
+        choices=(
+            ('all', _('all')),
+            ('insert', _('insert')),
+            ('update', _('update')),
+            ('delete', _('delete'))),
+        default='all')
     save = SubmitField(_('apply'))
 
 
@@ -99,8 +101,9 @@ class ActivityForm(FlaskForm):
     methods=['GET', 'POST'])
 @required_group('readonly')
 def user_activity(user_id: int = 0, entity_id: Optional[int] = None) -> str:
-    form = ActivityForm()
-    form.user.choices = [(0, _('all'))] + User.get_users_for_form()
+    form: Any = ActivityForm()
+    form.user.choices = \
+        [(0, _('all'))] + [(u.id, u.username) for u in User.get_all()]
     limit = 100
     user_id = user_id or 0
     action = 'all'
@@ -221,7 +224,7 @@ def user_update(id_: int) -> str | Response:
         abort(404)
     if user.group == 'admin' and current_user.group != 'admin':
         abort(403)
-    form = UserForm(obj=user)
+    form: Any = UserForm(obj=user)
     form.user_id = id_
     del (
         form.password,
@@ -257,7 +260,7 @@ def user_update(id_: int) -> str | Response:
 @app.route('/user/insert', methods=['GET', 'POST'])
 @required_group('manager')
 def user_insert() -> str | Response:
-    form = UserForm()
+    form: Any = UserForm()
     form.group.choices = get_groups()
     if not g.settings['mail']:
         del form.send_info
@@ -287,11 +290,11 @@ def user_insert() -> str | Response:
             if send_mail(subject, body, form.email.data, False):
                 flash(
                     _('Sent account information mail to %(email)s.',
-                      email=form.email.data))
+                        email=form.email.data))
             else:  # pragma: no cover
                 flash(
                     _('Failed to send account details to %(email)s.',
-                      email=form.email.data),
+                        email=form.email.data),
                     'error')
         if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             return redirect(url_for('user_insert'))
@@ -308,7 +311,7 @@ def user_insert() -> str | Response:
         title=_('user'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-user"],
-            '+&nbsp;<span class="uc-first d-inline-block">' + _('user')
+            f'+&nbsp;<span class="uc-first d-inline-block">{_('user')}'
             + '</span>'])
 
 

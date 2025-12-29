@@ -3,7 +3,7 @@ from typing import Any
 
 import bcrypt
 from flask import flash, g, render_template, session, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
@@ -12,7 +12,6 @@ from wtforms import BooleanField, PasswordField
 from wtforms.validators import InputRequired
 
 from openatlas import app
-from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.util import button, display_info
 from openatlas.display.util2 import manual, uc_first
@@ -23,9 +22,9 @@ from openatlas.forms.util import get_form_settings, set_form_settings
 
 
 class PasswordForm(FlaskForm):
-    password_old = PasswordField(_('old password'), [InputRequired()])
-    password = PasswordField(_('password'), [InputRequired()])
-    password2 = PasswordField(_('repeat password'), [InputRequired()])
+    password_old: Any = PasswordField(_('old password'), [InputRequired()])
+    password: Any = PasswordField(_('password'), [InputRequired()])
+    password2: Any = PasswordField(_('repeat password'), [InputRequired()])
     generate_password = generate_password_field()
     show_passwords = BooleanField(_('show passwords'))
     save = SubmitField(_('save'))
@@ -62,10 +61,10 @@ def profile_index() -> str:
             content=display_info({
                 _('name'): current_user.real_name,
                 _('email'): current_user.email,
-                _('show email'): str(_('on'))
-                if current_user.settings['show_email'] else str(_('off')),
-                _('newsletter'): str(_('on'))
-                if current_user.settings['newsletter'] else str(_('off'))}),
+                _('show email'): _('on')
+                if current_user.settings['show_email'] else _('off'),
+                _('newsletter'): _('on')
+                if current_user.settings['newsletter'] else _('off')}),
             buttons=[manual('tools/profile')]),
         'modules': Tab(
             'modules',
@@ -121,17 +120,9 @@ def profile_settings(category: str) -> str | Response:
                 if field.type == 'BooleanField':
                     value = 'True' if value else ''
                 settings[field.name] = value
-        Transaction.begin()
-        try:
-            current_user.update()
-            current_user.update_settings(settings)
-            Transaction.commit()
-            session['language'] = current_user.settings['language']
-            flash(_('info update'))
-        except Exception as e:  # pragma: no cover
-            Transaction.rollback()
-            g.logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
+        current_user.update(settings)
+        session['language'] = current_user.settings['language']
+        flash(_('info update'))
         return redirect(f"{url_for('profile_index')}#tab-{category}")
     set_form_settings(form, True)
     return render_template(

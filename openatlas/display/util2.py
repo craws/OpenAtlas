@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Optional
 
 from bs4 import BeautifulSoup
-from flask_babel import LazyString, lazy_gettext as _
+from flask_babel import gettext as _
 from flask_login import current_user
 from jinja2 import pass_context
 
@@ -35,7 +35,7 @@ def convert_size(size_bytes: int) -> str:
 
 
 def display_bool(value: bool, show_false: bool = True) -> str:
-    return str(_('yes')) if value else str(_('no')) if show_false else ''
+    return _('yes') if value else _('no') if show_false else ''
 
 
 @pass_context  # Prevent Jinja2 context caching
@@ -62,7 +62,7 @@ def is_authorized(context: str, group: Optional[str] = None) -> bool:
 
 
 @app.template_filter()
-def uc_first(string: Optional[str | LazyString] = None) -> str:
+def uc_first(string: Optional[str] = None) -> str:
     return str(string)[0].upper() + str(string)[1:] if string else ''
 
 

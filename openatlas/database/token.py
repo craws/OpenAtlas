@@ -67,12 +67,14 @@ def revoke_all_tokens() -> None:
 
 
 def delete_invalid_tokens(inactive_user_ids: list[int]) -> None:
-    g.cursor.execute(f"""
+    g.cursor.execute(
+        """
         DELETE FROM web.user_tokens
-        WHERE revoked = true 
-            OR valid_until < '{str(datetime.now())}' 
-            OR user_id IN %(inactive_user_ids)s;
-    """, {'inactive_user_ids': tuple(inactive_user_ids)})
+        WHERE revoked = true
+            OR valid_until < %(now)s
+            OR user_id IN %(user_ids)s;
+        """,
+        {'now': str(datetime.now()), 'user_ids': tuple(inactive_user_ids)})
 
 
 def check_token_revoked(jti: str) -> dict[str, Any]:
@@ -82,7 +84,8 @@ def check_token_revoked(jti: str) -> dict[str, Any]:
         FROM web.user_tokens t 
         LEFT JOIN web.user u ON t.user_id = u.id
         WHERE jti = %(jti)s;
-        """, {'jti': jti})
+        """,
+        {'jti': jti})
     token = {'revoked': True, 'valid_until': True, 'active': True}
     if row := g.cursor.fetchone():
         token = {'revoked': row[0], 'valid_until': row[1], 'active': row[2]}

@@ -1,7 +1,7 @@
 from typing import Any
 
 from flask import g, render_template, request
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
     BooleanField, IntegerField, SelectMultipleField, StringField, widgets)
@@ -70,7 +70,7 @@ class SearchForm(FlaskForm):
             self.end_day.data,
             to_date=True)
         if from_date and to_date and from_date > to_date:
-            self.begin_year.errors.append(
+            self.begin_year.errors.append(  # type: ignore
                 _('Begin dates cannot start after end dates.'))
             valid = False
         return valid

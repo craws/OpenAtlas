@@ -65,19 +65,20 @@ def get_annotation_text_orphans() -> list[dict[str, Any]]:
             a.link_end,
             a.text,
             a.created,
-			l2.domain_id AS source_root
+            l2.domain_id AS source_root
         FROM model.annotation_text a
         LEFT JOIN model.link l ON l.domain_id = a.source_id 
             AND l.range_id = a.entity_id 
             AND l.property_code = 'P67'
         LEFT JOIN model.link l2 ON l2.range_id = a.source_id
             AND l2.property_code = 'P73'
-		LEFT JOIN model.link l3 ON l3.domain_id = l2.domain_id
+        LEFT JOIN model.link l3 ON l3.domain_id = l2.domain_id
             AND l3.range_id = a.entity_id 
             AND l3.property_code = 'P67'
         WHERE l.id IS NULL AND a.entity_id IS NOT NULL AND l3.id IS NULL
         """)
     return list(g.cursor)
+
 
 def get_annotation_image_orphans() -> list[dict[str, Any]]:
     g.cursor.execute(

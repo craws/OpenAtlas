@@ -124,53 +124,6 @@ def get_all_links() -> list[dict[str, Any]]:
     return list(g.cursor)
 
 
-def check_link_duplicates() -> list[dict[str, int]]:
-    g.cursor.execute(
-        """
-        SELECT COUNT(*) AS count,
-               domain_id,
-               range_id,
-               property_code,
-               description,
-               type_id,
-               begin_from,
-               begin_to,
-               begin_comment,
-               end_from,
-               end_to,
-               end_comment
-        FROM model.link
-        GROUP BY domain_id,
-                 range_id,
-                 property_code,
-                 description,
-                 type_id,
-                 begin_from, begin_to, begin_comment,
-                 end_from, end_to, end_comment
-        HAVING COUNT(*) > 1;
-        """)
-    return list(g.cursor)
-
-
-def delete_link_duplicates() -> int:
-    g.cursor.execute(
-        """
-        DELETE
-        FROM model.link l
-        WHERE l.id NOT IN (SELECT id
-                           FROM (SELECT DISTINCT ON (
-                               domain_id,
-                               range_id,
-                               property_code,
-                               description,
-                               type_id,
-                               begin_from, begin_to, begin_comment,
-                               end_from, end_to, end_comment) *
-                                 FROM model.link) AS temp_table);
-        """)
-    return g.cursor.rowcount
-
-
 def get_all_links_for_network(
         system_classes: list[str]) -> list[dict[str, Any]]:
     g.cursor.execute(

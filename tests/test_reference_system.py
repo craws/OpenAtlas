@@ -9,7 +9,7 @@ class ReferenceSystemTest(TestBaseCase):
 
     def test_reference_system(self) -> None:
         c = self.client
-        rv = c.post(url_for('ajax_wikidata_info'), data={'id_': 'Q304037'})
+        rv = c.post(url_for('ajax_info_wikidata'), data={'id_': 'Q304037'})
         assert b'National Library of Austria' in rv.data
 
         rv = c.post(url_for('ajax_geonames_info'), data={'id_': '747712'})
@@ -71,7 +71,7 @@ class ReferenceSystemTest(TestBaseCase):
         assert b'The entry has been deleted' in rv.data
 
         rv = c.get(url_for('update', id_=g.geonames.id))
-        assert b'website url' in rv.data
+        assert b'website URL' in rv.data
 
         rv = c.post(
             url_for('insert', class_='person'),

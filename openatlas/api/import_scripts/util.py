@@ -18,22 +18,18 @@ def get_or_create_type(hierarchy: Any, type_name: str) -> Entity:
 
 
 def get_type_by_name(type_name: str) -> Optional[Entity]:
-    type_ = None
-    for type_id in g.types:
-        if g.types[type_id].name == type_name:
-            type_ = g.types[type_id]
-            break
-    return type_
+    for type_ in g.types.items():
+        if type_.name == type_name:
+            return type_
+    return None
 
 
 def get_reference_system_by_name(name: str) -> Optional[Entity]:
-    reference_system = None
-    name = name.lower().replace('_', ' ')
-    for id_ in g.reference_systems:
-        if g.reference_systems[id_].name.lower().replace('_', ' ') == name:
-            reference_system = g.reference_systems[id_]
-            break
-    return reference_system
+    for system in g.reference_systems.values():
+        if system.name.lower().replace('_', ' ') \
+                == name.lower().replace('_', ' '):
+            return system
+    return None
 
 
 def get_exact_match() -> Entity:

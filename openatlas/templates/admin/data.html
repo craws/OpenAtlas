@@ -1,12 +1,11 @@
 <h1 class="mb-1">{{ _('data integrity checks')|uc_first }}</h1>
 <div class="row g-1 d-flex align-items-center">
   <div class="col-auto">{{ 'admin/data_integrity_checks'|manual|safe }}</div>
+  <div class="col-auto">{{ _('similar names')|button(url_for('check_similar'))|safe }}</div>
   <div class="col-auto">{{ _('orphans')|button(url_for('orphans'))|safe }}</div>
   <div class="col-auto">{{ _('dates')|button(url_for('check_dates'))|safe }}</div>
-  <div class="col-auto">{{ _('similar names')|button(url_for('check_similar'))|safe }}</div>
   <div class="col-auto">{{ _('links')|button(url_for('check_links'))|safe }}</div>
-  <div class="col-auto">{{ _('link duplicates')|button(url_for('check_link_duplicates'))|safe }}</div>
-  <div class="col-auto">{{ _('check files')|button(url_for('check_files'))|safe }}</div>
+  <div class="col-auto">{{ _('files')|button(url_for('check_files'))|safe }}</div>
 </div>
 {% if 'manager'|is_authorized or imports %}
   <h1 class="mb-1">{{ _('data transfer')|uc_first }}</h1>

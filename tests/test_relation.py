@@ -50,7 +50,7 @@ class RelationTests(TestBaseCase):
         rv = c.get(url_for('view', id_=sub_id))
         assert b'Connor' in rv.data
 
-        rv = c.get(url_for('type_move_entities', id_=sub_id))
+        rv = c.get(url_for('change_type', id_=sub_id))
         assert b'The Kurgan' in rv.data
 
         with app.test_request_context():
@@ -58,7 +58,7 @@ class RelationTests(TestBaseCase):
             link_ = actor.get_links('OA7')[0]
 
         rv = c.post(
-            url_for('type_move_entities', id_=sub_id),
+            url_for('change_type', id_=sub_id),
             data={
                 relation.id: relation.subs[1],
                 'selection': [link_.id],
@@ -67,7 +67,7 @@ class RelationTests(TestBaseCase):
         assert b'Entities were updated' in rv.data
 
         rv = c.post(
-            url_for('type_move_entities', id_=relation.subs[1]),
+            url_for('change_type', id_=relation.subs[1]),
             data={
                 relation.id: '',
                 'selection': [link_.id],

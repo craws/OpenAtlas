@@ -86,7 +86,8 @@ class IiifForm(FlaskForm):
 class LogForm(FlaskForm):
     limit = SelectField(
         _('limit'),
-        choices=((0, _('all')), (100, 100), (500, 500)), default=100)
+        choices=((0, _('all')), (100, 100), (500, 500)),  # type: ignore
+        default=100)
     priority = SelectField(
         _('priority'),
         choices=(list(app.config['LOG_LEVELS'].items())),
@@ -100,7 +101,7 @@ class MapForm(FlaskForm):
     map_zoom_max = IntegerField(_('max map zoom'), [InputRequired()])
     map_cluster_disable_at_zoom = IntegerField(_('disable clustering at zoom'))
     map_cluster_max_radius = IntegerField(_('max cluster radius'))
-    geonames_username = StringField('GeoNames ' + _('username'))
+    geonames_username = StringField(f'GeoNames {_('username')}')
     save = SubmitField(_('save'))
 
 

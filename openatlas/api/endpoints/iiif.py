@@ -6,7 +6,7 @@ from typing import Any, Tuple
 import requests
 import svgwrite
 from flask import Response, g, jsonify, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from flask_restful import Resource
 
 from openatlas.api.endpoints.parser import Parser

@@ -4,7 +4,7 @@ from collections import OrderedDict
 from typing import Any, Optional
 
 from flask import g
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
@@ -63,7 +63,7 @@ def add_name_fields(form: Any, entity: Entity) -> None:
 
 
 def get_validators(item: dict[str, Any]) -> list[Any]:
-    validators = []
+    validators: list[Any] = []
     if item['required']:
         validators.append(InputRequired())
     if item.get('format') == 'url':
@@ -157,7 +157,7 @@ def add_type(form: Any, type_: Entity) -> None:
         add_form = AddDynamicType()
     validators = [InputRequired()] if type_.required else []
     if type_.category == 'value':
-        field = ValueTypeRootField(type_.name, type_.id)
+        field: Any = ValueTypeRootField(type_.name, type_.id)
     elif type_.multiple:
         field = TreeMultiField(str(type_.id), validators, form=add_form)
     else:
@@ -194,7 +194,10 @@ def add_relations(
                         filter_ids=[entity.id] if entity else [],
                         is_type_form=True))
                 if root.directional:
-                    setattr(form, 'name_inverse', StringField(_('inverse')))
+                    setattr(
+                        form,
+                        'name_inverse',
+                        StringField(_('inverse')))
             else:  # It's a root type (hierarchy)
                 if entity.category == 'custom':
                     form.multiple = BooleanField(
@@ -457,8 +460,8 @@ def add_value_type_fields(form_class: FlaskForm, subs: list[int]) -> None:
         add_value_type_fields(form_class, sub.subs)
 
 
-def add_buttons(form: Any, entity: Entity, relation: Relation) -> None:
-    field = SubmitField
+def add_buttons(form: Any, entity: Entity, relation: Relation | None) -> None:
+    field: Any = SubmitField
     if 'description' in entity.class_.attributes \
             and 'annotated' in entity.class_.attributes['description']:
         field = SubmitAnnotationField
@@ -485,10 +488,30 @@ def add_buttons(form: Any, entity: Entity, relation: Relation) -> None:
                     setattr(
                         form,
                         item,
-                        SubmitField(_('insert and add') + ' ' + _(label)))
+                        SubmitField(f'{_('insert and add')} {_(label)}'))
                 case 'insert_continue_human_remains':
                     setattr(
                         form,
                         item,
                         SubmitField(
-                            _('insert and add') + ' ' + _('human remains')))
+                            f'{_('insert and add')} {_('human remains')}'))
+
+
+def add_additional_link_fields(
+        form: Any,
+        relation: Relation,
+        link_: Optional[Link] = None) -> None:
+    for item in relation.additional_fields:
+        match item:
+            case 'dates':
+                add_date_fields(form, link_)
+            case 'description':
+                setattr(
+                    form,
+                    'description',
+                    TextAreaField(_(item), render_kw={'rows': 8}))
+            case 'page':
+                setattr(
+                    form,
+                    'description',
+                    StringField(_(item), render_kw={'rows': 8}))

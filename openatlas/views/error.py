@@ -6,7 +6,9 @@ from flask import g, jsonify, render_template, request
 from openatlas import app
 from openatlas.api.resources.error import (
     AccessDeniedError, DisplayFileNotFoundError, EntityDoesNotExistError,
-    EntityNotAnEventError, IIIFMetadataNotFound, InvalidCidocClassCodeError,
+    EntityNotAFileError, EntityNotAnEventError, FileIdNotInteger,
+    IIIFMetadataNotFound,
+    InvalidCidocClassCodeError,
     InvalidLimitError, InvalidSearchCategoryError, InvalidSearchSyntax,
     InvalidSearchValueError, InvalidSystemClassError, InvalidViewClassError,
     LastEntityError, LogicalOperatorError, NoLicenseError, NoSearchStringError,
@@ -108,6 +110,16 @@ def entity_not_an_event(_e: Exception) -> tuple[Any, int]:
     return jsonify({
         'title': 'Entity is not an event',
         'message': 'The requested entity has to be an event.',
+        'url': request.url,
+        'timestamp': datetime.now(),
+        'status': 404}), 404
+
+
+@app.errorhandler(EntityNotAFileError)
+def entity_not_a_file(_e: Exception) -> tuple[Any, int]:
+    return jsonify({
+        'title': 'Entity is not a file',
+        'message': 'The requested entity has to be a file.',
         'url': request.url,
         'timestamp': datetime.now(),
         'status': 404}), 404
@@ -315,6 +327,18 @@ def value_not_an_integer(_e: Exception) -> tuple[Any, int]:
         'title': 'Invalid search value',
         'message':
             'The search values need to be an integer for the chosen category.',
+        'url': request.url,
+        'timestamp': datetime.now(),
+        'status': 400}), 400
+
+
+@app.errorhandler(FileIdNotInteger)
+def file_id_not_an_integer(_e: Exception) -> tuple[Any, int]:
+    return jsonify({
+        'title': 'Filename is not an integer',
+        'message':
+            'Filename has to be an integer. It has the same ID as the related'
+            'file entity.',
         'url': request.url,
         'timestamp': datetime.now(),
         'status': 400}), 400

@@ -4,7 +4,7 @@ import ast
 from typing import Any
 
 from flask import g
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField
@@ -28,7 +28,7 @@ def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
         if field.type in ['StringField', 'IntegerField']:
             settings[field.label.text] = value
         if field.type == 'BooleanField':
-            settings[field.label.text] = str(_('on') if value else _('off'))
+            settings[field.label.text] = _('on' if value else _('off'))
         if field.type == 'SelectField':
             if isinstance(value, str) and value.isdigit():
                 value = int(value)

@@ -9,7 +9,7 @@ from subprocess import run
 from typing import Any, Optional
 
 from flask import flash, g, render_template, request, url_for
-from flask_babel import format_number, lazy_gettext as _
+from flask_babel import format_number, gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from werkzeug.exceptions import abort
@@ -19,7 +19,6 @@ from wtforms import StringField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app
-from openatlas.database.connect import Transaction
 from openatlas.display.image_processing import create_resized_images
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
@@ -164,11 +163,12 @@ def get_test_mail_form() -> str:
         body = (_(
             'This test mail was sent by %(username)s',
             username=current_user.username) +
-                ' ' + _('at') + ' ' + request.headers['Host'])
-        if send_mail(subject, body, form.receiver.data):
-            flash(_(
-                'A test mail was sent to %(email)s.',
-                email=form.receiver.data), 'info')
+            f' {_('at')} {request.headers['Host']}')
+        if send_mail(subject, body, form.receiver.data):  # type: ignore
+            flash(
+                _('A test mail was sent to %(email)s.',
+                    email=form.receiver.data),
+                'info')
     elif request.method == 'GET':
         form.receiver.data = current_user.email
     return display_form(form)
@@ -185,8 +185,7 @@ def get_newsletter_button(users: list[User]) -> str:
 def get_user_table(users: list[User]) -> Table:
     table = Table([
         'username', 'name', 'group', 'email', 'newsletter', 'created',
-        'last login', 'entities'],
-        defs=[{'className': 'dt-body-right', 'targets': 7}])
+        'last login', 'entities'])
     if is_authorized('manager'):
         table.columns.append(_('info'))
     for user in users:
@@ -264,16 +263,9 @@ def settings(category: str) -> str | Response:
             if field.type == 'BooleanField':
                 value = 'True' if field.data else ''
             data[field.name] = value
-        Transaction.begin()
-        try:
-            Settings.update(data)
-            g.logger.log('info', 'settings', 'Settings updated')
-            Transaction.commit()
-            flash(_('info update'))
-        except Exception as e:  # pragma: no cover
-            Transaction.rollback()
-            g.logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
+        Settings.update(data)
+        g.logger.log('info', 'settings', 'Settings updated')
+        flash(_('info update'))
         return redirect(redirect_url)
     if request.method == 'GET':
         set_form_settings(form)
@@ -384,8 +376,9 @@ def admin_file_iiif_delete(filename: str) -> Response:
 @app.route('/log', methods=['GET', 'POST'])
 @required_group('admin')
 def log() -> str:
-    form = LogForm()
-    form.user.choices = [(0, _('all'))] + User.get_users_for_form()
+    form: Any = LogForm()
+    form.user.choices = \
+        [(0, _('all'))] + [(u.id, u.username) for u in User.get_all()]
     table = Table(
         ['date', 'priority', 'type', 'message', 'user', 'info'],
         order=[[0, 'desc']])

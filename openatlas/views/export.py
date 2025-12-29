@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 from flask import flash, g, render_template, send_from_directory, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
@@ -119,7 +119,7 @@ def export_arche() -> str:
                 content=display_info(info_content),
                 buttons=[manual('admin/export'),
                          button(
-                             'ARCHE ' + _('file checker'),
+                             f'ARCHE {_('file checker')}',
                              url_for('check_files', arche='arche'))]),
             'export': Tab(
                 'export',
