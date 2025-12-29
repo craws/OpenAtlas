@@ -141,7 +141,7 @@ def add_class_types(form: Any, class_: OpenatlasClass) -> None:
 
 def add_type(form: Any, type_: Entity) -> None:
     add_form = None
-    if is_authorized('editor'):
+    if is_authorized('editor') and type_.category != 'system':
         class AddDynamicType(FlaskForm):
             pass
 

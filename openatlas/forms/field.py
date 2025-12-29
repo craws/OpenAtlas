@@ -352,7 +352,6 @@ class TreeMultiField(HiddenField):
 
 
 class TreeSelect(HiddenInput):
-
     def __call__(self, field: TreeField, **kwargs: Any) -> str:
         selection = ''
         selected_ids = []
@@ -375,7 +374,6 @@ class TreeSelect(HiddenInput):
 
 
 class TreeField(HiddenField):
-
     def __init__(
             self,
             label: str,
