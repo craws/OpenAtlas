@@ -22,7 +22,6 @@ that data can't be used together, at least not directly.
 
 Shared instance
 ***************
-
 Projects (or case studies) can use the same instance which can be useful if
 they share data, such as information about places or persons.
 

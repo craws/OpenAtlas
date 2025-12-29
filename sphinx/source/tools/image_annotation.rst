@@ -20,7 +20,7 @@ image and the annotation view will open in a new tab.
 
 In the image annotation view you can see the image in an IIIF viewer as
 well as a form for new annotations including a list of already saved
-annotations. Links to edit or delete previous annotations are als porvided.
+annotations. Links to edit or delete previous annotations are als provided.
 
 **Form fields**
 

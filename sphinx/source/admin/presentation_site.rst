@@ -3,7 +3,7 @@ Presentation site
 
 .. toctree::
 
-Many projects have a presentation site to make the project results accessible
+Many projects use a presentation site to make the project results accessible
 to a wider audience. If a running version of a presentation site exists
 already, the following values can be configured in the **Admin** area to create
 links shown in the backend:

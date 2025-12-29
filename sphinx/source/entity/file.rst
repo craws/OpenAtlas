@@ -73,11 +73,8 @@ If you have selected a larger image your browser will try to scale it.
 
 Image preview
 -------------
-If image processing is enabled (default=on, configurable by admins) and user
-have **Show icons in tables** in their :doc:`/tools/profile` activated, small
+If image processing is enabled (default=on, configurable by admins) small
 images of files are shown in tables.
-
-**Please be aware many files and large tables can impact performance.**
 
 How to make files available for the public
 ------------------------------------------
