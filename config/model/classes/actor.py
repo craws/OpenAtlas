@@ -139,3 +139,4 @@ person['display']['network_color'] = '#34B522'
 person['relations']['begins_in']['label'] = _('born in')
 person['relations']['ends_in']['label'] = _('died in')
 del person['relations']['member']
+del group['relations']['move']

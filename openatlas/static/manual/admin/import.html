@@ -1,21 +1,23 @@
 
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Import &mdash; OpenAtlas 8.15.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <title>Import &mdash; OpenAtlas 9.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+      <script src="../_static/jquery.js?v=8dae8fb0"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=801c8461"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Export" href="export.html" />
@@ -34,9 +36,6 @@
             OpenAtlas
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                8.15.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -64,7 +63,6 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Import</a></li>
 <li class="toctree-l2"><a class="reference internal" href="export.html">Export</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html">API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="arche.html">ARCHE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="vocabs.html">Vocabs</a></li>
 </ul>
 </li>
@@ -108,7 +106,7 @@
            <div itemprop="articleBody">
              
   <section id="import">
-<h1>Import<a class="headerlink" href="#import" title="Permalink to this heading"></a></h1>
+<h1>Import<a class="headerlink" href="#import" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <p>Import settings are available for admins and managers and offer functionality
@@ -135,7 +133,7 @@ Lists containing the following fields can be imported currently:</p>
 <li><p>Type hierarchy</p></li>
 </ul>
 <section id="preparation">
-<h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this heading"></a></h2>
+<h2>Preparation<a class="headerlink" href="#preparation" title="Link to this heading"></a></h2>
 <p>Automatic imports cause problems regarding data integrity, so proceed with
 caution. Fixing such problems can be time consuming, so we strongly advise
 you to:</p>
@@ -159,19 +157,19 @@ commas</p></li>
 </ul>
 </section>
 <section id="project">
-<h2>Project<a class="headerlink" href="#project" title="Permalink to this heading"></a></h2>
+<h2>Project<a class="headerlink" href="#project" title="Link to this heading"></a></h2>
 <p>To find imported entities after the import, they have to be associated with a
 project. If no project is available (or not the right one) you have
 to create a new one. Name and description of said project can be updated
 later.</p>
 </section>
 <section id="import-class">
-<h2>Import class<a class="headerlink" href="#import-class" title="Permalink to this heading"></a></h2>
+<h2>Import class<a class="headerlink" href="#import-class" title="Link to this heading"></a></h2>
 <p>Only one class can be imported at a time, so you have to choose one of the
 available classes.</p>
 </section>
 <section id="possible-import-fields">
-<h2>Possible import fields<a class="headerlink" href="#possible-import-fields" title="Permalink to this heading"></a></h2>
+<h2>Possible import fields<a class="headerlink" href="#possible-import-fields" title="Link to this heading"></a></h2>
 <p>Column headers can contain the following titles. Other titles won’t be
 imported and an error message will be displayed</p>
 <ul class="simple">
@@ -215,13 +213,13 @@ existing in OpenAtlas, see <a class="reference internal" href="#place-hierarchy-
 <strong>parent_id</strong>, see <a class="reference internal" href="#place-hierarchy-import"><span class="std std-ref">Place hierarchy</span></a></p></li>
 </ul>
 <section id="alias">
-<span id="alias-import"></span><h3>Alias<a class="headerlink" href="#alias" title="Permalink to this heading"></a></h3>
+<span id="alias-import"></span><h3>Alias<a class="headerlink" href="#alias" title="Link to this heading"></a></h3>
 <p><a class="reference internal" href="../ui/alias.html"><span class="doc">Alias</span></a> can be entered as string. Multiple aliases can be separated
 by semicolon (;). If an <a class="reference internal" href="../ui/alias.html"><span class="doc">Alias</span></a> contains a comma (,) please
 surround the whole string with double quotes(<strong>”</strong>).</p>
 </section>
 <section id="dates">
-<span id="dates-import"></span><h3>Dates<a class="headerlink" href="#dates" title="Permalink to this heading"></a></h3>
+<span id="dates-import"></span><h3>Dates<a class="headerlink" href="#dates" title="Link to this heading"></a></h3>
 <p>Dates can be entered in the format <strong>YYYY-MM-DD</strong>, <strong>YYYY-MM</strong> or <strong>YYYY</strong>.
 Fill out the <strong>begin_from</strong> and <strong>end_from</strong> field for a known timeframe.
 For a timespan you can use <strong>begin_to</strong> and <strong>end_to</strong> in combination
@@ -239,7 +237,7 @@ information see <a class="reference internal" href="data_integrity_checks.html">
 </ul>
 </section>
 <section id="types">
-<span id="types-import"></span><h3>Types<a class="headerlink" href="#types" title="Permalink to this heading"></a></h3>
+<span id="types-import"></span><h3>Types<a class="headerlink" href="#types" title="Link to this heading"></a></h3>
 <p>It is possible to link entities to one or multiple <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>. This
 can be useful for example when you use a custom type <strong>Case studies</strong> you
 can link all of the imported data to this.</p>
@@ -251,7 +249,7 @@ specific <a class="reference internal" href="../entity/type.html"><span class="d
 </ul>
 </section>
 <section id="origin-types">
-<span id="origin-types-import"></span><h3>Origin types<a class="headerlink" href="#origin-types" title="Permalink to this heading"></a></h3>
+<span id="origin-types-import"></span><h3>Origin types<a class="headerlink" href="#origin-types" title="Link to this heading"></a></h3>
 <p>It is possible to link entities to one or multiple <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>, which
 were imported in the same project by their origin id.</p>
 <ul class="simple">
@@ -262,7 +260,7 @@ specific <a class="reference internal" href="../entity/type.html"><span class="d
 </ul>
 </section>
 <section id="value-types">
-<span id="value-types-import"></span><h3>Value types<a class="headerlink" href="#value-types" title="Permalink to this heading"></a></h3>
+<span id="value-types-import"></span><h3>Value types<a class="headerlink" href="#value-types" title="Link to this heading"></a></h3>
 <p>It is possible to link entities to one or multiple value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>
 when importing.</p>
 <ul class="simple">
@@ -276,7 +274,7 @@ specific value <a class="reference internal" href="../entity/type.html"><span cl
 </ul>
 </section>
 <section id="origin-value-types">
-<span id="origin-value-types-import"></span><h3>Origin value types<a class="headerlink" href="#origin-value-types" title="Permalink to this heading"></a></h3>
+<span id="origin-value-types-import"></span><h3>Origin value types<a class="headerlink" href="#origin-value-types" title="Link to this heading"></a></h3>
 <p>It is possible to link entities to one or multiple origin value
 <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>, which were imported in the same project by their origin id.</p>
 <ul class="simple">
@@ -291,7 +289,7 @@ specific value <a class="reference internal" href="../entity/type.html"><span cl
 </ul>
 </section>
 <section id="references">
-<span id="references-import"></span><h3>References<a class="headerlink" href="#references" title="Permalink to this heading"></a></h3>
+<span id="references-import"></span><h3>References<a class="headerlink" href="#references" title="Link to this heading"></a></h3>
 <p>The imported data can be linked to an already existing
 <a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a>.</p>
 <ul class="simple">
@@ -308,7 +306,7 @@ said reference in your OpenAtlas instance</p></li>
 </ul>
 </section>
 <section id="origin-references">
-<span id="origin-references-import"></span><h3>Origin references<a class="headerlink" href="#origin-references" title="Permalink to this heading"></a></h3>
+<span id="origin-references-import"></span><h3>Origin references<a class="headerlink" href="#origin-references" title="Link to this heading"></a></h3>
 <p>The imported data can be linked to an already existing
 <a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> within the same import project and through the origin
 ID (the ID which was given in the import), e.g. “literature_1”.</p>
@@ -327,7 +325,7 @@ enabled in your <a class="reference internal" href="../tools/profile.html"><span
 </ul>
 </section>
 <section id="wkt-coordinates">
-<span id="wkt-import"></span><h3>WKT coordinates<a class="headerlink" href="#wkt-coordinates" title="Permalink to this heading"></a></h3>
+<span id="wkt-import"></span><h3>WKT coordinates<a class="headerlink" href="#wkt-coordinates" title="Link to this heading"></a></h3>
 <p>For places and artifact (multi)point, (multi)polygon, and (multi)linestring
 coordinates or GeometricCollection can be imported. Keep in mind to use
 the <a class="reference external" href="https://gisgeography.com/wgs84-world-geodetic-system/">WGS84</a>
@@ -341,7 +339,7 @@ format uses commas, surround tall coordinates with double quotes (“)</p>
 </dl>
 </section>
 <section id="external-reference-systems">
-<span id="reference-systems-import"></span><h3>External reference systems<a class="headerlink" href="#external-reference-systems" title="Permalink to this heading"></a></h3>
+<span id="reference-systems-import"></span><h3>External reference systems<a class="headerlink" href="#external-reference-systems" title="Link to this heading"></a></h3>
 <p>It is possible to link the imported entity to an existing <a class="reference internal" href="../entity/reference_system.html"><span class="doc">Reference System</span></a>.
 Named the coulmn <strong>reference_system_*</strong> with the <em>name</em> of the external
 <a class="reference internal" href="../entity/reference_system.html"><span class="doc">Reference System</span></a> appended, e.g. <strong>reference_system_wikidata</strong>.
@@ -356,7 +354,7 @@ value is the identifier, e.g. Q54123, the second value is the match type
 </dl>
 </section>
 <section id="place-hierarchy">
-<span id="place-hierarchy-import"></span><h3>Place hierarchy<a class="headerlink" href="#place-hierarchy" title="Permalink to this heading"></a></h3>
+<span id="place-hierarchy-import"></span><h3>Place hierarchy<a class="headerlink" href="#place-hierarchy" title="Link to this heading"></a></h3>
 <p>Use the <strong>parent_id</strong> or <strong>openatlas_parent_id</strong> to generate a
 <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a> hierarchy together
 with <a class="reference internal" href="../entity/feature.html"><span class="doc">Feature</span></a>, <a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>,
@@ -376,7 +374,7 @@ look at <strong>archaeological sub units</strong> at the OpenAtlas <a class="ref
 </section>
 </section>
 <section id="import-options">
-<h2>Import options<a class="headerlink" href="#import-options" title="Permalink to this heading"></a></h2>
+<h2>Import options<a class="headerlink" href="#import-options" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p><strong>File</strong> - select a file you’ll want to import</p></li>
 <li><p><strong>Preview</strong> - if this option is selected, nothing will be imported and you
@@ -388,7 +386,7 @@ duplicates are found, a warning is printed but doesn’t stop the import</p></li
 </ul>
 </section>
 <section id="after-the-import">
-<h2>After the import<a class="headerlink" href="#after-the-import" title="Permalink to this heading"></a></h2>
+<h2>After the import<a class="headerlink" href="#after-the-import" title="Link to this heading"></a></h2>
 <p>When the import went through, a summary which data was imported is shown.
 You can also browse the projects to see which imported entities are associated
 with them.

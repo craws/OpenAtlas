@@ -1,21 +1,23 @@
 
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FAQ &mdash; OpenAtlas 8.15.0 documentation</title>
-      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <title>FAQ &mdash; OpenAtlas 9.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=f5127f15" />
       <link rel="stylesheet" href="_static/style.css" type="text/css" />
+
   
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="_static/doctools.js"></script>
-        <script src="_static/sphinx_highlight.js"></script>
+      <script src="_static/jquery.js?v=8dae8fb0"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=801c8461"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="search" title="Search" href="search.html" />
     <link rel="prev" title="Error Codes" href="troubleshooting/error_codes.html" /> 
@@ -33,9 +35,6 @@
             OpenAtlas
               <img src="_static/logo.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                8.15.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -98,23 +97,23 @@
            <div itemprop="articleBody">
              
   <section id="faq">
-<h1>FAQ<a class="headerlink" href="#faq" title="Permalink to this heading"></a></h1>
+<h1>FAQ<a class="headerlink" href="#faq" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <p>Here you can find answers to some frequently asked questions.</p>
 <section id="how-to-manage-multiple-projects-or-case-studies">
-<h2>How to manage multiple projects or case studies<a class="headerlink" href="#how-to-manage-multiple-projects-or-case-studies" title="Permalink to this heading"></a></h2>
+<h2>How to manage multiple projects or case studies<a class="headerlink" href="#how-to-manage-multiple-projects-or-case-studies" title="Link to this heading"></a></h2>
 <p>Tag: technical</p>
 <p>There are two main approaches on how to deal with multiple projects or case
 studies:</p>
 <section id="multiple-instances">
-<h3>Multiple instances<a class="headerlink" href="#multiple-instances" title="Permalink to this heading"></a></h3>
+<h3>Multiple instances<a class="headerlink" href="#multiple-instances" title="Link to this heading"></a></h3>
 <p>If every project has their own instance (installation) of OpenAtlas then you
 don’t have to worry about separating the data later. But it would also mean
 that data can’t be used together, at least not directly.</p>
 </section>
 <section id="shared-instance">
-<h3>Shared instance<a class="headerlink" href="#shared-instance" title="Permalink to this heading"></a></h3>
+<h3>Shared instance<a class="headerlink" href="#shared-instance" title="Link to this heading"></a></h3>
 <p>Projects (or case studies) can use the same instance which can be useful if
 they share data, such as information about places or persons.</p>
 <p>For data separation a custom <a class="reference internal" href="entity/type.html"><span class="doc">Type</span></a> can be created,
@@ -131,7 +130,7 @@ via the <a class="reference internal" href="technical/api.html"><span class="doc
 </section>
 </section>
 <section id="how-does-data-access-work">
-<h2>How does data access work<a class="headerlink" href="#how-does-data-access-work" title="Permalink to this heading"></a></h2>
+<h2>How does data access work<a class="headerlink" href="#how-does-data-access-work" title="Link to this heading"></a></h2>
 <p>Tag: design decision</p>
 <p>If and when data saved in OpenAtlas is shared can be chosen at any point, but:</p>
 <ul class="simple">
@@ -149,7 +148,7 @@ If a strict separation is needed, using multiple OpenAtlas instances might
 be a better solution.</p>
 </section>
 <section id="how-to-enter-professions">
-<h2>How to enter professions<a class="headerlink" href="#how-to-enter-professions" title="Permalink to this heading"></a></h2>
+<h2>How to enter professions<a class="headerlink" href="#how-to-enter-professions" title="Link to this heading"></a></h2>
 <p>Tag: model</p>
 <p>A profession is not entered via a type as a lot of other information you
 will put into the database. You can enter a person’s profession by linking
@@ -162,11 +161,11 @@ detailed tutorial on how to enter professions, have a look
 <a class="reference internal" href="examples/profession.html"><span class="doc">here</span></a>.</p>
 </section>
 <section id="how-to-make-files-available-for-the-public">
-<span id="public-sharing-label"></span><h2>How to make files available for the public<a class="headerlink" href="#how-to-make-files-available-for-the-public" title="Permalink to this heading"></a></h2>
+<span id="public-sharing-label"></span><h2>How to make files available for the public<a class="headerlink" href="#how-to-make-files-available-for-the-public" title="Link to this heading"></a></h2>
 <p>If you plan on sharing files with the public, e.g. on a presentation
 site or a public archive, several criteria have to be met:</p>
 <section id="criteria-checked-by-the-software">
-<h3>Criteria checked by the software<a class="headerlink" href="#criteria-checked-by-the-software" title="Permalink to this heading"></a></h3>
+<h3>Criteria checked by the software<a class="headerlink" href="#criteria-checked-by-the-software" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>The file must exist</p></li>
 <li><p>A license has to be specified</p></li>
@@ -190,7 +189,7 @@ presentation site).</p>
 </ul>
 </section>
 <section id="criteria-checked-by-users">
-<h3>Criteria checked by users<a class="headerlink" href="#criteria-checked-by-users" title="Permalink to this heading"></a></h3>
+<h3>Criteria checked by users<a class="headerlink" href="#criteria-checked-by-users" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p>The linked license has to be the correct one and allow public sharing</p></li>
 <li><p>Other license specific criteria, e.g. specifying the creator, are met</p></li>
@@ -205,7 +204,7 @@ which might be informative for other users or viewers.</p>
 </section>
 </section>
 <section id="why-can-t-a-free-text-field-be-added-via-custom-types">
-<h2>Why can’t a free text field be added via custom types<a class="headerlink" href="#why-can-t-a-free-text-field-be-added-via-custom-types" title="Permalink to this heading"></a></h2>
+<h2>Why can’t a free text field be added via custom types<a class="headerlink" href="#why-can-t-a-free-text-field-be-added-via-custom-types" title="Link to this heading"></a></h2>
 <p>Tag: design decision</p>
 <p>A free text entry field would lead to lots of unstructured data.
 Unstructured data can not be processed automatically and would result in it
@@ -226,7 +225,7 @@ project’s specific needs, so please don’t hesitate to reach out to us if you
 have any additional questions on this topic.</p>
 </section>
 <section id="why-can-t-longer-texts-be-formatted">
-<h2>Why can’t longer texts be formatted<a class="headerlink" href="#why-can-t-longer-texts-be-formatted" title="Permalink to this heading"></a></h2>
+<h2>Why can’t longer texts be formatted<a class="headerlink" href="#why-can-t-longer-texts-be-formatted" title="Link to this heading"></a></h2>
 <p>Tag: design decision</p>
 <p>For formatting longer texts, e.g. entity descriptions, only linebreaks can
 be used. The main reason for not implementing formatting systems like HTML or

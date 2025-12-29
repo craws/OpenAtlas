@@ -30,6 +30,5 @@ html_copy_source = False  # Prevent including source html files
 html_show_copyright = False
 
 html_theme_options = {
-    'display_version': True,
     'style_external_links': True,
     'navigation_depth': 2}
