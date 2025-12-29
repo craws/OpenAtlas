@@ -1,21 +1,23 @@
 
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>API &mdash; OpenAtlas 8.15.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <title>API &mdash; OpenAtlas 9.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+      <script src="../_static/jquery.js?v=8dae8fb0"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=801c8461"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Database Structure" href="database_structure.html" />
@@ -34,9 +36,6 @@
             OpenAtlas
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                8.15.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -101,11 +100,11 @@
            <div itemprop="articleBody">
              
   <section id="api">
-<h1>API<a class="headerlink" href="#api" title="Permalink to this heading"></a></h1>
+<h1>API<a class="headerlink" href="#api" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <section id="introduction">
-<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this heading"></a></h2>
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
 <p>This page provides an overview of the OpenAtlas API. An (<a class="reference external" href="https://en.wikipedia.org/wiki/API">API</a>) allows easy and controlled access to the data
 stored in an OpenAtlas instance from external sources, such as presentation
 sites or analytical tools. The information provided is readable for human and
@@ -119,11 +118,11 @@ that the <a class="reference internal" href="../admin/api.html"><span class="doc
 section of the instance.</p>
 </section>
 <section id="quick-start-guide">
-<h2>Quick Start Guide<a class="headerlink" href="#quick-start-guide" title="Permalink to this heading"></a></h2>
+<h2>Quick Start Guide<a class="headerlink" href="#quick-start-guide" title="Link to this heading"></a></h2>
 <p>The API can be accessed via the OpenAtlas user interface or through an URL GET
 requests.</p>
 <section id="ui-access">
-<h3>1. UI access<a class="headerlink" href="#ui-access" title="Permalink to this heading"></a></h3>
+<h3>1. UI access<a class="headerlink" href="#ui-access" title="Link to this heading"></a></h3>
 <p>Each detail view of an entity provides two buttons (JSON and RDF). Via those
 buttons the format, in which the entity will be exported, can be selected.
 If the buttons are not visible, please change the <strong>Show API links</strong>
@@ -132,18 +131,18 @@ in the <a class="reference internal" href="../tools/profile.html#display"><span 
 <figure class="align-center" id="id5">
 <img alt="../_images/api_ui_json.jpg" src="../_images/api_ui_json.jpg" />
 <figcaption>
-<p><span class="caption-text">Possible JSON API formats</span><a class="headerlink" href="#id5" title="Permalink to this image"></a></p>
+<p><span class="caption-text">Possible JSON API formats</span><a class="headerlink" href="#id5" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 <figure class="align-center" id="id6">
 <img alt="../_images/api_ui_rdf.jpg" src="../_images/api_ui_rdf.jpg" />
 <figcaption>
-<p><span class="caption-text">Possible RDF API formats</span><a class="headerlink" href="#id6" title="Permalink to this image"></a></p>
+<p><span class="caption-text">Possible RDF API formats</span><a class="headerlink" href="#id6" title="Link to this image"></a></p>
 </figcaption>
 </figure>
 </section>
 <section id="url-get-access">
-<h3>2. URL / GET access<a class="headerlink" href="#url-get-access" title="Permalink to this heading"></a></h3>
+<h3>2. URL / GET access<a class="headerlink" href="#url-get-access" title="Link to this heading"></a></h3>
 <p>The most common way to communicate with the OpenAtlas API is through GET
 request. This can be done either manually from the local browser or with other
 applications following a specific URL schema:</p>
@@ -183,7 +182,7 @@ information see this
 </section>
 </section>
 <section id="versioning">
-<h2>Versioning<a class="headerlink" href="#versioning" title="Permalink to this heading"></a></h2>
+<h2>Versioning<a class="headerlink" href="#versioning" title="Link to this heading"></a></h2>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 25.0%" />
@@ -221,7 +220,7 @@ still under development, so breaking changes may occur at any time without
 prior notice.</p>
 </section>
 <section id="endpoints">
-<h2>Endpoints<a class="headerlink" href="#endpoints" title="Permalink to this heading"></a></h2>
+<h2>Endpoints<a class="headerlink" href="#endpoints" title="Link to this heading"></a></h2>
 <p>Through different endpoints, data can be retrieved from OpenAtlas. Each version
 has an own set of endpoints, make sure to use the correct one.</p>
 <p>The current version 0.4 endpoint descriptions are available at:</p>
@@ -239,7 +238,7 @@ or RDFs, derived from <a class="reference external" href="https://linked.art/">L
 data, can be accessed.</p>
 </section>
 <section id="parameters">
-<h2>Parameters<a class="headerlink" href="#parameters" title="Permalink to this heading"></a></h2>
+<h2>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
 <p>By using parameters the result of the requested endpoint can be manipulated
 (filtered, searched, sorted, etc.). Each endpoint provides another set of
 parameters which can be used. Consult the <a class="reference internal" href="#endpoints">Endpoints</a> list for more details.</p>
@@ -256,7 +255,7 @@ called from an OpenAtlas instance</p></li>
 </ul>
 </section>
 <section id="error-handling">
-<h2>Error handling<a class="headerlink" href="#error-handling" title="Permalink to this heading"></a></h2>
+<h2>Error handling<a class="headerlink" href="#error-handling" title="Link to this heading"></a></h2>
 <p>OpenAtlas uses conventional HTTP response codes to indicate the success or
 failure of an API request. Codes in the 2xx range indicate a successful request
 while those in the 4xx range signal an error - providing the information was
@@ -280,7 +279,7 @@ and displays an error message provided by its own
 <a class="reference external" href="https://flask-restful.readthedocs.io/en/latest/reqparse.html#error-handling">error handler</a></p>
 </section>
 <section id="proxy">
-<h2>Proxy<a class="headerlink" href="#proxy" title="Permalink to this heading"></a></h2>
+<h2>Proxy<a class="headerlink" href="#proxy" title="Link to this heading"></a></h2>
 <p>If the server is behind a proxy, issues with the RDF export of entities can
 occur. To provide the OpenAtlas API with a proxy server, add the following
 line to <strong>instance/production.py</strong></p>
@@ -291,7 +290,7 @@ line to <strong>instance/production.py</strong></p>
 </div>
 </section>
 <section id="authentication-guide">
-<h2>Authentication guide<a class="headerlink" href="#authentication-guide" title="Permalink to this heading"></a></h2>
+<h2>Authentication guide<a class="headerlink" href="#authentication-guide" title="Link to this heading"></a></h2>
 <p>No authentication is needed to use the OpenAtlas API.</p>
 </section>
 </section>

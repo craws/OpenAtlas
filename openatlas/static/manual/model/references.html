@@ -1,21 +1,23 @@
 
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>References &mdash; OpenAtlas 8.15.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <title>References &mdash; OpenAtlas 9.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+      <script src="../_static/jquery.js?v=8dae8fb0"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=801c8461"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Link checker" href="link_checker.html" />
@@ -34,9 +36,6 @@
             OpenAtlas
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                8.15.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -99,18 +98,18 @@
            <div itemprop="articleBody">
              
   <section id="references">
-<h1>References<a class="headerlink" href="#references" title="Permalink to this heading"></a></h1>
+<h1>References<a class="headerlink" href="#references" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <section id="id1">
-<h2>References<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h2>
-<p>OpenAtlas uses <a class="reference external" href="https://www.cidoc-crm.org/Property/P67-refers-to/version-7.1">P67</a> (“refers to”) in order to
+<h2>References<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<p>OpenAtlas uses <a class="extlink-cidoc_property reference external" href="https://www.cidoc-crm.org/Property/P67-refers-to/version-7.1">P67</a> (“refers to”) in order to
 link various entities to references.
 References can be:</p>
 <ul class="simple">
-<li><p>Documents (<a class="reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31</a>) such as files, bibliographic
+<li><p>Documents (<a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31</a>) such as files, bibliographic
 entities, or references like URLs, DOIs, etc.</p></li>
-<li><p>Linguistic Objects (<a class="reference external" href="https://www.cidoc-crm.org/Entity/E33-Linguistic-Object/version-7.1">E33</a>) such as the
+<li><p>Linguistic Objects (<a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/E33-Linguistic-Object/version-7.1">E33</a>) such as the
 content of a medieval charter</p></li>
 </ul>
 <p>In order to record which part of the document contains the respective reference
@@ -122,23 +121,23 @@ a page numbers of a book, a chapter, a figure number, etc.</p>
 </pre></div>
 </div>
 <p>Example:
-[Book of Kells (<a class="reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31 Document</a>)] refers to
-(<a class="reference external" href="https://www.cidoc-crm.org/Property/P67-refers-to/version-7.1">P67</a>) [Saint Mary
-(<a class="reference external" href="https://www.cidoc-crm.org/Entity/E21-Person/version-7.1">21 Person</a>)] at delimiter: “Folio 7v”</p>
+[Book of Kells (<a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31 Document</a>)] refers to
+(<a class="extlink-cidoc_property reference external" href="https://www.cidoc-crm.org/Property/P67-refers-to/version-7.1">P67</a>) [Saint Mary
+(<a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/E21-Person/version-7.1">21 Person</a>)] at delimiter: “Folio 7v”</p>
 <p>Each reference document is more or less unique and can refer to multiple
 entities. The distinction is defined by the delimiter value. If the document as
 a whole refers to the entity, no delimiter is necessary.</p>
 </section>
 <section id="reference-systems">
-<h2>Reference Systems<a class="headerlink" href="#reference-systems" title="Permalink to this heading"></a></h2>
+<h2>Reference Systems<a class="headerlink" href="#reference-systems" title="Link to this heading"></a></h2>
 <p>Reference systems include sources such as vocabularies, gazetteers, etc.
 They are considered authority documents
-(<a class="reference external" href="https://www.cidoc-crm.org/Entity/E32-Authority-Document/version-7.1">E32</a>).</p>
+(<a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/E32-Authority-Document/version-7.1">E32</a>).</p>
 <p>Users can define a reference system by defining a name, class, and description.</p>
 <p>Example:</p>
 <ul class="simple">
 <li><p>Name: <a class="reference external" href="http://geonames.org/">GeoNames</a></p></li>
-<li><p>Class: <a class="reference external" href="https://www.cidoc-crm.org/Entity/E32-Authority-Document/version-7.1">E32</a></p></li>
+<li><p>Class: <a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/E32-Authority-Document/version-7.1">E32</a></p></li>
 <li><p>Description: GeoNames - a geographical database - contains geographical
 information on all countries and the dataset includes over eleven million
 place names that are available for download free of charge.</p></li>
@@ -157,8 +156,8 @@ model.link table in the following way:</p>
 <li><p>range_id: ID of the entity</p></li>
 <li><p>description: delimiter (alphanumerical)</p></li>
 </ul>
-<p>This combination of <a class="reference external" href="https://www.cidoc-crm.org/Entity/E32-Authority-Document/version-7.1">E32</a> and delimiter
-can be resolved as <a class="reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31 Document</a> as it is a
+<p>This combination of <a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/E32-Authority-Document/version-7.1">E32</a> and delimiter
+can be resolved as <a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31 Document</a> as it is a
 unique reference documenting the entity while the E32 by itself can be
 considered as container for all possible references from this authority
 document.</p>
@@ -168,29 +167,29 @@ document.</p>
 </pre></div>
 </div>
 <p>Example:
-[Terry Prattchet (<a class="reference external" href="https://www.cidoc-crm.org/Entity/E21-Person/version-7.1">21 Person</a>)] is referred to by
-(<a class="reference external" href="https://www.cidoc-crm.org/Property/P67-refers-to/version-7.1">P67i</a>)
+[Terry Prattchet (<a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/E21-Person/version-7.1">21 Person</a>)] is referred to by
+(<a class="extlink-cidoc_property reference external" href="https://www.cidoc-crm.org/Property/P67-refers-to/version-7.1">P67i</a>)
 [<a class="reference external" href="https://www.wikidata.org/wiki/Q46248">Q46248</a>
-(<a class="reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31 Document</a>)] is listed in
-(<a class="reference external" href="https://www.cidoc-crm.org/Property/P71-lists/version-7.1">P71i</a>)[<a class="reference external" href="https://www.wikidata.org/wiki/">WikiData</a>
-(<a class="reference external" href="https://www.cidoc-crm.org/Entity/E32-Authority-Document/version-7.1">E32</a>)]</p>
+(<a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31 Document</a>)] is listed in
+(<a class="extlink-cidoc_property reference external" href="https://www.cidoc-crm.org/Property/P71-lists/version-7.1">P71i</a>)[<a class="reference external" href="https://www.wikidata.org/wiki/">WikiData</a>
+(<a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/E32-Authority-Document/version-7.1">E32</a>)]</p>
 <p>For more information on reference systems see the following links:
 <a class="reference internal" href="../examples/reference_systems.html"><span class="doc">References Systems</span></a> and <a class="reference internal" href="../entity/reference_system.html"><span class="doc">Reference System</span></a>.</p>
 </section>
 <section id="references-and-files">
-<h2>References and Files<a class="headerlink" href="#references-and-files" title="Permalink to this heading"></a></h2>
+<h2>References and Files<a class="headerlink" href="#references-and-files" title="Link to this heading"></a></h2>
 <p>Various entities can be connected to files. This is mapped as:</p>
-<p><a class="reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31</a> (Document = file) - refers to
-(<a class="reference external" href="https://www.cidoc-crm.org/Property/P67-refers-to/version-7.1">P67</a>) - <a class="reference external" href="https://www.cidoc-crm.org/Entity/E1-CRM-Entity/version-7.1">E1</a></p>
+<p><a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31</a> (Document = file) - refers to
+(<a class="extlink-cidoc_property reference external" href="https://www.cidoc-crm.org/Property/P67-refers-to/version-7.1">P67</a>) - <a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/E1-CRM-Entity/version-7.1">E1</a></p>
 <p>Files can refer to any of the “top level” entities and can be
 (but don’t have to be) images. Files are stored with a certain
 system type (i.e. file). If the file is an image, this is most probably a
 depiction of the entity.</p>
 <p>A file can be linked to a reference, such as a bibliographical reference to
 the publication the file originates from.
-In this creates a link between a document <a class="reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31</a>
-and a type “Bibliography” via <a class="reference external" href="https://www.cidoc-crm.org/Property/P67-refers-to/version-7.1">P67</a> to
-another document <a class="reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31</a> with a system type “file”.
+In this creates a link between a document <a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31</a>
+and a type “Bibliography” via <a class="extlink-cidoc_property reference external" href="https://www.cidoc-crm.org/Property/P67-refers-to/version-7.1">P67</a> to
+another document <a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31</a> with a system type “file”.
 In this case the file is not the depiction of the reference but the reference
 is the origin of the file. This is mostly needed to document the copyright
 respectively right holder or source of a file.</p>

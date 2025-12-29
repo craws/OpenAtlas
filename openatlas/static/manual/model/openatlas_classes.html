@@ -1,21 +1,23 @@
 
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OpenAtlas classes &mdash; OpenAtlas 8.15.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <title>OpenAtlas classes &mdash; OpenAtlas 9.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+      <script src="../_static/jquery.js?v=8dae8fb0"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=801c8461"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="OpenAtlas shortcuts" href="openatlas_shortcuts.html" />
@@ -34,9 +36,6 @@
             OpenAtlas
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                8.15.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -99,7 +98,7 @@
            <div itemprop="articleBody">
              
   <section id="openatlas-classes">
-<h1>OpenAtlas classes<a class="headerlink" href="#openatlas-classes" title="Permalink to this heading"></a></h1>
+<h1>OpenAtlas classes<a class="headerlink" href="#openatlas-classes" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <p>These special classes are used within the software to further refine
@@ -107,7 +106,7 @@
 While OpenAtlas uses the CIDOC CRM within the application, a finer grained
 model is needed to deal with contextual differences in the user
 interface. Therefore,
-<a class="reference external" href="https://www.cidoc-crm.org/Entity/e33-linguistic-object/version-7.1">E33 - Lingustic Object</a> is used as class
+<a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/e33-linguistic-object/version-7.1">E33 - Lingustic Object</a> is used as class
 for sources as well as source translations with different user interface forms.
 An overview of the internal mapping and CIDOC CRM classes can be found
 <a class="reference external" href="https://github.com/craws/OpenAtlas/tree/main/install/crm">here</a>.</p>
@@ -116,10 +115,10 @@ corresponding CIDOC CRM class. For all available classes and properties of
 CIDOC CRM (version 7.1.3) see
 <a class="reference external" href="https://cidoc-crm.org/Version/version-7.1.3">the CIDOC CRM documentation</a>.</p>
 <p>Example:
-<a class="reference external" href="https://www.cidoc-crm.org/Entity/e18-physical-thing/version-7.1">E18 - Physical Thing</a> “comprises all
+<a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/e18-physical-thing/version-7.1">E18 - Physical Thing</a> “comprises all
 persistent physical items with a relatively stable form, human-made or
 natural” (for more information see
-<a class="reference external" href="https://www.cidoc-crm.org/Entity/e18-physical-thing/version-7.1">CIDOC CRM</a> documentation).
+<a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/e18-physical-thing/version-7.1">CIDOC CRM</a> documentation).
 In OpenAtlas E18 is used to represent <a class="reference internal" href="../entity/place.html"><span class="doc">place</span></a>,
 <a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">stratigraphic unit</span></a>, and
 <a class="reference internal" href="../entity/feature.html"><span class="doc">feature</span></a>, which are all considered physical things
@@ -132,10 +131,10 @@ CIDOC CRM class in the background of the application, the user interface
 displays the OpenAtlas class name and a corresponding, entity-specific form
 for user’s convenience and to avoid confusion.</p>
 <p>The same is true for bibliography, edition, external reference and file,
-which are all considered to be <a class="reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31 - Documents</a> in
+which are all considered to be <a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1">E31 - Documents</a> in
 CIDOC CRM or the OpenAtlas classes source and source translation which
 correspond to the CIDOC class
-<a class="reference external" href="https://www.cidoc-crm.org/Entity/E33-Linguistic-Object/version-7.1">E33 - Linguistic object</a>.</p>
+<a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/E33-Linguistic-Object/version-7.1">E33 - Linguistic object</a>.</p>
 <p>An overview of all OpenAtlas classes used and how they correspond to CIDOC CRM
 classes can be found at the
 <a class="reference external" href="https://demo.openatlas.eu/overview/model/openatlas_class_index">demo</a>.</p>

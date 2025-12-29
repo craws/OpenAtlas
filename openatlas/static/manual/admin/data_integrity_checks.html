@@ -1,21 +1,23 @@
 
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Data integrity checks &mdash; OpenAtlas 8.15.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <title>Data integrity checks &mdash; OpenAtlas 9.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+      <script src="../_static/jquery.js?v=8dae8fb0"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=801c8461"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Import" href="import.html" />
@@ -34,9 +36,6 @@
             OpenAtlas
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                8.15.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -64,7 +63,6 @@
 <li class="toctree-l2"><a class="reference internal" href="import.html">Import</a></li>
 <li class="toctree-l2"><a class="reference internal" href="export.html">Export</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html">API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="arche.html">ARCHE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="vocabs.html">Vocabs</a></li>
 </ul>
 </li>
@@ -108,7 +106,7 @@
            <div itemprop="articleBody">
              
   <section id="data-integrity-checks">
-<h1>Data integrity checks<a class="headerlink" href="#data-integrity-checks" title="Permalink to this heading"></a></h1>
+<h1>Data integrity checks<a class="headerlink" href="#data-integrity-checks" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <p>OpenAtlas puts great emphasis on the data quality. Even if the
@@ -122,9 +120,9 @@ when importing data from other projects or deleting files outside of the
 application, etc. Therefore, functions to check possible inconsistencies were
 implemented and are described in detail below.</p>
 <section id="orphans">
-<h2>Orphans<a class="headerlink" href="#orphans" title="Permalink to this heading"></a></h2>
+<h2>Orphans<a class="headerlink" href="#orphans" title="Link to this heading"></a></h2>
 <section id="id1">
-<h3>Orphans<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<h3>Orphans<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
 <p>Here unlinked data are shown. These so called orphans could be artifacts
 from imports or results of bugs and can be deleted. If orphans seem to appear
 regularly (without data imports or known bugs) please report this issue to the
@@ -132,32 +130,32 @@ OpenAtlas team e.g. via the
 <a class="reference external" href="https://redmine.openatlas.eu/">OpenAtlas redmine</a>.</p>
 </section>
 <section id="entities-without-links">
-<h3>Entities without links<a class="headerlink" href="#entities-without-links" title="Permalink to this heading"></a></h3>
+<h3>Entities without links<a class="headerlink" href="#entities-without-links" title="Link to this heading"></a></h3>
 <p>Entries shown have no relation to other entities. Of course that can be
 part of the normal data set, but should be check if correct. An unlinked
 entity could be artifacts of an import or were not linked by accident.</p>
 </section>
 <section id="type">
-<h3>Type<a class="headerlink" href="#type" title="Permalink to this heading"></a></h3>
+<h3>Type<a class="headerlink" href="#type" title="Link to this heading"></a></h3>
 <p>The types listed here were created but have no sub types or associated data.
 They might have been pre-installed before teams have started entering
 information or were created and then never used.</p>
 </section>
 <section id="missing-files">
-<h3>Missing files<a class="headerlink" href="#missing-files" title="Permalink to this heading"></a></h3>
+<h3>Missing files<a class="headerlink" href="#missing-files" title="Link to this heading"></a></h3>
 <p>File entities without a corresponding file are listed here. This is (most
 likely) caused by the deletion of files from the dataset.</p>
 </section>
 <section id="orphaned-files">
-<h3>Orphaned files<a class="headerlink" href="#orphaned-files" title="Permalink to this heading"></a></h3>
+<h3>Orphaned files<a class="headerlink" href="#orphaned-files" title="Link to this heading"></a></h3>
 <p>Files without a corresponding file entity are listed here.</p>
 </section>
 <section id="orphaned-iiif-files">
-<h3>Orphaned IIIF files<a class="headerlink" href="#orphaned-iiif-files" title="Permalink to this heading"></a></h3>
+<h3>Orphaned IIIF files<a class="headerlink" href="#orphaned-iiif-files" title="Link to this heading"></a></h3>
 <p>IIIF files without a corresponding entity are listed here.</p>
 </section>
 <section id="orphaned-annotations">
-<h3>Orphaned annotations<a class="headerlink" href="#orphaned-annotations" title="Permalink to this heading"></a></h3>
+<h3>Orphaned annotations<a class="headerlink" href="#orphaned-annotations" title="Link to this heading"></a></h3>
 <p>Annotations that are linked to an entity, but file and entity themselves are
 not linked are listed here. There are three options to proceed:</p>
 <ul class="simple">
@@ -167,12 +165,12 @@ not linked are listed here. There are three options to proceed:</p>
 </ul>
 </section>
 <section id="orphaned-subunits">
-<h3>Orphaned subunits<a class="headerlink" href="#orphaned-subunits" title="Permalink to this heading"></a></h3>
+<h3>Orphaned subunits<a class="headerlink" href="#orphaned-subunits" title="Link to this heading"></a></h3>
 <p>Subunits without a link to the level above, e.g. a feature
 with no connection to a place.</p>
 </section>
 <section id="circular-dependencies">
-<h3>Circular dependencies<a class="headerlink" href="#circular-dependencies" title="Permalink to this heading"></a></h3>
+<h3>Circular dependencies<a class="headerlink" href="#circular-dependencies" title="Link to this heading"></a></h3>
 <p>It can be checked if an entity is linked to itself. This could happen, for
 example, if a person has been entered as is married to themself or a type
 has itself as super. It shouldn’t be possible to create circular
@@ -184,37 +182,37 @@ or known bugs, please report the issue e.g. via the
 </section>
 </section>
 <section id="dates">
-<h2>Dates<a class="headerlink" href="#dates" title="Permalink to this heading"></a></h2>
+<h2>Dates<a class="headerlink" href="#dates" title="Link to this heading"></a></h2>
 <p>In this view various results of invalid or inconsistent dates are shown.</p>
 <section id="invalid-dates">
-<h3>Invalid dates<a class="headerlink" href="#invalid-dates" title="Permalink to this heading"></a></h3>
+<h3>Invalid dates<a class="headerlink" href="#invalid-dates" title="Link to this heading"></a></h3>
 <p>In this tab invalid date combinations are shown, for example dates of begins
 That are later than end dates. These issues should be fixed, otherwise the user
 interface won’t allow to update these entities.</p>
 </section>
 <section id="invalid-link-dates">
-<h3>Invalid link dates<a class="headerlink" href="#invalid-link-dates" title="Permalink to this heading"></a></h3>
+<h3>Invalid link dates<a class="headerlink" href="#invalid-link-dates" title="Link to this heading"></a></h3>
 <p>Similar to “invalid dates”, invalid link dates should be fixed as soon as
 possible.</p>
 </section>
 <section id="invalid-involvement-dates">
-<h3>Invalid involvement dates<a class="headerlink" href="#invalid-involvement-dates" title="Permalink to this heading"></a></h3>
+<h3>Invalid involvement dates<a class="headerlink" href="#invalid-involvement-dates" title="Link to this heading"></a></h3>
 <p>Incompatible dates for involvements are shown. Example: A person participated
 in an event for longer than the event lasted.</p>
 </section>
 <section id="invalid-preceding-dates">
-<h3>Invalid preceding dates<a class="headerlink" href="#invalid-preceding-dates" title="Permalink to this heading"></a></h3>
+<h3>Invalid preceding dates<a class="headerlink" href="#invalid-preceding-dates" title="Link to this heading"></a></h3>
 <p>Here, incompatible dates for chained events are listed. Example: A
 preceding event starts after the succeeding event.</p>
 </section>
 <section id="invalid-sub-dates">
-<h3>Invalid sub dates<a class="headerlink" href="#invalid-sub-dates" title="Permalink to this heading"></a></h3>
+<h3>Invalid sub dates<a class="headerlink" href="#invalid-sub-dates" title="Link to this heading"></a></h3>
 <p>This tab shows incompatible dates for hierarchical events. Example: A
 sub event begins before the super event began.</p>
 </section>
 </section>
 <section id="check-links">
-<h2>Check links<a class="headerlink" href="#check-links" title="Permalink to this heading"></a></h2>
+<h2>Check links<a class="headerlink" href="#check-links" title="Link to this heading"></a></h2>
 <p>Here, every link will be checked for its CIDOC validity. Depending on the
 amount of data this can take some time. While data entered by using the
 OpenAtlas user interface should always be CIDOC conform, imported
@@ -222,7 +220,7 @@ data should be check after import. If invalid links are
 found the problem should be resolved in the original data source.</p>
 </section>
 <section id="check-link-duplicates">
-<h2>Check link duplicates<a class="headerlink" href="#check-link-duplicates" title="Permalink to this heading"></a></h2>
+<h2>Check link duplicates<a class="headerlink" href="#check-link-duplicates" title="Link to this heading"></a></h2>
 <p>Two tests are combined:</p>
 <p>The first test checks for duplicate links that are identically. These links
 can be afterwards by clicking the <em>Delete link duplicates</em> button.</p>
@@ -240,7 +238,7 @@ reoccuring issue for your dataset, please report e.g. via the
 <a class="reference external" href="https://redmine.openatlas.eu/">OpenAtlas redmine</a>.</p>
 </section>
 <section id="check-similar-names">
-<h2>Check similar names<a class="headerlink" href="#check-similar-names" title="Permalink to this heading"></a></h2>
+<h2>Check similar names<a class="headerlink" href="#check-similar-names" title="Link to this heading"></a></h2>
 <p>This test will search for similar entity names. Depending on selection
 and data volume this might take some time. The following options are given:</p>
 <ul class="simple">
@@ -253,12 +251,12 @@ package which uses the
 <a class="reference external" href="https://en.wikipedia.org/wiki/Levenshtein_distance">Levenshtein Distance</a>.</p>
 </section>
 <section id="check-files">
-<h2>Check files<a class="headerlink" href="#check-files" title="Permalink to this heading"></a></h2>
+<h2>Check files<a class="headerlink" href="#check-files" title="Link to this heading"></a></h2>
 <p>In this section, all files are checked for completeness and consistency.
 Further information about file entities can be found in the manual under
 <a class="reference internal" href="../entity/file.html"><span class="doc">File</span></a>.</p>
 <section id="missing-information">
-<h3>Missing information<a class="headerlink" href="#missing-information" title="Permalink to this heading"></a></h3>
+<h3>Missing information<a class="headerlink" href="#missing-information" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p><strong>No creator</strong>: Files without a creator entered.</p></li>
 <li><p><strong>No license holder</strong>: Files without a license holder entered.</p></li>
@@ -267,7 +265,7 @@ Further information about file entities can be found in the manual under
 </ul>
 </section>
 <section id="file-integrity">
-<h3>File integrity<a class="headerlink" href="#file-integrity" title="Permalink to this heading"></a></h3>
+<h3>File integrity<a class="headerlink" href="#file-integrity" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p><strong>Missing files</strong>: A file entity was created but has no associated file.</p></li>
 <li><p><strong>Duplicated files</strong>: Lists all files that share the same SHA value.
