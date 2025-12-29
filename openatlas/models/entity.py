@@ -2,80 +2,70 @@ from __future__ import annotations
 
 import ast
 import json
-import re
-from typing import Any, Iterable, Optional, TYPE_CHECKING
+from typing import Any, Iterable, Optional
 
 from flask import g, request
 from werkzeug.exceptions import abort
 
 from openatlas import app
-from openatlas.database import (
-    date, entity as db, link as db_link, tools as db_tools)
-from openatlas.display.util2 import (
-    convert_size, datetime64_to_timestamp, format_date_part, sanitize,
-    timestamp_to_datetime64)
+from openatlas.database import entity as db, link as db_link
+from openatlas.database.connect import Transaction
+from openatlas.display.util2 import convert_size, sanitize
 from openatlas.models.annotation import AnnotationText
+from openatlas.models.dates import Dates
 from openatlas.models.gis import Gis
-from openatlas.models.tools import get_carbon_link
-
-if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.type import Type
 
 
 class Entity:
+    count = 0
+    count_subs = 0
+    category = ''
+    multiple = False
+    required = False
+    directional = False
+    selectable = True
+    system = False
+
     def __init__(self, data: dict[str, Any]) -> None:
-        self.id = data['id']
-        self.name = data['name']
-        self.description = data['description']
-        self.created = data['created']
-        self.modified = data['modified']
-        self.cidoc_class = g.cidoc_classes[data['cidoc_class_code']]
         self.class_ = g.classes[data['openatlas_class_name']]
-        self.reference_systems: list[Link] = []
+        self.cidoc_class = self.class_.cidoc_class
+        self.id = 0
+        self.name = ''
+        self.aliases = {}
+        self.description = None
+        self.created = None
+        self.modified = None
         self.origin_id: Optional[int] = None  # When coming from another entity
         self.image_id: Optional[int] = None  # Profile image
         self.location: Optional[Entity] = None  # Respective location if place
         self.types = {}
         self.standard_type = None
+        self.root: list[int] = []
+        self.subs: list[int] = []
+        self.classes: list[str] = []
+        self.dates = Dates(data)
 
-        if 'types' in data and data['types']:
-            for item in data['types']:  # f1 = type id, f2 = value
-                type_ = g.types[item['f1']]
-                if type_.class_.name == 'type_tools':
-                    continue
-                self.types[type_] = item['f2']
-                if type_.category == 'standard':
-                    self.standard_type = type_
-
-        self.aliases = {}
-        if 'aliases' in data and data['aliases']:
-            for alias in data['aliases']:  # f1 = alias id, f2 = alias name
-                self.aliases[alias['f1']] = alias['f2']
-            self.aliases = dict(
-                sorted(self.aliases.items(), key=lambda item_: item_[1]))
-
-        self.begin_from = None
-        self.begin_to = None
-        self.begin_comment = None
-        self.end_from = None
-        self.end_to = None
-        self.end_comment = None
-        self.first = None
-        self.last = None
-        if 'begin_from' in data:
-            self.begin_from = timestamp_to_datetime64(data['begin_from'])
-            self.begin_to = timestamp_to_datetime64(data['begin_to'])
-            self.begin_comment = data['begin_comment']
-            self.end_from = timestamp_to_datetime64(data['end_from'])
-            self.end_to = timestamp_to_datetime64(data['end_to'])
-            self.end_comment = data['end_comment']
-            self.first = format_date_part(self.begin_from, 'year') \
-                if self.begin_from else None
-            self.last = format_date_part(self.end_from, 'year') \
-                if self.end_from else None
-            self.last = format_date_part(self.end_to, 'year') \
-                if self.end_to else self.last
-
+        for name, value in data.items():
+            if not value and value != 0:
+                continue
+            match name:
+                case 'types':
+                    for item in value:  # f1 = type id, f2 = value
+                        type_ = g.types[item['f1']]
+                        if type_.class_.name == 'type_tools':
+                            continue
+                        self.types[type_] = item['f2']
+                        if type_.category == 'standard':
+                            self.standard_type = type_
+                case 'aliases':
+                    for alias in data['aliases']:  # f1 = id, f2 = name
+                        self.aliases[alias['f1']] = alias['f2']
+                    self.aliases = dict(
+                        sorted(
+                            self.aliases.items(),
+                            key=lambda item_: item_[1]))
+                case _:
+                    setattr(self, name, value)
         if self.class_.name == 'file':
             self.public = False
             self.creator = None
@@ -84,15 +74,22 @@ class Entity:
                 self.public = g.file_info[self.id]['public']
                 self.creator = g.file_info[self.id]['creator']
                 self.license_holder = g.file_info[self.id]['license_holder']
+        if self.class_.name == 'reference_system' and 'website_url' in data:
+            self.website_url = data['website_url']
+            self.resolver_url = data['resolver_url']
+            self.example_id = data['identifier_example']
+            self.system = data['system']
 
     def get_linked_entity(
             self,
             code: str,
+            classes: Optional[list[str]] = None,
             inverse: bool = False,
             types: bool = False) -> Optional[Entity]:
         return Entity.get_linked_entity_static(
             self.id,
             code,
+            classes,
             inverse=inverse,
             types=types)
 
@@ -104,20 +101,24 @@ class Entity:
         return Entity.get_linked_entity_safe_static(
             self.id,
             code,
-            inverse,
-            types)
+            inverse=inverse,
+            types=types)
 
     def get_linked_entities(
             self,
             code: str | list[str],
+            classes: Optional[list[str]] = None,
             inverse: bool = False,
             types: bool = False,
+            aliases: bool = False,
             sort: bool = False) -> list[Entity]:
         return Entity.get_linked_entities_static(
             self.id,
             code,
+            classes,
             inverse=inverse,
             types=types,
+            aliases=aliases,
             sort=sort)
 
     def get_linked_entities_recursive(
@@ -129,12 +130,14 @@ class Entity:
             db.get_linked_entities_recursive(self.id, codes, inverse),
             types=types)
 
-    def link(self,
-             code: str,
-             range_: Entity | list[Entity],
-             description: Optional[str] = None,
-             inverse: bool = False,
-             type_id: Optional[int] = None) -> list[int]:
+    def link(
+            self,
+            code: str,
+            range_: Entity | list[Entity],
+            description: Optional[str] = None,
+            inverse: bool = False,
+            type_id: Optional[int] = None,
+            dates: Optional[dict[str, Any]] = None) -> list[int]:
         property_ = g.properties[code]
         entities = range_ if isinstance(range_, list) else [range_]
         new_link_ids = []
@@ -157,13 +160,22 @@ class Entity:
                     f" > {code} > {range_.class_.cidoc_class.code}"
                 g.logger.log('error', 'model', text)
                 abort(400, text)
-            id_ = db.link({
+            data = {
                 'property_code': code,
                 'domain_id': domain.id,
                 'range_id': range_.id,
                 'description': sanitize(description)
                 if isinstance(description, str) else description,
-                'type_id': type_id})
+                'type_id': type_id}
+            data.update(
+                dates or {
+                    'begin_from': None,
+                    'begin_to': None,
+                    'begin_comment': None,
+                    'end_from': None,
+                    'end_to': None,
+                    'end_comment': None})
+            id_ = db.link(data)
             new_link_ids.append(id_)
         return new_link_ids
 
@@ -180,97 +192,68 @@ class Entity:
     def get_links(
             self,
             codes: str | list[str],
+            classes: Optional[list[str]] = None,
             inverse: bool = False) -> list[Link]:
-        return Entity.get_links_of_entities(self.id, codes, inverse)
+        return Entity.get_links_of_entities(self.id, codes, classes, inverse)
 
     def delete(self) -> None:
-        Entity.delete_(self.id)
+        db.delete(self.id)
 
-    def delete_links(self, codes: list[str], inverse: bool = False) -> None:
-        if self.class_.name == 'stratigraphic_unit' \
-                and 'P2' in codes \
-                and not inverse:
-            exclude_ids = g.sex_type.get_sub_ids_recursive()
-            exclude_ids.append(g.radiocarbon_type.id)
-            if db_tools.get_sex_types(self.id) or get_carbon_link(self):
-                db.remove_types(self.id, exclude_ids)
-                codes.remove('P2')
-                if not codes:
-                    return
-        db.delete_links_by_codes(self.id, codes, inverse)
-
-    def update(
+    def delete_links(
             self,
-            data: dict[str, Any],
-            new: bool = False) -> Optional[int]:
-        continue_link_id = None
-        if 'attributes' in data:
-            self.update_attributes(data['attributes'])
-        if 'aliases' in data:
-            self.update_aliases(data['aliases'])
-        if 'administrative_units' in data \
-                and self.class_.name != 'administrative_unit':
-            self.update_administrative_units(data['administrative_units'], new)
-        if 'links' in data:
-            continue_link_id = self.update_links(data, new)
-        if 'gis' in data:
-            self.update_gis(data['gis'], new)
-        if self.class_.name == 'file':
-            data['file_info']['entity_id'] = self.id
-            db.update_file_info(data['file_info'])
-        return continue_link_id
+            property_: str,
+            classes: list[str],
+            inverse: bool = False) -> None:
+        db.delete_links_by_property_and_class(
+            self.id,
+            property_,
+            classes,
+            inverse)
 
-    def update_administrative_units(
-            self,
-            units: dict[str, list[int]],
-            new: bool) -> None:
-        if not self.location:
-            self.location = self.get_linked_entity_safe('P53')
-        if not new:
-            self.location.delete_links(['P89'])
-        if units:
-            self.location.link('P89', [g.types[id_] for id_ in units])
+    def save_file_info(self, data: dict[str, Any]) -> None:
+        db.update_file_info({
+            'entity_id': self.id,
+            'creator': data.get('creator'),
+            'license_holder': data.get('license_holder'),
+            'public': data.get('public', False)})
 
-    def update_attributes(self, attributes: dict[str, Any]) -> None:
-        for key, value in attributes.items():
-            setattr(self, key, value)
-        db.update({
-            'id': self.id,
-            'name': sanitize(self.name),
-            'begin_from': datetime64_to_timestamp(self.begin_from),
-            'begin_to': datetime64_to_timestamp(self.begin_to),
-            'end_from': datetime64_to_timestamp(self.end_from),
-            'end_to': datetime64_to_timestamp(self.end_to),
-            'begin_comment': sanitize(self.begin_comment),
-            'end_comment': sanitize(self.end_comment),
-            'description': self.update_description()})
-
-    def update_description(self) -> Optional[str]:
-        if not self.description:
-            return None
-        if self.class_.name not in ['source', 'source_translation']:
-            return sanitize(self.description)
-        AnnotationText.delete_annotations_text(self.id)
-        text = self.description.replace('</p><p>', '\n\n')
-        replace_strings = [
-            '<p>', '</p>', '<br class="ProseMirror-trailingBreak">']
-        for string in replace_strings:
-            text = text.replace(string, '')
-        text = re.sub(r'(<br>\s*)+$', '', text)
-        text = text.replace('<br>', '\n').replace('&quot;', '"')
-        processed_text = self.process_text(text)
-        for data in processed_text['data']:
-            AnnotationText.insert(
-                data['source_id'],
-                data['link_start'],
-                data['link_end'],
-                data['entity_id'],
-                data['text'])
-        return processed_text['text']
+    def update(self, data: dict[str, Any]) -> None:
+        data['id'] = self.id
+        annotation_data = []
+        if self.class_.attributes.get('description', []).get('annotated'):
+            result = AnnotationText.extract_annotations(data['description'])
+            data['description'] = result['text']
+            annotation_data = result['data']
+            AnnotationText.delete_annotations_text(self.id)
+        for item in ['name', 'description']:
+            data[item] = sanitize(data.get(item, getattr(self, item)))
+        db.update(data)
+        for annotation in annotation_data:
+            annotation['source_id'] = self.id
+            AnnotationText.insert(annotation)
+        for attribute in self.class_.attributes:
+            match attribute:
+                case 'alias':
+                    self.update_aliases(data.get('alias', []))
+                case 'location':
+                    self.update_gis(data['gis'])
+                case 'file':
+                    self.save_file_info(data)
+                case 'resolver_url':
+                    db.update_reference_system({
+                        'entity_id': self.id,
+                        'name': self.name,
+                        'website_url': data['website_url'],
+                        'resolver_url': data['resolver_url'],
+                        'identifier_example': sanitize(data['example_id'])})
+                    if data['reference_system_classes']:
+                        db.add_reference_system_classes(
+                            self.id,
+                            data['reference_system_classes'])
 
     def get_annotated_text(self) -> str:
         offset = 0
-        text = self.description
+        text = self.description or ''
         for annotation in AnnotationText.get_by_source_id(self.id):
             dict_ = {'annotationId': f'a-{annotation.id}'}
             if annotation.entity_id:
@@ -279,106 +262,55 @@ class Entity:
                 dict_['comment'] = annotation.text
             inner_text = text[
                 annotation.link_start + offset: annotation.link_end + offset]
-            meta = json.dumps(dict_).replace('"', '&quot;')
+            meta = str(json.dumps(dict_)).replace('"', '&quot;')
             mark = f'<mark meta="{meta}">{inner_text}</mark>'
             start = annotation.link_start + offset
             end = annotation.link_end + offset
             text = text[:start] + mark + text[end:]
             offset += (len(mark) - len(inner_text))
-        return text.replace('\n', '<br>') if text else text
-
-    def process_text(self, text: str) -> dict[str, Any]:
-        data = []
-        current_offset = 0
-        pattern = r'<mark meta="(.*?)">(.*?)</mark>'
-
-        def replace_mark(match: Any) -> str:
-            nonlocal current_offset
-            metadata = json.loads(match.group(1))
-            inner_text = match.group(2)
-            start, end = match.span()
-            adjusted_start = start + current_offset
-            adjusted_end = adjusted_start + len(inner_text)
-            data.append({
-                'source_id': self.id,
-                'entity_id': metadata.get('entityId'),
-                'text': metadata.get('comment'),
-                'link_start': adjusted_start,
-                'link_end': adjusted_end})
-            current_offset += len(inner_text) - (end - start)
-            return inner_text
-
-        return {
-            'text': re.sub(pattern, replace_mark, text),
-            'data': data}
+        return text.replace('\n', '<br>')
 
     def update_aliases(self, aliases: list[str]) -> None:
-        delete_ids = []
         for id_, alias in self.aliases.items():
             if alias in aliases:
                 aliases.remove(alias)
             else:
-                delete_ids.append(id_)
-        Entity.delete_(delete_ids)
+                Entity.get_by_id(int(id_)).delete()
         for alias in aliases:
             if alias.strip():
-                self.link('P1', Entity.insert('appellation', alias))
+                self.link(
+                    'P1',
+                    insert({
+                        'name': alias,
+                        'openatlas_class_name': 'appellation'}))
 
-    def update_links(self, data: dict[str, Any], new: bool) -> Optional[int]:
-        if not new:
-            if 'delete' in data['links'] and data['links']['delete']:
-                self.delete_links(data['links']['delete'])
-            if 'delete_inverse' in data['links'] \
-                    and data['links']['delete_inverse']:
-                self.delete_links(data['links']['delete_inverse'], True)
-            if 'delete_reference_system' in data['links'] \
-                    and data['links']['delete_reference_system']:
-                db.delete_reference_system_links(self.id)
-        continue_link_id = None
-        for link_ in data['links']['insert']:
-            ids = self.link(
-                link_['property'],
-                link_['range'],
-                link_['description'],
-                link_['inverse'],
-                link_['type_id'])
-            if 'attributes_link' in data:
-                for id_ in ids:
-                    item = Link.get_by_id(id_)
-                    item.begin_from = data['attributes_link']['begin_from']
-                    item.begin_to = data['attributes_link']['begin_to']
-                    item.begin_comment = \
-                        data['attributes_link']['begin_comment']
-                    item.end_from = data['attributes_link']['end_from']
-                    item.end_to = data['attributes_link']['end_to']
-                    item.end_comment = data['attributes_link']['end_comment']
-                    item.update()
-            if link_['return_link_id']:
-                continue_link_id = ids[0]
-        return continue_link_id
-
-    def update_gis(self, gis_data: dict[str, Any], new: bool) -> None:
-        if not self.location:
-            self.location = self.get_linked_entity_safe('P53')
-        if not new:
+    def update_gis(self, gis_data: dict[str, Any], new: bool = False) -> None:
+        if new:
+            location = insert({
+                'name': f'Location of {self.name}',
+                'openatlas_class_name': 'object_location'})
+            self.link('P53', location)
+        else:
+            location = self.get_linked_entity_safe('P53')
             db.update({
-                'id': self.location.id,
-                'name': f"Location of {sanitize(self.name)}",
-                'begin_from': None,
-                'begin_to': None,
-                'end_from': None,
-                'end_to': None,
-                'begin_comment': None,
-                'end_comment': None,
-                'description': None})
-            Gis.delete_by_entity(self.location)
-        Gis.insert(self.location, gis_data)
+                'id': location.id,
+                'name': f"Location of {sanitize(self.name)}"})
+            Gis.delete_by_entity(location)
+        if gis_data:
+            Gis.insert(location, gis_data)
 
     def get_profile_image_id(self) -> Optional[int]:
-        return db.get_profile_image_id(self.id)
-
-    def remove_profile_image(self) -> None:
-        db.remove_profile_image(self.id)
+        if self.class_.name == 'file':
+            return self.id
+        if not self.class_.relations.get('file'):
+            return None
+        image_id = db.get_profile_image_id(self.id)
+        if not image_id:
+            for link_ in self.get_links('P67', ['file'], inverse=True):
+                if file_ := g.files.get(link_.domain.id):
+                    if file_.suffix in g.display_file_ext:
+                        return link_.domain.id
+        return image_id
 
     def get_name_directed(self, inverse: bool = False) -> str | None:
         """Returns name part of a directed type e.g. parent of (child of)"""
@@ -387,7 +319,7 @@ class Entity:
             return sanitize(name_parts[1][:-1])  # pragma: no cover
         return name_parts[0]
 
-    def check_too_many_single_type_links(self) -> bool:
+    def check_too_many_single_type_links(self) -> Entity | None:
         type_dict: dict[int, int] = {}
         for type_ in self.types:
             if type_.root[0] in type_dict:
@@ -396,8 +328,8 @@ class Entity:
             type_dict[type_.root[0]] = 1
         for id_, count in type_dict.items():
             if count > 1 and not g.types[id_].multiple:
-                return True
-        return False
+                return g.types[id_]
+        return None
 
     def get_structure(self) -> dict[str, list[Entity]]:
         structure: dict[str, list[Entity]] = {
@@ -424,14 +356,103 @@ class Entity:
     def get_file_ext(self) -> str:
         return g.files[self.id].suffix if self.id in g.files else 'N/A'
 
+    def get_sub_ids_recursive(
+            self,
+            subs: Optional[list[int]] = None) -> list[int]:
+        subs = subs or []
+        for sub_id in self.subs:
+            subs.append(sub_id)
+            Entity.get_sub_ids_recursive(g.types[sub_id], subs)
+        return subs
+
+    def get_count_by_class(self, name: str) -> Optional[int]:
+        if type_ids := self.get_sub_ids_recursive():
+            return db.get_class_count(name, type_ids)
+        return None
+
+    def set_required(self) -> None:
+        db.set_required(self.id)
+
+    def unset_required(self) -> None:
+        db.unset_required(self.id)
+
+    def set_selectable(self) -> None:
+        db.set_selectable(self.id)
+
+    def unset_selectable(self) -> None:
+        if not self.count and self.category != 'value':
+            db.unset_selectable(self.id)
+
+    def remove_class(self, name: str) -> None:
+        db.remove_class(self.id, name)
+
+    def remove_reference_system_class(self, name: str) -> None:
+        db.remove_reference_system_class(self.id, name)
+
+    def remove_entity_links(self, entity_id: int) -> None:
+        db.remove_entity_links(self.id, entity_id)
+
+    def get_untyped(self) -> list[Entity]:
+        untyped = []
+        for entity in Entity.get_by_class(self.classes, types=True):
+            linked = False
+            to_check = entity
+            if self.name in ('Administrative unit', 'Historical place'):
+                to_check = entity.get_linked_entity_safe('P53', types=True)
+            for type_ in to_check.types:
+                if type_.root[0] == self.id:
+                    linked = True
+                    break
+            if not linked:
+                untyped.append(entity)
+        return untyped
+
+    def update_hierarchy(
+            self,
+            name: str,
+            classes: list[str],
+            multiple: bool) -> None:
+        db.update_hierarchy({
+            'id': self.id,
+            'name': sanitize(name),
+            'multiple': multiple})
+        db.add_classes_to_hierarchy(self.id, classes)
+
+    def change_type(self, new_type_id: int, checkbox_values: str) -> None:
+        root = g.types[self.root[0]]
+        entity_ids = ast.literal_eval(checkbox_values)
+        delete_ids = []
+        Transaction.begin()
+        if new_type_id:  # A new type was selected
+            if root.multiple:
+                cleaned_entity_ids = []
+                for e in Entity.get_by_ids(entity_ids, types=True):
+                    if any(type_.id == int(new_type_id) for type_ in e.types):
+                        delete_ids.append(e.id)
+                        continue
+                    cleaned_entity_ids.append(e.id)
+                entity_ids = cleaned_entity_ids
+            if entity_ids:
+                data = {
+                    'old_type_id': self.id,
+                    'new_type_id': new_type_id,
+                    'entity_ids': tuple(entity_ids)}
+                if root.name in app.config['PROPERTY_TYPES']:
+                    db.change_link_type(data)
+                else:
+                    db.change_type(data)
+        else:
+            delete_ids = entity_ids  # No type selected so delete all links
+        if delete_ids:
+            if root.name in app.config['PROPERTY_TYPES']:
+                db.remove_link_type(self.id, delete_ids)
+            else:
+                db.remove_type(self.id, delete_ids)
+        Transaction.commit()
+
     @staticmethod
     def get_file_info() -> dict[int, Any]:
         return db.get_file_info()
-
-    @staticmethod
-    def delete_(id_: int | list[int]) -> None:
-        if id_:
-            db.delete(id_ if isinstance(id_, list) else [id_])
 
     @staticmethod
     def get_by_class(
@@ -441,18 +462,11 @@ class Entity:
         if aliases:  # For performance: check classes if they can have an alias
             aliases = False
             for class_ in classes if isinstance(classes, list) else [classes]:
-                if g.classes[class_].alias_allowed:
+                if g.classes[class_].attributes.get('alias'):
                     aliases = True
                     break
         return [
             Entity(row) for row in db.get_by_class(classes, types, aliases)]
-
-    @staticmethod
-    def get_by_view(
-            view: str,
-            types: bool = False,
-            aliases: bool = False) -> list[Entity]:
-        return Entity.get_by_class(g.view_class_mapping[view], types, aliases)
 
     @staticmethod
     def get_display_files() -> list[Entity]:
@@ -462,21 +476,13 @@ class Entity:
             if ext in app.config['DISPLAY_FILE_EXT']:
                 entities.append(Entity(row))
         return entities
+
     @staticmethod
     def get_linked_entity_ids_recursive(
             entity_id: int,
             codes: list[str] | str,
             inverse: bool = False) -> list[int]:
         return db.get_linked_entities_recursive(entity_id, codes, inverse)
-
-    @staticmethod
-    def insert(class_: str, name: str, desc: Optional[str] = None) -> Entity:
-        return Entity.get_by_id(
-            db.insert({
-                'name': sanitize(name),
-                'code': g.classes[class_].cidoc_class.code,
-                'openatlas_class_name': class_,
-                'description': sanitize(desc)}))
 
     @staticmethod
     def get_by_cidoc_class(
@@ -490,7 +496,8 @@ class Entity:
     def get_by_id(
             id_: int,
             types: bool = False,
-            aliases: bool = False) -> Entity:
+            aliases: bool = False,
+            with_location: bool = True) -> Entity:
         if id_ in g.types:
             return g.types[id_]
         if id_ in g.reference_systems:
@@ -500,7 +507,12 @@ class Entity:
             if 'activity' in request.path:  # Re-raise if in user activity view
                 raise AttributeError
             abort(418)
-        return Entity(data)
+        entity = Entity(data)
+        if entity.class_.name == 'place' and with_location:
+            entity.location = entity.get_linked_entity_safe('P53', types=True)
+            if types:
+                entity.types.update(entity.location.types)
+        return entity
 
     @staticmethod
     def get_by_ids(
@@ -528,37 +540,34 @@ class Entity:
 
     @staticmethod
     def get_overview_counts() -> dict[str, int]:
-        return db.get_overview_counts(g.class_view_mapping)
+        return db.get_overview_counts(g.classes)
 
     @staticmethod
     def get_overview_counts_by_type(ids: list[int]) -> dict[str, int]:
-        return db.get_overview_counts_by_type(ids, g.class_view_mapping)
+        return db.get_overview_counts_by_type(ids, g.classes.keys())
 
     @staticmethod
     def get_latest(limit: int) -> list[Entity]:
-        return [
-            Entity(row) for row in db.get_latest(g.class_view_mapping, limit)]
+        classes = []
+        for class_ in g.classes.values():
+            if class_.group and class_.name != 'reference_system':
+                classes.append(class_.name)
+        return [Entity(r) for r in db.get_latest(classes, limit)]
 
     @staticmethod
     def set_profile_image(id_: int, origin_id: int) -> None:
         db.set_profile_image(id_, origin_id)
 
     @staticmethod
-    def get_roots(
-            property_code: str,
-            ids: list[int],
-            inverse: bool = False) -> dict[int, Any]:
-        return db.get_roots(property_code, ids, inverse)
-
-    @staticmethod
     def get_links_of_entities(
             entity_ids: int | list[int],
             codes: str | list[str] | None = None,
+            classes: Optional[list[str]] = None,
             inverse: bool = False) -> list[Link]:
         result = set()
         if codes:
             codes = codes if isinstance(codes, list) else [str(codes)]
-        rows = db.get_links_of_entities(entity_ids, codes, inverse)
+        rows = db.get_links_of_entities(entity_ids, codes, classes, inverse)
         for row in rows:
             result.add(row['domain_id'])
             result.add(row['range_id'])
@@ -577,11 +586,13 @@ class Entity:
     def get_linked_entity_static(
             id_: int,
             code: str,
+            classes: Optional[list[str]] = None,
             inverse: bool = False,
             types: bool = False) -> Optional[Entity]:
         result = Entity.get_linked_entities_static(
             id_,
             code,
+            classes,
             inverse=inverse,
             types=types)
         if len(result) > 1:  # pragma: no cover
@@ -596,14 +607,17 @@ class Entity:
     def get_linked_entities_static(
             id_: int,
             codes: str | list[str],
+            classes: Optional[list[str]] = None,
             inverse: bool = False,
             types: bool = False,
+            aliases: bool = False,
             sort: bool = False) -> list[Entity]:
         codes = codes if isinstance(codes, list) else [codes]
         entities = Entity.get_by_ids(
-            db.get_linked_entities_inverse(id_, codes) if inverse
-            else db.get_linked_entities(id_, codes),
-            types=types)
+            db.get_linked_entities_inverse(id_, codes, classes) if inverse
+            else db.get_linked_entities(id_, codes, classes),
+            types=types,
+            aliases=aliases)
         if sort and entities:
             entities.sort(key=lambda x: x.name)
         return entities
@@ -612,9 +626,15 @@ class Entity:
     def get_linked_entity_safe_static(
             id_: int,
             code: str,
+            classes: Optional[list[str]] = None,
             inverse: bool = False,
             types: bool = False) -> Entity:
-        entity = Entity.get_linked_entity_static(id_, code, inverse, types)
+        entity = Entity.get_linked_entity_static(
+            id_,
+            code,
+            classes,
+            inverse,
+            types)
         if not entity:  # pragma: no cover
             g.logger.log(
                 'error',
@@ -623,6 +643,182 @@ class Entity:
                 f'id: {id_}, code: {code}')
             abort(418, f'Missing linked {code} for {id_}')
         return entity
+
+    @staticmethod
+    def get_all_types(with_count: bool) -> dict[int, Entity]:
+        types = {}
+        for row in db.get_types(with_count):
+            type_ = Entity(row)
+            types[type_.id] = type_
+            type_.count = row['count'] or row['count_property']
+            type_.count_subs = 0
+            type_.subs = []
+            type_.root = [row['super_id']] if row['super_id'] else []
+            type_.selectable = not row['non_selectable']
+        Entity.populate_subs(types)
+        return types
+
+    @staticmethod
+    def populate_subs(types: dict[int, Entity]) -> None:
+        hierarchies = {row['id']: row for row in db.get_hierarchies()}
+        for type_ in types.values():
+            if type_.root:
+                super_ = types[type_.root[-1]]
+                super_.subs.append(type_.id)
+                type_.root = Entity.get_root_path(
+                    types,
+                    type_,
+                    type_.root[-1],
+                    type_.root)
+                type_.category = hierarchies[type_.root[0]]['category']
+                continue
+            type_.category = hierarchies[type_.id]['category']
+            type_.multiple = hierarchies[type_.id]['multiple']
+            type_.required = hierarchies[type_.id]['required']
+            type_.directional = hierarchies[type_.id]['directional']
+            for class_ in g.classes.values():
+                if class_.hierarchies and type_.id in class_.hierarchies:
+                    type_.classes.append(class_.name)
+
+    @staticmethod
+    def get_root_path(
+            types: dict[int, Entity],
+            type_: Entity,
+            super_id: int,
+            root: list[int]) -> list[int]:
+        super_ = types[super_id]
+        super_.count_subs += type_.count
+        if not super_.root:
+            return root
+        type_.root.insert(0, super_.root[-1])
+        return Entity.get_root_path(types, type_, super_.root[-1], root)
+
+    @staticmethod
+    def check_hierarchy_exists(name: str) -> list[Entity]:
+        return [x for x in g.types.values() if x.name == name and not x.root]
+
+    @staticmethod
+    def get_hierarchy(name: str) -> Entity:
+        return \
+            [x for x in g.types.values() if x.name == name and not x.root][0]
+
+    @staticmethod
+    def get_tree_data(
+            type_id: Optional[int],
+            selected_ids: list[int],
+            filtered_ids: Optional[list[int]] = None,
+            is_type_form: Optional[bool] = False) -> list[dict[str, Any]]:
+        return Entity.walk_tree(
+            g.types[type_id].subs,
+            selected_ids,
+            filtered_ids or [],
+            is_type_form or False)
+
+    @staticmethod
+    def walk_tree(
+            types: list[int],
+            selected_ids: list[int],
+            filtered_ids: list[int],
+            is_type_form: bool) -> list[dict[str, Any]]:
+        items = []
+        for id_ in [id_ for id_ in types if id_ not in filtered_ids]:
+            item = g.types[id_]
+            state = {}
+            if item.id in selected_ids:
+                state['selected'] = 'true'
+            if not is_type_form and not item.selectable:
+                state['disabled'] = 'true'
+            items.append({
+                'id': item.id,
+                'text': item.name.replace("'", "&apos;"),
+                'state': state or '',
+                'children':
+                    Entity.walk_tree(
+                        item.subs,
+                        selected_ids,
+                        filtered_ids,
+                        is_type_form)})
+        return items
+
+    @staticmethod
+    def get_class_choices(
+            root: Optional[Entity] = None) -> list[tuple[int, str]]:
+        choices = []
+        for class_ in g.classes.values():
+            if class_.new_types_allowed \
+                    and (not root or class_.name not in root.classes):
+                choices.append((class_.name, class_.label))
+        return choices
+
+    @staticmethod
+    def insert_hierarchy(
+            hierarchy: Entity,
+            category: str,
+            classes: list[str],
+            multiple: bool) -> None:
+        db.insert_hierarchy({
+            'id': hierarchy.id,
+            'name': hierarchy.name,
+            'multiple': multiple,
+            'category': category})
+        db.add_classes_to_hierarchy(hierarchy.id, classes)
+
+    @staticmethod
+    def reference_system_counts() -> dict[str, int]:
+        return db.reference_system_counts()
+
+    @staticmethod
+    def get_reference_systems() -> dict[int, Entity]:
+        systems = {}
+        for row in db.get_reference_systems():
+            system = Entity(row)
+            for class_ in g.classes.values():
+                if system.id in class_.reference_systems:
+                    system.classes.append(class_.name)
+            systems[system.id] = system
+            if system.system:
+                setattr(g, system.name.lower(), system)
+        return systems
+
+
+def insert(data: dict[str, Any]) -> Entity:
+    annotation_data = []
+    attributes = g.classes[data['openatlas_class_name']].attributes
+    if 'description' in attributes \
+            and 'annotated' in attributes['description']:
+        result = AnnotationText.extract_annotations(data['description'])
+        data['description'] = result['text']
+        annotation_data = result['data']
+    for item in [
+            'begin_from', 'begin_to', 'begin_comment',
+            'end_from', 'end_to', 'end_comment', 'description']:
+        data[item] = data.get(item)
+    for item in ['name', 'description']:
+        data[item] = sanitize(data[item])
+    entity = Entity.get_by_id(db.insert(data), with_location=False)
+    for attribute in attributes:
+        match attribute:
+            case 'alias' if 'alias' in data:
+                entity.update_aliases(data['alias'] or [])
+            case 'location':
+                entity.update_gis(data.get('gis', {}), new=True)
+            case 'file':
+                entity.save_file_info(data)
+            case 'resolver_url':
+                db.insert_reference_system({
+                    'entity_id': entity.id,
+                    'name': entity.name,
+                    'website_url': data['website_url'],
+                    'resolver_url': data['resolver_url'],
+                    'identifier_example': sanitize(data['example_id'])})
+                if data['reference_system_classes']:
+                    db.add_reference_system_classes(
+                        entity.id,
+                        data['reference_system_classes'])
+    for annotation in annotation_data:
+        annotation['source_id'] = entity.id
+        AnnotationText.insert(annotation)
+    return entity
 
 
 class Link:
@@ -642,54 +838,31 @@ class Link:
         self.types: dict[Entity, None] = {}
         if 'type_id' in row and row['type_id']:
             self.types[g.types[row['type_id']]] = None
-        if 'begin_from' in row:
-            self.begin_from = timestamp_to_datetime64(row['begin_from'])
-            self.begin_to = timestamp_to_datetime64(row['begin_to'])
-            self.begin_comment = row['begin_comment']
-            self.end_from = timestamp_to_datetime64(row['end_from'])
-            self.end_to = timestamp_to_datetime64(row['end_to'])
-            self.end_comment = row['end_comment']
-            self.first = format_date_part(self.begin_from, 'year') \
-                if self.begin_from else None
-            self.last = format_date_part(self.end_from, 'year') \
-                if self.end_from else None
-            self.last = format_date_part(self.end_to, 'year') \
-                if self.end_to else self.last
+        self.dates = Dates(row)
 
-    def update(self) -> None:
-        db_link.update({
+    def update(self, data: dict[str, Any]) -> None:
+        attributes = {
             'id': self.id,
             'property_code': self.property.code,
             'domain_id': self.domain.id,
             'range_id': self.range.id,
             'type_id': self.type.id if self.type else None,
-            'description': sanitize(self.description),
-            'begin_from': datetime64_to_timestamp(self.begin_from),
-            'begin_to': datetime64_to_timestamp(self.begin_to),
-            'begin_comment': sanitize(self.begin_comment),
-            'end_from': datetime64_to_timestamp(self.end_from),
-            'end_to': datetime64_to_timestamp(self.end_to),
-            'end_comment': sanitize(self.end_comment)})
-
-    def set_dates(self, data: dict[str, Any]) -> None:
-        self.begin_from = data['begin_from']
-        self.begin_to = data['begin_to']
-        self.begin_comment = data['begin_comment']
-        self.end_from = data['end_from']
-        self.end_to = data['end_to']
-        self.end_comment = data['end_comment']
+            'description': sanitize(data.get('description', self.description))}
+        attributes.update(self.dates.to_timestamp())
+        attributes.update(data)
+        db_link.update(attributes)
 
     @staticmethod
     def get_by_id(id_: int) -> Link:
         return Link(db_link.get_by_id(id_))
 
     @staticmethod
-    def get_links_by_type(type_: Type) -> list[dict[str, Any]]:
+    def get_links_by_type(type_: Entity) -> list[dict[str, Any]]:
         return db_link.get_links_by_type(type_.id)
 
     @staticmethod
     def get_links_by_type_recursive(
-            type_: Type,
+            type_: Entity,
             result: list[dict[str, Any]]) -> list[dict[str, Any]]:
         result += db_link.get_links_by_type(type_.id)
         for sub_id in type_.subs:
@@ -704,30 +877,9 @@ class Link:
     def delete_(id_: int) -> None:
         db_link.delete_(id_)
 
-    @staticmethod
-    def invalid_involvement_dates() -> list[Link]:
-        return [
-            Link.get_by_id(row['id'])
-            for row in date.invalid_involvement_dates()]
 
-    @staticmethod
-    def invalid_preceding_dates() -> list[Link]:
-        return [
-            Link.get_by_id(row['id'])
-            for row in date.invalid_preceding_dates()]
-
-    @staticmethod
-    def invalid_sub_dates() -> list[Link]:
-        return [Link.get_by_id(row['id']) for row in date.invalid_sub_dates()]
-
-    @staticmethod
-    def get_invalid_link_dates() -> list[Link]:
-        return [Link.get_by_id(row['id']) for row in date.invalid_link_dates()]
-
-    @staticmethod
-    def check_link_duplicates() -> list[dict[str, Any]]:
-        return db_link.check_link_duplicates()
-
-    @staticmethod
-    def delete_link_duplicates() -> int:
-        return db_link.delete_link_duplicates()
+def get_entity_ids_with_links(
+        property_: str,
+        classes: list[str],
+        inverse: bool) -> list[int]:
+    return db.get_entity_ids_with_links(property_, classes, inverse)

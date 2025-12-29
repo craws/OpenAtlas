@@ -16,30 +16,44 @@ class ImageTest(TestBaseCase):
     def test_image(self) -> None:
         c = self.client
         app.config['IMAGE_SIZE']['tmp'] = '1'
+        logo_path = \
+            Path(app.root_path) / 'static' / 'images' / 'layout' / 'logo.png'
         with app.test_request_context():
             app.preprocess_request()
             place = insert('place', 'Nostromos')
 
-        # Resizing through UI insert
-        with open(Path(app.root_path) / 'static'
-                  / 'images' / 'layout' / 'logo.png', 'rb') as img:
+        with open(logo_path, 'rb') as img:
             rv: Any = c.post(
-                url_for('insert', class_='file', origin_id=place.id),
+                url_for(
+                    'insert',
+                    class_='file',
+                    origin_id=place.id,
+                    relation='file'),
                 data={'name': 'OpenAtlas logo', 'file': img},
+                follow_redirects=True)
+        assert b'An entry has been created' in rv.data
+
+        with open(logo_path, 'rb') as img:
+            rv = c.post(
+                url_for(
+                    'insert',
+                    class_='file',
+                    origin_id=place.id,
+                    relation='file'),
+                data={'name': 'OpenAtlas logo2', 'file': img},
                 follow_redirects=True)
         assert b'An entry has been created' in rv.data
 
         with app.test_request_context():
             app.preprocess_request()
             files = Entity.get_by_class('file')
-            file_id = files[0].id
 
         rv = c.get(
-            url_for('set_profile_image', id_=file_id, origin_id=place.id),
+            url_for('set_profile_image', id_=files[0].id, origin_id=place.id),
             follow_redirects=True)
         assert b'Remove' in rv.data
 
-        rv = c.get(url_for('delete', id_=file_id), follow_redirects=True)
+        rv = c.get(url_for('delete', id_=files[0].id), follow_redirects=True)
         assert b'The entry has been deleted' in rv.data
 
         with app.test_request_context():
@@ -62,7 +76,7 @@ class ImageTest(TestBaseCase):
             copyfile(
                 Path(app.root_path) / 'static' / 'manifest.json',
                 Path(app.config['UPLOAD_PATH'] / f'{file_json.id}.json'))
-            safe_resize_image(file2.id, '.png', size="???")
+            safe_resize_image(str(file2.id), '.png', size="???")
             profile_image(file_pathless)
 
         rv = c.get(url_for('view', id_=file_json.id))
@@ -71,7 +85,7 @@ class ImageTest(TestBaseCase):
         rv = c.get(url_for('view', id_=file_pathless.id))
         assert b'Missing file' in rv.data
 
-        rv = c.get(url_for('index', view='file'))
+        rv = c.get(url_for('index', group='file'))
         assert b'Test_File' in rv.data
 
         with c.get(url_for('display_file', filename=file_name)) as rv:

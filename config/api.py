@@ -63,6 +63,7 @@ JSON_FORMATS = {
     'loud': 'application/ld+json',
     'geojson': 'application/json',
     'geojson-v2': 'application/json',
+    'table_row': 'application/json',
     'presentation': 'application/json'}
 
 API_FORMATS = RDF_FORMATS | JSON_FORMATS

@@ -11,7 +11,6 @@ from openatlas.api.resources.util import (
 from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis
-from openatlas.models.type import Type
 
 unit_map = {
     'B': 'bytes',
@@ -101,7 +100,7 @@ def get_loud_entities(
                 _external=True),
             'type': loud[get_crm_code(link_).replace(' ', '_')],
             '_label': link_.range.name}
-        if link_.begin_from or link_.end_from:
+        if link_.dates.begin_from or link_.dates.end_from:
             property_['timespan'] = get_loud_timespan(link_)
         code_ = link_.property.code
         if code_ == 'P2':
@@ -152,7 +151,7 @@ def get_loud_entities(
                 _external=True),
             'type': loud[get_crm_code(link_, True).replace(' ', '_')],
             '_label': link_.domain.name}
-        if link_.begin_from or link_.end_from:
+        if link_.dates.begin_from or link_.dates.end_from:
             property_['timespan'] = get_loud_timespan(link_)
         code_ = link_.property.code
         if code_ == 'P2':
@@ -279,7 +278,7 @@ def get_loud_entities(
 
 def base_entity_dict(entity: Entity) -> dict[str, Any]:
     timespan = get_loud_timespan(entity) \
-        if entity.first or entity.last else {}
+        if entity.dates.first or entity.dates.last else {}
     type_ = remove_spaces_dashes(entity.cidoc_class.i18n['en'])
     if entity.class_.name == 'file':
         type_ = 'DigitalObject'
@@ -356,14 +355,14 @@ def get_loud_timespan(entity: Entity) -> dict[str, Any]:
     if not isinstance(entity, Link):
         if remove_spaces_dashes(entity.cidoc_class.i18n['en']) == 'Person':
             born, death = {}, {}
-            if entity.begin_from:
+            if entity.dates.begin_from:
                 born = {'born': {
                     'type': 'Birth',
                     '_label': f'Birth of {entity.name}',
                     'timespan':
                         {'type': 'TimeSpan'} |
                         get_loud_begin_dates(entity)}}
-            if entity.end_from:
+            if entity.dates.end_from:
                 death = {'death_of': {
                     'type': 'Death',
                     '_label': f'Death of {entity.name}',
@@ -373,14 +372,14 @@ def get_loud_timespan(entity: Entity) -> dict[str, Any]:
             timespan = born | death
         if remove_spaces_dashes(entity.cidoc_class.i18n['en']) == 'Group':
             formed, dissolved = {}, {}
-            if entity.begin_from:
+            if entity.dates.begin_from:
                 formed = {'formed_by': {
                     'type': 'Formation',
                     '_label': f'Founding of {entity.name}',
                     'timespan':
                         {'type': 'TimeSpan'} |
                         get_loud_begin_dates(entity)}}
-            if entity.end_from:
+            if entity.dates.end_from:
                 dissolved = {'dissolved_by': {
                     'type': 'Dissolution',
                     '_label': f'Dissolution of {entity.name}',
@@ -393,34 +392,34 @@ def get_loud_timespan(entity: Entity) -> dict[str, Any]:
 
 def get_loud_begin_dates(entity: Entity) -> dict[str, Any]:
     return {
-        'begin_of_the_begin': date_to_str(entity.begin_from),
-        'end_of_the_begin': date_to_str(entity.begin_to),
-        'beginning_is_qualified_by': entity.begin_comment}
+        'begin_of_the_begin': date_to_str(entity.dates.begin_from),
+        'end_of_the_begin': date_to_str(entity.dates.begin_to),
+        'beginning_is_qualified_by': entity.dates.begin_comment}
 
 
 def get_loud_end_dates(entity: Entity) -> dict[str, Any]:
     return {
-        'begin_of_the_end': date_to_str(entity.end_from),
-        'end_of_the_end': date_to_str(entity.end_to),
-        'end_is_qualified_by': entity.end_comment}
+        'begin_of_the_end': date_to_str(entity.dates.end_from),
+        'end_of_the_end': date_to_str(entity.dates.end_to),
+        'end_is_qualified_by': entity.dates.end_comment}
 
 
-def get_type_property(type_: Type) -> dict[str, Any]:
-    property_ = {
+def get_type_property(type_: Entity) -> dict[str, Any]:
+    property_: dict[str, Any] = {
         'id': url_for(
             'api.entity',
             id_=type_.id,
             _external=True),
         'type': remove_spaces_dashes(type_.cidoc_class.i18n['en']),
         '_label': type_.name}
-    if type_.begin_from or type_.end_from:
+    if type_.dates.begin_from or type_.dates.end_from:
         property_['timespan'] = get_loud_timespan(type_)
     for super_type in [g.types[root] for root in type_.root]:
         property_['part_of'] = [get_type_property(super_type)]
     return property_
 
 
-def get_standard_type_loud(types: dict[Type, Any]) -> Optional[Type]:
+def get_standard_type_loud(types: dict[Entity, Any]) -> Optional[Entity]:
     standard = None
     for type_ in types:
         if type_.category == 'standard':

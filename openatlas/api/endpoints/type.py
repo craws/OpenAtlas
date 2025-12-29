@@ -9,7 +9,6 @@ from openatlas.api.resources.resolve_endpoints import download
 from openatlas.api.resources.templates import (
     type_by_view_class_template, type_overview_template, type_tree_template)
 from openatlas.models.entity import Entity
-from openatlas.models.type import Type
 
 
 def walk_type_tree(types: list[int]) -> list[dict[str, Any]]:
@@ -93,14 +92,14 @@ class GetTypeTree(Resource):
             in g.types.items()}
 
     @staticmethod
-    def serialize_to_json(type_: Type) -> dict[str, Any]:
+    def serialize_to_json(type_: Entity) -> dict[str, Any]:
         return {
             'id': type_.id,
             'name': type_.name,
             'description': type_.description,
             'origin_id': type_.origin_id,
-            'first': type_.first,
-            'last': type_.last,
+            'first': type_.dates.first,
+            'last': type_.dates.last,
             'root': type_.root,
             'subs': type_.subs,
             'count': type_.count,

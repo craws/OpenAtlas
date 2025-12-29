@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 15.12 (Debian 15.12-0+deb12u2)
--- Dumped by pg_dump version 15.12 (Debian 15.12-0+deb12u2)
+-- Dumped from database version 15.14 (Debian 15.14-0+deb12u1)
+-- Dumped by pg_dump version 15.14 (Debian 15.14-0+deb12u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -776,12 +776,8 @@ CREATE TABLE model.openatlas_class (
     name text NOT NULL,
     cidoc_class_code text,
     standard_type_id integer,
-    alias_allowed boolean DEFAULT false,
-    reference_system_allowed boolean DEFAULT false,
     new_types_allowed boolean DEFAULT false,
-    write_access_group_name text,
-    layout_color text,
-    layout_icon text
+    write_access_group_name text
 );
 
 
@@ -792,20 +788,6 @@ ALTER TABLE model.openatlas_class OWNER TO openatlas;
 --
 
 COMMENT ON TABLE model.openatlas_class IS 'A more fine grained use of CIDOC classes';
-
-
---
--- Name: COLUMN openatlas_class.layout_color; Type: COMMENT; Schema: model; Owner: openatlas
---
-
-COMMENT ON COLUMN model.openatlas_class.layout_color IS 'For e.g. network vizualistaion';
-
-
---
--- Name: COLUMN openatlas_class.layout_icon; Type: COMMENT; Schema: model; Owner: openatlas
---
-
-COMMENT ON COLUMN model.openatlas_class.layout_icon IS 'For Bootstrap icons';
 
 
 --
@@ -2720,4 +2702,3 @@ ALTER TABLE ONLY web.user_tokens
 --
 -- PostgreSQL database dump complete
 --
-

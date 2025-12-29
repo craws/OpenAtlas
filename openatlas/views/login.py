@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Any, Optional
 
 import bcrypt
 from bcrypt import hashpw
 from flask import abort, flash, g, render_template, request, session, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from flask_login import (
     LoginManager, current_user, login_required, login_user, logout_user)
 from flask_wtf import FlaskForm
@@ -108,7 +108,7 @@ def login() -> str | Response:
 def reset_password() -> str | Response:
     if current_user.is_authenticated:  # Prevent password reset if logged in
         return redirect(url_for('overview'))
-    form = PasswordResetForm()
+    form: Any = PasswordResetForm()
     if form.validate_on_submit() and g.settings['mail']:
         if user := User.get_by_email(form.email.data):
             code = User.generate_password()
@@ -133,12 +133,11 @@ def reset_password() -> str | Response:
             if send_mail(subject, body, form.email.data):
                 flash(
                     _('A password reset confirmation mail was send '
-                      'to %(email)s.', email=email),
-                    'info')
+                        'to %(email)s.', email=email))
             else:  # pragma: no cover
                 flash(
                     _('Failed to send password reset confirmation mail '
-                      'to %(email)s.', email=email),
+                        'to %(email)s.', email=email),
                     'error')
             return redirect(url_for('login'))
         g.logger.log(
@@ -148,7 +147,7 @@ def reset_password() -> str | Response:
         flash(_('error non existing email'), 'error')
     return render_template(
         'content.html',
-        content='<p>' + _('info password reset') + f'</p>{display_form(form)}',
+        content=f'<p>{_('info password reset')}</p>{display_form(form)}',
         crumbs=[[_('login'), url_for('login')], _('Forgot your password?')])
 
 
@@ -179,9 +178,7 @@ def reset_confirm(code: str) -> Response:
     body += f"{uc_first(_('username'))}: {user.username}\n"
     body += f"{uc_first(_('password'))}: {password}\n"
     if send_mail(subject, body, user.email, False):
-        flash(
-            _('A new password was sent to %(email)s.', email=user.email),
-            'info')
+        flash(_('A new password was sent to %(email)s.', email=user.email))
     else:  # pragma: no cover
         flash(
             _('Failed to send password mail to %(email)s.', email=user.email),

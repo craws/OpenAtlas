@@ -68,17 +68,16 @@ def get_lp_links(
     return out
 
 
-
 def get_lp_time(entity: Entity | Link) -> Optional[dict[str, Any]]:
     return {
         'start': {
-            'earliest': date_to_str(entity.begin_from),
-            'latest': date_to_str(entity.begin_to),
-            'comment': entity.begin_comment},
+            'earliest': date_to_str(entity.dates.begin_from),
+            'latest': date_to_str(entity.dates.begin_to),
+            'comment': entity.dates.begin_comment},
         'end': {
-            'earliest': date_to_str(entity.end_from),
-            'latest': date_to_str(entity.end_to),
-            'comment': entity.end_comment}}
+            'earliest': date_to_str(entity.dates.end_from),
+            'latest': date_to_str(entity.dates.end_to),
+            'comment': entity.dates.end_comment}}
 
 
 def get_lp_file(file: Entity) -> dict[str, Any]:

@@ -1,18 +1,18 @@
 from __future__ import annotations
 
 import ast
+import re
 from collections import defaultdict
 from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g, json
-from shapely.geometry import Point, Polygon, LineString
 
+from openatlas import app
 from openatlas.database import gis as db
 from openatlas.display.util2 import sanitize
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
-    from openatlas.models.imports import Project
 
 
 class InvalidGeomException(Exception):
@@ -99,8 +99,16 @@ class Gis:
                     if row['name'] else '',
                     'description': description,
                     'shapeType': row['type']}}
+            color_map = app.config['MAP_TYPE_COLOR']
+            item["properties"]["color"] = color_map.get('default')
             if 'types' in row and row['types']:
                 type_ids = ast.literal_eval(f"[{row['types']}]")
+                for id_, color in color_map.items():
+                    if id_ != 'default' \
+                            and int(id_) in type_ids \
+                            and re.match(r"^(#)?[A-Fa-f0-9]+$", color):
+                        item["properties"]["color"] = color  # pragma: no cover
+                        break  # pragma: no cover
                 for type_id in list(set(type_ids)):
                     type_ = g.types[type_id]
                     if type_.root and g.types[type_.root[0]].name == 'Place':
@@ -111,7 +119,7 @@ class Gis:
                     and structure['supers'] \
                     and row['object_id'] == structure['supers'][-1].id:
                 extra['supers'].append(item)
-            elif row['object_id'] in object_ids:
+            if row['object_id'] in object_ids:
                 selected[shape].append(item)
             elif row['object_id'] in subunit_ids:
                 extra['subs'].append(item)  # pragma: no cover
@@ -157,6 +165,8 @@ class Gis:
     @staticmethod
     def insert(entity: Entity, data: dict[str, Any]) -> None:
         for shape in ['point', 'line', 'polygon']:
+            if not data.get(shape):
+                continue
             for item in json.loads(data[shape]):
                 if item['properties']['shapeType'] != 'centerpoint' \
                         and not db.test_geom(json.dumps(item['geometry'])):
@@ -170,29 +180,6 @@ class Gis:
                             sanitize(item['properties']['description']),
                         'type': item['properties']['shapeType'],
                         'geojson': json.dumps(item['geometry'])})
-
-    @staticmethod
-    def insert_wkt(
-            entity: Entity,
-            location: Entity,
-            project: Project,
-            wkt_: Polygon | Point | LineString) -> None:
-        shape_type = ''
-        match wkt_type := str(wkt_.type).lower():
-            case 'point':
-                shape_type = 'centerpoint'
-            case 'linestring':
-                shape_type = 'polyline'
-            case 'polygon':
-                shape_type = 'shape'
-        db.insert_wkt({
-            'entity_id': location.id,
-            'description':
-                f"Imported geometry of {sanitize(entity.name)} "
-                f"from the {sanitize(project.name)} project",
-            'type': shape_type,
-            'wkt': str(wkt_)},
-            wkt_type)
 
     @staticmethod
     def delete_by_entity(entity: Entity) -> None:

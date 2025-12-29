@@ -7,11 +7,6 @@ DEBUG = True
 WTF_CSRF_ENABLED = False
 WTF_CSRF_METHODS: list[str] = []
 
-ARCHE = {
-    'id': 0,
-    'collection_ids': [0],
-    'base_url': 'https://arche-curation.acdh-dev.oeaw.ac.at/',
-    'thumbnail_url': 'https://arche-thumbnails.acdh.oeaw.ac.at/'}
 
 ARCHE_METADATA = {
     'topCollection': 'OpenAtlas Test Collection',
@@ -30,8 +25,8 @@ ARCHE_METADATA = {
         'Stefan',
         'https://orcid.org/0000-0003-2576-2266',
         'https://orcid.org/0000-0002-4911-8451'],
-    'relatedDiscipline':
-        ['https://vocabs.acdh.oeaw.ac.at/oefosdisciplines/601003',
-         'https://vocabs.acdh.oeaw.ac.at/oefosdisciplines/602001'],
+    'relatedDiscipline': [
+        'https://vocabs.acdh.oeaw.ac.at/oefosdisciplines/601003',
+        'https://vocabs.acdh.oeaw.ac.at/oefosdisciplines/602001'],
     'typeIds': [],
     'excludeReferenceSystems': []}

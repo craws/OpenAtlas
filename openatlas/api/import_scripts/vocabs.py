@@ -3,10 +3,7 @@ from typing import Any, Optional
 from flask import g
 
 from openatlas.api.import_scripts.util import get_exact_match, vocabs_requests
-from openatlas.database import reference_system as db
-from openatlas.models.entity import Entity
-from openatlas.models.reference_system import ReferenceSystem
-from openatlas.models.type import Type
+from openatlas.models.entity import Entity, insert
 
 
 def import_vocabs_data(
@@ -27,13 +24,14 @@ def fetch_top_groups(
     duplicates = []
     if ref := get_vocabs_reference_system(details):
         for group in form_data['choices']:
-            if not Type.check_hierarchy_exists(group[1]) and \
+            if not Entity.check_hierarchy_exists(group[1]) and \
                     group[0] in form_data['top_concepts']:
-                hierarchy = Entity.insert(
-                    'type',
-                    group[1],
-                    f'Automatically imported from {details["title"]}')
-                Type.insert_hierarchy(
+                hierarchy = insert({
+                    'openatlas_class_name': 'type',
+                    'name': group[1],
+                    'description':
+                        f'Automatically imported from {details["title"]}'})
+                Entity.insert_hierarchy(
                     hierarchy,
                     'custom', form_data['classes'],
                     form_data['multiple'])
@@ -47,7 +45,7 @@ def fetch_top_groups(
                     ref,
                     hierarchy)
                 count.append(group[0])
-            if Type.check_hierarchy_exists(group[1]) \
+            if Entity.check_hierarchy_exists(group[1]) \
                     and group[0] in form_data['top_concepts']:
                 duplicates.append(group[1])
     return count, duplicates
@@ -57,14 +55,16 @@ def import_member(
         uri: str,
         id_: str,
         lang: str,
-        ref: ReferenceSystem,
+        ref: Entity,
         super_: Optional[Entity], ) -> bool:
     req = vocabs_requests(id_, 'groupMembers', {'uri': uri, 'lang': lang})
     child = None
     for member in req['members']:
         name = member['uri'].rsplit('/', 1)[-1]
         if super_:
-            child = Entity.insert('type', member['prefLabel'])
+            child = insert({
+                'openatlas_class_name': 'type',
+                'name': member['prefLabel']})
             child.link('P127', super_)
             ref.link('P67', child, name, type_id=get_exact_match().id)
         if member['hasMembers']:
@@ -82,12 +82,13 @@ def fetch_top_level(
     if ref := get_vocabs_reference_system(details):
         for entry in req['topconcepts']:
             if entry['uri'] in form_data['top_concepts'] \
-                    and not Type.check_hierarchy_exists(entry['label']):
-                hierarchy = Entity.insert(
-                    'type',
-                    entry['label'],
-                    f'Automatically imported from {details["title"]}')
-                Type.insert_hierarchy(
+                    and not Entity.check_hierarchy_exists(entry['label']):
+                hierarchy = insert({
+                    'openatlas_class_name': 'type',
+                    'name': entry['label'],
+                    'description':
+                        f'Automatically imported from {details["title"]}'})
+                Entity.insert_hierarchy(
                     hierarchy,
                     'custom', form_data['classes'],
                     form_data['multiple'])
@@ -101,7 +102,7 @@ def fetch_top_level(
                     ref,
                     hierarchy)
                 count.append(entry)
-            if Type.check_hierarchy_exists(entry['label']):
+            if Entity.check_hierarchy_exists(entry['label']):
                 duplicates.append(entry['label'])
     return count, duplicates
 
@@ -110,7 +111,7 @@ def import_children(
         uri: str,
         id_: str,
         lang: str,
-        ref: ReferenceSystem,
+        ref: Entity,
         super_: Optional[Entity], ) -> list[dict[str, Any]]:
     req = vocabs_requests(id_, 'narrower', {'uri': uri, 'lang': lang})
     exact_match_id = get_exact_match().id
@@ -125,11 +126,10 @@ def import_children(
             continue
         name = entry['uri'].rsplit('/', 1)[-1]
         if super_:
-            child = Entity.insert(
-                'type',
-                entry['prefLabel']  # Switch if bug is solved
-                # get_pref_label(entry['prefLabel'], id_, entry['uri'])
-            )
+            child = insert({
+                'openatlas_class_name': 'type',
+                'name': entry['prefLabel']})  # Switch if bug is solved
+            # get_pref_label(entry['prefLabel'], id_, entry['uri'])
             child.link('P127', super_)
             ref.link('P67', child, name, type_id=exact_match_id)
         entry['subs'] = import_children(entry['uri'], id_, lang, ref, child)
@@ -146,19 +146,21 @@ def import_children(
 #     return label
 
 
-def get_vocabs_reference_system(details: dict[str, Any], ) -> ReferenceSystem:
+def get_vocabs_reference_system(details: dict[str, Any], ) -> Entity:
     title = details['title']
     system = None
     for system_ in g.reference_systems.values():
         if system_.name == f'{title} vocabulary':
             system = system_
     if not system:
-        system = ReferenceSystem.insert_system({
+        system = insert({
             'name': f'{title} vocabulary',
+            'openatlas_class_name': 'reference_system',
             'description': f'Import of {title} vocabulary (autogenerated)',
             'website_url': g.settings['vocabs_base_url'],
-            'resolver_url': f"{details['conceptUri'].rsplit('/', 1)[0]}/"})
-        db.add_classes(system.id, ['type'])
+            'resolver_url': f"{details['conceptUri'].rsplit('/', 1)[0]}/",
+            'example_id': None,
+            'reference_system_classes': ['type']})
     return system
 
 

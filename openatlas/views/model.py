@@ -2,7 +2,7 @@ import re
 from typing import Optional
 
 from flask import g, render_template, url_for
-from flask_babel import format_number, lazy_gettext as _
+from flask_babel import format_number, gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
     BooleanField, IntegerField, SelectField, SelectMultipleField, StringField,
@@ -14,16 +14,17 @@ from openatlas.display.table import Table
 from openatlas.display.util import button, link, required_group
 from openatlas.display.util2 import manual, uc_first
 from openatlas.forms.field import SubmitField
-from openatlas.forms.form import get_cidoc_form
+from openatlas.forms.form import cidoc_form
 from openatlas.models.entity import Entity
 from openatlas.models.network import Network
-from openatlas.models.openatlas_class import OpenatlasClass
+from openatlas.models.openatlas_class import (
+    get_class_count, get_db_relations, get_model_relations)
 
 
 @app.route('/overview/model', methods=['GET', 'POST'])
 @required_group('readonly')
 def model_index() -> str:
-    form = get_cidoc_form()
+    form = cidoc_form()
     result = None
     if form.validate_on_submit():
         domain = g.cidoc_classes[form.domain.data]
@@ -37,11 +38,42 @@ def model_index() -> str:
                 property_.find_object('domain_class_code', domain.code),
             'range_valid':
                 property_.find_object('range_class_code', range_.code)}
+    relations = get_model_relations()
+    invalid_relations = Table(['domain', 'property', 'range'])
+    for row in get_db_relations():
+        if row['property_code'] in ['P1'] or row['domain'] == 'type_tools' \
+                or (row['property_code'] == 'P2'
+                    and row['range'] in ['type', 'type_tools']) \
+                or (row['property_code'] == 'P67'
+                    and row['domain'] == 'reference_system') \
+                or (row['property_code'] == 'P53'
+                    and row['range'] == 'object_location'):
+            continue
+        if row['domain'] not in relations \
+                or row['range'] not in relations[row['domain']] \
+                or row['property_code'] \
+                not in relations[row['domain']][row['range']]:
+            invalid_relations.rows.append([
+                g.classes[row['domain']].label,
+                row['property_code'],
+                g.classes[row['range']].label])  # pragma: no cover
+    model_relations = Table(['domain', 'property', 'range', 'count'])
+    for domain, data in relations.items():
+        for range_, range_data in data.items():
+            for property_, count in range_data.items():
+                model_relations.rows.append([
+                    g.classes[domain].label,
+                    property_,
+                    g.classes[range_].label,
+                    count])
     return render_template(
         'model/index.html',
         form=form,
         result=result,
         title=_('model'),
+        tables={
+            'model_relations': model_relations,
+            'invalid_relations': invalid_relations},
         buttons=[manual('model/index')],
         crumbs=[_('model')])
 
@@ -68,34 +100,25 @@ def class_entities(code: str) -> str:
 def openatlas_class_index() -> str:
     table = Table([
         'name',
-        f"CIDOC {_('class')}",
+        'CIDOC class',
         _('standard type'),
-        _('view'),
+        _('group'),
         _('write access'),
-        'alias',
         _('reference system'),
         'add type',
-        _('color'),
-        _('icon'),
-        'count'],
-        defs=[
-            {'orderDataType': 'cidoc-model', 'targets': [1]},
-            {'sType': 'numeric', 'targets': [1]}])
-    class_count = OpenatlasClass.get_class_count()
+        'count'])
+    class_count = get_class_count()
     for class_ in g.classes.values():
         table.rows.append([
             class_.label,
             link(class_.cidoc_class),
             link(g.types[class_.standard_type_id])
             if class_.standard_type_id else '',
-            uc_first(_((class_.view.replace("_", " "))))
-            if class_.view else '',
+            uc_first(_((class_.group['name'].replace("_", " "))))
+            if class_.group.get('name') else '',
             class_.write_access,
-            _('allowed') if class_.alias_allowed else '',
-            _('allowed') if class_.reference_system_allowed else '',
+            _('allowed') if 'reference_system' in class_.extra else '',
             _('allowed') if class_.new_types_allowed else '',
-            class_.network_color,
-            class_.icon,
             format_number(class_count[class_.name])
             if class_count[class_.name] else ''])
     return render_template(
@@ -110,20 +133,13 @@ def openatlas_class_index() -> str:
 @app.route('/overview/model/cidoc_class_index')
 @required_group('readonly')
 def cidoc_class_index() -> str:
-    table = Table(
-        ['code', 'name', 'count'],
-        defs=[
-            {'className': 'dt-body-right', 'targets': 2},
-            {'orderDataType': 'cidoc-model', 'targets': [0]},
-            {'sType': 'numeric', 'targets': [0]}])
+    table = Table(['code', 'name', 'count'])
     for class_ in g.cidoc_classes.values():
         count = ''
-        if class_.count:
-            count = format_number(class_.count)
-            if class_.code not in ['E53', 'E41', 'E82']:
-                count = link(
-                    format_number(class_.count),
-                    url_for('class_entities', code=class_.code))
+        if class_.count and class_.code not in ['E53', 'E41', 'E82']:
+            count = link(
+                format_number(class_.count),
+                url_for('class_entities', code=class_.code))
         table.rows.append([link(class_), class_.name, count])
     return render_template(
         'content.html',
@@ -137,14 +153,9 @@ def cidoc_class_index() -> str:
 def property_index() -> str:
     classes = g.cidoc_classes
     properties = g.properties
-    table = Table(
-        [
-            'code', 'name', 'inverse', 'domain', 'domain name', 'range',
-            'range name', 'count'],
-        defs=[
-            {'className': 'dt-body-right', 'targets': 7},
-            {'orderDataType': 'cidoc-model', 'targets': [0, 3, 5]},
-            {'sType': 'numeric', 'targets': [0, 3, 5]}])
+    table = Table([
+        'code', 'name', 'inverse', 'domain code', 'domain name',
+        'range code', 'range name', 'count'])
     for property_ in properties.values():
         table.rows.append([
             link(property_),
@@ -166,20 +177,15 @@ def property_index() -> str:
 @required_group('readonly')
 def cidoc_class_view(code: str) -> str:
     class_ = g.cidoc_classes[code]
-    tables = {}
+    tables = {
+        'super': Table(['code', 'name'], paging=False),
+        'sub': Table(['code', 'name'], paging=False),
+        'domains': Table(['code', 'name'], paging=False),
+        'ranges': Table(['code', 'name'], paging=False)}
     for table in ['super', 'sub']:
-        tables[table] = Table(paging=False, defs=[
-            {'orderDataType': 'cidoc-model', 'targets': [0]},
-            {'sType': 'numeric', 'targets': [0]}])
-        for code_ in getattr(class_, table):
-            tables[table].rows.append(
-                [link(g.cidoc_classes[code_]), g.cidoc_classes[code_].name])
-    tables['domains'] = Table(paging=False, defs=[
-        {'orderDataType': 'cidoc-model', 'targets': [0]},
-        {'sType': 'numeric', 'targets': [0]}])
-    tables['ranges'] = Table(paging=False, defs=[
-        {'orderDataType': 'cidoc-model', 'targets': [0]},
-        {'sType': 'numeric', 'targets': [0]}])
+        tables[table].rows = [
+            [link(g.cidoc_classes[code_]), g.cidoc_classes[code_].name]
+            for code_ in getattr(class_, table)]
     for property_ in g.properties.values():
         if class_.code == property_.domain_class_code:
             tables['domains'].rows.append([link(property_), property_.name])
@@ -209,14 +215,13 @@ def property_view(code: str) -> str:
         'inverse': property_.name_inverse,
         'domain': f'{link(domain)} {domain.name}',
         'range': f'{link(range_)} {range_.name}'}
-    tables = {}
+    tables = {
+        'super': Table(['code', 'name'], paging=False),
+        'sub':  Table(['code', 'name'], paging=False)}
     for table in ['super', 'sub']:
-        tables[table] = Table(paging=False, defs=[
-            {'orderDataType': 'cidoc-model', 'targets': [0]},
-            {'sType': 'numeric', 'targets': [0]}])
-        for code_ in getattr(property_, table):
-            tables[table].rows.append(
-                [link(g.properties[code_]), g.properties[code_].name])
+        tables[table].rows = [
+            [link(g.properties[code_]), g.properties[code_].name]
+            for code_ in getattr(property_, table)]
     return render_template(
         'model/property_view.html',
         tables=tables,
@@ -251,6 +256,7 @@ class NetworkForm(FlaskForm):
         _('depth'),
         default=1,
         choices=[(x, str(x)) for x in range(1, 13)])
+    # noinspection PyTypeChecker
     classes = SelectMultipleField(
         _('colors'),
         widget=widgets.ListWidget(prefix_label=False))
@@ -264,13 +270,20 @@ class NetworkForm(FlaskForm):
 @required_group('readonly')
 def network(dimensions: Optional[int] = 0, id_: Optional[int] = None) -> str:
     entity = Entity.get_by_id(id_) if id_ else None
-    classes = [c for c in g.classes.values() if c.network_color]
-    for class_ in classes:
-        setattr(NetworkForm, class_.name, StringField(
-            default=class_.network_color,
-            render_kw={
-                'data-huebee': True,
-                'class': f'data-huebee {app.config["CSS"]["string_field"]}'}))
+    render_kw = {
+       'data-huebee': True,
+       'class': f'data-huebee {app.config["CSS"]["string_field"]}'}
+    classes = []
+    for class_ in g.classes.values():
+        color = class_.display.get('network_color')
+        if class_.name == 'object_location':
+            color = g.classes['place'].display.get('network_color')
+        if color:
+            classes.append(class_)
+            setattr(
+                NetworkForm,
+                class_.name,
+                StringField(default=color, render_kw=render_kw))
     setattr(NetworkForm, 'save', SubmitField(_('apply')))
     form = NetworkForm()
     form.classes.choices = [
@@ -278,12 +291,11 @@ def network(dimensions: Optional[int] = 0, id_: Optional[int] = None) -> str:
         for class_ in [x for x in classes if x.name != 'object_location']]
     colors = {}
     for class_ in classes:
-        color_code = getattr(form, class_.name).data
-        colors[class_.name] = class_.network_color
-        getattr(form, class_.name).data = class_.network_color
-        if re.match(r"^(#)?[A-Fa-f0-9]+$", color_code):
-            colors[class_.name] = color_code
-            getattr(form, class_.name).data = color_code
+        color_code = class_.display.get('network_color')
+        if re.match(r"^(#)?[A-Fa-f0-9]+$", getattr(form, class_.name).data):
+            color_code = getattr(form, class_.name).data
+        colors[class_.name] = color_code
+        getattr(form, class_.name).data = color_code
     if entity:
         json_data = Network.get_ego_network_json(
             colors,

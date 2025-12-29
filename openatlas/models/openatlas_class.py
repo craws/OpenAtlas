@@ -1,149 +1,147 @@
 from __future__ import annotations
 
-from typing import Optional
+from dataclasses import dataclass, field
+from typing import Any
 
 from flask import g
 from flask_babel import lazy_gettext as _
 
+from config.model.class_groups import class_groups
+from config.model.model import model
 from openatlas.database import openatlas_class as db
 
-view_class_mapping = {
-    'actor': ['person', 'group'],
-    'event': [
-        'activity', 'acquisition', 'creation', 'event', 'modification', 'move',
-        'production'],
-    'file': ['file'],
-    'artifact': ['artifact', 'human_remains'],
-    'place': ['feature', 'place', 'stratigraphic_unit'],
-    'reference': ['bibliography', 'edition', 'external_reference'],
-    'reference_system': ['reference_system'],
-    'source': ['source'],
-    'type': ['administrative_unit', 'type'],
-    'source_translation': ['source_translation']}
 
-
+@dataclass
 class OpenatlasClass:
-    # Needed class label translations
-    _('acquisition')
-    _('actor relation')
-    _('actor function')
-    _('administrative unit')
-    _('appellation')
-    _('bibliography')
-    _('creation')
-    _('external reference')
-    _('feature')
-    _('involvement')
-    _('modification')
-    _('move')
-    _('production')
-    _('object location')
-    _('source translation')
-    _('type tools')
+    name: str
+    cidoc_class: str
+    hierarchies: list[int]
+    reference_systems: list[int]
+    new_types_allowed: bool
+    standard_type_id: int | None
+    write_access: str
+    attributes: dict[str, Any]
+    relations: dict[str, Relation]
+    display: dict[str, Any]
+    extra: dict[str, Any]
 
-    def __init__(
-            self,
-            name: str,
-            cidoc_class: str | None,
-            hierarchies: list[int],
-            alias_allowed: bool,
-            reference_system_allowed: bool,
-            reference_system_ids: list[int],
-            new_types_allowed: bool,
-            standard_type_id: Optional[int] = None,
-            color: Optional[str] = None,
-            write_access: str = 'contributor',
-            icon: Optional[str] = None) -> None:
-        self.name = name
-        label = _(name.replace('_', ' '))
-        self.label = str(label)[0].upper() + str(label)[1:]
-        self.cidoc_class = g.cidoc_classes[cidoc_class] \
-            if cidoc_class else None
-        self.hierarchies = hierarchies
-        self.standard_type_id = standard_type_id
-        self.network_color = color
-        self.write_access = write_access
-        self.view = None
-        self.alias_allowed = alias_allowed
-        self.reference_system_allowed = reference_system_allowed
-        self.reference_systems = reference_system_ids
-        self.new_types_allowed = new_types_allowed
-        self.icon = icon
-        for item, classes in view_class_mapping.items():
-            if name in classes:
-                self.view = item
+    def __post_init__(self) -> None:
+        self.group = {}
+        for data in g.class_groups.values():
+            if self.name in data['classes']:
+                self.group = data
+        self.label = _(self.name.replace('_', ' '))
+        self.label = str(self.label)[0].upper() + str(self.label)[1:]
 
-    def get_tooltip(self) -> Optional[str]:
-        tooltips = {
-            'E5': _('events not performed by actors, e.g. a natural disaster'),
-            'E7': _('the most common, e.g. a battle, a meeting or a wedding'),
-            'E8': _('mapping a change of property'),
-            'E9': _('movement of artifacts or persons'),
-            'E11': _('modification of artifacts'),
-            'E12': _('creation of artifacts'),
-            'E65': _('creation of documents (files)')}
-        if self.cidoc_class.code in tooltips:
-            return tooltips[self.cidoc_class.code]
-        return None
 
-    @staticmethod
-    def get_class_count() -> dict[str, int]:
-        return db.get_class_count()
+@dataclass
+class Relation:
+    name: str
+    property: str
+    classes: list[str]
+    inverse: bool = False
+    multiple: bool = False
+    required: bool = False
+    label: str = ''
+    mode: str = 'tab'
+    add_dynamic: bool = False
+    tooltip: str | None = None
+    additional_fields: list[str] = field(default_factory=list)
+    type: str | None = None
+    reverse_relation: Relation | None = None
+    tab: dict[str, Any] = field(default_factory=dict)
 
-    @staticmethod
-    def get_all() -> dict[str, OpenatlasClass]:
-        classes = {}
-        for row in db.get_classes():
-            classes[row['name']] = OpenatlasClass(
-                name=row['name'],
-                cidoc_class=row['cidoc_class_code'],
-                standard_type_id=row['standard_type_id'],
-                alias_allowed=row['alias_allowed'],
-                reference_system_allowed=row['reference_system_allowed'],
-                reference_system_ids=row['system_ids']
-                if row['system_ids'] else [],
-                new_types_allowed=row['new_types_allowed'],
-                write_access=row['write_access_group_name'],
-                color=row['layout_color'],
-                hierarchies=row['hierarchies'],
-                icon=row['layout_icon'])
-        return classes
+    def __post_init__(self) -> None:
+        self.label = self.label or _(self.name.replace('_', ' '))
+        if self.mode == 'tab':
+            self.tab['additional_columns'] = \
+                self.tab.get('additional_columns', [])
+            self.tab['buttons'] = self.tab.get('buttons', [])
+            self.tab['columns'] = self.tab.get('columns')
+            self.tab['tooltip'] = self.tab.get('tooltip')
 
-    @staticmethod
-    def get_table_headers() -> dict[str, list[str]]:
-        headers = {
-            'actor': ['name', 'class', 'begin', 'end', 'description'],
-            'artifact': [
-                'name', 'class', 'type', 'begin', 'end', 'description'],
-            'entities': ['name', 'class', 'info'],
-            'event': ['name', 'class', 'type', 'begin', 'end', 'description'],
-            'external_reference': ['name', 'class', 'type', 'description'],
-            'file': [
-                'name', 'license', 'public', 'creator', 'license holder',
-                'size', 'extension', 'description'],
-            'member': ['member', 'function', 'first', 'last', 'description'],
-            'member_of': [
-                'member of', 'function', 'first', 'last', 'description'],
-            'note': ['date', 'visibility', 'user', 'note'],
-            'place': ['name', 'class', 'type', 'begin', 'end', 'description'],
-            'relation': ['relation', 'actor', 'first', 'last', 'description'],
-            'reference': ['name', 'class', 'type', 'description'],
-            'reference_system': [
-                'name', 'count', 'website URL', 'resolver URL', 'example ID',
-                'default precision', 'description'],
-            'source': ['name', 'type', 'description'],
-            'subs': ['name', 'count', 'info'],
-            'text': ['text', 'type', 'content'],
-            'type': ['name', 'description']}
-        for view in ['actor', 'artifact', 'event', 'place']:
-            for class_ in view_class_mapping[view]:
-                headers[class_] = headers[view]
-        return headers
 
-    @staticmethod
-    def get_class_view_mapping() -> dict['str', 'str']:
-        mapping = {}
-        for view, classes in view_class_mapping.items():
-            for class_ in classes:
-                mapping[class_] = view
-        return mapping
+def get_class_count() -> dict[str, int]:
+    return db.get_class_count()
+
+
+def get_classes() -> dict[str, OpenatlasClass]:
+    g.class_groups = class_groups
+    classes = {}
+    for row in db.get_classes():
+        model_ = get_model(row['name'])
+        relations = {}
+        for name_, relation in model_['relations'].items():
+            relations[name_] = Relation(name_, **relation)
+        classes[row['name']] = OpenatlasClass(
+            name=row['name'],
+            cidoc_class=g.cidoc_classes[row['cidoc_class_code']],
+            standard_type_id=row['standard_type_id'],
+            reference_systems=row['system_ids']
+            if row['system_ids'] else [],
+            new_types_allowed=row['new_types_allowed'],
+            write_access=row['write_access_group_name'],
+            hierarchies=row['hierarchies'],
+            attributes=model_['attributes'],
+            relations=relations,
+            display=model_['display'],
+            extra=model_['extra'])
+    for class_ in classes.values():
+        for relation in class_.relations.values():
+            if not relation.classes:
+                continue
+            related_class = classes[
+                relation.classes[0].replace('object_location', 'place')]
+            for relation2 in related_class.relations.values():
+                if class_.name in relation2.classes \
+                        and relation.property == relation2.property \
+                        and relation.inverse != relation2.inverse:
+                    relation.reverse_relation = relation2
+                    break
+                if class_.name == 'place' and 'object_location' \
+                        in relation2.classes \
+                        and relation.property == relation2.property \
+                        and relation.inverse != relation2.inverse:
+                    relation.reverse_relation = relation2
+                    break
+    return classes
+
+
+def get_model(class_name: str) -> dict[str, Any]:
+    data: dict[str, Any] = model[class_name]
+    for name, item in data['attributes'].items():
+        item['label'] = item.get('label', _(name))
+        item['required'] = item.get('required', False)
+    data['display'] = data.get('display', {})
+    data['display']['tooltip'] = data['display'].get('tooltip')
+    data['display']['additional_tabs'] = \
+        data['display'].get('additional_tabs', {})
+    data['display']['buttons'] = data['display'].get('buttons', {})
+    data['display']['form_buttons'] = data['display'].get('form_buttons', [])
+    data['display']['additional_information'] = \
+        data['display'].get('additional_information', {})
+    for name, item in data['display']['additional_information'].items():
+        item['label'] = item.get('label', _(name))
+    data['extra'] = data.get('extra', [])
+    data['relations'] = data.get('relations', {})
+    return data
+
+
+def get_db_relations() -> list[dict[str, Any]]:
+    return db.get_db_relations()
+
+
+def get_model_relations() -> dict[str, Any]:
+    relations: dict[str, Any] = {}
+    for name, data in model.items():
+        for relation in data['relations'].values():
+            for range_ in relation['classes']:
+                domain = range_ if relation.get('inverse') else name
+                range_ = name if relation.get('inverse') else range_
+                relations[domain] = relations.get(domain, {})
+                relations[domain][range_] = relations[domain].get(range_, {})
+                if relation['property'] not in relations[domain][range_]:
+                    relations[domain][range_][relation['property']] = 1
+                else:
+                    relations[domain][range_][relation['property']] += 1
+    return relations

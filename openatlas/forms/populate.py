@@ -1,92 +1,88 @@
+import time
 from typing import Any
 
 from flask import g
 
-from openatlas.display.util2 import format_date_part
+from openatlas.models.dates import Dates, format_date_part
+from openatlas.models.entity import Entity
 
 
-def populate_types(manager: Any) -> None:
-    types: dict[Any, Any] = manager.link_.types \
-        if manager.link_ else manager.entity.types
-    if manager.entity and manager.entity.class_.name == 'place':
-        if location := \
-                manager.entity.get_linked_entity_safe('P53', types=True):
-            types |= location.types  # Admin. units and historical places
+def populate_insert(form: Any, entity: Entity, origin: Entity | None) -> None:
+    if hasattr(form, 'alias'):
+        form.alias.append_entry('')
+    if entity.class_.group['name'] == 'type' and origin and origin.root:
+        getattr(form, 'super').data = origin.id
+
+
+def populate_update(form: Any, entity: Entity) -> None:
+    form.opened.data = time.time()
+    if hasattr(form, 'name_inverse'):
+        name_parts = entity.name.split(' (')
+        form.name.data = name_parts[0].strip()
+        if len(name_parts) > 1:
+            form.name_inverse.data = name_parts[1][:-1].strip()
+    populate_reference_systems(form, entity)
+    if 'dates' in entity.class_.attributes:
+        populate_dates(form, entity.dates)
+    if hasattr(form, 'alias'):
+        for alias in entity.aliases.values():
+            form.alias.append_entry(alias)
+        form.alias.append_entry('')
+
     type_data: dict[int, list[int]] = {}
-    for type_, value in types.items():
-        root = g.types[type_.root[0]] if type_.root else type
+    for type_, value in entity.types.items():
+        root: Entity = g.types[type_.root[0]] if type_.root else type_
         if root.id not in type_data:
             type_data[root.id] = []
         type_data[root.id].append(type_.id)
         if root.category == 'value':
-            getattr(manager.form, str(type_.id)).data = value
+            getattr(form, str(type_.id)).data = value
     for root_id, types_ in type_data.items():
-        if hasattr(manager.form, str(root_id)):
-            getattr(manager.form, str(root_id)).data = types_
+        if hasattr(form, str(root_id)):
+            getattr(form, str(root_id)).data = types_
+
+    if entity.class_.group['name'] == 'type' and len(entity.root) > 1:
+        getattr(form, 'super').data = entity.root[-1]
 
 
-def populate_reference_systems(manager: Any) -> None:
-    if not manager.entity:
-        return  # It's a link update which have no reference systems
-    system_links = {
-        # Can't use isinstance for class check here
-        link_.domain.id:
-            link_ for link_ in manager.entity.get_links('P67', True)
-            if link_.domain.class_.name == 'reference_system'}
-    for key in manager.form.data:
-        field = getattr(manager.form, key)
-        if field.id.startswith('reference_system_id_'):
-            system_id = int(field.id.replace('reference_system_id_', ''))
-            if system_id in system_links:
-                field.data = {
-                    'value': system_links[system_id].description,
-                    'precision': str(system_links[system_id].type.id)}
+def populate_reference_systems(form: Any, entity: Entity) -> None:
+    for link_ in entity.get_links('P67', ['reference_system'], inverse=True):
+        getattr(form, f'reference_system_id_{link_.domain.id}').data = {
+            'value': link_.description,
+            'precision': str(link_.type.id) if link_.type else None}
 
 
-def populate_dates(manager: Any) -> None:
-    form = manager.form
-    item = manager.link_ or manager.entity
-    if item.begin_from:
-        form.begin_year_from.data = format_date_part(item.begin_from, 'year')
-        form.begin_month_from.data = format_date_part(item.begin_from, 'month')
-        form.begin_day_from.data = format_date_part(item.begin_from, 'day')
-        if 'begin_hour_from' in form:
-            form.begin_hour_from.data = \
-                format_date_part(item.begin_from, 'hour')
-            form.begin_minute_from.data = \
-                format_date_part(item.begin_from, 'minute')
-            form.begin_second_from.data = \
-                format_date_part(item.begin_from, 'second')
-        form.begin_comment.data = item.begin_comment
-        if item.begin_to:
-            form.begin_year_to.data = format_date_part(item.begin_to, 'year')
-            form.begin_month_to.data = format_date_part(item.begin_to, 'month')
-            form.begin_day_to.data = format_date_part(item.begin_to, 'day')
+def populate_dates(form: Any, dates: Dates) -> None:
+    for item in ['begin', 'end']:
+        from_ = getattr(dates, f'{item}_from')
+        to = getattr(dates, f'{item}_to')
+        if from_:
+            getattr(form, f'{item}_year_from').data = \
+                format_date_part(from_, 'year')
+            getattr(form, f'{item}_month_from').data = \
+                format_date_part(from_, 'month')
+            getattr(form, f'{item}_day_from').data = \
+                format_date_part(from_, 'day')
             if 'begin_hour_from' in form:
-                form.begin_hour_to.data = \
-                    format_date_part(item.begin_to, 'hour')
-                form.begin_minute_to.data = \
-                    format_date_part(item.begin_to, 'minute')
-                form.begin_second_to.data = \
-                    format_date_part(item.begin_to, 'second')
-    if item.end_from:
-        form.end_year_from.data = format_date_part(item.end_from, 'year')
-        form.end_month_from.data = format_date_part(item.end_from, 'month')
-        form.end_day_from.data = format_date_part(item.end_from, 'day')
-        if 'begin_hour_from' in form:
-            form.end_hour_from.data = format_date_part(item.end_from, 'hour')
-            form.end_minute_from.data = \
-                format_date_part(item.end_from, 'minute')
-            form.end_second_from.data = \
-                format_date_part(item.end_from, 'second')
-        form.end_comment.data = item.end_comment
-        if item.end_to:
-            form.end_year_to.data = format_date_part(item.end_to, 'year')
-            form.end_month_to.data = format_date_part(item.end_to, 'month')
-            form.end_day_to.data = format_date_part(item.end_to, 'day')
-            if 'begin_hour_from' in form:
-                form.end_hour_to.data = format_date_part(item.end_to, 'hour')
-                form.end_minute_to.data = \
-                    format_date_part(item.end_to, 'minute')
-                form.end_second_to.data = \
-                    format_date_part(item.end_to, 'second')
+                getattr(form, f'{item}_hour_from').data = \
+                    format_date_part(from_, 'hour')
+                getattr(form, f'{item}_minute_from').data = \
+                    format_date_part(from_, 'minute')
+                getattr(form, f'{item}_second_from').data = \
+                    format_date_part(from_, 'second')
+            form.begin_comment.data = dates.begin_comment
+            if to:
+                getattr(form, f'{item}_year_to').data = \
+                    format_date_part(to, 'year')
+                getattr(form, f'{item}_month_to').data = \
+                    format_date_part(to, 'month')
+                getattr(form, f'{item}_day_to').data = \
+                    format_date_part(to, 'day')
+                if 'begin_hour_from' in form:
+                    getattr(form, f'{item}_hour_to').data = \
+                        format_date_part(to, 'hour')
+                    getattr(form, f'{item}_minute_to').data = \
+                        format_date_part(to, 'minute')
+                    getattr(form, f'{item}_second_to').data = \
+                        format_date_part(to, 'second')
+                form.end_comment.data = dates.end_comment

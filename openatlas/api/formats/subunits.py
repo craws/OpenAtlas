@@ -129,10 +129,10 @@ def get_references(
 
 def get_timespans(entity: Entity) -> dict[str, Any]:
     return {
-        'earliestBegin': str(entity.begin_from) or None,
-        'latestBegin': str(entity.begin_to) or None,
-        'earliestEnd': str(entity.end_from) or None,
-        'latestEnd': str(entity.end_to) or None}
+        'earliestBegin': str(entity.dates.begin_from) or None,
+        'latestBegin': str(entity.dates.begin_to) or None,
+        'earliestEnd': str(entity.dates.end_from) or None,
+        'latestEnd': str(entity.dates.end_to) or None}
 
 
 def get_file(data: dict[str, Any]) -> list[dict[str, Any]]:
@@ -207,8 +207,10 @@ def get_subunits_from_id(
     links = Entity.get_links_of_entities([e.id for e in entities])
     links_inverse = (
         Entity.get_links_of_entities([e.id for e in entities], inverse=True))
-    latest_modified = max(
-        entity.modified for entity in entities if entity.modified)
+    latest_modified = None
+    if entity.modified:
+        latest_modified = max(
+            entity.modified for entity in entities if entity.modified)
 
     link_dict: dict[int, dict[str, list[Any]]] = {}
     for entity_ in entities:

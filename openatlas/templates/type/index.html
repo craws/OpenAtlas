@@ -15,7 +15,7 @@
             role="tab"
             aria-selected="{% if loop.index == 1 %}true{% else %}false{% endif %}"
             href="#menu-tab-{{ category }}">
-          {{ category|uc_first + ' ' + _('types') }}
+          {{ category|uc_first }}
         </a>
       </li>
     {% endfor %}
@@ -59,11 +59,7 @@
                             type="text"></div>
                         {% if 'editor'|is_authorized and type_.category != 'system' %}
                           <div class="col-auto">
-                            {% if category == 'place' %}
-                              {{ _('place')|button(url_for('insert', class_='administrative_unit', origin_id=type_.id))|safe }}
-                            {% else %}
-                              {{ _('type')|button(url_for('insert', class_='type', origin_id=type_.id))|safe }}
-                            {% endif %}
+                            {{ _('type')|button(url_for('insert', class_=type_.class_.name, origin_id=type_.id, relation='subs'))|safe }}
                           </div>
                         {% endif %}
                         {% if category in ['custom', 'value'] and 'manager'|is_authorized %}
@@ -91,7 +87,7 @@
                           <br>
                           {% if category in ['custom', 'place', 'standard'] %}
                             <strong>{{ _('required')|uc_first }}</strong>:
-                            {{ _('true') if type_.required else _('false') }}
+                            {{ _('yes') if type_.required else _('no') }}
                             {% if 'manager'|is_authorized %}
                               {% if type_.required %}
                                 (<a href="{{ url_for('required_remove', id_=type_.id) }}">{{ _('remove required') }}</a>)
@@ -127,9 +123,7 @@
                       {% if not type_.subs %}
                         <p class="error">{{ _("this type has no subs and won't show in forms")|uc_first }}.</p>
                       {% endif %}
-                      {% if type_.reference_systems %}
-                        <p>{{ type_.reference_systems|ext_references|safe }}</p>
-                      {% endif %}
+                      {{ type_.reference_systems_display|safe }}
                       {% if type_.description %}
                         <div class="description">
                           <strong>{{ _('description')|uc_first }}</strong>

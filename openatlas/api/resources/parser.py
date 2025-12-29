@@ -50,10 +50,27 @@ entity_.add_argument(
         'name',
         'cidoc_class',
         'system_class',
+        'type',
+        'checkbox',
+        'class',
+        'created',
+        'creator',
+        'content',
+        'count',
+        'description',
+        'extension',
+        'icon',
+        'group',
+        'license_holder',
+        'license',
+        'public',
+        'size',
         'begin_from',
         'begin_to',
         'end_from',
-        'end_to'),
+        'end_to',
+        'end',
+        'begin'),
     location='args')
 entity_.add_argument(
     'search',
@@ -146,6 +163,18 @@ entity_.add_argument(
     default='false',
     choices=('true', 'false'),
     location='args')
+entity_.add_argument(
+    'table_columns',
+    type=str,
+    action='append',
+    help="{error_msg}",
+    location='args')
+entity_.add_argument(
+    'checked',
+    type=int,
+    action='append',
+    help="{error_msg}",
+    location='args')
 
 properties = entity_.copy()
 properties.add_argument(
@@ -184,12 +213,14 @@ presentation.add_argument(
     location='args')
 presentation.add_argument(
     'place_hierarchy',
+    case_sensitive=False,
     type=str,
     default='false',
     choices=('true', 'false'),
     location='args')
 presentation.add_argument(
     'map_overlay',
+    case_sensitive=False,
     type=str,
     default='false',
     choices=('true', 'false'),
@@ -226,6 +257,7 @@ query.add_argument(
     action='append',
     help="{error_msg}",
     location='args')
+
 
 gis = default.copy()
 gis.add_argument(

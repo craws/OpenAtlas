@@ -9,18 +9,19 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import (
     BooleanField, HiddenField, PasswordField, SelectField, StringField,
-    TextAreaField, validators)
+    TextAreaField)
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app
 from openatlas.display.tab import Tab
-from openatlas.display.table import Table
+from openatlas.display.table import Table, entity_table
 from openatlas.display.util import (
     button, description, display_info, link, required_group, send_mail)
 from openatlas.display.util2 import (
-    format_date, is_authorized, manual, sanitize, uc_first)
+    is_authorized, manual, sanitize, uc_first)
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField, generate_password_field
+from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 
@@ -45,7 +46,7 @@ class UserForm(FlaskForm):
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
 
-    def validate(self, extra_validators: validators = None) -> bool:
+    def validate(self, extra_validators: Any = None) -> bool:
         valid = FlaskForm.validate(self)
         username = ''
         user_email = ''
@@ -72,14 +73,9 @@ class UserForm(FlaskForm):
 
 
 class ActivityForm(FlaskForm):
-    action_choices = (
-        ('all', _('all')),
-        ('insert', _('insert')),
-        ('update', _('update')),
-        ('delete', _('delete')))
     limit = SelectField(
         _('limit'),
-        choices=((0, _('all')), (100, 100), (500, 500)),
+        choices=((0, _('all')), (100, 100), (500, 500)),  # type: ignore
         default=100,
         coerce=int)
     user = SelectField(
@@ -87,7 +83,14 @@ class ActivityForm(FlaskForm):
         choices=([(0, _('all'))]),
         default=0,
         coerce=int)
-    action = SelectField(_('action'), choices=action_choices, default='all')
+    action = SelectField(
+        _('action'),
+        choices=(
+            ('all', _('all')),
+            ('insert', _('insert')),
+            ('update', _('update')),
+            ('delete', _('delete'))),
+        default='all')
     save = SubmitField(_('apply'))
 
 
@@ -98,8 +101,9 @@ class ActivityForm(FlaskForm):
     methods=['GET', 'POST'])
 @required_group('readonly')
 def user_activity(user_id: int = 0, entity_id: Optional[int] = None) -> str:
-    form = ActivityForm()
-    form.user.choices = [(0, _('all'))] + User.get_users_for_form()
+    form: Any = ActivityForm()
+    form.user.choices = \
+        [(0, _('all'))] + [(u.id, u.username) for u in User.get_all()]
     limit = 100
     user_id = user_id or 0
     action = 'all'
@@ -191,29 +195,18 @@ def user_delete(id_: int) -> Response:
             or (user.group == 'admin' and not is_authorized('admin')):
         abort(403)
     user.delete()
-    flash(_('user deleted'), 'info')
+    flash(_('user deleted'))
     return redirect(f"{url_for('admin_index')}#tab-user")
 
 
 @app.route('/user/entities/<int:id_>')
 @required_group('readonly')
 def user_entities(id_: int) -> str:
-    table = Table([
-        'name',
-        'class',
-        'type',
-        'begin',
-        'end',
-        'created'])
+    table = Table()
     if user := User.get_by_id(id_):
-        for entity in user.get_entities():
-            table.rows.append([
-                link(entity),
-                entity.class_.label,
-                link(entity.standard_type),
-                entity.first,
-                entity.last,
-                format_date(entity.created)])
+        table = entity_table(
+            user.get_entities(),
+            columns=['name', 'class', 'type', 'begin', 'end', 'created'])
     return render_template(
         'content.html',
         content=table.display(),
@@ -231,7 +224,7 @@ def user_update(id_: int) -> str | Response:
         abort(404)
     if user.group == 'admin' and current_user.group != 'admin':
         abort(403)
-    form = UserForm(obj=user)
+    form: Any = UserForm(obj=user)
     form.user_id = id_
     del (
         form.password,
@@ -250,7 +243,7 @@ def user_update(id_: int) -> str | Response:
         user.description = form.description.data
         user.group = form.group.data
         user.update()
-        flash(_('info update'), 'info')
+        flash(_('info update'))
         return redirect(url_for('user_view', id_=id_))
     if user.id == current_user.id:
         del form.active
@@ -267,7 +260,7 @@ def user_update(id_: int) -> str | Response:
 @app.route('/user/insert', methods=['GET', 'POST'])
 @required_group('manager')
 def user_insert() -> str | Response:
-    form = UserForm()
+    form: Any = UserForm()
     form.group.choices = get_groups()
     if not g.settings['mail']:
         del form.send_info
@@ -282,7 +275,7 @@ def user_insert() -> str | Response:
             'password': bcrypt.hashpw(
                 form.password.data.encode('utf-8'),
                 bcrypt.gensalt()).decode('utf-8')})
-        flash(_('user created'), 'info')
+        flash(_('user created'))
         if g.settings['mail'] and form.send_info.data:
             subject = _(
                 'Your account information for %(sitename)s',
@@ -297,12 +290,11 @@ def user_insert() -> str | Response:
             if send_mail(subject, body, form.email.data, False):
                 flash(
                     _('Sent account information mail to %(email)s.',
-                      email=form.email.data),
-                    'info')
+                        email=form.email.data))
             else:  # pragma: no cover
                 flash(
                     _('Failed to send account details to %(email)s.',
-                      email=form.email.data),
+                        email=form.email.data),
                     'error')
         if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             return redirect(url_for('user_insert'))
@@ -319,7 +311,7 @@ def user_insert() -> str | Response:
         title=_('user'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-user"],
-            '+&nbsp;<span class="uc-first d-inline-block">' + _('user')
+            f'+&nbsp;<span class="uc-first d-inline-block">{_('user')}'
             + '</span>'])
 
 
@@ -340,7 +332,7 @@ def first_admin() -> str | Response:
             'password': bcrypt.hashpw(
                 form.password.data.encode('utf-8'),
                 bcrypt.gensalt()).decode('utf-8')})
-        flash(_('user created'), 'info')
+        flash(_('user created'))
         return redirect(url_for('login'))
     return render_template(
         'content.html',

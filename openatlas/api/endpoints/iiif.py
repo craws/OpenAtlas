@@ -6,12 +6,13 @@ from typing import Any, Tuple
 import requests
 import svgwrite
 from flask import Response, g, jsonify, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from flask_restful import Resource
 
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.resources.api_entity import ApiEntity
-from openatlas.api.resources.error import DisplayFileNotFoundError
+from openatlas.api.resources.error import DisplayFileNotFoundError, \
+    IIIFMetadataNotFound
 from openatlas.api.resources.parser import iiif
 from openatlas.api.resources.util import get_license_name, get_license_url
 from openatlas.display.util import check_iiif_file_exist
@@ -240,7 +241,8 @@ class IIIFManifest(Resource):
     @staticmethod
     def get_manifest_version_2(id_: int, parser: Parser) -> dict[str, Any]:
         entity = ApiEntity.get_by_id(id_, types=True)
-        if entity.class_.view != 'file' and not check_iiif_file_exist(id_):
+        if entity.class_.group.get('name') != 'file' \
+                and not check_iiif_file_exist(id_):
             raise DisplayFileNotFoundError
         license_ = get_license_name(entity)
         if entity.license_holder:
@@ -258,7 +260,8 @@ class IIIFManifest(Resource):
                     "value": f"<a href={url} target=_blank>{text}</a>"})
         if entity.creator:
             metadata.append({
-                "label": _('creator').capitalize(), "value": entity.creator})
+                "label": _('creator').capitalize(),
+                "value": entity.creator})
         see_also = []
         if related_entities := entity.get_links('P67'):
             for related_entity in related_entities:
@@ -289,13 +292,19 @@ class IIIFManifest(Resource):
 
 
 def get_metadata(entity: Entity) -> dict[str, Any]:
-    if entity.class_.view != 'file' and not check_iiif_file_exist(entity.id):
+    if entity.class_.group.get('name') != 'file' \
+            and not check_iiif_file_exist(entity.id):
         raise DisplayFileNotFoundError
     ext = '.tiff' if g.settings['iiif_conversion'] else entity.get_file_ext()
     image_url = f"{g.settings['iiif_url']}{entity.id}{ext}"
-    req = requests.get(f"{image_url}/info.json", timeout=30)
-    image_api = req.json()
-    return {'entity': entity, 'img_url': image_url, 'img_api': image_api}
+
+    try:
+        resp = requests.get(f"{image_url}/info.json", timeout=30)
+        resp.raise_for_status()
+    except Exception as exc:  # pragma: no cover
+        raise IIIFMetadataNotFound(image_url) from exc
+
+    return {'entity': entity, 'img_url': image_url, 'img_api': resp.json()}
 
 
 def get_logo() -> dict[str, Any]:

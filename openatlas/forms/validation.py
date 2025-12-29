@@ -2,17 +2,14 @@ from pathlib import Path
 from typing import Any
 
 from flask import g, request
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from flask_wtf import FlaskForm
-from wtforms import validators
 
-from openatlas.forms.util import form_to_datetime64
-from openatlas.models.entity import Entity
-from openatlas.models.type import Type
+from openatlas.models.dates import form_to_datetime64
 
 
 def file(_form: FlaskForm, field: Any) -> None:
-    for file_ in request.files.getlist('file'):
+    for file_ in request.files.getlist('file'):  # pylint: disable=no-member
         if not file_ \
                 or Path(str(file_.filename)).suffix[1:].lower() not in [
                     i.lower() for i in
@@ -20,14 +17,7 @@ def file(_form: FlaskForm, field: Any) -> None:
             field.errors.append(_('file type not allowed'))
 
 
-def hierarchy_name_exists(form: Any, field: Any) -> None:
-    if not hasattr(form, 'entity_id') or \
-            Entity.get_by_id(int(form.entity_id.data)).name != form.name.data:
-        if Type.check_hierarchy_exists(form.name.data):
-            field.errors.append(_('error name exists'))
-
-
-def validate(form: FlaskForm, extra_validators: validators = None) -> bool:
+def validate(form: FlaskForm, extra_validators: Any = None) -> bool:
     valid = FlaskForm.validate(form, extra_validators)
     if hasattr(form, 'begin_year_from') and not validate_dates(form):
         valid = False

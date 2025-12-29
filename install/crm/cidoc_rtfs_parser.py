@@ -1,4 +1,4 @@
-# pylint: disable=C,R
+# pylint: disable-all
 #
 # This script is for developing purposes and not needed to install OpenAtlas.
 #
@@ -80,12 +80,11 @@ class Item:
 
 
 def import_cidoc() -> None:
-
     start = time.time()
     classes = {}
     properties: Dict[str, Item] = {}
     properties_inverse: Dict[str, Item] = {}
-    graph = Graph()
+    graph: Any = Graph()
     graph.parse(FILENAME, format='application/rdf+xml')
 
     # Get classes and properties
@@ -95,16 +94,11 @@ def import_cidoc() -> None:
         except Exception:
             print(f'Not able to parse subject: {subject}')
             continue
-        item = Item(
-            code,
-            name.replace('_', ' '),
-            graph.comment(subject))  # type: ignore
+        item = Item(code, name.replace('_', ' '), graph.comment(subject))
 
         # Translations
         for language in ['de', 'en', 'fr', 'ru', 'el', 'pt', 'zh']:
-            translation = graph.preferredLabel(
-                subject,
-                lang=language)  # type: ignore
+            translation = graph.preferredLabel(subject, lang=language)
             if translation and translation[0][1]:
                 item.label[language] = translation[0][1]
 

@@ -61,7 +61,7 @@ class ImportTest(ImportTestCase):
             assert b'File deleted' in rv.data
 
         rv = c.get(
-            url_for('delete_export',view='sql',filename='non_existing'),
+            url_for('delete_export', view='sql', filename='non_existing'),
             follow_redirects=True)
         assert b'An error occurred when trying to delete the f' in rv.data
 
@@ -160,9 +160,8 @@ class ImportTest(ImportTestCase):
             url_for('check_files', arche='arche'),
             follow_redirects=True)
         assert b'No license' in rv.data
-
-
         assert b'export RDF/NT' in c.get(url_for('export_rdf')).data
+
         rv = c.get(
             url_for('rdf_execute'),
             follow_redirects=True)

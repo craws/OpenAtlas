@@ -4,11 +4,11 @@ from typing import Any, Optional
 
 import pandas as pd
 from flask import flash, g, render_template, request, url_for
-from flask_babel import format_number, lazy_gettext as _
+from flask_babel import format_number, gettext as _
 from flask_wtf import FlaskForm
 from pandas import DataFrame, Series
 from shapely import wkt
-from shapely.errors import WKTReadingError
+from shapely.errors import ShapelyError
 from werkzeug.exceptions import ImATeapot
 from werkzeug.utils import redirect, secure_filename
 from werkzeug.wrappers import Response
@@ -20,17 +20,18 @@ from openatlas.api.import_scripts.util import (
     get_match_types, get_reference_system_by_name)
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.error import EntityDoesNotExistError
-from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, button_bar, description, link, required_group)
+    button, button_bar, description, get_backup_file_data, link,
+    required_group)
 from openatlas.display.util2 import (
-    datetime64_to_timestamp, format_date, get_backup_file_data, is_authorized,
+    is_authorized,
     manual, uc_first)
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
-from openatlas.forms.util import form_to_datetime64
+from openatlas.models.dates import (
+    datetime64_to_timestamp, form_to_datetime64, format_date)
 from openatlas.models.entity import Entity
 from openatlas.models.imports import (
     Project, check_duplicates, check_single_type_duplicates, check_type_id,
@@ -74,7 +75,7 @@ class ProjectForm(FlaskForm):
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
 
-    def validate(self, extra_validators: validators = None) -> bool:
+    def validate(self, extra_validators: Any = None) -> bool:
         valid = FlaskForm.validate(self)
         name = Project.get_by_id(self.project_id).name \
             if self.project_id else ''
@@ -138,7 +139,7 @@ def import_index() -> str:
             format_number(project.count),
             project.description])
     buttons = [manual('admin/import')]
-    if is_authorized('admin'):
+    if is_authorized('manager'):
         buttons.append(button(_('project'), url_for('import_project_insert')))
     return render_template(
         'content.html',
@@ -156,7 +157,7 @@ def import_project_insert() -> str | Response:
     form = ProjectForm()
     if form.validate_on_submit():
         id_ = Project.insert(form.name.data, form.description.data)
-        flash(_('project inserted'), 'info')
+        flash(_('project inserted'))
         return redirect(url_for('import_project_view', id_=id_))
     return render_template(
         'content.html',
@@ -165,7 +166,7 @@ def import_project_insert() -> str | Response:
         crumbs=[
             [_('admin'), url_for('admin_index') + '#tab-data'],
             [_('import'), url_for('import_index')],
-            '+ <span class="uc-first">' + _('project') + '</span>'])
+            f'+ <span class="uc-first">{_('project')}</span>'])
 
 
 @app.route('/import/project/view/<int:id_>')
@@ -190,8 +191,8 @@ def import_project_view(id_: int) -> str:
         buttons = []
         for class_ in \
                 ['source'] \
-                + g.view_class_mapping['event'] \
-                + g.view_class_mapping['actor'] \
+                + g.class_groups['event']['classes'] \
+                + g.class_groups['actor']['classes'] \
                 + ['place', 'artifact', 'bibliography', 'edition', 'type']:
             buttons.append(button(
                 _(class_),
@@ -231,7 +232,7 @@ def import_project_update(id_: int) -> str | Response:
         project.name = form.name.data
         project.description = form.description.data
         project.update()
-        flash(_('project updated'), 'info')
+        flash(_('project updated'))
         return redirect(url_for('import_project_view', id_=project.id))
     return render_template(
         'content.html',
@@ -248,7 +249,7 @@ def import_project_update(id_: int) -> str | Response:
 @required_group('manager')
 def import_project_delete(id_: int) -> Response:
     Project.delete(id_)
-    flash(_('project deleted'), 'info')
+    flash(_('project deleted'))
     return redirect(url_for('import_index'))
 
 
@@ -258,7 +259,7 @@ class ImportForm(FlaskForm):
     duplicate = BooleanField(_('check for duplicates'), default=True)
     save = SubmitField(_('import'))
 
-    def validate(self, extra_validators: validators = None) -> bool:
+    def validate(self, extra_validators: Any = None) -> bool:
         valid = FlaskForm.validate(self)
         if Path(str(request.files['file'].filename)).suffix.lower() != '.csv':
             self.file.errors.append(_('file type not allowed'))
@@ -285,8 +286,7 @@ def import_data(project_id: int, class_: str) -> str:
                 checks,
                 checked_data,
                 project)
-        except Exception as e:
-            g.logger.log('error', 'import', 'import check failed', e)
+        except Exception:
             flash(_('error at import'), 'error')
             return render_template(
                 'import_data.html',
@@ -299,19 +299,14 @@ def import_data(project_id: int, class_: str) -> str:
                     [_('import'), url_for('import_index')],
                     project,
                     class_label])
-
-        if not form.preview.data and checked_data and (
-                not file_data['backup_too_old'] or app.testing):
-            Transaction.begin()
+        if not form.preview.data \
+                and checked_data \
+                and (not file_data['backup_too_old'] or app.testing):
             try:
                 import_data_(project, class_, checked_data)
-                Transaction.commit()
-                g.logger.log('info', 'import', f'import: {len(checked_data)}')
-                flash(f"{_('import of')}: {len(checked_data)}", 'info')
+                flash(f"{_('import of')}: {len(checked_data)}")
                 imported = True
-            except Exception as e:  # pragma: no cover
-                Transaction.rollback()
-                g.logger.log('error', 'import', 'import failed', e)
+            except Exception:  # pragma: no cover
                 flash(_('error transaction'), 'error')
     return render_template(
         'import_data.html',
@@ -336,12 +331,13 @@ def check_data_for_table_representation(
     file_ = request.files['file']
     file_path = app.config['TMP_PATH'] / secure_filename(str(file_.filename))
     file_.save(str(file_path))
-    data_frame = pd.read_csv(
+    data_frame: Any = pd.read_csv(
         file_path,
-        keep_default_na=False,
         dtype=str,
-        skipinitialspace=True)
-    headers = get_clean_header(data_frame, class_, checks)
+        skipinitialspace=True,
+        keep_default_na=True,
+        na_values=['']).where(pd.notna, None)
+    columns = get_clean_header(data_frame, class_, checks)
     table_data = []
     origin_ids = []
     names = []
@@ -359,7 +355,7 @@ def check_data_for_table_representation(
             checks.set_error('empty_parend_id', row.get('id'))
         table_row = []
         checked_row = {}
-        for item in headers:
+        for item in columns:
             table_row.append(
                 check_cell_value(row, item, class_, checks, project))
             checked_row[item] = row[item]
@@ -375,7 +371,7 @@ def check_data_for_table_representation(
         checks.set_error('double_ids_in_import', ', '.join(doubles))
     if origin_ids and (existing := get_origin_ids(project, origin_ids)):
         checks.set_error('ids_already_in_database', ', '.join(existing))
-    if 'openatlas_class' in headers:
+    if 'openatlas_class' in columns:
         entity_dict: dict[str, Any] = {
             row.get('id'): row['openatlas_class'].replace(' ', '_')
             for row in checked_data}
@@ -387,7 +383,7 @@ def check_data_for_table_representation(
                         row['openatlas_class'].replace(' ', '_'),
                         entity_dict[row['parent_id']]):
                     checks.set_error('invalid_parent_class', row.get('id'))
-    return Table(headers, rows=table_data)
+    return Table(columns, rows=table_data)
 
 
 def check_parent(entity_class: str, parent_class: str) -> bool:
@@ -401,11 +397,12 @@ def check_parent(entity_class: str, parent_class: str) -> bool:
             if parent_class == 'feature':
                 is_parent = True
         case 'artifact':
-            if parent_class in g.view_class_mapping['place'] + ['artifact']:
+            if parent_class in \
+                    g.class_groups['place']['classes'] + ['artifact']:
                 is_parent = True
         case 'human_remains':
             if (parent_class in
-                    g.view_class_mapping['place'] + ['human_remains']):
+                    g.class_groups['place']['classes'] + ['human_remains']):
                 is_parent = True
         case 'type':
             if parent_class == 'type':
@@ -440,7 +437,7 @@ def get_allowed_columns(class_: str) -> dict[str, list[str]]:
         columns.extend([
             'type_ids', 'value_types', 'origin_type_ids',
             'origin_value_types'])
-    if class_ not in g.view_class_mapping['reference']:
+    if class_ not in g.class_groups['reference']['classes']:
         columns.extend([
             'begin_from', 'begin_to', 'begin_comment',
             'end_from', 'end_to', 'end_comment',
@@ -538,7 +535,7 @@ def check_cell_value(
                     else:
                         try:
                             ref = ApiEntity.get_by_id(int(values[0]))
-                            if not ref.class_.view == 'reference':
+                            if not ref.class_.group['name'] == 'reference':
                                 raise EntityDoesNotExistError
                         except EntityDoesNotExistError:
                             values[0] = error_span(values[0])
@@ -554,7 +551,7 @@ def check_cell_value(
                     values = str(reference).split(';')
                     if origin_id := get_id_from_origin_id(project, values[0]):
                         ref = ApiEntity.get_by_id(int(origin_id))
-                        if not ref.class_.view == 'reference':
+                        if not ref.class_.group['name'] == 'reference':
                             values[0] = error_span(values[0])
                             checks.set_warning(
                                 'invalid_origin_reference_id',
@@ -569,7 +566,7 @@ def check_cell_value(
         case 'wkt' if value:
             try:
                 wkt.loads(row[item])
-            except WKTReadingError:
+            except ShapelyError:
                 value = error_span(value)
                 checks.set_warning('invalid_coordinates', id_)
         case 'begin_from' | 'begin_to' | 'end_from' | 'end_to' if value:
@@ -594,10 +591,10 @@ def check_cell_value(
                 value = error_span(value)
                 checks.set_warning('invalid_administrative_units', id_)
         case 'openatlas_class' if value:
-            if (value.lower().replace(' ', '_') not in
-                    (g.view_class_mapping['place'] +
-                     g.view_class_mapping['artifact']+
-                     g.view_class_mapping['type'])):
+            if (value.lower().replace(' ', '_') not in (
+                    g.class_groups['place']['classes'] +
+                    g.class_groups['artifact']['classes'] +
+                    g.class_groups['type']['classes'])):
                 value = error_span(value)
                 checks.set_warning('invalid_openatlas_class', id_)
         case 'openatlas_parent_id' if value:

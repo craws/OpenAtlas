@@ -5,7 +5,7 @@ from rdflib import Namespace
 
 from config.database_versions import DATABASE_VERSIONS
 
-VERSION = '8.15.0'
+VERSION = '9.0.0'
 DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 DEBUG = False
@@ -68,7 +68,8 @@ CSS = {
     'string_field': 'form-control form-control-sm',
     'button': {
         'primary': 'btn btn-outline-primary btn-sm',
-        'secondary': 'btn btn-outline-secondary btn-sm'}}
+        'secondary': 'btn btn-outline-secondary btn-sm',
+        'danger': 'btn btn-outline-danger btn-sm'}}
 
 # Tests
 LOAD_WINDOWS_TEST_SQL = False
@@ -84,7 +85,7 @@ USER_AGENT = {
 CSP_HEADER = "frame-ancestors 'self'"
 
 # ARCHE export
-ACDH = Namespace("https://vocabs.acdh.oeaw.ac.at/schema#")  # type: ignore
+ACDH = Namespace("https://vocabs.acdh.oeaw.ac.at/schema#")
 ARCHE_URI_RULES = \
     'https://raw.githubusercontent.com/acdh-oeaw/arche-assets' \
     '/refs/heads/master/AcdhArcheAssets/uriNormRules.json'
@@ -99,3 +100,16 @@ ARCHE_METADATA = {
     'relatedDiscipline': [],
     'typeIds': [],
     'excludeReferenceSystems': []}
+
+# Configure map point colors
+# Defined colors for type_ids override the default, top ones are prioritised
+MAP_TYPE_COLOR = {
+    'default': '#007bd9',
+    '123': '#007bd9'}
+
+# These are special types because they are used for links instead of entities
+PROPERTY_TYPES = [
+    'Actor relation',
+    'Actor function',
+    'External reference match',
+    'Involvement']

@@ -22,7 +22,7 @@ class FileTest(TestBaseCase):
             app.root_path) / 'static' / 'images' / 'layout' / 'logo.png'
         with open(logo, 'rb') as img_1, open(logo, 'rb') as img_2:
             rv: Any = c.post(
-                url_for('insert', class_='file', origin_id=place.id),
+                url_for('insert', class_='file'),
                 data={
                     'name': 'OpenAtlas logo',
                     'public': True,
@@ -78,7 +78,7 @@ class FileTest(TestBaseCase):
         assert b'License' in rv.data
 
         rv = c.post(
-            url_for('insert', class_='external_reference', origin_id=iiif_id),
+            url_for('link_insert_detail', name='reference', origin_id=iiif_id),
             data={'name': 'https://openatlas.eu'},
             follow_redirects=True)
         assert b'page' in rv.data
@@ -120,16 +120,11 @@ class FileTest(TestBaseCase):
                 follow_redirects=True)
         assert b'File type not allowed' in rv.data
 
-        rv = c.get(
-            url_for('remove_profile_image', entity_id=place.id),
-            follow_redirects=True)
-        assert b'Unset' not in rv.data
-
         rv = c.post(
-            url_for('reference_add', id_=reference.id, view='file'),
-            data={'file': iiif_id, 'page': '777'},
+            url_for('link_insert_detail', origin_id=reference.id, name='file'),
+            data={'file': iiif_id},
             follow_redirects=True)
-        assert b'777' in rv.data
+        assert b'Ancient Books' in rv.data
 
         rv = c.post(
             url_for('update', id_=iiif_id),
@@ -137,11 +132,11 @@ class FileTest(TestBaseCase):
             follow_redirects=True)
         assert b'Changes have been saved' in rv.data
 
-        rv = c.get(url_for('file_add', id_=iiif_id, view='actor'))
-        assert b'link actor' in rv.data
+        rv = c.get(url_for('link_insert', origin_id=iiif_id, name='actor'))
+        assert b'actor' in rv.data
 
         rv = c.post(
-            url_for('file_add', id_=iiif_id, view='actor'),
+            url_for('link_insert', origin_id=iiif_id, name='actor'),
             data={'checkbox_values': [place.id]},
             follow_redirects=True)
         assert b'File keeper' in rv.data
@@ -150,8 +145,11 @@ class FileTest(TestBaseCase):
         assert b'File keeper' in rv.data
 
         rv = c.post(
-            url_for('entity_add_file', id_=get_hierarchy('Sex').subs[0]),
-            data={'checkbox_values': str([iiif_id])},
+            url_for(
+                'link_insert',
+                origin_id=get_hierarchy('Sex').subs[0],
+                name='file'),
+            data={'checkbox_values': [iiif_id]},
             follow_redirects=True)
         assert b'Updated file' in rv.data
 
@@ -278,26 +276,26 @@ class FileTest(TestBaseCase):
 
         with app.test_request_context():
             app.preprocess_request()
-            iiif_file.delete_links(['P67'])
+            iiif_file.delete_links('P67', classes=['file', 'place'])
 
         rv = c.get(url_for('orphans'))
         assert b'File keeper' in rv.data
 
         rv = c.get(
             url_for(
-                'admin_annotation_relink',
-                image_id=iiif_id,
+                'admin_annotation_image_relink',
+                origin_id=iiif_id,
                 entity_id=place.id),
             follow_redirects=True)
         assert b'Entities relinked' in rv.data
 
         with app.test_request_context():
             app.preprocess_request()
-            iiif_file.delete_links(['P67'])
+            iiif_file.delete_links('P67', classes=['file', 'place'])
 
         rv = c.get(
             url_for(
-                'admin_annotation_remove_entity',
+                'admin_annotation_image_remove_entity',
                 annotation_id=1,
                 entity_id=place.id),
             follow_redirects=True)
@@ -323,10 +321,10 @@ class FileTest(TestBaseCase):
 
         with app.test_request_context():
             app.preprocess_request()
-            iiif_file.delete_links(['P67'])
+            iiif_file.delete_links('P67', classes=['file', 'place'])
 
         rv = c.get(
-            url_for('admin_annotation_delete', id_=2),
+            url_for('admin_annotation_image_delete', id_=2),
             follow_redirects=True)
         assert b'Annotation deleted' in rv.data
 

@@ -2,9 +2,9 @@
 Some knowledge about package installation, web server and database
 configuration will be needed.
 
-This software was developed and tested on Linux/Debian 12.2
-(codename "bookwom") and the easiest way to install would be on a
-[Debian](https://www.debian.org/) 12.2 system following these instructions.
+This software was developed and tested on Linux/Debian 13.2
+(codename "trixie") and the easiest way to install would be on a
+[Debian](https://www.debian.org/) 13.2 system following these instructions.
 
 Another (experimental) way to install it would be via
 [Docker](https://www.docker.com/).
@@ -23,19 +23,24 @@ that we are using to set up Debian servers for OpenAtlas installations.
 * [Tests](#Tests) (optional)
 
 ## Requirements
-### Python 3.11 and Flask 2.2.2
-    sudo apt install python3 python3-bcrypt python3-dateutil python3-psycopg2 python3-fuzzywuzzy python3-flask
-    sudo apt install python3-flask-babel python3-flask-login python3-flaskext.wtf python3-markdown python3-numpy
-    sudo apt install python3-pandas python3-jinja2 python3-flask-cors python3-flask-restful p7zip-full python3-wand
-    sudo apt install python3-rdflib python3-rdflib-jsonld python3-flasgger python3-requests
-    sudo apt install exiftran python3-email-validator python3-svgwrite python3-shapely python3-xmltodict python3-lxml
-    sudo apt install python3-validators python3-jwt python3-python-flask-jwt-extended python3-bs4 python3-unidecode
+### Python 3.13 and Flask 3.1.1
+    sudo apt install python3 python3-flask python3-psycopg2 python3-flask-babel python3-flask-login
+    sudo apt install python3-jwt python3-python-flask-jwt-extended python3-flaskext.wtf python3-flask-cors
+    sudo apt install python3-rdflib python3-shapely python3-flasgger python3-flask-restful python3-pandas
+    sudo apt install python3-validators python3-email-validator python3-wand python3-svgwrite python3-fuzzywuzzy 
+    sudo apt install python3-xmltodict python3-markdown exiftran
+
+# Todo: 
+Following packages should be installed with other packages:
+
+    python3-bcrypt python3-dateutil p7zip-full python3-requests python3-bs4 python3-unidecode python3-lxml 
+    python3-unidecode python3-numpy
 
 ### Apache 2.4, gettext, npm
     sudo apt install apache2 libapache2-mod-wsgi-py3 gettext npm
 
-### PostgreSQL 15 and PostGIS 3
-    sudo apt install postgresql postgresql-15-postgis-3 postgresql-15-postgis-3-scripts
+### PostgreSQL 17 and PostGIS 3
+    sudo apt install postgresql postgresql-17-postgis-3
 
 ## Installation
 ### Files
@@ -124,7 +129,7 @@ high-quality, attributed digital objects online at scale. Be aware that:
 
 ### Installation
 
-    sudo apt install iipimage-server libvips-tools libapache2-mod-fcgid
+    sudo apt install iipimage-server
     sudo a2enmod fcgid
     sudo service apache2 restart
 
@@ -152,7 +157,7 @@ application.
 ## Tests
 Install required packages:
 
-    sudo apt install python3-coverage python3-pytest python3-pytes-cov
+    sudo apt install python3-coverage python3-pytest python3-pytest-cov
 
 As postgres:
 
@@ -173,4 +178,5 @@ Run tests with coverage
 
 # Installing OpenAtlas with Docker (Experimental)
 
-A Docker setup is available for local development. Please follow the [detailed Docker installation instructions here](install/docker/install.md).
+A Docker setup is available for local development. Please follow the 
+[detailed Docker installation instructions here](install/docker/install.md).

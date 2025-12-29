@@ -4,8 +4,6 @@ from flask import g, url_for
 
 from openatlas import app
 from openatlas.database import entity as db
-from openatlas.forms.util import form_to_datetime64
-from openatlas.models.entity import Link
 from openatlas.models.logger import Logger
 from tests.base import TestBaseCase, get_hierarchy, insert
 
@@ -30,7 +28,13 @@ class AdminTests(TestBaseCase):
                 'domain_id': invalid.id,
                 'range_id': invalid.id,
                 'description': '',
-                'type_id': None})
+                'type_id': None,
+                'begin_from': None,
+                'begin_to': None,
+                'begin_comment': None,
+                'end_from': None,
+                'end_to': None,
+                'end_comment': None})
 
         self.client.post(  # Login again after Logger statements above
             url_for('login'),
@@ -48,9 +52,6 @@ class AdminTests(TestBaseCase):
 
         rv = c.get(url_for('check_dates'))
         assert b'Congratulations, everything looks fine!' in rv.data
-
-        rv = c.get(url_for('check_links'))
-        assert b'Invalid linked entity' in rv.data
 
         file_ = 'Test77.txt'
         file_path = Path(app.config['UPLOAD_PATH'] / file_)
@@ -83,26 +84,23 @@ class AdminTests(TestBaseCase):
         with app.test_request_context():
             app.preprocess_request()
             event = insert('acquisition', 'Event Horizon')
-            event.update(
-                data={
-                    'attributes':
-                        {'begin_from': form_to_datetime64(2000, 1, 1)}})
+            event.update({'begin_from': '2000-01-011'})
             event2 = insert('activity', 'Event Impossible')
-            event2.update(
-                data={
-                    'attributes':
-                        {'begin_from': form_to_datetime64(1000, 1, 1)}})
+            event2.update({'begin_from': '1000-01-01'})
             event2.link('P134', event)
             event.link('P9', event2)
-            person.update({
-                'attributes': {
-                    'begin_from': '2018-01-31',
-                    'begin_to': '2018-01-01'}})
-            involvement = Link.get_by_id(event.link('P11', person)[0])
-            involvement.begin_from = form_to_datetime64(2017, 1, 31)
-            involvement.begin_to = form_to_datetime64(2017, 1, 1)
-            involvement.end_from = form_to_datetime64(2017, 1, 1)
-            involvement.update()
+            person.update({'begin_from': '2018-01-31', 'begin_to': '2018-1-1'})
+            event.link(
+                'P11',
+                person,
+                dates={
+                    'begin_from': '2017-01-31',
+                    'begin_to': '2017-01-01',
+                    'begin_comment': None,
+                    'end_from': '2017-01-01',
+                    'end_to': None,
+                    'end_comment': None})
+
             source = insert('source', 'Tha source')
             source.link('P67', event)
             source.link('P67', event)
@@ -113,13 +111,12 @@ class AdminTests(TestBaseCase):
         rv = c.get(url_for('check_dates'))
         assert b'tab-counter' in rv.data
 
-        rv = c.get(url_for('check_link_duplicates'))
+        rv = c.get(url_for('check_links'))
         assert b'Event Horizon' in rv.data
+        assert b'Invalid linked entity' in rv.data
 
-        rv = c.get(
-            url_for('check_link_duplicates', delete='delete'),
-            follow_redirects=True)
-        assert b'Remove' in rv.data
+        rv = c.get(url_for('delete_link_duplicates'), follow_redirects=True)
+        assert b'Deleted links' in rv.data
 
         rv = c.get(
             url_for(
@@ -158,9 +155,6 @@ class AdminTests(TestBaseCase):
 
         rv = c.get(url_for('admin_content', item='legal_notice'))
         assert b'Save' in rv.data
-
-        rv = c.get(url_for('arche_index'))
-        assert b'https://arche-curation.acdh-dev.oeaw.ac.at/' in rv.data
 
         rv = c.post(
             url_for('admin_content', item='legal_notice'),

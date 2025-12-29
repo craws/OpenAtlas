@@ -12,10 +12,7 @@ class ActorTests(TestBaseCase):
             app.preprocess_request()
             place = insert('place', 'Vienna')
             event = insert('acquisition', 'Event Horizon')
-            group = insert('group', 'LV-426 colony')
-
-        rv = c.get(url_for('insert', class_='person', origin_id=place.id))
-        assert b'Vienna' in rv.data
+            actor2 = insert('person', 'Captain Miller')
 
         sex = get_hierarchy('Sex')
         data = {
@@ -47,29 +44,17 @@ class ActorTests(TestBaseCase):
         rv = c.post(url_for('insert', class_='person'), data=data)
         actor_id = rv.location.split('/')[-1]
 
-        rv = c.post(
-            url_for('insert', class_='group'),
-            data=data,
-            follow_redirects=True)
-        assert b'An entry has been created' in rv.data
-
-        corrupted_data = data
-        corrupted_data["name"] = '<h1 class="test">Sigourney Weaver</h1>'
+        # Test string sanitzation
+        data["name"] = '<h1 class="test">Sigourney Weaver</h1>with HTML'
         rv = c.post(
             url_for('insert', class_='person'),
-            data=corrupted_data,
+            data=data,
             follow_redirects=True)
         assert b'<h1 class="test">Sigourney Weaver</h1>' not in rv.data
         assert b'Sigourney Weaver' in rv.data
 
         rv = c.post(
-            url_for('insert', class_='person', origin_id=place.id),
-            data=data,
-            follow_redirects=True)
-        assert b'An entry has been created' in rv.data
-
-        rv = c.post(
-            url_for('type_move_entities', id_=sex.subs[0]),
+            url_for('change_type', id_=sex.subs[0]),
             data={
                 sex.id: sex.subs[1],
                 'selection': [actor_id],
@@ -79,12 +64,6 @@ class ActorTests(TestBaseCase):
 
         rv = c.get(url_for('remove_class', id_=sex.id, name='person'))
         assert b'403' in rv.data
-
-        rv = c.post(
-            url_for('insert', class_='person', origin_id=actor_id),
-            data=data,
-            follow_redirects=True)
-        assert b'An entry has been created' in rv.data
 
         rv = c.post(
             url_for('insert', class_='person', origin_id=event.id),
@@ -122,38 +101,51 @@ class ActorTests(TestBaseCase):
                 'description': 'AI'})
         assert rv.data.isdigit()
 
-        rv = c.post(
-            url_for('ajax_get_entity_table', content_domain='artifact'),
-            data={'filterIds': str([])})
-        assert b'Bishop' in rv.data
-
         rv = c.get(
             url_for('link_delete', origin_id=actor_id, id_=666),
             follow_redirects=True)
         assert b'removed' in rv.data
 
-        rv = c.get(
-            url_for('insert_relation', origin_id=group.id, type_='member'))
-        assert b'Actor function' in rv.data
+        rv = c.post(
+            url_for('update', id_=event.id),
+            data={
+                'name': 'Event Horizon',
+                'begin_year_from': '949',
+                'begin_month_from': '10',
+                'begin_day_from': '8',
+                'end_year_from': '1951'},
+            follow_redirects=True)
+        assert b'Event Horizon' in rv.data
 
         rv = c.post(
-            url_for('insert_relation', origin_id=actor_id, type_='membership'),
-            data={'group': str([group.id])},
+            url_for(
+                'link_insert_detail',
+                origin_id=actor2.id,
+                name='participated'),
+            data={
+                'participated': event.id,
+                'begin_year_from': '',
+                'end_year_from': ''},
             follow_redirects=True)
-        assert b'LV-426 colony' in rv.data
+        assert b'Event Horizon' in rv.data
 
         rv = c.post(
-            url_for('insert_relation', origin_id=group.id, type_='member'),
-            data={'actor': str([actor_id]), 'continue_': 'yes'},
+            url_for(
+                'link_insert_detail',
+                origin_id=actor2.id,
+                name='participated'),
+            data={
+                'participated': event.id,
+                'begin_year_from': '948',
+                'end_year_from': '1952'},
             follow_redirects=True)
-        assert b'Ripley' in rv.data
-
-        with app.test_request_context():
-            app.preprocess_request()
-            link_ = group.get_links('P107')[0]
+        assert b'Event Horizon' in rv.data
 
         rv = c.post(
-            url_for('link_update', id_=link_.id, origin_id=group.id),
-            data={'description': 'We are here to help you'},
+            url_for(
+                'link_insert_detail',
+                origin_id=event.id,
+                name='recipient'),
+            data={'recipient': actor2.id, 'continue_': 'yes'},
             follow_redirects=True)
-        assert b'We are here to help you' in rv.data
+        assert b'Event Horizon' in rv.data

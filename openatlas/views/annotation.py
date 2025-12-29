@@ -1,5 +1,5 @@
 from flask import flash, render_template, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -8,9 +8,10 @@ from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import get_file_path, link, required_group
-from openatlas.display.util2 import format_date, is_authorized, manual
-from openatlas.forms.form import get_annotation_image_form
+from openatlas.display.util2 import is_authorized, manual
+from openatlas.forms.form import annotate_image_form
 from openatlas.models.annotation import AnnotationImage
+from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity
 
 
@@ -20,7 +21,7 @@ def annotation_image_insert(id_: int) -> str | Response:
     image = Entity.get_by_id(id_, types=True, aliases=True)
     if not get_file_path(image.id):
         return abort(404)  # pragma: no cover
-    form = get_annotation_image_form(image.id)
+    form = annotate_image_form(image.id)
     if form.validate_on_submit():
         AnnotationImage.insert(
             image_id=id_,
@@ -28,7 +29,7 @@ def annotation_image_insert(id_: int) -> str | Response:
             entity_id=form.entity.data,
             text=form.text.data)
         return redirect(url_for('annotation_image_insert', id_=image.id))
-    table = None
+    table = Table()
     if annotations := AnnotationImage.get_by_file_id(image.id):
         rows = []
         for annotation in annotations:
@@ -37,7 +38,7 @@ def annotation_image_insert(id_: int) -> str | Response:
                 delete = link(
                     _('delete'),
                     url_for('annotation_image_delete', id_=annotation.id),
-                    js="return confirm('" + _('delete annotation') + "?')")
+                    js=f"return confirm('{_('delete annotation')}?')")
             rows.append([
                 format_date(annotation.created),
                 annotation.text,
@@ -65,7 +66,7 @@ def annotation_image_insert(id_: int) -> str | Response:
 @required_group('contributor')
 def annotation_image_update(id_: int) -> str | Response:
     annotation = AnnotationImage.get_by_id(id_)
-    form = get_annotation_image_form(
+    form = annotate_image_form(
         annotation.image_id,
         Entity.get_by_id(annotation.entity_id)
         if annotation.entity_id else None,
@@ -80,7 +81,7 @@ def annotation_image_update(id_: int) -> str | Response:
         'tabs.html',
         tabs={'annotation': Tab('annotation', form=form)},
         crumbs=[
-            [_('file'), url_for('index', view='file')],
+            [_('file'), url_for('index', group='file')],
             Entity.get_by_id(annotation.image_id),
             _('annotate')])
 
@@ -90,6 +91,6 @@ def annotation_image_update(id_: int) -> str | Response:
 def annotation_image_delete(id_: int) -> Response:
     annotation = AnnotationImage.get_by_id(id_)
     annotation.delete()
-    flash(_('annotation deleted'), 'info')
+    flash(_('annotation deleted'))
     return redirect(
         url_for('annotation_image_insert', id_=annotation.image_id))

@@ -120,16 +120,27 @@ class GetTypeEntitiesAll(Resource):
         return Endpoint(entities, entity_.parse_args()).resolve()
 
 
-class GetQuery(Resource):
+class GetTableRows(Resource):
     @staticmethod
     def get() -> tuple[Resource, int] | Response | dict[str, Any]:
         parser = query.parse_args()
+        parser['format'] = 'table_row'
+        return GetQuery.get(parser)
+
+
+class GetQuery(Resource):
+    @staticmethod
+    def get(
+            parser: dict[str, Any] | None = None) \
+            -> tuple[Resource, int] | Response | dict[str, Any]:
+        if parser is None:
+            parser = query.parse_args()
         if not any([
-            parser['entities'],
-            parser['cidoc_classes'],
-            parser['view_classes'],
-            parser['system_classes'],
-            parser['linked_entities']]):
+                parser['entities'],
+                parser['cidoc_classes'],
+                parser['view_classes'],
+                parser['system_classes'],
+                parser['linked_entities']]):
             raise QueryEmptyError
         entities = []
         if parser['entities']:
@@ -173,7 +184,7 @@ class GetSearchEntities(Resource):
                 entity = Entity.get_linked_entity_safe_static(
                     row['id'],
                     'P1',
-                    True)
+                    inverse=True)
                 if entity.class_.name not in classes:
                     continue
             else:

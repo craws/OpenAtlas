@@ -3,8 +3,8 @@ from __future__ import annotations
 from typing import Any, Optional
 
 from flask import g, render_template
-from flask_babel import lazy_gettext as _
-from wtforms import Field, FileField, IntegerField, SelectField, StringField
+from flask_babel import gettext as _
+from wtforms import FileField, IntegerField, SelectField, StringField
 from wtforms.validators import Email
 
 from openatlas import app
@@ -26,7 +26,8 @@ def html_form(
         if field.id.startswith('insert_'):
             continue  # These will be added in combination with other fields
         if isinstance(field, ValueTypeField):
-            html += add_row(field, '', field(), row_css=field.selectors)
+            field.label.text = ''
+            html += add_row(field, value=field(), row_css=field.selectors)
             continue
         if field.type in ['CSRFTokenField', 'HiddenField']:
             html += f' {field}'
@@ -40,11 +41,11 @@ def html_form(
             if not reference_systems_added:
                 reference_systems_added = True
                 html += add_row(
-                    None,
-                    _('reference system'),
-                    '<span id="reference-system-switcher" class="uc-first '
-                    f'{app.config["CSS"]["button"]["secondary"]}">'
-                    + _('show') + '</span>')
+                    label=_('reference system'),
+                    value='<span id="reference-system-switcher" '
+                    'class="uc-first '
+                    f'{app.config["CSS"]["button"]["secondary"]}">{_('show')}'
+                    '</span>')
             html += add_row(field, row_css="d-none")
             continue
         if field.id.split('_', 1)[0] in ('begin', 'end'):
@@ -52,7 +53,7 @@ def html_form(
                 html += add_dates(form)
             continue
         if field.type in ['TreeField', 'TreeMultiField', 'ValueTypeRootField']:
-            type_ = g.types[int(field.type_id)]
+            type_ = g.types[field.type_id]
             if not type_.subs:
                 continue
             label = type_.name
@@ -60,11 +61,10 @@ def html_form(
                 label = _('type')
             if field.label.text == 'super':
                 label = _('super')
-            if field.flags.required and field.label.text:
-                label += ' *'
             if not hasattr(field, 'is_type_form') or not field.is_type_form:
                 field.description = type_.description
-            html += add_row(field, label)
+            field.label.text = label
+            html += add_row(field)
             continue
         if field.id == 'save':
             class_ = \
@@ -80,9 +80,9 @@ def html_form(
                     form.insert_continue_human_remains(class_=class_))
             buttons = list(
                 map(lambda x: f'<div class="col-auto">{x}</div>', buttons))
+            field.label.text = ''
             html += add_row(
                 field,
-                '',  # Setting label to '' to keep button row label empty
                 '<div class="row g-1 align-items-center ">'
                 f'{"".join(buttons)}</div>')
             continue
@@ -93,9 +93,9 @@ def html_form(
 
 
 def add_row(
-        field: Optional[Field],
-        label: Optional[str] = None,
+        field: Optional[Any] = None,
         value: Optional[str] = None,
+        label: Optional[str] = None,
         form_id: Optional[str] = None,
         row_css: Optional[str] = None) -> str:
     row_css = row_css or ''

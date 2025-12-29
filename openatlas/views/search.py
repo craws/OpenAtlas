@@ -1,29 +1,30 @@
 from typing import Any
 
 from flask import g, render_template, request
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
-    BooleanField, IntegerField, SelectMultipleField, StringField, validators,
-    widgets)
+    BooleanField, IntegerField, SelectMultipleField, StringField, widgets)
 from wtforms.validators import InputRequired, NoneOf, NumberRange, Optional
 
 from openatlas import app
-from openatlas.display.table import Table
-from openatlas.display.util import link, required_group
+from openatlas.display.table import Table, entity_table
+from openatlas.display.util import required_group
+from openatlas.display.util2 import uc_first
 from openatlas.forms.field import SubmitField
-from openatlas.forms.util import form_to_datetime64
+from openatlas.models.dates import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.search import search
 
 
 class SearchForm(FlaskForm):
     term = StringField(
-        _('search'),
+        'search',
         [InputRequired()],
         render_kw={'autofocus': True})
     own = BooleanField(_('Only entities edited by me'))
     desc = BooleanField(_('Also search in description'))
+    # noinspection PyTypeChecker
     classes = SelectMultipleField(
         _('classes'),
         [InputRequired()],
@@ -57,7 +58,7 @@ class SearchForm(FlaskForm):
         validators=validator_day)
     include_dateless = BooleanField(_('Include dateless entities'))
 
-    def validate(self, extra_validators: validators = None) -> bool:
+    def validate(self, extra_validators: Any = None) -> bool:
         valid = FlaskForm.validate(self)
         from_date = form_to_datetime64(
             self.begin_year.data,
@@ -69,7 +70,7 @@ class SearchForm(FlaskForm):
             self.end_day.data,
             to_date=True)
         if from_date and to_date and from_date > to_date:
-            self.begin_year.errors.append(
+            self.begin_year.errors.append(  # type: ignore
                 _('Begin dates cannot start after end dates.'))
             valid = False
         return valid
@@ -79,8 +80,10 @@ class SearchForm(FlaskForm):
 @required_group('readonly')
 def search_index() -> str:
     classes = [
-        name for name, count in Entity.get_overview_counts().items() if count]
+        name for name, count in Entity.get_overview_counts().items()
+        if count and g.classes[name].group]
     form = SearchForm()
+    getattr(form, 'search').label.text = uc_first(_('search'))
     form.classes.choices = [(name, g.classes[name].label) for name in classes]
     form.classes.default = classes
     form.classes.process(request.form)
@@ -88,9 +91,9 @@ def search_index() -> str:
     if request.method == 'POST' and 'global-term' in request.form:
         form.term.data = request.form['global-term']
         form.classes.data = classes
-        table = build_search_table(form)
+        table = results_table(form)
     elif form.validate_on_submit():
-        table = build_search_table(form)
+        table = results_table(form)
     return render_template(
         'search.html',
         form=form,
@@ -99,8 +102,7 @@ def search_index() -> str:
         crumbs=[_('search')])
 
 
-def build_search_table(form: Any) -> Table:
-    table = Table(['name', 'class', 'first', 'last', 'description'])
+def results_table(form: Any) -> Table:
     entities = search({
         'term': form.term.data,
         'classes': form.classes.data,
@@ -116,11 +118,6 @@ def build_search_table(form: Any) -> Table:
             form.end_month.data,
             form.end_day.data,
             to_date=True)})
-    for entity in entities:
-        table.rows.append([
-            link(entity),
-            g.classes[entity.class_.name].label,
-            entity.first,
-            entity.last,
-            entity.description])
-    return table
+    return entity_table(
+        entities,
+        columns=['name', 'class', 'begin', 'end', 'description'])

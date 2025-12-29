@@ -1,47 +1,42 @@
+from time import sleep
 from typing import Any, Optional
 
 import requests
-from flask import g
+from flask import abort, g
 
 from openatlas import app
-from openatlas.models.entity import Entity
-from openatlas.models.reference_system import ReferenceSystem
-from openatlas.models.type import Type
+from openatlas.models.entity import Entity, insert
 
 
 def get_or_create_type(hierarchy: Any, type_name: str) -> Entity:
     if type_ := get_type_by_name(type_name):
         if type_.root[0] == hierarchy.id:
             return type_
-    type_entity = Entity.insert('type', type_name)  # pragma: no cover
-    type_entity.link('P127', hierarchy)  # pragma: no cover
-    return type_entity  # pragma: no cover
+    type_entity = insert({'openatlas_class_name': 'type', 'name': type_name})
+    type_entity.link('P127', hierarchy)
+    return type_entity
 
 
-def get_type_by_name(type_name: str) -> Optional[Type]:
-    type_ = None
-    for type_id in g.types:
-        if g.types[type_id].name == type_name:
-            type_ = g.types[type_id]
-            break
-    return type_
+def get_type_by_name(type_name: str) -> Optional[Entity]:
+    for type_ in g.types.items():
+        if type_.name == type_name:
+            return type_
+    return None
 
 
-def get_reference_system_by_name(name: str) -> Optional[ReferenceSystem]:
-    reference_system = None
-    name = name.lower().replace('_', ' ')
-    for id_ in g.reference_systems:
-        if g.reference_systems[id_].name.lower().replace('_', ' ') == name:
-            reference_system = g.reference_systems[id_]
-            break
-    return reference_system
+def get_reference_system_by_name(name: str) -> Optional[Entity]:
+    for system in g.reference_systems.values():
+        if system.name.lower().replace('_', ' ') \
+                == name.lower().replace('_', ' '):
+            return system
+    return None
 
 
 def get_exact_match() -> Entity:
     return get_or_create_type(g.reference_match_type, 'exact match')
 
 
-def get_match_types() -> dict[str, Type]:
+def get_match_types() -> dict[str, Entity]:
     match_dictionary = {}
     for match in [g.types[match] for match in g.reference_match_type.subs]:
         match match.name:
@@ -53,23 +48,25 @@ def get_match_types() -> dict[str, Type]:
 
 
 def vocabs_requests(
-        id_: Optional[str] = '',
-        endpoint: Optional[str] = '',
+        id_: Optional[str] = "",
+        endpoint: Optional[str] = "",
         parameter: Optional[dict[str, str]] = None) -> dict[str, Any]:
-    req = requests.get(
-        f"{g.settings['vocabs_base_url']}{g.settings['vocabs_endpoint']}{id_}/"
-        f"{endpoint}",
-        params=parameter or '',
-        timeout=60,
-        auth=(g.settings['vocabs_user'], app.config['VOCABS_PASS']))
-    return req.json()
+    base = g.settings["vocabs_base_url"]
+    vocabs_endpoint = g.settings["vocabs_endpoint"]
+    url = f"{base}{vocabs_endpoint}{id_}/{endpoint}"
+    sleep(0.1)  # fix connection abort
+    try:
+        resp = requests.get(
+            url,
+            params=parameter or "",
+            timeout=60,
+            auth=(g.settings["vocabs_user"], app.config["VOCABS_PASS"]))
+        resp.raise_for_status()
+    except requests.exceptions.RequestException as e:  # pragma: no cover
+        abort(400, f"Request failed for {url}: {e}")
 
-
-def request_arche_metadata(id_: int) -> dict[str, Any]:
-    req = requests.get(
-        f"{app.config['ARCHE']['url']}/api/{id_}/metadata",
-        headers={
-            'Accept': 'application/ld+json',
-            'X-METADATA-READ-MODE': '1_1_0_0'},
-        timeout=60)
-    return req.json()
+    try:
+        result = resp.json()
+    except ValueError:  # pragma: no cover
+        abort(400, f"Invalid JSON from {url}")
+    return result

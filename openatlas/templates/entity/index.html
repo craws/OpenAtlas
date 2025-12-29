@@ -3,9 +3,6 @@
   <div class="row">
     <div class="{{ 'col-lg-6' if gis_data else 'col' }}">
       {{ buttons|button_bar|safe }}
-      {% if file_info %}
-        <p>{{ file_info }}</p>
-      {% endif %}
       {{ table.display()|safe }}
     </div>
     {% if gis_data %}

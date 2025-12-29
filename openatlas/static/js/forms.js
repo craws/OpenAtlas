@@ -14,11 +14,13 @@ function onActivateKeyInput(event) {
 }
 
 function validateSubmitHandler (form) {
-  if (this.submitButton.id === "insert_and_continue") $('#continue_').val('yes');
-  if (this.submitButton.id === "insert_continue_sub") $('#continue_').val('sub');
-  if (this.submitButton.id === "insert_continue_human_remains") $('#continue_').val('human_remains');
-  $('button[type="submit"]').prop("disabled", true).text(translate.inProgress);
-  form.submit();
+  if (typeof this.submitButton !== 'undefined') {
+      if (this.submitButton.id === "insert_and_continue") $('#continue_').val('yes');
+      if (this.submitButton.id === "insert_continue_sub") $('#continue_').val('sub');
+      if (this.submitButton.id === "insert_continue_human_remains") $('#continue_').val('human_remains');
+    $('button[type="submit"]').prop("disabled", true).text(translate.inProgress);
+    form.submit();
+  }
 }
 
 /* Show and hide function for value type input fields. Has to be outside of $(document).ready() */

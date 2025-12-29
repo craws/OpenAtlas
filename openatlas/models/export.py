@@ -192,8 +192,8 @@ def get_place_and_actor_relations(
     file_to_related_entity_ids: dict[int, list[int]] = defaultdict(list)
     places_and_actors: dict[int, dict[str, Any]] = {}
     for link in linked_entities:
-        if (link.range.class_.view == 'actor'
-                or link.range.class_.name == 'place'):
+        if (link.range.class_.group['name'] == 'actor'
+                or link.range.class_.group['name'] == 'place'):
             places_and_actors[link.range.id] = {
                 'entity': link.range,
                 'links_inverse': [],
@@ -287,7 +287,7 @@ def get_arche_file_turtle_graph(
         type_ids: set[int],
         top_collection: str) -> str:
     graph = Graph()
-    graph.bind("acdh", ACDH)  # type: ignore
+    graph.bind("acdh", ACDH)
     metadata = get_arche_file_metadata(entities, type_ids, top_collection)
     for metadata_obj in metadata:
         add_arche_file_metadata_to_graph(graph, metadata_obj)

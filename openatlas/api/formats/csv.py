@@ -17,12 +17,12 @@ def build_dataframe(entity: Entity) -> dict[str, Any]:
         'id': str(entity.id),
         'name': entity.name,
         'description': entity.description,
-        'begin_from': entity.begin_from,
-        'begin_to': entity.begin_to,
-        'begin_comment': entity.begin_comment,
-        'end_from': entity.end_from,
-        'end_to': entity.end_to,
-        'end_comment': entity.end_comment,
+        'begin_from': entity.dates.begin_from,
+        'begin_to': entity.dates.begin_to,
+        'begin_comment': entity.dates.begin_comment,
+        'end_from': entity.dates.end_from,
+        'end_to': entity.dates.end_to,
+        'end_comment': entity.dates.end_comment,
         'cidoc_class': entity.cidoc_class.name,
         'system_class': entity.class_.name,
         'geom_type': geom['type'],
@@ -37,12 +37,12 @@ def build_link_dataframe(link: Link) -> dict[str, Any]:
         'domain_id': link.domain.id,
         'domain_name': link.domain.name,
         'description': link.description,
-        'begin_from': link.begin_from,
-        'begin_to': link.begin_to,
-        'begin_comment': link.begin_comment,
-        'end_from': link.end_from,
-        'end_to': link.end_to,
-        'end_comment': link.end_comment}
+        'begin_from': link.dates.begin_from,
+        'begin_to': link.dates.begin_to,
+        'begin_comment': link.dates.begin_comment,
+        'end_from': link.dates.end_from,
+        'end_to': link.dates.end_to,
+        'end_comment': link.dates.end_comment}
 
 
 def get_csv_types(entity_dict: dict[str, Any]) -> dict[Any, list[Any]]:
@@ -79,7 +79,7 @@ def get_csv_links(entity_dict: dict[str, Any]) -> dict[str, Any]:
 
 def get_csv_geom_entry(entity: Entity) -> dict[str, None]:
     geom = {'type': None, 'coordinates': None}
-    if entity.class_.view == 'place' or entity.class_.name == 'artifact':
+    if entity.class_.group.get('name') in ['place', 'artifact']:
         geom = get_csv_geometry(entity.get_linked_entity_safe('P53'))
     elif entity.class_.name == 'object_location':
         geom = get_csv_geometry(entity)

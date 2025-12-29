@@ -42,9 +42,9 @@ class Classes(Resource):
         return marshal([{
             "systemClass": item.name,
             "crmClass": item.cidoc_class.code if item.cidoc_class else None,
-            "view": item.view,
+            "view": item.group.get('name'),
             "standardTypeId": item.standard_type_id,
-            "icon": item.icon,
+            "icon": item.group.get('icon'),
             "en": item.label} for item in g.classes.values()],
             class_overview_template()), 200
 
@@ -59,9 +59,10 @@ class ClassMapping(Resource):
                 "systemClass": class_.name,
                 "crmClass":
                     class_.cidoc_class.code if class_.cidoc_class else None,
-                "view": class_.view,
+                "view": class_.group['name'] if class_.group else None,
                 "standardTypeId": class_.standard_type_id,
-                "icon": class_.icon} for class_ in g.classes.values()]}
+                "icon": class_.group.get('icon')}
+                for class_ in g.classes.values()]}
         if locale.parse_args()['download']:
             return download(results, class_mapping_template())
         return marshal(results, class_mapping_template()), 200

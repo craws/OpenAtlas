@@ -15,16 +15,24 @@ def update(data: dict[str, Any]) -> None:
              range_id,
              description,
              type_id,
-             begin_from, begin_to, begin_comment,
-             end_from, end_to, end_comment
-                ) = (
-                     %(property_code)s,
-                     %(domain_id)s,
-                     %(range_id)s,
-                     %(description)s,
-                     %(type_id)s,
-                     %(begin_from)s, %(begin_to)s, %(begin_comment)s,
-                     %(end_from)s, %(end_to)s, %(end_comment)s)
+             begin_from,
+             begin_to,
+             begin_comment,
+             end_from,
+             end_to,
+             end_comment
+        ) = (
+            %(property_code)s,
+            %(domain_id)s,
+            %(range_id)s,
+            %(description)s,
+            %(type_id)s,
+            %(begin_from)s,
+            %(begin_to)s,
+            %(begin_comment)s,
+            %(end_from)s,
+            %(end_to)s,
+            %(end_comment)s)
         WHERE id = %(id)s;
         """,
         data)
@@ -33,26 +41,27 @@ def update(data: dict[str, Any]) -> None:
 def get_by_id(id_: int) -> dict[str, Any]:
     g.cursor.execute(
         """
-        SELECT l.id,
-               l.property_code,
-               l.domain_id,
-               l.range_id,
-               l.description,
-               l.created,
-               l.modified,
-               l.type_id,
-               COALESCE(to_char(l.begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
-                   AS begin_from,
-               l.begin_comment,
-               COALESCE(to_char(l.begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
-                   AS begin_to,
-               COALESCE(to_char(l.end_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
-                   AS end_from,
-               l.end_comment,
-               COALESCE(to_char(l.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
-                   AS end_to
-        FROM model.link l
-        WHERE l.id = %(id)s;
+        SELECT
+            id,
+            property_code,
+            domain_id,
+            range_id,
+            description,
+            created,
+            modified,
+            type_id,
+            COALESCE(to_char(begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                AS begin_from,
+            begin_comment,
+            COALESCE(to_char(begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                AS begin_to,
+            COALESCE(to_char(end_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                AS end_from,
+            end_comment,
+            COALESCE(to_char(end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                AS end_to
+        FROM model.link
+        WHERE id = %(id)s;
         """,
         {'id': id_})
     return g.cursor.fetchone()
@@ -113,53 +122,6 @@ def get_all_links() -> list[dict[str, Any]]:
         FROM model.link l;
         """)
     return list(g.cursor)
-
-
-def check_link_duplicates() -> list[dict[str, int]]:
-    g.cursor.execute(
-        """
-        SELECT COUNT(*) AS count,
-               domain_id,
-               range_id,
-               property_code,
-               description,
-               type_id,
-               begin_from,
-               begin_to,
-               begin_comment,
-               end_from,
-               end_to,
-               end_comment
-        FROM model.link
-        GROUP BY domain_id,
-                 range_id,
-                 property_code,
-                 description,
-                 type_id,
-                 begin_from, begin_to, begin_comment,
-                 end_from, end_to, end_comment
-        HAVING COUNT(*) > 1;
-        """)
-    return list(g.cursor)
-
-
-def delete_link_duplicates() -> int:
-    g.cursor.execute(
-        """
-        DELETE
-        FROM model.link l
-        WHERE l.id NOT IN (SELECT id
-                           FROM (SELECT DISTINCT ON (
-                               domain_id,
-                               range_id,
-                               property_code,
-                               description,
-                               type_id,
-                               begin_from, begin_to, begin_comment,
-                               end_from, end_to, end_comment) *
-                                 FROM model.link) AS temp_table);
-        """)
-    return g.cursor.rowcount
 
 
 def get_all_links_for_network(

@@ -11,7 +11,7 @@ def search(data: dict[str, Any]) -> list[Entity]:
     if not data['term']:
         return []
     for class_ in data['classes']:
-        if g.classes[class_].alias_allowed:
+        if g.classes[class_].attributes.get('alias'):
             data['classes'].append('appellation')
             break
     entities = []
@@ -25,7 +25,7 @@ def search(data: dict[str, Any]) -> list[Entity]:
             entity = Entity.get_linked_entity_safe_static(
                 row['id'],
                 'P1',
-                True)
+                inverse=True)
             if entity.class_.name not in data['classes']:
                 continue
         else:
@@ -38,16 +38,16 @@ def search(data: dict[str, Any]) -> list[Entity]:
 def check_dates(entity: Entity, data: dict[str, Any]) -> bool:
     if not data['from_date'] and not data['to_date']:
         return True
-    if not entity.begin_from \
-            and not entity.begin_to \
-            and not entity.end_from \
-            and not entity.end_to:
+    if not entity.dates.begin_from \
+            and not entity.dates.begin_to \
+            and not entity.dates.end_from \
+            and not entity.dates.end_to:
         return bool(data['include_dateless'])
     dates = [
-        entity.begin_from,
-        entity.begin_to,
-        entity.end_from,
-        entity.end_to]
+        entity.dates.begin_from,
+        entity.dates.begin_to,
+        entity.dates.end_from,
+        entity.dates.end_to]
     begin_ok = False
     if not data['from_date']:
         begin_ok = True
@@ -63,7 +63,3 @@ def check_dates(entity: Entity, data: dict[str, Any]) -> bool:
             if date and date <= data['to_date']:
                 end_ok = True
     return bool(begin_ok and end_ok)
-
-
-def get_subunits_without_super(classes: list[str]) -> list[int]:
-    return db.get_subunits_without_super(classes)

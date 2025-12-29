@@ -22,12 +22,8 @@ def get_classes() -> list[dict[str, Any]]:
             c.name,
             c.cidoc_class_code,
             c.standard_type_id,
-            c.alias_allowed,
-            c.reference_system_allowed,
             c.new_types_allowed,
             c.write_access_group_name,
-            c.layout_color,
-            c.layout_icon,
             hierarchies,
             system_ids
         FROM model.openatlas_class c,
@@ -44,5 +40,19 @@ def get_classes() -> list[dict[str, Any]]:
                 FROM web.reference_system_openatlas_class ro
                 WHERE c.name = ro.openatlas_class_name) y) y
         ORDER BY c.name;
+        """)
+    return list(g.cursor)
+
+
+def get_db_relations() -> list[dict[str, Any]]:
+    g.cursor.execute(
+        """
+        SELECT DISTINCT
+            d.openatlas_class_name AS domain,
+            l.property_code,
+            r.openatlas_class_name AS range
+        FROM model.entity d
+        JOIN model.link l ON d.id = l.domain_id
+        JOIN model.entity r ON l.range_id = r.id;
         """)
     return list(g.cursor)

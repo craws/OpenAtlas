@@ -1,29 +1,31 @@
 {% extends 'layout.html' %}
 {% block content %}
-  {% if entity.class_.view not in ['artifact', 'place'] %}
-    <div class="container">
-      {{ form|display_form(manual_page='entity/' + entity.class_.view)|safe }}
-      {{ entity.class_.view|display_citation_example|safe }}
-    </div>
-  {% else %}
+<div class="row">
+  <div class="col">
     <div class="row">
+      {% if entity.image_id %}
+        <div class="col-lg-1">
+          {{ entity|profile_image(False, max_width_100=True)|safe }}
+        </div>
+      {% endif %}
       <div class="col">
-        <div class="row">
-          <div id='map-info-display'>
-            {{ form|display_form(manual_page='entity/' + entity.class_.view)|safe }}
-          </div>
-          {{ entity|profile_image|safe }}
+        <div class="row g-1">
+          {{ form|display_form(manual_page='entity/' + entity.class_.group['name'])|safe }}
+          {{ entity.class_.group['name']|citation_example|safe }}
         </div>
       </div>
-      <div class="col-lg-7 d-flex align-items-stretch">
-        <div onclick="toggleMapWidth(this)" class="d-none btn btn-light d-lg-flex align-items-center"><i
-            class="fas fa-chevron-right"></i></div>
-        <div id="map" class="map"></div>
-      </div>
+      {% if entity.class_.attributes.get('location') %}
+        <div class="col-lg-6 d-flex align-items-stretch">
+          <div onclick="toggleMapWidth(this)" class="d-none btn btn-light d-lg-flex align-items-center"><i
+              class="fas fa-chevron-right"></i></div>
+          <div id="map" class="map"></div>
+        </div>
+        <link rel="stylesheet" href="/static/node_modules/leaflet-draw/dist/leaflet.draw.css">
+        <script src="/static/node_modules/leaflet-draw/dist/leaflet.draw.js"></script>
+        <script src="/static/js/map/map.js"></script>
+        <script src="/static/js/map/draw.js"></script>
+      {% endif %}
     </div>
-    <link rel="stylesheet" href="/static/node_modules/leaflet-draw/dist/leaflet.draw.css">
-    <script src="/static/node_modules/leaflet-draw/dist/leaflet.draw.js"></script>
-    <script src="/static/js/map/map.js"></script>
-    <script src="/static/js/map/draw.js"></script>
-  {% endif %}
+  </div>
+</div>
 {% endblock %}

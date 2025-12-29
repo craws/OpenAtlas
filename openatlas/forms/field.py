@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+# pylint: disable=too-few-public-methods
+# mypy: ignore-errors, too much trouble to mypy check form elements
 import ast
 from typing import Any, Optional
 
 from flask import g, render_template, request
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from flask_wtf import FlaskForm
 from markupsafe import Markup
 from wtforms import (
@@ -14,12 +16,11 @@ from wtforms.validators import InputRequired
 from wtforms.widgets import FileInput, HiddenInput, Input, TextInput
 
 from openatlas import app
-from openatlas.display.table import Table
-from openatlas.display.util import get_base_table_data
+from openatlas.display.table import Table, entity_table
+from openatlas.display.util import link
 from openatlas.display.util2 import is_authorized
-from openatlas.forms.util import string_to_entity_list
+from openatlas.forms.util import convert
 from openatlas.models.entity import Entity
-from openatlas.models.type import Type
 
 
 class RemovableListInput(HiddenInput):
@@ -155,14 +156,15 @@ class TableMultiSelect(HiddenInput):
             field.selection = []
             if request.form[field.name]:
                 field.selection = \
-                    string_to_entity_list(request.form[field.name])
+                    Entity.get_by_ids(convert(request.form[field.name]))
         if field.selection:
-            field.data = [e.id for e in field.selection]
+            field.data = str([e.id for e in field.selection])
             field.data_list = sorted([e.name for e in field.selection])
-        field.table = table_multi(
+        field.table = entity_table(
             field.entities,
-            field.selection,
-            field.filter_ids)
+            forms={
+                'checkbox': True,
+                'selection_ids': [e.id for e in field.selection]})
         return super().__call__(field, **kwargs) + Markup(
             render_template('forms/table_multi_select.html', field=field))
 
@@ -174,35 +176,26 @@ class TableMultiField(HiddenField):
             self,
             entities: list[Entity],
             selection: Optional[list[Entity]] = None,
-            filter_ids: Optional[list[int]] = None,
             description: Optional[str] = None,
             **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.entities = entities
         self.selection = selection or []
-        self.filter_ids = filter_ids or []
         self.description = description
 
 
-def table_multi(
-        entities: list[Entity],
-        selection: list[Entity],
-        filter_ids: list[int]) -> Table:
-    filter_ids = filter_ids or []
-    selection_ids = [e.id for e in selection] if selection else []
-    view = entities[0].class_.view if entities else 'place'
-    table_ = Table(
-        [''] + g.table_headers[view],
-        order=[[0, 'desc'], [1, 'asc']],
-        defs=[{'orderDataType': 'dom-checkbox', 'targets': 0}])
-    for e in [e for e in entities if e.id not in filter_ids]:
-        row = get_base_table_data(e, show_links=False)
-        row.insert(
-            0,
-            f'<input type="checkbox" value="{e.name}" id="{e.id}" '
-            f'{" checked" if e.id in selection_ids else ""}>')
-        table_.rows.append(row)
-    return table_
+class LinkTableSelect(HiddenInput):
+    def __call__(self: Any, field: LinkTableField, **kwargs: Any) -> str:
+        return super().__call__(field, **kwargs) \
+            + Markup(field.table.display())
+
+
+class LinkTableField(HiddenField):
+    widget = LinkTableSelect()
+
+    def __init__(self, table: Table, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self.table = table
 
 
 class ValueFloatField(FloatField):
@@ -253,7 +246,7 @@ class TableSelect(HiddenInput):
                     f'{field.id}-{class_name_}-standard-type-dynamic',
                     TreeField(
                         str(standard_type_id),
-                        type_id=str(standard_type_id)))
+                        type_id=standard_type_id))
             setattr(
                 SimpleEntityForm,
                 'description_dynamic',
@@ -263,21 +256,18 @@ class TableSelect(HiddenInput):
         field.forms = {}
         for class_name in field.add_dynamical:
             field.forms[class_name] = get_form(class_name)
-
         if request and request.method == 'POST':  # If validation failed
             field.selection = \
                 Entity.get_by_id(int(request.form[field.name])) \
                 if request.form[field.name] else None
-
-        field.data = ''
-        field.data_string = ''
-        if field.selection:
-            field.data = field.selection.id
-            field.data_string = field.selection.name
-        if field.id == 'entity':
-            field.table = table_annotation(field.entities)
-        else:
-            field.table = table(field.id, field.entities, field.filter_ids)
+        field.data = field.selection.id if field.selection else ''
+        field.data_string = field.selection.name if field.selection else ''
+        field.table = entity_table(
+            field.entities,
+            columns=['name', 'class', 'description']
+            if field.id == 'entity' else None,
+            table_id=field.id,
+            forms={'mode': 'single'})
         return super().__call__(field, **kwargs) + Markup(
             render_template('forms/table_select.html', field=field))
 
@@ -289,14 +279,12 @@ class TableField(HiddenField):
             self,
             entities: list[Entity],
             selection: Optional[Entity] = None,
-            filter_ids: Optional[list[int]] = None,
             validators: Optional[Any] = None,
             add_dynamic: Optional[list[str]] = None,
             **kwargs: Any) -> None:
         super().__init__(validators=validators, **kwargs)
         self.entities = entities
         self.selection = selection
-        self.filter_ids = filter_ids or []
         self.add_dynamical = \
             (add_dynamic or []) if is_authorized('editor') else []
         self.add_dynamical.reverse()  # Reverse needed (CSS .float-end)
@@ -326,40 +314,12 @@ class TableCidocField(HiddenField):
         self.selection = None
 
 
-def table(
-        table_id: str,
-        entities: list[Entity],
-        filter_ids: Optional[list[int]] = None) -> Table:
-    table_ = Table(
-        g.table_headers[entities[0].class_.name if entities else 'place'])
-    for e in [e for e in entities if not filter_ids or e.id not in filter_ids]:
-        data = get_base_table_data(e, show_links=False)
-        data[0] = format_name_and_aliases(e, table_id)
-        table_.rows.append(data)
-    return table_
-
-
-def table_annotation(entities: list[Entity]) -> Table:
-    table_ = Table(['name', 'class', 'description'])
-    for item in entities:
-        table_.rows.append([
-            format_name_and_aliases(item, 'entity'),
-            item.class_.name,
-            item.description])
-    return table_
-
-
 def table_cidoc(table_id: str, items: list[Any]) -> Table:
-    table_ = Table(
-        ['code', 'name'],
-        defs=[
-            {'orderDataType': 'cidoc-model', 'targets': [0]},
-            {'sType': 'numeric', 'targets': [0]}])
+    table_ = Table(['code', 'name'])
     for i in items:
-        onclick = f'''
-            onclick="selectFromTable(this,
-            '{table_id}', '{i.code}', '{i.code} {i.name}');"'''
-        table_.rows.append([f'<a href="#" {onclick}>{i.code}</a>', i.name])
+        js = "selectFromTable(" \
+            + f"this, '{table_id}', '{i.code}', '{i.code} {i.name}');"
+        table_.rows.append([link(i.code, '#', js=js), i.name])
     return table_
 
 
@@ -372,7 +332,7 @@ class TreeMultiSelect(HiddenInput):
             field=field,
             root=g.types[int(field.type_id)],
             selection=sorted(data, key=lambda k: g.types[k].name),
-            data=Type.get_tree_data(int(field.id), data))) \
+            data=Entity.get_tree_data(int(field.id), data))) \
             + super().__call__(field, **kwargs)
 
 
@@ -386,7 +346,7 @@ class TreeMultiField(HiddenField):
             **kwargs: Any) -> None:
         super().__init__(label, validators, **kwargs)
         self.form = form
-        self.type_id = type_id or self.id
+        self.type_id = type_id or int(self.id)
 
     widget = TreeMultiSelect()
 
@@ -401,16 +361,17 @@ class TreeSelect(HiddenInput):
                 if isinstance(field.data, list) else field.data
             selection = g.types[int(field.data)].name
             selected_ids.append(g.types[int(field.data)].id)
-        return Markup(render_template(
-            'forms/tree_select.html',
-            field=field,
-            selection=selection,
-            root=g.types[int(field.type_id)],
-            data=Type.get_tree_data(
-                int(field.type_id),
-                selected_ids,
-                field.filters_ids,
-                field.is_type_form))) + super().__call__(field, **kwargs)
+        return Markup(
+            render_template(
+                'forms/tree_select.html',
+                field=field,
+                selection=selection,
+                root=g.types[field.type_id],
+                data=Entity.get_tree_data(
+                    field.type_id,
+                    selected_ids,
+                    field.filter_ids,
+                    field.is_type_form))) + super().__call__(field, **kwargs)
 
 
 class TreeField(HiddenField):
@@ -419,15 +380,15 @@ class TreeField(HiddenField):
             self,
             label: str,
             validators: Any = None,
-            type_id: str = '',
+            type_id: Optional[int] = None,
             filter_ids: Optional[list[int]] = None,
             is_type_form: Optional[bool] = False,
             form: Any = None,
             **kwargs: Any) -> None:
         super().__init__(label, validators, **kwargs)
         self.form = form
-        self.type_id = type_id or self.id
-        self.filters_ids = filter_ids
+        self.type_id = type_id or int(self.id)
+        self.filter_ids = filter_ids
         self.is_type_form = is_type_form
 
     widget = TreeSelect()
@@ -486,7 +447,7 @@ class SubmitField(BooleanField):
     widget = SubmitInput()
 
 
-class SubmitSourceInput(Input):
+class SubmitAnnotationInput(Input):
     input_type = 'submit'
 
     def __call__(self, field: Field, **kwargs: Any) -> str:
@@ -503,8 +464,8 @@ class SubmitSourceInput(Input):
              >{field.label.text}</button>''')
 
 
-class SubmitSourceField(BooleanField):
-    widget = SubmitSourceInput()
+class SubmitAnnotationField(BooleanField):
+    widget = SubmitAnnotationInput()
 
 
 def generate_password_field() -> CustomField:
@@ -515,7 +476,7 @@ def generate_password_field() -> CustomField:
             id="generate-password">{_("generate password")}</span>''')
 
 
-def value_type_expand_icon(type_: Type) -> str:
+def value_type_expand_icon(type_: Entity) -> str:
     return f'''
         <span onkeydown="
             if (onActivateKeyInput(event))
@@ -530,15 +491,3 @@ def value_type_expand_icon(type_: Type) -> str:
             class="fa fa-chevron-right value-type-switcher input-height-sm">
             </i>
         </span>'''
-
-
-def format_name_and_aliases(entity: Entity, field_id: str) -> str:
-    link = \
-        f"""<a value="{entity.name}"  href='#' onclick="selectFromTable(this,
-        '{field_id}', {entity.id})">{entity.name}</a>"""
-    if entity.aliases:
-        html = f'<p>{link}</p>'
-        for i, alias in enumerate(entity.aliases.values()):
-            html += alias if i else f'<p>{alias}</p>'
-        return html
-    return link

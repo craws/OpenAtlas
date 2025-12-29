@@ -58,7 +58,10 @@ class Network:
             show_orphans: bool,
             dimensions: Optional[int]) -> Optional[str]:
         mapping = db.get_object_mapping()
-        classes = [c.name for c in g.classes.values() if c.network_color]
+        classes = [
+            c.name for c in g.classes.values()
+            if c.display.get('network_color')]
+        classes.append('object_location')
         entities: set[int] = set()
         nodes = []
         for row in db.get_entities(classes):

@@ -1,7 +1,7 @@
 import ast
 
 from flask import flash, render_template, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -73,7 +73,7 @@ def overlay_update(place_id: int, overlay_id: int) -> str | Response:
             'top_right_easting': form.top_right_easting.data,
             'bottom_left_northing': form.bottom_left_northing.data,
             'bottom_left_easting': form.bottom_left_easting.data})
-        flash(_('info update'), 'info')
+        flash(_('info update'))
         return redirect(
             f"{url_for('view', id_=place.id)}#tab-file")
     bounding = [[0, 0], [0, 0], [0, 0]]  # For data entered before 6.4.0

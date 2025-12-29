@@ -86,7 +86,8 @@ class IiifForm(FlaskForm):
 class LogForm(FlaskForm):
     limit = SelectField(
         _('limit'),
-        choices=((0, _('all')), (100, 100), (500, 500)), default=100)
+        choices=((0, _('all')), (100, 100), (500, 500)),  # type: ignore
+        default=100)
     priority = SelectField(
         _('priority'),
         choices=(list(app.config['LOG_LEVELS'].items())),
@@ -100,13 +101,13 @@ class MapForm(FlaskForm):
     map_zoom_max = IntegerField(_('max map zoom'), [InputRequired()])
     map_cluster_disable_at_zoom = IntegerField(_('disable clustering at zoom'))
     map_cluster_max_radius = IntegerField(_('max cluster radius'))
-    geonames_username = StringField('GeoNames ' + _('username'))
+    geonames_username = StringField(f'GeoNames {_('username')}')
     save = SubmitField(_('save'))
 
 
 class FrontendForm(FlaskForm):
-    frontend_website_url = StringField(_('website URL'), [Optional(), URL()])
-    frontend_resolver_url = StringField(_('resolver URL'), [Optional(), URL()])
+    frontend_website_url = StringField(_('website url'), [Optional(), URL()])
+    frontend_resolver_url = StringField(_('resolver url'), [Optional(), URL()])
     save = SubmitField(_('save'))
 
 
@@ -153,7 +154,6 @@ class DisplayForm(FlaskForm):
         choices=list(app.config['TABLE_ROWS'].items()),
         coerce=int)
     table_show_aliases = BooleanField(_('show aliases in tables'))
-    table_show_icons = BooleanField(_('show icons in tables'))
     entity_show_dates = BooleanField(
         _('show created and modified information'))
     entity_show_import = BooleanField(_('show import information'))

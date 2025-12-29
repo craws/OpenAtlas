@@ -12,35 +12,36 @@ class EventTest(TestBaseCase):
             app.preprocess_request()
             actor = insert('person', 'Captain Miller')
             file = insert('file', 'X-Files')
-            artifact = insert('artifact', 'artifact')
+            artifact = insert('artifact', 'artifact new')
             residence = insert('place', 'Lewis and Clark')
-            reference = insert('external_reference', 'https://d-nb.info')
 
         data = {'name': 'Event Horizon', 'location': residence.id}
         rv = c.post(url_for('insert', class_='activity'), data=data)
         activity_id = rv.location.split('/')[-1]
 
         rv = c.post(
-            url_for('insert', class_='activity', origin_id=actor.id),
+            url_for(
+                'insert',
+                class_='activity',
+                origin_id=actor.id,
+                relation='performed'),
             data=data,
             follow_redirects=True)
         assert b'An entry has been created' in rv.data
 
         rv = c.post(
-            url_for('insert', class_='activity', origin_id=file.id),
+            url_for('insert', class_='activity'),
             data=data,
             follow_redirects=True)
         assert b'An entry has been created' in rv.data
 
-        rv = c.get(
-            url_for('insert', class_='activity', origin_id=residence.id))
-        assert b'location' in rv.data
+        rv = c.get(url_for('insert', class_='activity'))
+        assert b'Location' in rv.data
 
-        rv = c.get(url_for('insert', class_='move', origin_id=residence.id))
-        assert b'Moved artifact' in rv.data
+        rv = c.get(url_for('insert', class_='move'))
+        assert b'Moved object' in rv.data
 
-        rv = c.get(
-            url_for('insert', class_='acquisition', origin_id=artifact.id))
+        rv = c.get(url_for('insert', class_='acquisition'))
         assert b'+ Acquisition' in rv.data
 
         data = {
@@ -48,12 +49,14 @@ class EventTest(TestBaseCase):
             'given_place': [residence.id],
             'given_artifact': '',
             'location': residence.id,
-            'sub_event_of': activity_id,
             'begin_year_from': '1949',
             'begin_month_from': '10',
             'begin_day_from': '8',
             'end_year_from': '1951',
             'preceding_event': '',
+            'super': activity_id,
+            'recipient': '',
+            'donor': '',
             f'reference_system_id_{g.wikidata.id}':
                 ['Q123', self.precision_type.subs[0]]}
 
@@ -70,7 +73,7 @@ class EventTest(TestBaseCase):
                 'name': 'Keep it moving',
                 'place_to': residence.id,
                 'place_from': residence.id,
-                'moved_artifact': artifact.id,
+                'moved_object': artifact.id,
                 'moved_person': actor.id})
         move_id = rv.location.split('/')[-1]
 
@@ -83,54 +86,39 @@ class EventTest(TestBaseCase):
         rv = c.get(url_for('update', id_=move_id))
         assert b'Keep it moving' in rv.data
 
-        rv = c.get(url_for('insert', class_='creation', origin_id=file.id))
-        assert b'+ Creation' in rv.data
-
-        rv = c.post(
-            url_for('insert', class_='creation'),
-            data={'name': 'A creation event', 'file': file.id})
-        creation_id = rv.location.split('/')[-1]
-
-        rv = c.get(url_for('view', id_=creation_id, origin_id=file.id))
-        assert b'File' in rv.data
-
-        rv = c.get(url_for('update', id_=creation_id))
-        assert b'A creation event' in rv.data
-
         rv = c.get(
-            url_for('insert', class_='modification', origin_id=artifact.id))
+            url_for('insert', class_='modification'))
         assert b'+ Modification' in rv.data
 
         rv = c.post(
             url_for('insert', class_='modification'),
             data={
                 'name': 'A modification event',
-                'artifact': artifact.id,
+                'modified_object': str([artifact.id]),
                 'modified_place': residence.id})
         modification_id = rv.location.split('/')[-1]
 
         rv = c.get(url_for('view', id_=modification_id))
-        assert b'A modification event' in rv.data
+        assert b'artifact new' in rv.data
 
         rv = c.get(url_for('update', id_=modification_id))
         assert b'A modification event' in rv.data
 
         rv = c.post(
             url_for('insert', class_='production'),
-            data={'name': 'A productive event', 'artifact': artifact.id})
+            data={'name': 'New production', 'produced_artifact': artifact.id})
         production_id = rv.location.split('/')[-1]
-
         rv = c.get(url_for('view', id_=production_id))
-        assert b'artifact' in rv.data
+
+        assert b'artifact new' in rv.data
 
         rv = c.get(url_for('view', id_=artifact.id))
-        assert b'A productive event' in rv.data
+        assert b'New production' in rv.data
 
         rv = c.get(url_for('update', id_=production_id))
-        assert b'A productive event' in rv.data
+        assert b'New production' in rv.data
 
-        rv = c.get(
-            url_for('insert', class_='production', origin_id=artifact.id))
+        rv = c.get(url_for('insert', class_='production'))
         assert b'+ Production' in rv.data
 
         rv = c.post(
@@ -151,23 +139,11 @@ class EventTest(TestBaseCase):
             follow_redirects=True)
         assert b'An entry has been created' in rv.data
 
-        rv = c.get(url_for('view', id_=activity_id))
-        assert b'1949' in rv.data
-
-        rv = c.get(url_for('entity_add_file', id_=event_id))
-        assert b'link file' in rv.data
-
         rv = c.post(
-            url_for('entity_add_file', id_=event_id),
+            url_for('link_insert', origin_id=event_id, name='file'),
             data={'checkbox_values': str([file.id])},
             follow_redirects=True)
         assert b'X-Files' in rv.data
-
-        rv = c.post(
-            url_for('entity_add_reference', id_=event_id),
-            data={'reference': reference.id, 'page': '777'},
-            follow_redirects=True)
-        assert b'777' in rv.data
 
         rv = c.get(url_for('update', id_=activity_id))
         assert b'Event Horizon' in rv.data

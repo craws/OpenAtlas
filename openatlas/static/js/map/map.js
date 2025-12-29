@@ -147,7 +147,11 @@ const pointLayer = new L.GeoJSON(gisAll, {
   filter: pointFilter,
   onEachFeature: setPopup(false),
   pointToLayer: function (feature, latlng) {
-    return L.circleMarker(latlng, myCircleStyle);
+    const newCircleStyle = {
+      ...myCircleStyle,
+      fillColor: feature.properties.color ?? myCircleStyle.fillColor
+    }
+    return L.circleMarker(latlng, newCircleStyle);
   },
 });
 const polygonLayer = new L.GeoJSON(gisAll, {
@@ -340,16 +344,17 @@ const geoSearchControl = L.control.geonames({
 });
 geoSearchControl.on("select", function (e) {
   if (geoNamesModule) {
-    const popup = `<div>
-                  <a href='https://www.geonames.org/${e.geoname.geonameId}' target='_blank'>${e.geoname.name}</a><br>
-                  <div id="buttonBar" style="white-space:nowrap;">
-                    <p>
-                        <button class="${style.button.primary}" id="ImportGeonamesID">Import ID</button>
-                        <button class="${style.button.primary}" id="ImportCoordinates">Import Coordinates</button><br><br>
-                        <button class="${style.button.primary}" id="ImportAll">Import ID and Coordinates</button>
-                    </p>
-                </div>
-            </div>`;
+    const popup = `
+        <div>
+           <a href='https://www.geonames.org/${e.geoname.geonameId}' target='_blank'>${e.geoname.name}</a><br>
+          <div id="buttonBar" style="white-space:nowrap;">
+            <p>
+              <button class="${style.button.primary}" id="ImportGeonamesID">Import ID</button>
+              <button class="${style.button.primary}" id="ImportCoordinates">Import Coordinates</button><br><br>
+              <button class="${style.button.primary}" id="ImportAll">Import ID and Coordinates</button>
+            </p>
+          </div>
+        </div>`;
     e.target._map.on("opengeopopup", (p) => {
       p.popup.setContent(popup);
       p.popup.update();

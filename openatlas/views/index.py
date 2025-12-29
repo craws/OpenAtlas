@@ -1,5 +1,5 @@
 from flask import flash, g, render_template, request, session, url_for
-from flask_babel import format_number, lazy_gettext as _
+from flask_babel import format_number, gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
@@ -12,9 +12,10 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
     bookmark_toggle, button, link, required_group, send_mail)
-from openatlas.display.util2 import format_date, manual, uc_first
+from openatlas.display.util2 import manual, uc_first
 from openatlas.forms.field import SubmitField
 from openatlas.models.content import get_translation
+from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 
@@ -45,7 +46,7 @@ def overview() -> str:
                 button(_('model'), url_for('model_index')),
                 button(
                     _('reference systems'),
-                    url_for('index', view='reference_system')),
+                    url_for('index', group='reference_system')),
                 button(
                     _('network visualization'),
                     url_for('network', dimensions=0)),
@@ -61,17 +62,11 @@ def overview() -> str:
         'notes': Tab(
             'notes',
             _('notes'),
-            buttons=[manual('tools/notes')],
-            table=Table(
-                ['date', _('visibility'), 'entity', 'class', _('note')]))}
-    tables = {
-        'overview': Table(
-            [_('class'), _('count')],
-            paging=False,
-            defs=[{'className': 'dt-body-right', 'targets': 1}]),
-        'latest': Table([
-                _('latest'), _('name'), _('class'), _('begin'), _('end'),
-                _('user')],
+            table=Table(['date', _('visibility'), 'entity', 'class', 'note']))}
+    tables: dict[str, Table] = {
+        'overview': Table([_('class'), _('count')], paging=False),
+        'latest': Table(
+            [_('latest'), 'name', 'class', 'begin', 'end', 'user'],
             paging=False,
             order=[[0, 'desc']])}
     for entity_id in current_user.bookmarks:
@@ -79,8 +74,8 @@ def overview() -> str:
         tabs['bookmarks'].table.rows.append([
             link(entity),
             entity.class_.label,
-            entity.first,
-            entity.last,
+            entity.dates.first,
+            entity.dates.last,
             bookmark_toggle(entity.id, True)])
     for note in User.get_notes_by_user_id(current_user.id):
         entity = Entity.get_by_id(note['entity_id'])
@@ -91,14 +86,17 @@ def overview() -> str:
             entity.class_.label,
             note['text'],
             link(_("view"), url_for("note_view", id_=note["id"]))])
+    if tabs['notes'].table.rows:
+        tabs['notes'].buttons = [manual('tools/notes')]
     for name, count in Entity.get_overview_counts().items():
-        url = url_for('index', view=g.class_view_mapping[name])
+        if not g.classes[name].group:
+            continue
+        url = ''
+        if name not in [
+                'feature', 'stratigraphic_unit', 'source_translation']:
+            url = url_for('index', group=g.classes[name].group['name'])
         if name == 'administrative_unit':
-            url = f"{url_for('type_index')}#menu-tab-place"
-        elif name == 'type':
-            url = url_for('type_index')
-        elif name in ['feature', 'stratigraphic_unit', 'source_translation']:
-            url = ''
+            url = f"{url_for('index', group='type')}#menu-tab-place"
         tables['overview'].rows.append([
             link(g.classes[name].label, url) if url else g.classes[name].label,
             format_number(count)])
@@ -107,8 +105,8 @@ def overview() -> str:
             format_date(entity.created),
             link(entity),
             entity.class_.label,
-            entity.first,
-            entity.last,
+            entity.dates.first,
+            entity.dates.last,
             link(g.logger.get_log_info(entity.id)['creator'])])
     tabs['info'].content = render_template('index/index.html', tables=tables)
     return render_template('tabs.html', tabs=tabs, crumbs=['overview'])
@@ -128,7 +126,6 @@ def set_locale(language: str) -> Response:
 @app.route('/overview/feedback', methods=['GET', 'POST'])
 @required_group('readonly')
 def index_feedback() -> str | Response:
-
     class FeedbackForm(FlaskForm):
         subject = SelectField(
             _('subject'),
@@ -151,7 +148,7 @@ def index_feedback() -> str | Response:
                 form.subject.data + f" from {g.settings['site_name']}",
                 body,
                 g.settings['mail_recipients_feedback']):
-            flash(_('info feedback thanks'), 'info')
+            flash(_('info feedback thanks'))
         else:
             flash(_('error mail send'), 'error')  # pragma: no cover
         return redirect(url_for('overview'))

@@ -1,18 +1,17 @@
 from __future__ import annotations
 
 import ast
-from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
-import numpy
 from flask import g
-from flask_babel import lazy_gettext as _
+from flask_babel import gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField
 
 from openatlas import app
-from openatlas.models.entity import Entity, Link
+from openatlas.display.util2 import is_authorized
+from openatlas.models.entity import Entity
 
 
 def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
@@ -29,7 +28,7 @@ def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
         if field.type in ['StringField', 'IntegerField']:
             settings[field.label.text] = value
         if field.type == 'BooleanField':
-            settings[field.label.text] = str(_('on') if value else _('off'))
+            settings[field.label.text] = _('on' if value else _('off'))
         if field.type == 'SelectField':
             if isinstance(value, str) and value.isdigit():
                 value = int(value)
@@ -41,10 +40,11 @@ def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
     return settings
 
 
-def string_to_entity_list(string: str) -> list[Entity]:
-    ids = ast.literal_eval(string)
-    ids = [int(id_) for id_ in ids] if isinstance(ids, list) else [int(ids)]
-    return Entity.get_by_ids(ids)
+def convert(value: str) -> list[int]:
+    if not value:
+        return []
+    ids = ast.literal_eval(value)
+    return ids if isinstance(ids, list) else [int(ids)]
 
 
 def set_form_settings(form: Any, profile: bool = False) -> None:
@@ -75,73 +75,6 @@ def set_form_settings(form: Any, profile: bool = False) -> None:
         field.data = g.settings[field.name]
 
 
-def was_modified(form: Any, entity: Entity) -> bool:
-    if not entity.modified or not form.opened.data:
-        return False
-    if entity.modified < datetime.fromtimestamp(
-            float(form.opened.data)):
-        return False
-    g.logger.log('info', 'multi user', 'Overwrite denied')
-    return True
-
-
-def form_to_datetime64(
-        year: Any,
-        month: Any,
-        day: Any,
-        hour: Optional[Any] = None,
-        minute: Optional[Any] = None,
-        second: Optional[Any] = None,
-        to_date: bool = False) -> Optional[numpy.datetime64]:
-    if not year:
-        return None
-    year = year if year > 0 else year + 1
-
-    def is_leap_year(year_: int) -> bool:
-        if year_ % 400 == 0:  # e.g. 2000
-            return True
-        if year_ % 100 == 0:  # e.g. 1000
-            return False
-        if year_ % 4 == 0:  # e.g. 1996
-            return True
-        return False
-
-    def get_last_day_of_month(year_: int, month_: int) -> int:
-        months_days: dict[int, int] = {
-            1: 31, 2: 28, 3: 31, 4: 30, 5: 31, 6: 30, 7: 31, 8: 31, 9: 30,
-            10: 31, 11: 30, 12: 31}
-        months_days_leap: dict[int, int] = {
-            1: 31, 2: 29, 3: 31, 4: 30, 5: 31, 6: 30, 7: 31, 8: 31, 9: 30,
-            10: 31, 11: 30, 12: 31}
-        date_lookup = months_days_leap \
-            if is_leap_year(year_) else months_days
-        return date_lookup[month_]
-
-    if month:
-        month = f'{month:02}'
-    elif to_date:
-        month = '12'
-    else:
-        month = '01'
-
-    if day:
-        day = f'{day:02}'
-    elif to_date:
-        day = f'{get_last_day_of_month(int(year), int(month)):02}'
-    else:
-        day = '01'
-
-    hour = f'{hour:02}' if hour else '00'
-    minute = f'{minute:02}' if minute else '00'
-    second = f'{second:02}' if second else '00'
-    try:
-        date_time = numpy.datetime64(
-            f'{year}-{month}-{day}T{hour}:{minute}:{second}')
-    except ValueError:
-        return None
-    return date_time
-
-
 class GlobalSearchForm(FlaskForm):
     term = StringField('')
 
@@ -151,8 +84,27 @@ def inject_template_functions() -> dict[str, str | GlobalSearchForm]:
     return {'search_form': GlobalSearchForm(prefix='global')}
 
 
-def check_if_entity_has_time(item: Entity | Link) -> bool:
-    for date_ in [item.begin_from, item.begin_to, item.end_from, item.end_to]:
-        if date_ and '00:00:00' not in str(date_):
+def deletion_possible(entity: Entity) -> bool:
+    if not is_authorized(entity.class_.write_access):
+        return False
+    if current_user.group == 'contributor':
+        info = g.logger.get_log_info(entity.id)
+        if not info['creator'] or info['creator'].id != current_user.id:
+            return False
+    match entity.class_.group['name']:
+        case 'reference_system' if entity.system or entity.classes:
+            return False
+        case 'type':
+            if entity.category == 'system' \
+                    or (entity.category == 'standard' and not entity.root):
+                return False
             return True
-    return False
+    for relation in entity.class_.relations.values():
+        if relation.reverse_relation \
+                and relation.reverse_relation.required \
+                and entity.get_linked_entities(
+                    relation.property,
+                    relation.classes,
+                    relation.inverse):
+            return False
+    return True
