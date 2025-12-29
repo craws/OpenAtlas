@@ -140,9 +140,12 @@ basic CIDOC CRM classes and properties wherever possible. In addition, some
 shortcuts are used to increase performance and to keep the code base
 maintainable. For more information, see
 <a class="reference internal" href="openatlas_shortcuts.html"><span class="doc">OpenAtlas shortcuts</span></a>.</p>
+<p>It’s also worth noting that OpenAtlas in some cases saves dates and type
+IDs in links between entities, e.g. a participation of an actor at an event
+(which is a link) can have associated dates and a type ID.</p>
 <p>While OpenAtlas uses the CIDOC CRM within the application, a finer grained
 model is needed to deal with contextual differences in the user interface.
-Therefore, <a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/e33-linguistic-object/version-7.1">E33 - Lingustic Object</a> is
+Therefore, <a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/e33-linguistic-object/version-7.1">E33 - Linguistic Object</a> is
 used as class for sources as well as source translations with different user
 interface forms.
 An overview of the internal mapping and CIDOC CRM classes can be found
