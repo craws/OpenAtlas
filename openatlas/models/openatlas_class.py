@@ -65,7 +65,7 @@ def get_class_count() -> dict[str, int]:
     return db.get_class_count()
 
 
-def get_classes() -> dict[str, OpenatlasClass]:
+def get_classes() -> None:
     g.class_groups = class_groups
     classes = {}
     for row in db.get_classes():
@@ -86,25 +86,37 @@ def get_classes() -> dict[str, OpenatlasClass]:
             relations=relations,
             display=model_['display'],
             extra=model_['extra'])
+    g.classes = classes
+
+    # Set default reverse relations with first relation class which is good
+    # enough for most cases. If not, call it again with a specific class.
     for class_ in classes.values():
         for relation in class_.relations.values():
-            if not relation.classes:
-                continue
-            related_class = classes[
-                relation.classes[0].replace('object_location', 'place')]
-            for relation2 in related_class.relations.values():
-                if class_.name in relation2.classes \
-                        and relation.property == relation2.property \
-                        and relation.inverse != relation2.inverse:
-                    relation.reverse_relation = relation2
-                    break
-                if class_.name == 'place' and 'object_location' \
-                        in relation2.classes \
-                        and relation.property == relation2.property \
-                        and relation.inverse != relation2.inverse:
-                    relation.reverse_relation = relation2
-                    break
-    return classes
+            if relation.classes:
+                relation.reverse_relation = get_reverse_relation(
+                    class_,
+                    relation,
+                    relation.classes[0])
+
+
+def get_reverse_relation(
+        class_: OpenatlasClass,
+        relation: Relation,
+        related_class_name: str) -> Relation | None:
+    if relation.classes:
+        related_class = \
+            g.classes[related_class_name.replace('object_location', 'place')]
+        for relation2 in related_class.relations.values():
+            if class_.name in relation2.classes \
+                    and relation.property == relation2.property \
+                    and relation.inverse != relation2.inverse:
+                return relation2
+            if class_.name == 'place' and 'object_location' \
+                    in relation2.classes \
+                    and relation.property == relation2.property \
+                    and relation.inverse != relation2.inverse:
+                return relation2
+    return None
 
 
 def get_model(class_name: str) -> dict[str, Any]:
