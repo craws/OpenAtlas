@@ -19,7 +19,7 @@ class ReferenceSystemTest(TestBaseCase):
         assert b'Mozart' in rv.data
 
         rv = c.get(url_for('insert', class_='reference_system'))
-        assert b'resolver url' in rv.data
+        assert b'resolver URL' in rv.data
 
         data: Any = {
             'name': 'Wikipedia',
