@@ -5,21 +5,21 @@ approach is to speed up development and make it easier to understand the
 system.
 
 Changes can be made to test different setups, but we strongly advice against
-implementing changes for productive environments for following reasons:
+implementing changes for productive environments because:
 
-* There will be conflicts with future OpenAtlas updates, especially because
+* There may be conflicts with future OpenAtlas versions, especially because
 this approach is relatively new and will be subject to changes.
-* Currently, there are no checks or validation functions
-* Even if the changes don't break the application, they might cause unwanted
-side effects in the application, API, presentation sites or similar.
+* Currently, there are no check or validation functions for the configuration
+* Even if changes appear to work, they might cause unwanted
+side effects in the application, API or presentation sites.
 
-A much better approach would be to test needed changes and then tell us about
-it. In case we decide to implement suggested changes, it would mitigate the
-dangers mentioned above.
+A better approach would be to test needed changes and then tell us about
+it. In case we implement suggested changes, it would mitigate the
+issues mentioned above.
 
 # Functionality
 With changes in the config files it is possible to:
-* Add, change or remove relations between classes, e.g. make some required
+* Add, change or remove entity classes and their relations
 * Determine modes of linking, e.g. if relations are edited directly at an
 entity form or via tabs
 * Change display details like labels and the order of shown items, e.g. tabs
@@ -44,8 +44,8 @@ Description of the structure for classes used in the classes directory.
   * **options**: label, required, annotated (only for description)
 * **relations** - the order affects display of entity views and forms
   * **label** - optional (default = relation name)
-  * **classes** - a list of related classes
-  * **property** - the property used to link them
+  * **classes** - a list of related OpenAtlas classes
+  * **property** - the CIDOC property used to link them
   * **inverse** - link direction (default = False)
   * **required** - if possible to remove (default = False)
   * **multiple** - if multiple connections are possible (default = False)
@@ -81,7 +81,7 @@ Description of the structure for classes used in the classes directory.
   * **additional_tabs**
     * **note** - possibility to add notes
     * **person_place** - special function to show event places at an actor
-    * **place_person** - special function to show actors of event at a place
+    * **place_person** - special function to show actors of events at a place
   * **additional_information** - labels can be set optionally
     * **file_size** - used for files
     * **file_extension** - used for files
