@@ -16,7 +16,20 @@ then run the database upgrade script, then restart Apache:
     git pull origin main
     sudo python3 install/upgrade/database_upgrade.py
     sudo service apache2 restart
-    
+
+### 8.15.x to 9.0.0
+WARNING - this is a major release and requires software upgrades. If you are
+using a Debian system upgrade it to 13 (Trixie).
+
+Use packages from install.md after the upgrade to be sure to have the relevant
+packages, for more information and instructions see
+https://redmine.openatlas.eu/issues/2343.
+
+If you upgrade a Debian system be sure to have the new postgis
+packages installed (see install.md) before you upgrade database clusters.
+
+9.0.0.sql is needed but will be taken care of by the database upgrade script.
+
 ### 8.15.0 to 8.15.1
 A code base update (e.g. with git pull) and a webserver restart is sufficient.
 
