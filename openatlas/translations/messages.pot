@@ -8,14 +8,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-11-15 15:27+0100\n"
+"POT-Creation-Date: 2025-12-31 10:29+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.10.3\n"
+"Generated-By: Babel 2.17.0\n"
 
 #: openatlas/api/endpoints/iiif.py:257 openatlas/display/classes.py:48
 #: openatlas/display/classes.py:340 openatlas/display/util.py:213
@@ -115,6 +115,10 @@ msgstr ""
 msgid "artifact"
 msgstr ""
 
+#: openatlas/display/classes.py:222
+msgid "participated at an event"
+msgstr ""
+
 #: openatlas/display/classes.py:230
 msgid "produced"
 msgstr ""
@@ -143,7 +147,8 @@ msgid "precision"
 msgstr ""
 
 #: openatlas/display/classes.py:280 openatlas/display/util.py:46
-#: openatlas/views/hierarchy.py:102 openatlas/views/overlay.py:96
+#: openatlas/views/admin.py:297 openatlas/views/hierarchy.py:102
+#: openatlas/views/overlay.py:96 openatlas/views/overlay.py:98
 msgid "remove"
 msgstr ""
 
@@ -194,8 +199,9 @@ msgstr ""
 msgid "copy"
 msgstr ""
 
-#: openatlas/display/classes_base.py:161 openatlas/views/admin.py:938
+#: openatlas/display/classes_base.py:160 openatlas/views/admin.py:938
 #: openatlas/views/admin.py:956 openatlas/views/export.py:202
+#: openatlas/views/user.py:171
 #, python-format
 msgid "Delete %(name)s?"
 msgstr ""
@@ -315,7 +321,8 @@ msgstr ""
 
 #: openatlas/display/classes_base.py:430 openatlas/display/tab.py:307
 #: openatlas/display/util.py:540 openatlas/templates/forms/form_table.html:5
-#: openatlas/views/link.py:40 openatlas/views/link.py:161
+#: openatlas/views/file.py:122 openatlas/views/link.py:40
+#: openatlas/views/link.py:161 openatlas/views/link.py:204
 #: openatlas/views/link.py:227 openatlas/views/link.py:250
 msgid "link"
 msgstr ""
@@ -363,7 +370,7 @@ msgstr ""
 
 #: openatlas/display/classes_base.py:563 openatlas/display/util.py:171
 #: openatlas/forms/setting.py:126 openatlas/views/index.py:69
-#: openatlas/views/index.py:73
+#: openatlas/views/index.py:73 openatlas/views/model.py:71
 msgid "class"
 msgstr ""
 
@@ -455,6 +462,8 @@ msgid "external reference systems"
 msgstr ""
 
 #: openatlas/display/util.py:67 openatlas/views/admin.py:150
+#: openatlas/views/login.py:127 openatlas/views/login.py:178
+#: openatlas/views/user.py:293
 msgid "at"
 msgstr ""
 
@@ -462,7 +471,12 @@ msgstr ""
 msgid "event"
 msgstr ""
 
-#: openatlas/display/util.py:131
+#: openatlas/display/util.py:97 openatlas/display/util.py:103
+#: openatlas/display/util.py:110 openatlas/display/util.py:116
+msgid "at an"
+msgstr ""
+
+#: openatlas/display/util.py:129
 #, python-format
 msgid "between %(begin)s and %(end)s"
 msgstr ""
@@ -521,7 +535,7 @@ msgstr ""
 #: openatlas/views/annotation.py:83 openatlas/views/entity_index.py:31
 #: openatlas/views/file.py:42 openatlas/views/file.py:60
 #: openatlas/views/file.py:62 openatlas/views/file.py:236
-#: openatlas/views/imports.py:256
+#: openatlas/views/imports.py:256 openatlas/views/link.py:204
 msgid "file"
 msgstr ""
 
@@ -562,7 +576,17 @@ msgstr ""
 msgid "citation_example"
 msgstr ""
 
-#: openatlas/display/util2.py:134 openatlas/views/index.py:41
+#: openatlas/display/util.py:600 openatlas/forms/add_fields.py:244
+#: openatlas/forms/field.py:260 openatlas/forms/manager_base.py:134
+#: openatlas/templates/model/cidoc_class_view.html:8
+#: openatlas/templates/model/property_view.html:8
+#: openatlas/templates/type/index.html:135 openatlas/views/imports.py:74
+#: openatlas/views/imports.py:134 openatlas/views/index.py:140
+#: openatlas/views/note.py:22
+msgid "description"
+msgstr ""
+
+#: openatlas/display/util2.py:136 openatlas/views/index.py:41
 msgid "manual"
 msgstr ""
 
@@ -601,22 +625,16 @@ msgstr ""
 msgid "comment"
 msgstr ""
 
-#: openatlas/forms/add_fields.py:244 openatlas/forms/field.py:260
-#: openatlas/forms/manager_base.py:134
-#: openatlas/templates/model/cidoc_class_view.html:8
-#: openatlas/templates/model/property_view.html:8
-#: openatlas/templates/type/index.html:135 openatlas/views/imports.py:74
-#: openatlas/views/imports.py:134 openatlas/views/index.py:140
-#: openatlas/views/note.py:22
-msgid "description"
-msgstr ""
-
 #: openatlas/forms/display.py:44 openatlas/views/model.py:76
 msgid "reference system"
 msgstr ""
 
 #: openatlas/forms/display.py:156 openatlas/templates/util/translations.html:10
 msgid "hide"
+msgstr ""
+
+#: openatlas/forms/field.py:515 openatlas/templates/layout.html:36
+msgid "generate password"
 msgstr ""
 
 #: openatlas/forms/form.py:59 openatlas/forms/manager.py:276
@@ -746,8 +764,9 @@ msgstr ""
 #: openatlas/templates/model/index.html:9
 #: openatlas/templates/model/index.html:11 openatlas/templates/search.html:36
 #: openatlas/templates/type/index.html:107 openatlas/views/model.py:61
-#: openatlas/views/model.py:132 openatlas/views/model.py:196
-#: openatlas/views/search.py:28 openatlas/views/vocabs.py:138
+#: openatlas/views/model.py:107 openatlas/views/model.py:132
+#: openatlas/views/model.py:196 openatlas/views/search.py:28
+#: openatlas/views/vocabs.py:138
 msgid "classes"
 msgstr ""
 
@@ -770,6 +789,10 @@ msgstr ""
 
 #: openatlas/forms/manager_base.py:244
 msgid "ends in"
+msgstr ""
+
+#: openatlas/forms/manager_base.py:362
+msgid "exists"
 msgstr ""
 
 #: openatlas/forms/manager_base.py:446 openatlas/views/vocabs.py:139
@@ -943,7 +966,8 @@ msgid "max cluster radius"
 msgstr ""
 
 #: openatlas/forms/setting.py:103 openatlas/views/login.py:35
-#: openatlas/views/user.py:32 openatlas/views/user.py:145
+#: openatlas/views/login.py:179 openatlas/views/user.py:32
+#: openatlas/views/user.py:145 openatlas/views/user.py:295
 msgid "username"
 msgstr ""
 
@@ -1248,10 +1272,6 @@ msgstr ""
 
 #: openatlas/templates/import_data.html:33
 msgid "preview"
-msgstr ""
-
-#: openatlas/templates/layout.html:36
-msgid "generate password"
 msgstr ""
 
 #: openatlas/templates/layout.html:86 openatlas/templates/search.html:9
@@ -1860,17 +1880,17 @@ msgstr ""
 msgid "data"
 msgstr ""
 
-#: openatlas/views/admin.py:144
+#: openatlas/views/admin.py:145
 #, python-format
 msgid "Test mail from %(site_name)s"
 msgstr ""
 
-#: openatlas/views/admin.py:147
+#: openatlas/views/admin.py:148
 #, python-format
 msgid "This test mail was sent by %(username)s"
 msgstr ""
 
-#: openatlas/views/admin.py:152
+#: openatlas/views/admin.py:153
 #, python-format
 msgid "A test mail was sent to %(email)s."
 msgstr ""
@@ -1892,6 +1912,10 @@ msgstr ""
 
 #: openatlas/views/admin.py:249
 msgid "check links"
+msgstr ""
+
+#: openatlas/views/admin.py:259
+msgid "deleted links"
 msgstr ""
 
 #: openatlas/views/admin.py:285
@@ -2008,6 +2032,10 @@ msgstr ""
 msgid "duplicated files"
 msgstr ""
 
+#: openatlas/views/admin.py:658 openatlas/views/admin.py:713
+msgid "was deleted"
+msgstr ""
+
 #: openatlas/views/admin.py:661 openatlas/views/admin.py:674
 #: openatlas/views/admin.py:716 openatlas/views/entity.py:177
 #: openatlas/views/export.py:49
@@ -2026,7 +2054,7 @@ msgstr ""
 msgid "entity removed from annotation"
 msgstr ""
 
-#: openatlas/views/admin.py:748
+#: openatlas/views/admin.py:748 openatlas/views/admin.py:750
 msgid "delete all logs"
 msgstr ""
 
@@ -2042,6 +2070,14 @@ msgstr ""
 msgid "send"
 msgstr ""
 
+#: openatlas/views/admin.py:805
+msgid "To unsubscribe use the link below."
+msgstr ""
+
+#: openatlas/views/admin.py:809
+msgid "Newsletter send"
+msgstr ""
+
 #: openatlas/views/admin.py:833
 msgid "images were created"
 msgstr ""
@@ -2050,15 +2086,16 @@ msgstr ""
 msgid "resized orphaned images were deleted"
 msgstr ""
 
-#: openatlas/views/admin.py:985
+#: openatlas/views/admin.py:985 openatlas/views/admin.py:990
 msgid "relink entity"
 msgstr ""
 
-#: openatlas/views/admin.py:992
+#: openatlas/views/admin.py:992 openatlas/views/admin.py:997
 msgid "remove entity"
 msgstr ""
 
-#: openatlas/views/admin.py:999 openatlas/views/annotation.py:40
+#: openatlas/views/admin.py:999 openatlas/views/admin.py:1001
+#: openatlas/views/annotation.py:40
 msgid "delete annotation"
 msgstr ""
 
@@ -2072,6 +2109,11 @@ msgstr ""
 
 #: openatlas/views/arche.py:46
 msgid "no entities to retrieve"
+msgstr ""
+
+#: openatlas/views/arche.py:62 openatlas/views/imports.py:310
+#: openatlas/views/vocabs.py:170
+msgid "import of"
 msgstr ""
 
 #: openatlas/views/changelog.py:11 openatlas/views/changelog.py:12
@@ -2321,7 +2363,7 @@ msgstr ""
 msgid "project inserted"
 msgstr ""
 
-#: openatlas/views/imports.py:187
+#: openatlas/views/imports.py:186
 #, python-format
 msgid "delete %(name)s?"
 msgstr ""
@@ -2405,7 +2447,7 @@ msgstr ""
 msgid "unsubscribe link not valid"
 msgstr ""
 
-#: openatlas/views/index.py:183
+#: openatlas/views/index.py:184
 msgid ""
 "You have successfully unsubscribed. You can subscribe again in your "
 "Profile."
@@ -2423,8 +2465,9 @@ msgstr ""
 msgid "page / link text"
 msgstr ""
 
-#: openatlas/views/login.py:38 openatlas/views/profile.py:26
-#: openatlas/views/profile.py:161 openatlas/views/user.py:37
+#: openatlas/views/login.py:38 openatlas/views/login.py:180
+#: openatlas/views/profile.py:26 openatlas/views/profile.py:161
+#: openatlas/views/user.py:37 openatlas/views/user.py:296
 msgid "password"
 msgstr ""
 
@@ -2448,14 +2491,26 @@ msgstr ""
 msgid "Invalid user or password"
 msgstr ""
 
-#: openatlas/views/login.py:120
+#: openatlas/views/login.py:121
 #, python-format
 msgid "Password reset request for %(site_name)s"
 msgstr ""
 
-#: openatlas/views/login.py:123
+#: openatlas/views/login.py:124
 #, python-format
 msgid "We received a password reset request for %(username)s"
+msgstr ""
+
+#: openatlas/views/login.py:128
+msgid "reset password link"
+msgstr ""
+
+#: openatlas/views/login.py:130
+msgid "The link is valid for"
+msgstr ""
+
+#: openatlas/views/login.py:131
+msgid "hours"
 msgstr ""
 
 #: openatlas/views/login.py:135
@@ -2661,11 +2716,11 @@ msgstr ""
 msgid "not valid"
 msgstr ""
 
-#: openatlas/views/token.py:82
+#: openatlas/views/token.py:82 openatlas/views/token.py:84
 msgid "revoke all tokens"
 msgstr ""
 
-#: openatlas/views/token.py:87
+#: openatlas/views/token.py:87 openatlas/views/token.py:89
 msgid "authorize all tokens"
 msgstr ""
 
@@ -2673,8 +2728,16 @@ msgstr ""
 msgid "delete revoked tokens"
 msgstr ""
 
+#: openatlas/views/token.py:94
+msgid "delete all revoked tokens"
+msgstr ""
+
 #: openatlas/views/token.py:97
 msgid "delete invalid tokens"
+msgstr ""
+
+#: openatlas/views/token.py:99
+msgid "delete all invalid tokens"
 msgstr ""
 
 #: openatlas/views/token.py:104
@@ -2691,6 +2754,10 @@ msgstr ""
 
 #: openatlas/views/token.py:119
 msgid "authorize"
+msgstr ""
+
+#: openatlas/views/token.py:165
+msgid "token stored for"
 msgstr ""
 
 #: openatlas/views/token.py:193
@@ -2746,6 +2813,18 @@ msgstr ""
 msgid "sex estimation"
 msgstr ""
 
+#: openatlas/views/tools.py:223
+msgid "laboratory"
+msgstr ""
+
+#: openatlas/views/tools.py:223 openatlas/views/tools.py:227
+msgid "ID"
+msgstr ""
+
+#: openatlas/views/tools.py:227
+msgid "specimen"
+msgstr ""
+
 #: openatlas/views/tools.py:231
 msgid "radiocarbon year"
 msgstr ""
@@ -2762,7 +2841,7 @@ msgstr ""
 msgid "types deleted"
 msgstr ""
 
-#: openatlas/views/type.py:113
+#: openatlas/views/type.py:114
 msgid ""
 "Warning: this type has subs and/or links to entities (see tabs). Please "
 "check if you want to delete these subs and links too."
@@ -2812,7 +2891,7 @@ msgstr ""
 msgid "user created"
 msgstr ""
 
-#: openatlas/views/user.py:287
+#: openatlas/views/user.py:288
 #, python-format
 msgid "Your account information for %(sitename)s"
 msgstr ""
@@ -2849,7 +2928,7 @@ msgstr ""
 msgid "vocabularies"
 msgstr ""
 
-#: openatlas/views/vocabs.py:132
+#: openatlas/views/vocabs.py:132 openatlas/views/vocabs.py:170
 msgid "top concepts"
 msgstr ""
 
@@ -2863,6 +2942,10 @@ msgstr ""
 
 #: openatlas/views/vocabs.py:154
 msgid "import hierarchy"
+msgstr ""
+
+#: openatlas/views/vocabs.py:172
+msgid "Check log for not imported concepts"
 msgstr ""
 
 #: openatlas/views/vocabs.py:189
