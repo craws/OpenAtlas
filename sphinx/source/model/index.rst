@@ -59,5 +59,7 @@ model is needed to deal with contextual differences in the user interface.
 Therefore, :cidoc_entity:`E33 - Linguistic Object<e33-linguistic-object>` is
 used as class for sources as well as source translations with different user
 interface forms.
-An overview of the internal mapping and CIDOC CRM classes can be found
-`here <https://github.com/craws/OpenAtlas/tree/main/install/crm>`_.
+An overview of the internal mapping and CIDOC CRM classes can be seen in the
+user interface at **Model** -> **OpenAtlas classes** or
+`here <https://demo.openatlas.eu/overview/model/openatlas_class_index>`_ at
+the demo version.
