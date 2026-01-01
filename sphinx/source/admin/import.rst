@@ -250,8 +250,9 @@ Example:
 
 External reference systems
 ++++++++++++++++++++++++++
-It is possible to link the imported entity to an existing :doc:`/entity/reference_system`.
-Named the coulmn **reference_system_*** with the *name* of the external
+It is possible to link the imported entity to an existing
+:doc:`/entity/reference_system`. Named the column **reference_system_*** with
+the *name* of the external
 :doc:`/entity/reference_system` appended, e.g. **reference_system_wikidata**.
 If spaces occur in the name, please substitute them with underscore (_),
 e.g. **reference_system_getty_aat**.

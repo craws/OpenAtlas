@@ -1,21 +1,23 @@
 
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Feature &mdash; OpenAtlas 8.15.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <title>Feature &mdash; OpenAtlas 9.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+      <script src="../_static/jquery.js?v=8dae8fb0"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=801c8461"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Stratigraphic unit" href="stratigraphic_unit.html" />
@@ -34,9 +36,6 @@
             OpenAtlas
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                8.15.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -106,39 +105,38 @@
            <div itemprop="articleBody">
              
   <section id="feature">
-<h1>Feature<a class="headerlink" href="#feature" title="Permalink to this heading"></a></h1>
+<h1>Feature<a class="headerlink" href="#feature" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>CIDOC documentation: <a class="reference external" href="https://www.cidoc-crm.org/Entity/e18-physical-thing/version-7.1">E18 Physical Thing</a></p>
+<p>CIDOC documentation: <a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/e18-physical-thing/version-7.1">E18 Physical Thing</a></p>
 <p>Features are subunit of a <a class="reference internal" href="place.html"><span class="doc">Place</span></a> and used in archaeological data
 recording. E.g. graves or buildings of an archaeological site would be
 considered features.</p>
 <section id="form-fields">
-<h2>Form fields<a class="headerlink" href="#form-fields" title="Permalink to this heading"></a></h2>
+<h2>Form fields<a class="headerlink" href="#form-fields" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="../ui/name.html"><span class="doc">Name</span></a></p></li>
 <li><p><a class="reference internal" href="type.html"><span class="doc">Type</span></a></p></li>
 <li><p><a class="reference internal" href="../ui/date.html"><span class="doc">Date</span></a></p></li>
 <li><p><a class="reference internal" href="../ui/description.html"><span class="doc">Description</span></a></p></li>
-<li><p>Super - <a class="reference internal" href="place.html"><span class="doc">Place</span></a> the feature is a part of</p></li>
+<li><p><strong>Super</strong> - A <a class="reference internal" href="place.html"><span class="doc">Place</span></a> the feature is a part of</p></li>
 <li><p><a class="reference internal" href="../tools/map.html"><span class="doc">Map</span></a></p></li>
 </ul>
 </section>
 <section id="can-be-linked-via-tabs-to">
-<h2>Can be linked via tabs to<a class="headerlink" href="#can-be-linked-via-tabs-to" title="Permalink to this heading"></a></h2>
+<h2>Can be linked via tabs to<a class="headerlink" href="#can-be-linked-via-tabs-to" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="source.html"><span class="doc">Source</span></a> - use, if a feature is referenced in it</p></li>
-<li><p><a class="reference internal" href="event.html"><span class="doc">Event</span></a> - use only for new events. For already existing events link
-the location in the event form</p></li>
-<li><p><a class="reference internal" href="reference.html"><span class="doc">Reference</span></a> can be used to add a citation</p></li>
+<li><p><a class="reference internal" href="reference.html"><span class="doc">Reference</span></a></p></li>
+<li><p><a class="reference internal" href="artifact.html"><span class="doc">Artifact</span></a></p></li>
 <li><p><a class="reference internal" href="stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a> is used to link a subunit of a feature (e.g. a
 skeleton (stratigraphic unit) in a grave (feature))</p></li>
-<li><p><a class="reference internal" href="file.html"><span class="doc">File</span></a> can be used to add files such as pictures</p></li>
+<li><p><a class="reference internal" href="file.html"><span class="doc">File</span></a></p></li>
 </ul>
 </section>
 <section id="super-and-subunits">
-<h2>Super and subunits<a class="headerlink" href="#super-and-subunits" title="Permalink to this heading"></a></h2>
-<p>In the OpenAtlas database a feature is a subunit of a <a class="reference internal" href="place.html"><span class="doc">Place</span></a>.
+<h2>Super and subunits<a class="headerlink" href="#super-and-subunits" title="Link to this heading"></a></h2>
+<p>In OpenAtlas a feature is a subunit of a <a class="reference internal" href="place.html"><span class="doc">Place</span></a>.
 A <a class="reference internal" href="place.html"><span class="doc">Place</span></a> can consist of one or more subunits called Features
 (e.g. buildings, graves, pits, ditches, ramparts etc.).
 Features themselves are structured in the same way as Places and can consist

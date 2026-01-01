@@ -44,13 +44,9 @@ Display
 * **Show import information** - show project and identifier for entities
   that were imported from another project
 * **Show CIDOC class** - show the corresponding CIDOC class at entity view
-* **Show API links** - show a buttons for :doc:`/technical/api` views at
-  entity view
 * **Default map zoom** - define the lowest zoom level to include all
   features in a :doc:`/tools/map` view
 * **Max map zoom** - adjust how far you can zoom into a :doc:`/tools/map`.
-* **Show icons in tables** - if activated small images of files are shown in
-  tables
 
 Presentation site
 -----------------

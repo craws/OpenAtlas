@@ -1,21 +1,23 @@
 
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Export &mdash; OpenAtlas 8.15.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <title>Export &mdash; OpenAtlas 9.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+      <script src="../_static/jquery.js?v=8dae8fb0"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=801c8461"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="API" href="api.html" />
@@ -34,9 +36,6 @@
             OpenAtlas
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                8.15.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -64,7 +63,6 @@
 <li class="toctree-l2"><a class="reference internal" href="import.html">Import</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Export</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html">API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="arche.html">ARCHE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="vocabs.html">Vocabs</a></li>
 </ul>
 </li>
@@ -108,12 +106,12 @@
            <div itemprop="articleBody">
              
   <section id="export">
-<h1>Export<a class="headerlink" href="#export" title="Permalink to this heading"></a></h1>
+<h1>Export<a class="headerlink" href="#export" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <p>Available for admins and managers</p>
 <section id="export-sql">
-<h2>Export SQL<a class="headerlink" href="#export-sql" title="Permalink to this heading"></a></h2>
+<h2>Export SQL<a class="headerlink" href="#export-sql" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Be aware, especially when sharing, that <strong>user data</strong>, e.g. email addresses,
 are included in the database backups</p></li>
@@ -123,7 +121,7 @@ are included in the database backups</p></li>
 <li><p>Existing backups are shown in a list and can be downloaded or deleted</p></li>
 </ul>
 <section id="id1">
-<h3>Export SQL<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h3>
+<h3>Export SQL<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
 <p>A SQL dump will be created with <strong>pg_dump</strong> in a plain text format. The
 resulting file can be used to fill an existing empty database, such as</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">psql</span> <span class="n">openatlas</span> <span class="o">&lt;</span> <span class="n">export</span><span class="o">.</span><span class="n">sql</span>
@@ -131,7 +129,7 @@ resulting file can be used to fill an existing empty database, such as</p>
 </div>
 </section>
 <section id="export-database-dump">
-<h3>Export database dump<a class="headerlink" href="#export-database-dump" title="Permalink to this heading"></a></h3>
+<h3>Export database dump<a class="headerlink" href="#export-database-dump" title="Link to this heading"></a></h3>
 <p>A SQL dump will be created with <strong>pg_dump</strong> in a custom archiving format (-Fc).
 In this format <strong>pg_restore</strong> can be used to restore the database regardless
 of used operating system and if line breaks are used or not</p>
@@ -141,7 +139,7 @@ of used operating system and if line breaks are used or not</p>
 </section>
 </section>
 <section id="export-rdf-nt">
-<h2>Export RDF/NT<a class="headerlink" href="#export-rdf-nt" title="Permalink to this heading"></a></h2>
+<h2>Export RDF/NT<a class="headerlink" href="#export-rdf-nt" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>RDF/NT dumps are saved in the <strong>files/rdf/export</strong> folder</p></li>
 <li><p>A warning will appear if the directory isn’t writable</p></li>
@@ -151,7 +149,7 @@ of used operating system and if line breaks are used or not</p>
 </ul>
 </section>
 <section id="export-csv">
-<h2>Export CSV<a class="headerlink" href="#export-csv" title="Permalink to this heading"></a></h2>
+<h2>Export CSV<a class="headerlink" href="#export-csv" title="Link to this heading"></a></h2>
 <p>When the <strong>Export CSV</strong> button is clicked, a <strong>ZIP</strong> file containing several
 <strong>CSV</strong> files is downloaded. The ZIP file contains:</p>
 <ul class="simple">
@@ -167,7 +165,7 @@ of used operating system and if line breaks are used or not</p>
 example 2022-10-04_1610-export.zip. This process can take some time.</p>
 </section>
 <section id="export-json">
-<h2>Export JSON<a class="headerlink" href="#export-json" title="Permalink to this heading"></a></h2>
+<h2>Export JSON<a class="headerlink" href="#export-json" title="Link to this heading"></a></h2>
 <p>When the <strong>Export JSON</strong> button is clicked, a <strong>JSON</strong> file is downloaded.
 This file contains the following keys:</p>
 <ul class="simple">
@@ -183,7 +181,7 @@ This file contains the following keys:</p>
 2022-10-04_1610-export.json. This process can take some time.</p>
 </section>
 <section id="export-xml">
-<h2>Export XML<a class="headerlink" href="#export-xml" title="Permalink to this heading"></a></h2>
+<h2>Export XML<a class="headerlink" href="#export-xml" title="Link to this heading"></a></h2>
 <p>When the <strong>Export XML</strong> button is clicked, an <strong>XML</strong> file is
 downloaded. This file contains the following tags:</p>
 <ul class="simple">
@@ -199,7 +197,7 @@ downloaded. This file contains the following tags:</p>
 2022-10-04_1610-export.xml. This process can take some time.</p>
 </section>
 <section id="export-arche">
-<h2>Export ARCHE<a class="headerlink" href="#export-arche" title="Permalink to this heading"></a></h2>
+<h2>Export ARCHE<a class="headerlink" href="#export-arche" title="Link to this heading"></a></h2>
 <p>A dedicated export is available to generate data suitable for ingestion into
 <a class="reference external" href="https://arche.acdh.oeaw.ac.at/">ARCHE</a>, the ACDH repository system.
 This feature is intended for administrative use only.</p>
@@ -220,7 +218,7 @@ in an ARCHE-compatible structure</p></li>
 available to administrators due to performance and data sensitivity concerns.</p>
 </div>
 <section id="tabs">
-<h3>Tabs<a class="headerlink" href="#tabs" title="Permalink to this heading"></a></h3>
+<h3>Tabs<a class="headerlink" href="#tabs" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><p><strong>Info</strong>
 Displays the data entered in <code class="docutils literal notranslate"><span class="pre">production.py</span></code>.
@@ -234,7 +232,7 @@ Allows administrators to start and manage the ARCHE export.</p></li>
 </ul>
 </section>
 <section id="configuration">
-<h3>Configuration<a class="headerlink" href="#configuration" title="Permalink to this heading"></a></h3>
+<h3>Configuration<a class="headerlink" href="#configuration" title="Link to this heading"></a></h3>
 <p>To make use of the ARCHE export functionality, specific metadata must be
 provided in the <code class="docutils literal notranslate"><span class="pre">production.py</span></code> settings file using the
 <code class="docutils literal notranslate"><span class="pre">ARCHE_METADATA</span></code> dictionary.</p>
@@ -280,7 +278,7 @@ provided in the <code class="docutils literal notranslate"><span class="pre">pro
 </div>
 </section>
 <section id="description-of-fields">
-<h3>Description of fields<a class="headerlink" href="#description-of-fields" title="Permalink to this heading"></a></h3>
+<h3>Description of fields<a class="headerlink" href="#description-of-fields" title="Link to this heading"></a></h3>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>For all fields that refer to people (e.g., <code class="docutils literal notranslate"><span class="pre">depositor</span></code>, <code class="docutils literal notranslate"><span class="pre">curator</span></code>,

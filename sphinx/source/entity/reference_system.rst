@@ -11,7 +11,7 @@ available reference systems is provided when clicking the
 **Reference system** button on the start page.
 
 Linking entities to external reference systems has many advantages such as
-being able to find or provide more information from other sources. Futhermore,
+being able to find or provide more information from other sources. Furthermore,
 they facilitate the merge of data sets. By using reference systems LOD (Linked
 Open Data) can be created.
 Furthermore, analogue reference systems such as library catalogues or
@@ -92,6 +92,7 @@ Admins and manager can add, update, and delete external reference systems.
 
 * **Name** - e.g. Wikipedia; the name can not be changed for the
   pre-installed reference systems Wikidata and GeoNames
+* **External reference match** - default precision selected in forms
 * **Website URL** - URL of the reference system (e.g.
   `Wikidata <https://wikidata.org/>`_ for Wikidata)
 * **Resolver URL** - URL that - in combination with the ID - links to an
@@ -100,11 +101,10 @@ Admins and manager can add, update, and delete external reference systems.
   creates the external link: https://www.wikidata.org/wiki/Q123 (September)
 * **Example ID** - an example id to show the desired format (e.g. Q123
   for Wikidata)
-* **External reference match** - default precision selected in forms
-* **Description** - a short description, shown in forms when mouse over
-  the **i** icon
 * **Classes** - a checkbox list of available classes, for GeoNames only place
   is available
+* **Description** - a short description, shown in forms when mouse over
+  the **i** icon
 
 Classes can be removed from a reference system by clicking on the tab with the
 corresponding class name and clicking the **Remove** button. This button is

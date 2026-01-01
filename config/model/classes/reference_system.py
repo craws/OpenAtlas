@@ -23,5 +23,4 @@ reference_system: dict[str, Any] = {
     'display': {
         'buttons': ['insert'],
         'form_buttons': ['insert_and_continue'],
-        'additional_tabs': {
-            'note': {}}}}
+        'additional_tabs': {'note': {}}}}

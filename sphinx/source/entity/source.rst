@@ -15,7 +15,8 @@ Form fields
 -----------
 * :doc:`/ui/name`
 * :doc:`type`
-* :doc:`/entity/artifact` - use if the source is part of an artifact
+* **Information carrier** - use if the source is depicted
+  on an :doc:`/entity/artifact`
 * **Content** - a summary or the whole text of the source.
   :doc:`/tools/text_annotation` can be used.
 

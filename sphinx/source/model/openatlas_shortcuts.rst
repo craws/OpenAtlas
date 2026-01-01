@@ -5,7 +5,7 @@ OpenAtlas shortcuts
 
 OpenAtlas uses several shortcuts in order to simplify connections between
 entities that are continuously used in the same way. All shortcuts can be
-resolved in accordance with  the:doc:`CIDOC CRM<cidoc_crm>` specifications and
+resolved in accordance with the :doc:`CIDOC CRM<cidoc_crm>` specifications and
 are valid links. These shortcuts are indicated by a preceding OA in
 combination with a number. Currently OpenAtlas uses 3 shortcuts:
 

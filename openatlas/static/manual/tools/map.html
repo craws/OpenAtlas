@@ -1,21 +1,23 @@
 
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Map &mdash; OpenAtlas 8.15.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <title>Map &mdash; OpenAtlas 9.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+      <script src="../_static/jquery.js?v=8dae8fb0"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=801c8461"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Network visualization" href="network.html" />
@@ -34,9 +36,6 @@
             OpenAtlas
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                8.15.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -103,7 +102,7 @@
            <div itemprop="articleBody">
              
   <section id="map">
-<h1>Map<a class="headerlink" href="#map" title="Permalink to this heading"></a></h1>
+<h1>Map<a class="headerlink" href="#map" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <p>The interactive map (based on <a class="reference external" href="https://leafletjs.com/">Leaflet</a>) is a tool
@@ -111,7 +110,7 @@ to present and enter a place’s location.
 <a class="reference external" href="https://postgis.net/">PostGIS</a> is used for creating and manipulating
 spatial data.</p>
 <section id="navigation">
-<h2>Navigation<a class="headerlink" href="#navigation" title="Permalink to this heading"></a></h2>
+<h2>Navigation<a class="headerlink" href="#navigation" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p>Zoom in/out of the map by using your mousewheel or the <strong>+</strong>/<strong>-</strong>
 buttons in the upper left corner</p></li>
@@ -121,7 +120,7 @@ buttons in the upper left corner</p></li>
 </ul>
 </section>
 <section id="search">
-<h2>Search<a class="headerlink" href="#search" title="Permalink to this heading"></a></h2>
+<h2>Search<a class="headerlink" href="#search" title="Link to this heading"></a></h2>
 <p>Press the magnifying glass icon on the left side to search for
 a places. The search filters data on
 <a class="reference external" href="https://www.geonames.org/">GeoNames</a> and provides a list of places with
@@ -129,7 +128,7 @@ the same name. Choosing the desired places allows to import the geonames ID
 and/or the coordinates of said place into the OpenAtlas place form (see below).</p>
 </section>
 <section id="wkt-import">
-<h2>WKT import<a class="headerlink" href="#wkt-import" title="Permalink to this heading"></a></h2>
+<h2>WKT import<a class="headerlink" href="#wkt-import" title="Link to this heading"></a></h2>
 <p>With the <img alt="edit" src="../_images/edit.png" /> icon WKT text can be imported.
 Clicking this button will open a new popup where a WKT geometry can be entered.
 If the geometry is valid, the <strong>draw geometry</strong> button will be enabled. By
@@ -143,7 +142,7 @@ geometry popup will open to enter <em>title</em> and <em>description</em> for th
 </ul>
 </section>
 <section id="adding-new-geometries">
-<h2>Adding new geometries<a class="headerlink" href="#adding-new-geometries" title="Permalink to this heading"></a></h2>
+<h2>Adding new geometries<a class="headerlink" href="#adding-new-geometries" title="Link to this heading"></a></h2>
 <p>When in insert or update mode of a place you have the following options
 (more than one can be used):</p>
 <ul class="simple">
@@ -155,7 +154,7 @@ the course of a road or the bed of a river</p></li>
 </ul>
 </section>
 <section id="id1">
-<h2>GeoNames<a class="headerlink" href="#id1" title="Permalink to this heading"></a></h2>
+<h2>GeoNames<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
 <p>The <em>GeoNames ID</em> field can either be entered manually or imported
 from the map’s search result</p>
 <p><strong>Exact match</strong> should be used if there is a high degree of confidence that
@@ -166,7 +165,7 @@ applications. Please refer to <a class="reference external" href="https://www.w3
 for further information.</p>
 </section>
 <section id="map-overlay">
-<h2>Map Overlay<a class="headerlink" href="#map-overlay" title="Permalink to this heading"></a></h2>
+<h2>Map Overlay<a class="headerlink" href="#map-overlay" title="Link to this heading"></a></h2>
 <p>If the module map overlay is activated in the <a class="reference internal" href="profile.html"><span class="doc">Profile</span></a> settings, added
 overlays for places will be visible on the map by default and can be toggled
 with the map layer button at the upper right corner.</p>

@@ -16,15 +16,12 @@ Form fields
 * :doc:`type`
 * :doc:`/ui/date`
 * :doc:`/ui/description`
-* Super - a :doc:`feature` which it is a part of
+* **Super** - a :doc:`feature` which it is a part of
 * :doc:`/tools/map`
 
 Can be linked via tabs to
 -------------------------
 * :doc:`source` - link if a stratigraphic unit is referenced in a source
-* :doc:`event` - you can link a stratigraphic subunit to a newly created
-  event. It's not possible to link to existing events in this way; you can
-  link a place to an existing event via the event's form though
 * :doc:`reference`
 * :doc:`artifact`
 * :doc:`human_remains`

@@ -1,24 +1,26 @@
 
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>API &mdash; OpenAtlas 8.15.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <title>API &mdash; OpenAtlas 9.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+      <script src="../_static/jquery.js?v=8dae8fb0"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=801c8461"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="ARCHE" href="arche.html" />
+    <link rel="next" title="Vocabs" href="vocabs.html" />
     <link rel="prev" title="Export" href="export.html" /> 
 </head>
 
@@ -34,9 +36,6 @@
             OpenAtlas
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                8.15.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -64,7 +63,6 @@
 <li class="toctree-l2"><a class="reference internal" href="import.html">Import</a></li>
 <li class="toctree-l2"><a class="reference internal" href="export.html">Export</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="arche.html">ARCHE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="vocabs.html">Vocabs</a></li>
 </ul>
 </li>
@@ -108,12 +106,12 @@
            <div itemprop="articleBody">
              
   <section id="api">
-<h1>API<a class="headerlink" href="#api" title="Permalink to this heading"></a></h1>
+<h1>API<a class="headerlink" href="#api" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <p>Description: <a class="reference internal" href="../technical/api.html"><span class="doc">API</span></a></p>
 <section id="public-default-off">
-<h2><strong>Public</strong> (default=off)<a class="headerlink" href="#public-default-off" title="Permalink to this heading"></a></h2>
+<h2><strong>Public</strong> (default=off)<a class="headerlink" href="#public-default-off" title="Link to this heading"></a></h2>
 <blockquote>
 <div><ul>
 <li><p>If turned off, the API can still be accessed by</p>
@@ -130,7 +128,7 @@
 </div></blockquote>
 </section>
 <section id="api-token">
-<h2><strong>API token</strong><a class="headerlink" href="#api-token" title="Permalink to this heading"></a></h2>
+<h2><strong>API token</strong><a class="headerlink" href="#api-token" title="Link to this heading"></a></h2>
 <p>API Tokens can be created to query the API if it is turned off. Only Admins
 are allowed to create, revoke and delete tokens. Available options are:</p>
 <blockquote>
@@ -143,7 +141,7 @@ are allowed to create, revoke and delete tokens. Available options are:</p>
 </ul>
 </div></blockquote>
 <section id="valid-token">
-<span id="id1"></span><h3><strong>Valid token</strong><a class="headerlink" href="#valid-token" title="Permalink to this heading"></a></h3>
+<span id="id1"></span><h3><strong>Valid token</strong><a class="headerlink" href="#valid-token" title="Link to this heading"></a></h3>
 <p>A token is valid if:</p>
 <blockquote>
 <div><ul class="simple">
@@ -154,7 +152,7 @@ are allowed to create, revoke and delete tokens. Available options are:</p>
 </div></blockquote>
 </section>
 <section id="generate">
-<span id="id2"></span><h3><strong>Generate</strong><a class="headerlink" href="#generate" title="Permalink to this heading"></a></h3>
+<span id="id2"></span><h3><strong>Generate</strong><a class="headerlink" href="#generate" title="Link to this heading"></a></h3>
 <ul class="simple">
 <li><dl class="simple">
 <dt><strong>Expiration</strong>:</dt><dd><p>Set how long a token is valid. Entered numbers are days. 0 means no expiration date.</p>
@@ -184,7 +182,7 @@ In this box the token string will be visible and is copied on click.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="export.html" class="btn btn-neutral float-left" title="Export" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="arche.html" class="btn btn-neutral float-right" title="ARCHE" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="vocabs.html" class="btn btn-neutral float-right" title="Vocabs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

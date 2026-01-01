@@ -1,21 +1,23 @@
 
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Actor &mdash; OpenAtlas 8.15.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <title>Actor &mdash; OpenAtlas 9.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+      <script src="../_static/jquery.js?v=8dae8fb0"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=801c8461"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Place" href="place.html" />
@@ -34,9 +36,6 @@
             OpenAtlas
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                8.15.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -106,15 +105,15 @@
            <div itemprop="articleBody">
              
   <section id="actor">
-<h1>Actor<a class="headerlink" href="#actor" title="Permalink to this heading"></a></h1>
+<h1>Actor<a class="headerlink" href="#actor" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>CIDOC documentation: <a class="reference external" href="https://www.cidoc-crm.org/Entity/e21-person/version-7.1">E21 Person</a> and
-<a class="reference external" href="https://www.cidoc-crm.org/Entity/e74-group/version-7.1">E74 Group</a></p>
+<p>CIDOC documentation: <a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/e21-person/version-7.1">E21 Person</a> and
+<a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/e74-group/version-7.1">E74 Group</a></p>
 <ul class="simple">
-<li><p><strong>Person</strong> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e21-person/version-7.1">E21 Person</a>) - A single person,
+<li><p><strong>Person</strong> (<a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/e21-person/version-7.1">E21 Person</a>) - A single person,
 such as Albert Einstein or Queen Victoria</p></li>
-<li><p><strong>Group</strong> (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e74-group/version-7.1">E74 Group</a>) - A group of people,
+<li><p><strong>Group</strong> (<a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/e74-group/version-7.1">E74 Group</a>) - A group of people,
 e.g. a family, a tribe, Greenpeace or the National Museum of
 Denmark</p></li>
 </ul>
@@ -126,7 +125,7 @@ Denmark</p></li>
 view.</strong></p></li>
 </ul>
 <section id="form-fields">
-<h2>Form fields<a class="headerlink" href="#form-fields" title="Permalink to this heading"></a></h2>
+<h2>Form fields<a class="headerlink" href="#form-fields" title="Link to this heading"></a></h2>
 <ul class="simple">
 <li><p><a class="reference internal" href="../ui/name.html"><span class="doc">Name</span></a></p></li>
 <li><p><a class="reference internal" href="../ui/alias.html"><span class="doc">Alias</span></a></p></li>
@@ -141,11 +140,17 @@ group came into existence</p></li>
 </ul>
 </section>
 <section id="can-be-linked-via-tabs-to">
-<h2>Can be linked via tabs to<a class="headerlink" href="#can-be-linked-via-tabs-to" title="Permalink to this heading"></a></h2>
+<h2>Can be linked via tabs to<a class="headerlink" href="#can-be-linked-via-tabs-to" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p><a class="reference internal" href="source.html"><span class="doc">Source</span></a> - Use, if an actor is mentioned in a source</p></li>
-<li><p><a class="reference internal" href="event.html"><span class="doc">Event</span></a> - Use, if an actor participated in an event</p></li>
-<li><p><strong>Relation</strong> - Use to specify relations to other actors such as mother of
+<li><p><a class="reference internal" href="source.html"><span class="doc">Source</span></a> - If an actor is mentioned in a source</p></li>
+<li><p><strong>Performed</strong> - If an actor performed in an <a class="reference internal" href="event.html"><span class="doc">Event</span></a>, e.g. signed a
+treaty</p></li>
+<li><p><strong>Participated</strong> - If an actor participated in an <a class="reference internal" href="event.html"><span class="doc">Event</span></a>, e.g.
+witnessed the signing of a treaty</p></li>
+<li><p><strong>Move</strong> - If a person moved at an move <a class="reference internal" href="event.html"><span class="doc">Event</span></a></p></li>
+<li><p><strong>Donor</strong> - If an actor donated at an acquisition <a class="reference internal" href="event.html"><span class="doc">Event</span></a></p></li>
+<li><p><strong>Recipient</strong> - If an actor received at an acquisition <a class="reference internal" href="event.html"><span class="doc">Event</span></a></p></li>
+<li><p><strong>Relation</strong> - Use to specify relations to other actors such as parent of
 or married to</p></li>
 <li><p><strong>Member of</strong> - Use to specify a group an actor is a member of</p></li>
 <li><p><strong>Member</strong> - Link to actors to specify who was a member in a group (only

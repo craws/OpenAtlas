@@ -171,7 +171,7 @@ def add_arche_file_metadata_to_graph(
         for uri in create_uri(metadata.curators):
             graph.add((subject_uri, ACDH.hasCurator, uri))
 
-    if metadata.descriptions:  # pragma: no cover, Todo: test or remove todo
+    if metadata.descriptions:
         for desc_text, lang in metadata.descriptions:
             graph.add((
                 subject_uri,

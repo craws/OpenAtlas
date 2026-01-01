@@ -1,21 +1,23 @@
 
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CIDOC CRM &mdash; OpenAtlas 8.15.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <title>CIDOC CRM &mdash; OpenAtlas 9.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+      <script src="../_static/jquery.js?v=8dae8fb0"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=801c8461"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="OpenAtlas classes" href="openatlas_classes.html" />
@@ -34,9 +36,6 @@
             OpenAtlas
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                8.15.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -99,7 +98,7 @@
            <div itemprop="articleBody">
              
   <section id="cidoc-crm">
-<h1>CIDOC CRM<a class="headerlink" href="#cidoc-crm" title="Permalink to this heading"></a></h1>
+<h1>CIDOC CRM<a class="headerlink" href="#cidoc-crm" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <p>The <a class="reference external" href="https://www.cidoc-crm.org/">CIDOC Conceptual reference model</a> is a
@@ -118,10 +117,10 @@ In this way all data is mapped to CIDOC CRM automatically without the
 users having to familiarise themselves with the ontology.</p>
 <p>The ontology consists of classes, linked together by properties.</p>
 <section id="cidoc-classes">
-<h2>CIDOC classes<a class="headerlink" href="#cidoc-classes" title="Permalink to this heading"></a></h2>
+<h2>CIDOC classes<a class="headerlink" href="#cidoc-classes" title="Link to this heading"></a></h2>
 <p>Classes are indicated by a preceding <strong>E</strong> followed by a numeric code - e.g.
-“<a class="reference external" href="https://www.cidoc-crm.org/Entity/e39-actor/version-7.1">E39 - Actor</a>” or
-“<a class="reference external" href="https://www.cidoc-crm.org/Entity/e67-birth/version-7.1">E67 - Birth</a>”.
+“<a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/e39-actor/version-7.1">E39 - Actor</a>” or
+“<a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/e67-birth/version-7.1">E67 - Birth</a>”.
 All entities used within OpenAtlas can be characterised as CIDOC classes.
 An overview of all CIDOC CRM classes can be found
 <a class="reference external" href="https://demo.openatlas.eu/overview/model/cidoc_class_index">here</a>.
@@ -132,11 +131,11 @@ detailed information, such as a short description, sub- and super classes as
 well as possible properties.</p>
 </section>
 <section id="cidoc-properties">
-<h2>CIDOC Properties<a class="headerlink" href="#cidoc-properties" title="Permalink to this heading"></a></h2>
+<h2>CIDOC Properties<a class="headerlink" href="#cidoc-properties" title="Link to this heading"></a></h2>
 <p>CIDOC properties are indicated by a combination of the letter “P” and a
 numerical sequence - think
-“<a class="reference external" href="https://www.cidoc-crm.org/Property/p11-had-participant/version-7.1">P11 - had participant</a>” or
-“<a class="reference external" href="https://www.cidoc-crm.org/Property/p2-has-type/version-7.1">P2 - has type</a>“. They are used to link a
+“<a class="extlink-cidoc_property reference external" href="https://www.cidoc-crm.org/Property/p11-had-participant/version-7.1">P11 - had participant</a>” or
+“<a class="extlink-cidoc_property reference external" href="https://www.cidoc-crm.org/Property/p2-has-type/version-7.1">P2 - has type</a>“. They are used to link a
 class to another class. So an activity taking place at a certain location,
 can be modelled in the following way</p>
 <img alt="../_images/properties.png" src="../_images/properties.png" />
@@ -156,7 +155,7 @@ suffix. Since we don’t use inverse properties in the database
 (direction is determined through domain/range selection) they are linked to
 their counterpart without i.</p>
 <p>There are some “special” properties that are not included in OpenAtlas, e.g.
-<a class="reference external" href="https://www.cidoc-crm.org/Property/P3-has-note/version-7.1">P3 - has note</a>. They can be found in the
+<a class="extlink-cidoc_property reference external" href="https://www.cidoc-crm.org/Property/P3-has-note/version-7.1">P3 - has note</a>. They can be found in the
 <a class="reference external" href="https://github.com/craws/OpenAtlas/blob/main/install/crm/cidoc_rtfs_parser.py">OpenAtlas CIDOC parser script</a>
 on GitHub, where they are defined on the top:
 These properties are not import due to technical reasons, e.g. missing
