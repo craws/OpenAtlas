@@ -44,7 +44,7 @@ class ActorTests(TestBaseCase):
         rv = c.post(url_for('insert', class_='person'), data=data)
         actor_id = rv.location.split('/')[-1]
 
-        # Test string sanitzation
+        # Test string sanitization
         data["name"] = '<h1 class="test">Sigourney Weaver</h1>with HTML'
         rv = c.post(
             url_for('insert', class_='person'),

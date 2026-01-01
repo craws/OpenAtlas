@@ -3,7 +3,7 @@ Content
 
 .. toctree::
 
-Used to cutomise text in available languages:
+Used to customise text in available languages:
 
 * **Intro** - displayed on top of the start page before log in
 * **Contact** - displayed on contact site, e.g. contact information for

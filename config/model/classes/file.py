@@ -39,8 +39,7 @@ file: dict[str, Any] = {
     'display': {
         'buttons': ['download'],
         'form_buttons': ['insert_and_continue'],
-        'additional_tabs': {
-            'note': {}},
+        'additional_tabs': {'note': {}},
         'additional_information': {
             'file_size': {'label': _('size')},
             'file_extension': {'label': _('extension')}}}}

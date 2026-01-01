@@ -28,7 +28,7 @@ Can be linked via tabs to
 * :doc:`source` - Use, if an artifact is mentioned in a source
 * :doc:`event` - Use, if an artifact was part of an event such as its
   production
-* **Artifact** - Use, to add sub artifacts or :doc:`human_remains`
+* **Subs** - Use, to add sub artifacts
 * :doc:`reference` - Use to add citation
 * :doc:`file` - Add a file, e.g. a picture of the artifact
 

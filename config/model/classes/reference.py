@@ -50,8 +50,7 @@ bibliography = {
     'display': {
         'buttons': ['copy'],
         'form_buttons': ['insert_and_continue'],
-        'additional_tabs': {
-            'note': {}}}}
+        'additional_tabs': {'note': {}}}}
 
 edition = copy.deepcopy(bibliography)
 edition['label'] = _('edition')

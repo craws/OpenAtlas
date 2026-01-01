@@ -15,22 +15,21 @@ Form fields
 * :doc:`type`
 * :doc:`/ui/date`
 * :doc:`/ui/description`
-* Super - :doc:`place` the feature is a part of
+* **Super** - A :doc:`place` the feature is a part of
 * :doc:`/tools/map`
 
 Can be linked via tabs to
 -------------------------
 * :doc:`source` - use, if a feature is referenced in it
-* :doc:`event` - use only for new events. For already existing events link
-  the location in the event form
-* :doc:`reference` can be used to add a citation
+* :doc:`reference`
+* :doc:`artifact`
 * :doc:`stratigraphic_unit` is used to link a subunit of a feature (e.g. a
   skeleton (stratigraphic unit) in a grave (feature))
-* :doc:`file` can be used to add files such as pictures
+* :doc:`file`
 
 Super and subunits
 ------------------
-In the OpenAtlas database a feature is a subunit of a :doc:`place`.
+In OpenAtlas a feature is a subunit of a :doc:`place`.
 A :doc:`place` can consist of one or more subunits called Features
 (e.g. buildings, graves, pits, ditches, ramparts etc.).
 Features themselves are structured in the same way as Places and can consist

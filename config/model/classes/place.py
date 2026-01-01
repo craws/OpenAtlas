@@ -156,5 +156,4 @@ stratigraphic_unit: dict[str, Any] = {
             'insert_and_continue',
             'insert_continue_sub',
             'insert_continue_human_remains'],
-        'additional_tabs': {
-            'note': {}}}}
+        'additional_tabs': {'note': {}}}}

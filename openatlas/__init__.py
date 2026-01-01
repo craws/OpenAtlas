@@ -77,7 +77,7 @@ def before_request() -> Response | None:
     g.properties = cidoc_properties(
         session['language'],
         (request.path.startswith('/overview/model/property')))
-    g.classes = get_classes()
+    get_classes()  # Sets g.classes
     g.types = Entity.get_all_types(count_type())
     g.radiocarbon_type = Entity.get_hierarchy('Radiocarbon')
     g.sex_type = Entity.get_hierarchy('Features for sexing')

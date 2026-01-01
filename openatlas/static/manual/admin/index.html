@@ -1,21 +1,23 @@
 
+
+
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin &mdash; OpenAtlas 8.15.0 documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <title>Admin &mdash; OpenAtlas 9.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
   
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+      <script src="../_static/jquery.js?v=8dae8fb0"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=801c8461"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="User" href="user.html" />
@@ -34,9 +36,6 @@
             OpenAtlas
               <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
-              <div class="version">
-                8.15.0
-              </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
@@ -64,7 +63,6 @@
 <li class="toctree-l2"><a class="reference internal" href="import.html">Import</a></li>
 <li class="toctree-l2"><a class="reference internal" href="export.html">Export</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api.html">API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="arche.html">ARCHE</a></li>
 <li class="toctree-l2"><a class="reference internal" href="vocabs.html">Vocabs</a></li>
 </ul>
 </li>
@@ -107,7 +105,7 @@
            <div itemprop="articleBody">
              
   <section id="admin">
-<h1>Admin<a class="headerlink" href="#admin" title="Permalink to this heading"></a></h1>
+<h1>Admin<a class="headerlink" href="#admin" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="user.html">User</a><ul>
@@ -138,16 +136,15 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="data_integrity_checks.html">Data integrity checks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="data_integrity_checks.html#similar-names">Similar names</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_integrity_checks.html#orphans">Orphans</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="data_integrity_checks.html#id1">Orphans</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_integrity_checks.html#entities-without-links">Entities without links</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data_integrity_checks.html#type">Type</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data_integrity_checks.html#missing-files">Missing files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data_integrity_checks.html#orphaned-files">Orphaned files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data_integrity_checks.html#orphaned-iiif-files">Orphaned IIIF files</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data_integrity_checks.html#orphaned-annotations">Orphaned annotations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data_integrity_checks.html#orphaned-subunits">Orphaned subunits</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data_integrity_checks.html#circular-dependencies">Circular dependencies</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="data_integrity_checks.html#dates">Dates</a><ul>
@@ -158,9 +155,13 @@
 <li class="toctree-l3"><a class="reference internal" href="data_integrity_checks.html#invalid-sub-dates">Invalid sub dates</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="data_integrity_checks.html#check-links">Check links</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_integrity_checks.html#check-link-duplicates">Check link duplicates</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_integrity_checks.html#check-similar-names">Check similar names</a></li>
+<li class="toctree-l2"><a class="reference internal" href="data_integrity_checks.html#links">Links</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data_integrity_checks.html#invalid-cidoc-links">Invalid CIDOC links</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_integrity_checks.html#link-duplicates">Link duplicates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_integrity_checks.html#invalid-multiple-types">Invalid multiple types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data_integrity_checks.html#circular-dependencies">Circular dependencies</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="data_integrity_checks.html#check-files">Check files</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="data_integrity_checks.html#missing-information">Missing information</a></li>
 <li class="toctree-l3"><a class="reference internal" href="data_integrity_checks.html#file-integrity">File integrity</a></li>
@@ -213,18 +214,6 @@
 <li class="toctree-l2"><a class="reference internal" href="api.html#api-token"><strong>API token</strong></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api.html#valid-token"><strong>Valid token</strong></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#generate"><strong>Generate</strong></a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="arche.html">ARCHE</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="arche.html#overview">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="arche.html#fetch">Fetch</a></li>
-<li class="toctree-l2"><a class="reference internal" href="arche.html#data-from-arche">Data from ARCHE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="arche.html#automatically-created-entities">Automatically created entities</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="arche.html#entity-type"><span class="xref std std-doc">/entity/type</span></a></li>
-<li class="toctree-l3"><a class="reference internal" href="arche.html#entity-reference-system"><span class="xref std std-doc">/entity/reference_system</span></a></li>
-<li class="toctree-l3"><a class="reference internal" href="arche.html#entity-index"><span class="xref std std-doc">/entity/index</span></a></li>
 </ul>
 </li>
 </ul>

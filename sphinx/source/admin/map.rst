@@ -10,4 +10,3 @@ Map
   disabled
 * **MaxClusterRadius** - the maximal range of a cluster
 * **GeoNames username** - used to access GeoNames functions
-* **GeoNames URL** - used to access GeoNames functions

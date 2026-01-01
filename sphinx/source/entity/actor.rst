@@ -29,9 +29,15 @@ Form fields
 
 Can be linked via tabs to
 -------------------------
-* :doc:`source` - Use, if an actor is mentioned in a source
-* :doc:`event` - Use, if an actor participated in an event
-* **Relation** - Use to specify relations to other actors such as mother of
+* :doc:`source` - If an actor is mentioned in a source
+* **Performed** - If an actor performed in an :doc:`event`, e.g. signed a
+  treaty
+* **Participated** - If an actor participated in an :doc:`event`, e.g.
+  witnessed the signing of a treaty
+* **Move** - If a person moved at an move :doc:`event`
+* **Donor** - If an actor donated at an acquisition :doc:`event`
+* **Recipient** - If an actor received at an acquisition :doc:`event`
+* **Relation** - Use to specify relations to other actors such as parent of
   or married to
 * **Member of** - Use to specify a group an actor is a member of
 * **Member** - Link to actors to specify who was a member in a group (only

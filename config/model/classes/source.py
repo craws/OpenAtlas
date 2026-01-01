@@ -85,5 +85,4 @@ source_translation = {
             'mode': 'direct'}},
     'display': {
         'form_buttons': ['insert_and_continue'],
-        'additional_tabs': {
-            'note': {}}}}
+        'additional_tabs': {'note': {}}}}

@@ -20,7 +20,8 @@ from openatlas.forms.field import (
     TreeMultiField, ValueTypeField, ValueTypeRootField)
 from openatlas.models.dates import check_if_entity_has_time
 from openatlas.models.entity import Entity, Link, get_entity_ids_with_links
-from openatlas.models.openatlas_class import OpenatlasClass, Relation
+from openatlas.models.openatlas_class import (
+    OpenatlasClass, Relation, get_reverse_relation)
 
 
 def filter_entities(
@@ -141,7 +142,7 @@ def add_class_types(form: Any, class_: OpenatlasClass) -> None:
 
 def add_type(form: Any, type_: Entity) -> None:
     add_form = None
-    if is_authorized('editor'):
+    if is_authorized('editor') and type_.category != 'system':
         class AddDynamicType(FlaskForm):
             pass
 
@@ -217,7 +218,11 @@ def add_relations(
                     relation.property,
                     relation.classes,
                     inverse=relation.inverse)
-            elif selection_available(origin, relation, origin_relation):
+            elif selection_available(
+                    entity,
+                    relation,
+                    origin,
+                    origin_relation):
                 selection = [origin]
             setattr(
                 form,
@@ -235,7 +240,11 @@ def add_relations(
                     relation.property,
                     relation.classes,
                     relation.inverse)
-            elif selection_available(origin, relation, origin_relation):
+            elif selection_available(
+                    entity,
+                    relation,
+                    origin,
+                    origin_relation):
                 selection = origin
             if selection and selection.class_.name == 'object_location':
                 selection = selection.get_linked_entity_safe('P53', True)
@@ -257,8 +266,9 @@ def add_relations(
 
 
 def selection_available(
-        origin: Entity | None,
+        entity: Entity,
         relation: Relation,
+        origin: Entity | None,
         origin_relation: str | None) -> bool:
     if not origin:
         return False
@@ -266,10 +276,13 @@ def selection_available(
             and origin.class_.name.replace('place', 'object_location') \
             not in relation.classes:
         return False
-    if relation.reverse_relation and \
-            relation.reverse_relation.name == origin_relation:
+    reverse_relation = get_reverse_relation(
+        entity.class_,
+        relation,
+        origin.class_.name)
+    if reverse_relation and reverse_relation.name == origin_relation:
         return True
-    return False
+    return False  # pragma: no cover
 
 
 def add_date_fields(
