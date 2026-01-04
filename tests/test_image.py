@@ -96,15 +96,14 @@ class ImageTest(TestBaseCase):
                 'display_file',
                 filename=file_name,
                 size=app.config['IMAGE_SIZE']['thumbnail'])) as _rv:
-            # assert b'\xff' in rv.data  # GitHub struggles with this test
-            pass
+            assert b'\xff' in rv.data
 
         rv = c.get(url_for('display_file', filename=file_name, size='500'))
         assert b'400 Bad Request' in rv.data
 
-        c.get(
+        rv = c.get(
             url_for('api.display', filename=file_name, image_size='thumbnail'))
-        # assert b'\xff' in rv.data  # GitHub struggles with this test
+        assert b'This file is not public shareable' in rv.data
 
         app.config['IMAGE_SIZE']['tmp'] = '<'
         rv = c.get(url_for('view', id_=file.id))
