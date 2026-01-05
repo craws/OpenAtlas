@@ -152,7 +152,7 @@ class IIIFAnnotation(Resource):
         if annotation.entity_id:
             entity = ApiEntity.get_by_id(annotation.entity_id)
             url = get_url(entity.id, parser.url)
-            entity_link = f"<a href={url} target=_blank>{entity.name}</a>"
+            entity_link = f'<a href={url} target=_blank>{entity.name}</a>'
         return {
             "@id": url_for(
                 'api.iiif_annotation',
@@ -296,7 +296,7 @@ def get_metadata(entity: Entity) -> dict[str, Any]:
             and not check_iiif_file_exist(entity.id):
         raise DisplayFileNotFoundError
     ext = '.tiff' if g.settings['iiif_conversion'] else entity.get_file_ext()
-    image_url = f"{g.settings['iiif_url']}{entity.id}{ext}"
+    image_url = f'{g.settings['iiif_url']}{entity.id}{ext}'
 
     try:
         resp = requests.get(f"{image_url}/info.json", timeout=30)

@@ -127,9 +127,9 @@ def get_relation_types_dict_for_locations(
         entity_id: int,
         property_: CidocProperty,
         parser: Parser) -> dict[str, Any]:
-    property_string = f"i_{property_.i18n_inverse['en'].replace(' ', '_')}"
+    property_string = f'i_{property_.i18n_inverse['en'].replace(' ', '_')}'
     relation_types = {
-        'property': f"crm:{property_.code}{property_string}",
+        'property': f'crm:{property_.code}{property_string}',
         'relationTo': entity_id,
         'type': None,
         'description': None,

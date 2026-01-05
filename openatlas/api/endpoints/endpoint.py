@@ -352,7 +352,7 @@ class Endpoint:
         links = self.entities_with_links[_id]['links']
         links_inverse = self.entities_with_links[_id]['links_inverse']
         geometry = self.entities_with_links[_id]['geometry']
-        crm = f"crm:{entity.cidoc_class.code} {entity.cidoc_class.i18n['en']}"
+        crm = f'crm:{entity.cidoc_class.code} {entity.cidoc_class.i18n['en']}'
         feature = {
             '@id': url_for('api.entity', id_=entity.id, _external=True),
             'type': 'Feature',

@@ -120,8 +120,8 @@ def get_loud_entities(
                 system = g.reference_systems[link_.domain.id]
                 match_case = to_camel_case(
                     g.types[link_.type.id].name).replace(' ', '_')
-                link_url = f"{system.resolver_url or ''}{link_.description}"
-                property_[f"skos:{match_case}"] = link_url
+                property_[f"skos:{match_case}"] = \
+                    f'{system.resolver_url or ''}{link_.description}'
         if code_ == 'OA7':
             relationship = {
                 'type': 'Event',
@@ -176,9 +176,8 @@ def get_loud_entities(
                     system = g.reference_systems[link_.domain.id]
                     match_case = to_camel_case(
                         g.types[link_.type.id].name).replace(' ', '_')
-                    link_url = \
-                        f"{system.resolver_url or ''}{link_.description}"
-                    property_[f"skos:{match_case}"] = link_url
+                    property_[f"skos:{match_case}"] = \
+                        f'{system.resolver_url or ''}{link_.description}'
             if link_.domain.class_.name == 'external_reference':
                 property_ = {
                     "type": "LinguisticObject",
@@ -191,8 +190,7 @@ def get_loud_entities(
                         "format": "text/html",
                         "_label": link_.description,
                         "access_point": [{
-                            "id":
-                                link_.domain.name,
+                            "id": link_.domain.name,
                             "type": "DigitalObject"}]}]}
         if code_ == 'OA7':
             relationship = {

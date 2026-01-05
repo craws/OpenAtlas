@@ -63,15 +63,15 @@ def get_csv_types(entity_dict: dict[str, Any]) -> dict[Any, list[Any]]:
 def get_csv_links(entity_dict: dict[str, Any]) -> dict[str, Any]:
     links: dict[str, Any] = defaultdict(list)
     for link in entity_dict['links']:
-        key = f"{link.property.i18n['en'].replace(' ', '_')}_" \
-              f"{link.range.class_.name}"
+        key = link.property.i18n['en'].replace(' ', '_') + '_' + \
+            link.range.class_.name
         links[key].append(link.range.name)
     for link in entity_dict['links_inverse']:
-        key = f"{link.property.i18n['en'].replace(' ', '_')}_" \
-              f"{link.range.class_.name}"
+        key = link.property.i18n['en'].replace(' ', '_') + '_' + \
+            link.range.class_.name
         if link.property.i18n_inverse['en']:
-            key = link.property.i18n_inverse['en'].replace(' ', '_')
-            key += '_' + link.domain.class_.name
+            key = link.property.i18n_inverse['en'].replace(' ', '_') + '_' + \
+                link.domain.class_.name
         links[key].append(link.domain.name)
     links.pop('has_type_type', None)
     return links
