@@ -147,14 +147,11 @@ class ImportTest(ImportTestCase):
         rv = c.get(url_for('download_export', view='arche', filename=filename))
         assert b'PK' in rv.data
 
-        rv = c.get(
-            url_for(
-                'delete_export',
-                view='arche',
-                filename=filename),
-            follow_redirects=True)
-        if os.name == 'posix':
-            assert b'File deleted' in rv.data
+        with c.get(
+                url_for('delete_export', view='arche', filename=filename),
+                follow_redirects=True) as rv_:
+            if os.name == 'posix':
+                assert b'File deleted' in rv_.data
 
         rv = c.get(
             url_for('check_files', arche='arche'),

@@ -1,3 +1,5 @@
+import json
+
 from flask import url_for
 
 from openatlas import app
@@ -15,15 +17,17 @@ class SourceTest(TestBaseCase):
             gillian = insert('person', 'Gillian Anderson Gillian Anderson')
             artifact = insert('artifact', 'Artifact with inscription')
 
+        annotation_data = {
+            'annotation_id': 'c27',
+            'comment': 'whatever',
+            'entityId': artifact.id}
         rv = c.post(
             url_for('insert', class_='source'),
             data={
                 'name': 'Necronomicon',
-                'description': (
-                    'The <mark meta="{"annotationId":"c27",'
-                    f'"entityId":{artifact.id},'
-                    '"comment":"asdf"}">Necronomicon</mark>,'
-                    ' also referred to as the Book of the Dead')})
+                'description':
+                    f'The <mark meta="{json.dumps(annotation_data)}">'
+                    'Necronomicon</mark>, the Book of the Dead.'})
         source_id = rv.location.split('/')[-1]
 
         rv = c.get(url_for('insert', class_='source'))
@@ -41,14 +45,14 @@ class SourceTest(TestBaseCase):
         rv = c.get(url_for('update', id_=source_id))
         assert b'Necronomicon' in rv.data
 
+        del annotation_data['entityId']
         rv = c.post(
             url_for('update', id_=source_id),
             data={
                 'name': 'Source updated',
-                'description': (
-                    'The <mark meta="{"annotationId":"c27",'
-                    '"comment":"asdf"}">Necronomicon</mark>,'
-                    ' also referred to as the Book of the Dead'),
+                'description':
+                    f'The <mark meta="{json.dumps(annotation_data)}">'
+                    'Necronomicon</mark>, the Book of the Dead.',
                 'artifact': [artifact.id]},
             follow_redirects=True)
         assert b'Source updated' in rv.data

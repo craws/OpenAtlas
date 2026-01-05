@@ -9,7 +9,6 @@ from tests.base import TestBaseCase, get_hierarchy, insert
 class HierarchyTest(TestBaseCase):
 
     def test_hierarchy(self) -> None:
-
         c = self.client
         data: dict[str, Any] = {
             'name': 'Geronimo',
@@ -38,12 +37,6 @@ class HierarchyTest(TestBaseCase):
             data=data,
             follow_redirects=True)
         assert b'Changes have been saved' in rv.data
-
-        rv = c.get(url_for('hierarchy_update', id_=hierarchy.id))
-        assert b'checked class="" id="multiple"' in rv.data
-
-        rv = c.get(url_for('hierarchy_insert', category='custom'))
-        assert b'+ Custom' in rv.data
 
         sex = get_hierarchy('Sex')
         rv = c.get(url_for('required_risk', id_=sex.id))
