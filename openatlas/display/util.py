@@ -40,7 +40,7 @@ def remove_link(
     url = url_for('link_delete', id_=link_.id, origin_id=origin.id)
     return link(
         _('remove'),
-        f"{url}#tab-{tab.replace('_', '-')}" if tab else url,
+        f'{url}#tab-{tab.replace('_', '-')}' if tab else url,
         js=f"return confirm('{confirm}')")
 
 
@@ -81,7 +81,7 @@ def reference_systems(entity: Entity) -> str:
                 </button>"""
             info_div = f'<div id="{name}-info-div" class="mt-2"></div>'
             logo = f"""<img src="/static/images/logos/{system.name}.svg" alt=""
-                class="rounded-circle object-fit-cover my-1" width="16"/>"""
+                class="rounded-circle object-fit-cover my-1" width="16">"""
         entry = f"""
             <li class="list-group-item bg-transparent">
               <div class="d-flex gap-2 align-items-center">
@@ -119,7 +119,7 @@ def get_appearance(entity: Entity) -> tuple[str, str]:
             inverse=True):
         event = link_.domain
         actor = link_.range
-        html = f" {_('at an')} " + \
+        html = f' {_('at an')} ' + \
             link(_('event'), url_for('view', id_=event.id))
         if not actor.dates.first:
             if link_.dates.first and (
@@ -170,10 +170,10 @@ def get_system_data(entity: Entity) -> dict[str, Any]:
     if 'entity_show_dates' in current_user.settings \
             and current_user.settings['entity_show_dates']:
         data[_('created')] = \
-            f"{format_date(entity.created)} {link(info['creator'])} "
+            f'{format_date(entity.created)} {link(info['creator'])}'
         if info['modified']:
             data[_('modified')] = \
-                f"{format_date(info['modified'])} {link(info['modifier'])}"
+                f'{format_date(info['modified'])} {link(info['modifier'])}'
         data[_('activity')] = link(
             _('log'),
             url_for('user_activity', user_id=0, entity_id=entity.id))
@@ -189,7 +189,7 @@ def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
     label = _('bookmark remove') \
         if current_user.bookmarks and entity_id in current_user.bookmarks \
         else _('bookmark')
-    onclick = f"ajaxBookmark('{entity_id}');"
+    onclick = f'ajaxBookmark("{entity_id}");'
     if for_table:
         return \
             f'<a href="#" id="bookmark{entity_id}" onclick="{onclick}">' \
@@ -263,8 +263,8 @@ def profile_image(
         iiif_ext = '.tiff' if g.settings['iiif_conversion'] \
             else g.files[file_id].suffix
         src = \
-            f"{g.settings['iiif_url']}{file_id}{iiif_ext}" \
-            f"/full/!{width},{width}/0/default.jpg"
+            f'{g.settings['iiif_url']}{file_id}{iiif_ext}' \
+            f'/full/!{width},{width}/0/default.jpg'
     elif g.settings['image_processing'] and check_processed_image(path.name):
         if path_ := get_file_path(
                 file_id,
@@ -281,9 +281,7 @@ def profile_image(
             return f'<p class="uc-first">{_('no preview available')}</p>'
     else:
         url = url_for('view', id_=entity.image_id)
-    max_width = f"{width}px"
-    if max_width_100:
-        max_width = "100%"
+    max_width = '100%' if max_width_100 else '{width}px'
     html =  \
         f'<img style="max-width:{max_width}" alt="{entity.name}" src="{src}">'
     if not link_image:
@@ -352,7 +350,7 @@ def send_mail(
     recipients = recipients if isinstance(recipients, list) else [recipients]
     if not g.settings['mail'] or not recipients:
         return False  # pragma: no cover
-    from_ = f"{g.settings['mail_from_name']} <{g.settings['mail_from_email']}>"
+    from_ = f'{g.settings['mail_from_name']} <{g.settings['mail_from_email']}>'
     if app.testing:
         return True  # To test mail functions without sending them
     try:  # pragma: no cover
@@ -382,14 +380,14 @@ def send_mail(
         g.logger.log(
             'error',
             'mail',
-            f"Error mail login for {g.settings['mail_transport_username']}", e)
+            f'Error mail login for {g.settings['mail_transport_username']}', e)
         flash(_('error mail login'), 'error')
         return False
     except Exception as e:  # pragma: no cover
         g.logger.log(
             'error',
             'mail',
-            f"Error send mail for {g.settings['mail_transport_username']}", e)
+            f'Error send mail for {g.settings['mail_transport_username']}', e)
         flash(_('error mail send'), 'error')
         return False  # pragma: no cover
     return True  # pragma: no cover
@@ -403,8 +401,8 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
     warnings = []
     if app.config['DATABASE_VERSION'] != g.settings['database_version']:
         warnings.append(
-            f"Database version {app.config['DATABASE_VERSION']} is needed but "
-            f"current version is {g.settings['database_version']}")
+            f'Database version {app.config['DATABASE_VERSION']} is needed but'
+            f' current version is {g.settings['database_version']}')
     if hasattr(g, 'writable_paths'):
         for path in g.writable_paths:
             check_write_access(path, warnings)
@@ -416,7 +414,7 @@ def check_write_access(path: Path, warnings: list[str]) -> list[str]:
     if not os.access(path, os.W_OK):
         warnings.append(
             f'<p class="uc-first">{_('directory not writable')}'
-            f"{str(path).replace(app.root_path, '')}</p>")
+            f'{str(path).replace(app.root_path, '')}</p>')
     return warnings
 
 
@@ -442,12 +440,11 @@ def get_file_path(
     if not hasattr(g, 'files') or id_ not in g.files:
         return None
     ext = g.files[id_].suffix
+    path = app.config['UPLOAD_PATH'] / f'{id_}{ext}'
     if size:
         if ext in app.config['PROCESSABLE_EXT']:
             ext = app.config['PROCESSED_EXT']  # pragma: no cover
-        path = app.config['RESIZED_IMAGES'] / size / f"{id_}{ext}"
-    else:
-        path = app.config['UPLOAD_PATH'] / f"{id_}{ext}"
+        path = app.config['RESIZED_IMAGES'] / size / f'{id_}{ext}'
     return path if os.path.exists(path) else None
 
 
@@ -552,13 +549,11 @@ def button(
 
 @app.template_filter()
 def button_bar(buttons: list[Any]) -> str:
-    def add_col(input_: str) -> str:
-        return \
-            f'<div class="col-auto d-flex align-items-center">{input_}</div>'
-    return f"""
-        <div class="row my-2 g-1">
-            {' '.join([str(b) for b in list(map(add_col, buttons))])}
-        </div>""" if buttons else ''
+    html = ''
+    for name in buttons:
+        html += \
+            f'<div class="col-auto d-flex align-items-center">{name}</div> '
+    return f'<div class="row my-2 g-1">{html}</div>' if html else ''
 
 
 @app.template_filter()

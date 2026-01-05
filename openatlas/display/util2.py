@@ -28,10 +28,10 @@ def sanitize(
 
 def convert_size(size_bytes: int) -> str:
     if size_bytes <= 0:
-        return "0 B"  # pragma: no cover
-    size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+        return '0 B'  # pragma: no cover
+    size_name = ('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB')
     i = int(math.floor(math.log(size_bytes, 1024)))
-    return f"{int(size_bytes / math.pow(1024, i))} {size_name[i]}"
+    return f'{int(size_bytes / math.pow(1024, i))} {size_name[i]}'
 
 
 def display_bool(value: bool, show_false: bool = True) -> str:

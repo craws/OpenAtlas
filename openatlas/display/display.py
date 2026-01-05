@@ -56,7 +56,7 @@ class Display:
             title = " > ".join([g.types[i].name for i in type_.root])
             html = f'<span title="{title}">{link(type_)}</span>'
             if type_.category == 'value':
-                html += f" {float(value):g} {type_.description or ''}"
+                html += f' {float(value):g} {type_.description or ''}'
             data[g.types[type_.root[0]].name].append(html)
         return {key: data[key] for key in sorted(data.keys())}
 
@@ -82,9 +82,9 @@ class Display:
         text = ''
         if 'stratigraphic_tools' in self.entity.class_.display['buttons']:
             if radiocarbon := carbon_result(self.entity):
-                text += f"<p>{radiocarbon}</p>"
+                text += f'<p>{radiocarbon}</p>'
             if sex_estimation := sex_result(self.entity):
-                text += f"<p>{sex_estimation}</p>"
+                text += f'<p>{sex_estimation}</p>'
         description_ = self.entity.description
         label = ''
         if 'description' in self.entity.class_.attributes and description_:
@@ -173,7 +173,9 @@ class Display:
                     self.add_person_place_tab()
                 case 'place_person':
                     self.add_place_person_tab()
+        self.process_empty_tabs()
 
+    def process_empty_tabs(self) -> None:
         empty_tabs = []
         for name, tab in self.tabs.items():
             if name != 'info' and not tab.table.rows:
@@ -181,12 +183,12 @@ class Display:
         if empty_tabs:
             self.tabs['additional'] = Tab(
                 'additional',
-                '+ ' + uc_first(_('add')))
+                f'+ {uc_first(_('add'))}')
             self.tabs['additional'].content = ''
             for name in empty_tabs:
                 if self.tabs[name].buttons:
                     self.tabs['additional'].content += \
-                        f"<h2>{self.tabs[name].label}</h2>" + \
+                        f'<h2>{self.tabs[name].label}</h2>' + \
                         button_bar(self.tabs[name].buttons)
                 del self.tabs[name]
 
@@ -391,7 +393,7 @@ class Display:
         if next_id:
             self.buttons.append(button('>', url_for('view', id_=next_id)))
         self.buttons.append(
-            f"{position} {_('of')} {len(self.structure['siblings'])}")
+            f'{position} {_('of')} {len(self.structure['siblings'])}')
 
     def add_data(self) -> None:
         self.data = {
@@ -421,7 +423,7 @@ class Display:
                                 and not self.entity.standard_type:
                             value += (
                                 ' <span class="error">'
-                                f"{_('but license is missing ')}</span>")
+                                f'{_('but license is missing ')}</span>')
                     elif attribute.get('format') == 'url':
                         value = link(value, value, external=True)
                     self.data[attribute['label']] = str(value)

@@ -268,8 +268,7 @@ def format_name_and_aliases(
         forms: dict[str, Any]) -> str:
     if forms.get('mode') == 'single':
         link_ = f"""
-            <a value="{entity.name}"
-                href="#"
+            <a value="{entity.name}" href="#"
                 onclick="selectFromTable(this,'{table_id}', {entity.id})"
             >{entity.name}</a>"""
         if not entity.aliases:
@@ -290,13 +289,13 @@ def file_preview(entity_id: int) -> str:
     if g.settings['iiif'] and check_iiif_file_exist(entity_id):
         ext = '.tiff' if g.settings['iiif_conversion'] \
             else g.files[entity_id].suffix
-        url =\
-            f"{g.settings['iiif_url']}{entity_id}{ext}" \
-            f"/full/!100,100/0/default.jpg"
-        return f"<img src='{url}' {param}>"
+        url = \
+            f'{g.settings['iiif_url']}{entity_id}{ext}' \
+            f'/full/!100,100/0/default.jpg'
+        return f'<img src="{url}" {param}>'
     if icon := get_file_path(entity_id, app.config['IMAGE_SIZE']['table']):
         url = url_for('display_file', filename=icon.name, size=size)
-        return f"<img src='{url}' {param}>"
+        return f'<img src="{url}" {param}>'
     if g.settings['image_processing']:
         path = get_file_path(entity_id)
         if path and check_processed_image(path.name):
@@ -304,7 +303,7 @@ def file_preview(entity_id: int) -> str:
                     entity_id,
                     app.config['IMAGE_SIZE']['table']):
                 url = url_for('display_file', filename=icon.name, size=size)
-                return f"<img src='{url}' {param}>"
+                return f'<img src="{url}" {param}>'
     return ''
 
 
