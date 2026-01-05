@@ -74,9 +74,8 @@ class ValueTypeInput(TextInput):
             **kwargs: Any) -> Markup:
         type_ = g.types[field.type_id]
         padding = len(type_.root)
-        expand_col = \
-            f' <div class="me-1">{value_type_expand_icon(type_)}</div>'
-        return Markup(f'''
+        expand_col = f'<div class="me-1">{value_type_expand_icon(type_)}</div>'
+        return Markup(f"""
             <div class="row g-1" >
               <div class="col-4  d-flex" style="padding-left:{padding}rem">
                 {expand_col if type_.subs else ''}
@@ -90,13 +89,13 @@ class ValueTypeInput(TextInput):
                   type="text"
                   class="{app.config['CSS']['string_field']} value-type"
                   name="{field.id}" id="{field.id}"
-                  value="{field.data or ''}" />
+                  value="{field.data or ''}">
               </div>
               <div
                 class="col-2 text-truncate"
                 title="{type_.description or ''}">{type_.description or ''}
               </div>
-            </div>''')
+            </div>""")
 
 
 class ValueTypeField(FloatField):
@@ -244,9 +243,7 @@ class TableSelect(HiddenInput):
                 setattr(
                     SimpleEntityForm,
                     f'{field.id}-{class_name_}-standard-type-dynamic',
-                    TreeField(
-                        str(standard_type_id),
-                        type_id=standard_type_id))
+                    TreeField(str(standard_type_id), type_id=standard_type_id))
             setattr(
                 SimpleEntityForm,
                 'description_dynamic',
@@ -398,9 +395,8 @@ class DragNDrop(FileInput):
             field: RemovableListField,
             *args: Any,
             **kwargs: Any) -> str:
-        accept = ', '.join([
-            f'.{filename}' for filename
-            in g.settings['file_upload_allowed_extension']])
+        accept = ', '.join(
+            [f'.{ext}' for ext in g.settings['file_upload_allowed_extension']])
         return super().__call__(field, accept=accept, **kwargs) \
             + Markup(render_template('forms/drag_n_drop_field.html'))
 
@@ -433,12 +429,10 @@ class SubmitInput(Input):
     def __call__(self, field: Field, **kwargs: Any) -> str:
         kwargs['class_'] = (kwargs['class_'] + ' uc-first') \
             if 'class_' in kwargs else 'uc-first'
-        return Markup(
-            f'''<button
-             type="submit"
-             id="{field.id}"
-             {self.html_params(name=field.name, **kwargs)}
-             >{field.label.text}</button>''')
+        return Markup(f"""
+            <button type="submit" id="{field.id}"
+                {self.html_params(name=field.name, **kwargs)}
+            >{field.label.text}</button>""")
 
 
 class SubmitField(BooleanField):
@@ -453,13 +447,10 @@ class SubmitAnnotationInput(Input):
         kwargs['class_'] = (kwargs['class_'] + ' uc-first') \
             if 'class_' in kwargs else 'uc-first'
         kwargs['onclick'] = onclick_event
-        return Markup(
-            f'''
-            <button
-             type="submit"
-             id="{field.id}"
-             {self.html_params(name=field.name, **kwargs)}
-             >{field.label.text}</button>''')
+        return Markup(f"""
+            <button type="submit" id="{field.id}"
+                {self.html_params(name=field.name, **kwargs)}
+             >{field.label.text}</button>""")
 
 
 class SubmitAnnotationField(BooleanField):
@@ -469,13 +460,13 @@ class SubmitAnnotationField(BooleanField):
 def generate_password_field() -> CustomField:
     return CustomField(
         '',
-        content=f'''
+        content=f"""
             <span class="uc-first {app.config["CSS"]["button"]["primary"]}"
-            id="generate-password">{_("generate password")}</span>''')
+            id="generate-password">{_("generate password")}</span>""")
 
 
 def value_type_expand_icon(type_: Entity) -> str:
-    return f'''
+    return f"""
         <span onkeydown="
             if (onActivateKeyInput(event))
                 switch_value_type({type_.id},this.children[0])"
@@ -488,4 +479,4 @@ def value_type_expand_icon(type_: Entity) -> str:
             id="value-type-switcher-{type_.id}"
             class="fa fa-chevron-right value-type-switcher input-height-sm">
             </i>
-        </span>'''
+        </span>"""

@@ -84,7 +84,7 @@ def html_form(
             html += add_row(
                 field,
                 '<div class="row g-1 align-items-center ">'
-                f'{"".join(buttons)}</div>')
+                f'{''.join(buttons)}</div>')
             continue
         if field.type in ['TableField', 'TableMultiField']:
             field.label.text = _(field.label.text.lower())
@@ -109,11 +109,12 @@ def add_row(
             field.label.text += ' *'
         field_css += ' required' if field.flags.required else ''
         field_css += ' integer' if isinstance(field, IntegerField) else ''
-        field_css += f' {app.config["CSS"]["string_field"]}' \
-            if isinstance(
+        if isinstance(
                 field,
-                (StringField, SelectField, FileField, IntegerField)) else ''
-        row_css += f' {field.row_css if hasattr(field, "row_css") else ""}'
+                (StringField, SelectField, FileField, IntegerField)):
+            field_css += f' {app.config["CSS"]["string_field"]}'
+        if hasattr(field, "row_css"):
+            row_css += f' {field.row_css}'
         for validator in field.validators:
             field_css += ' email' if isinstance(validator, Email) else ''
     return render_template(
@@ -164,8 +165,9 @@ def display_form(
         manual_page: Optional[str] = None) -> str:
     form_id = f'id="{form_id}"' if form_id else ''
     multipart = 'enctype="multipart/form-data"' if 'file' in form else ''
-    return \
-        f'<form method="post" {form_id} {multipart}>' \
-        '<table class="table table-no-style">' \
-        f'{html_form(form, form_id, manual_page)}' \
-        f'</table></form>'
+    return f"""
+        <form method="post" {form_id} {multipart}>
+          <table class="table table-no-style">
+            {html_form(form, form_id, manual_page)}
+          </table>
+        </form>"""

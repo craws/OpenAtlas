@@ -78,8 +78,10 @@ def manual(site: str) -> str:
     if not path.exists():
         # print(f'Missing manual link: {path}')
         return ''
-    return \
-        '<a title="' + uc_first(_('manual')) + '" ' \
-        f'href="/static/manual/{site}.html" class="manual" ' \
-        f'target="_blank" rel="noopener noreferrer">' \
-        f'<i class="fas fs-4 fa-book"></i></a>'
+    return f"""
+        <a title="{uc_first(_('manual'))}"
+            href="/static/manual/{site}.html" class="manual"
+            target="_blank"
+            rel="noopener noreferrer">
+          <i class="fas fs-4 fa-book"></i>
+        </a>"""

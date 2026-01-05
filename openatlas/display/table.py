@@ -281,9 +281,7 @@ def format_name_and_aliases(
     name = entity.name if forms else link(entity)
     if not entity.aliases or not get_user_setting('table_show_aliases', False):
         return name
-    return \
-        f'{name}' \
-        f'{"".join(f"<p>{alias}</p>" for alias in entity.aliases.values())}'
+    return f'{name}{''.join(f'<p>{i}</p>' for i in entity.aliases.values())}'
 
 
 def file_preview(entity_id: int) -> str:

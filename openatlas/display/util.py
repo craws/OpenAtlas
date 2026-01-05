@@ -68,36 +68,39 @@ def reference_systems(entity: Entity) -> str:
             </div>"""
         if system.name in ['GeoNames', 'GND', 'Wikidata']:
             name = system.name.lower()
-            show = '<span id="show">' + uc_first(_('show info')) + '</span>'
+            show = f'<span id="show">{uc_first(_('show info'))}</span>'
             hide = '<span id="hide" class="d-none">' + \
-                uc_first(_('hide info')) + '</span>'
-            show_info_button += (
-                f' <button id="{name}-switch" class="uc-first mt-1 me-1 '
-                f'{app.config["CSS"]["button"]["secondary"]}"'
-                f'onclick="ajax{uc_first(name)}Info'
-                f'(\'{link_.description}\')">{show}{hide}</button>')
+                f'{uc_first(_('hide info'))}</span>'
+            show_info_button += f"""
+                <button
+                    id="{name}-switch"
+                    class="uc-first mt-1 me-1
+                        {app.config["CSS"]["button"]["secondary"]}"
+                    onclick="ajax{uc_first(name)}Info('{link_.description}')"
+                    >{show}{hide}
+                </button>"""
             info_div = f'<div id="{name}-info-div" class="mt-2"></div>'
             logo = f"""<img src="/static/images/logos/{system.name}.svg" alt=""
                 class="rounded-circle object-fit-cover my-1" width="16"/>"""
         entry = f"""
             <li class="list-group-item bg-transparent">
-                <div class="d-flex gap-2 align-items-center">
+              <div class="d-flex gap-2 align-items-center">
                 {logo}
                 <span><b>{link(link_.domain)}</b>: {link_.description}</span>
                 <span class="badge badge-pill rounded-pill
                     badge-secondary bg-secondary">
-                    {g.types[link_.type.id].name if link_.type else ''}
+                  {g.types[link_.type.id].name if link_.type else ''}
                 </span>
-                </div>
-                {show_info_button}
-                {link(
+              </div>
+              {show_info_button}
+              {link(
                 _('show on %(system_name)s', system_name=link_.domain.name),
-                f'{system.resolver_url}{link_.description}',
+                system.resolver_url + link_.description,
                 external=True,
                 icon='fa-external-link-alt',
                 class_="btn btn-sm btn-outline-primary mt-1")
-                if system.resolver_url else ''}
-                {info_div}
+               if system.resolver_url else ''}
+              {info_div}
             </li>
             """
         html += entry
@@ -405,9 +408,8 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
     if hasattr(g, 'writable_paths'):
         for path in g.writable_paths:
             check_write_access(path, warnings)
-    return \
-        '<div class="alert alert-danger">' \
-        f'{"<br>".join(warnings)}</div>' if warnings else ''
+    return f'<div class="alert alert-danger">{"<br>".join(warnings)}</div>' \
+        if warnings else ''
 
 
 def check_write_access(path: Path, warnings: list[str]) -> list[str]:
@@ -423,14 +425,14 @@ def tooltip(text: str) -> str:
     if not text:
         return ''
     title = text.replace('"', "'")
-    return (
-        f"""<span
-        data-bs-toggle="tooltip"
-        data-bs-placement="top"
-        data-bs-custom-class="custom-tooltip"
-        data-bs-title="{title}">"""
-        '<i class="fas fa-info-circle fs-6 tooltipicon"></i>'
-        '</span>')
+    return f"""
+        <span
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            data-bs-custom-class="custom-tooltip"
+            data-bs-title="{title}">
+          <i class="fas fa-info-circle fs-6 tooltipicon"></i>
+        </span>"""
 
 
 def get_file_path(
@@ -553,18 +555,17 @@ def button_bar(buttons: list[Any]) -> str:
     def add_col(input_: str) -> str:
         return \
             f'<div class="col-auto d-flex align-items-center">{input_}</div>'
-    return \
-        '<div class="row my-2 g-1">' \
-        f'{" ".join([str(b) for b in list(map(add_col, buttons))])}' \
-        '</div>' if buttons else ''
+    return f"""
+        <div class="row my-2 g-1">
+            {' '.join([str(b) for b in list(map(add_col, buttons))])}
+        </div>""" if buttons else ''
 
 
 @app.template_filter()
 def citation_example(code: str) -> str:
-    html = ''
     if code == 'reference' and (text := get_translation('citation_example')):
-        html = f'<h1 class="uc-first">{_('citation_example')}</h1>{text}'
-    return html
+        return f'<h1 class="uc-first">{_('citation_example')}</h1>{text}'
+    return ''
 
 
 @app.template_filter()
@@ -668,8 +669,7 @@ def display_crumbs(crumbs: list[Any]) -> str:
     items = []
     for item in crumbs:
         if isinstance(item, list):
-            items.append(
-                f'<a href="{item[1]}" class="uc-first">{str(item[0])}</a>')
+            items.append(f'<a href="{item[1]}" class="uc-first">{item[0]}</a>')
         elif isinstance(item, (str, LazyString)):
             items.append(f'<span class="uc-first">{item}</span>')
         elif item:

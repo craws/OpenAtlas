@@ -46,11 +46,11 @@ def sex_result(entity: Entity) -> str:
     calculation = SexEstimation.calculate(entity)
     if calculation is None:
         return ''
-    return \
-        f'<h1 class="uc-first">{_('sex estimation')}</h1>' \
-        'Ferembach et al. 1979: ' \
-        f'<span class="anthro-result">{calculation}</span> - ' + \
-        _('corresponds to') + f' "{name_result(calculation)}"'
+    return f"""
+        <h1 class="uc-first">{_('sex estimation')}</h1>
+        Ferembach et al. 1979:
+        <span class="anthro-result">{calculation}</span> -
+        {_('corresponds to')} "{name_result(calculation)}" """
 
 
 def carbon_result(entity: Entity) -> str:

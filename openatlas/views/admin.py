@@ -92,11 +92,11 @@ def admin_index() -> str:
                 manual('admin/iiif'),
                 button(_('edit'), url_for('settings', category='iiif')),
                 button(
-                    _('convert all files') + f' ({count_files_to_convert()})',
+                    f'{_('convert all files')} ({count_files_to_convert()})',
                     url_for('convert_iiif_files')),
                 button(
-                    _('delete all IIIF files') +
-                    f' ({count_files_to_delete()})',
+                    f'{_('delete all IIIF files')} '
+                    f'({count_files_to_delete()})',
                     url_for('delete_iiif_files'))])
     if is_authorized('manager'):
         tabs['modules'] = Tab(
@@ -472,7 +472,7 @@ def newsletter() -> str | Response:
                 user.username,
                 user.email,
                 f'<input value="{user.id}" name="recipient" type="checkbox" '
-                f'checked="checked">'])
+                'checked="checked">'])
     return render_template(
         'admin/newsletter.html',
         form=form,
