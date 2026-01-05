@@ -121,7 +121,7 @@ $(document).ready(function () {
     formatResult: function (item) {
       return {
         value: item.id,
-        text: `${item.label} - ${item.description}<br/><small>${item.id}</small>`
+        text: `${item.label} - ${item.description}<br><small>${item.id}</small>`
       };
     },
     events: {
@@ -148,7 +148,7 @@ $(document).ready(function () {
     formatResult: function (item) {
       return {
          value: item.id,
-         text: `${item.label} - ${item.category}<br/><small>${item.id.substring(item.id.lastIndexOf('/') + 1)}</small>`
+         text: `${item.label} - ${item.category}<br><small>${item.id.substring(item.id.lastIndexOf('/') + 1)}</small>`
       };
     },
     events: {
@@ -516,7 +516,7 @@ function addListElement(id, classes=""){
   const newField = document.createElement('li')
   newField.innerHTML = `
     <div class="d-flex">
-        <div class="w-100"><input id="${id}-${lastId + 1}"  name="${id}-${lastId + 1}" class="${classes} form-control form-control-sm" type="text"/></div>
+        <div class="w-100"><input id="${id}-${lastId + 1}"  name="${id}-${lastId + 1}" class="${classes} form-control form-control-sm" type="text"></div>
         <div><button onclick="removeListField('${id}-${lastId + 1}')" type="button" class="${style.button.secondary} ms-1"><icon class="fa fa-minus"></icon></button></div>
     </div>`
   list.appendChild(newField)
