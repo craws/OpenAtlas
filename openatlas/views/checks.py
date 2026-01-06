@@ -95,7 +95,7 @@ def check_links() -> str:
         tabs=tabs,
         title=_('admin'),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            [_('admin'), f'{url_for('admin_index')}#tab-data'],
             _('check links')])
 
 
@@ -111,7 +111,7 @@ def delete_single_type_duplicate(entity_id: int, type_id: int) -> Response:
 @required_group('contributor')
 def delete_link_duplicates() -> Response:
     count = checks.delete_link_duplicates()
-    g.logger.log('info', 'admin', f"Deleted duplicate links: {count}")
+    g.logger.log('info', 'admin', f'Deleted duplicate links: {count}')
     flash(f"{_('deleted links')}: {count}")
     return redirect(url_for('check_links') + '#tab-duplicates')
 
@@ -130,7 +130,7 @@ def check_similar() -> str:
                 form.ratio.data if form.ratio.data else 100).values():
             similar = [link(entity) for entity in item['entities']]
             table.rows.append([
-                f"{link(item['entity'])}<br>{'<br>'.join(similar)}",
+                f'{link(item['entity'])}<br>{'<br>'.join(similar)}',
                 len(item['entities']) + 1])
     content = display_form(form, manual_page='admin/data_integrity_checks')
     if not table.rows:  # pragma: no cover
@@ -140,7 +140,7 @@ def check_similar() -> str:
         tabs={'similar': Tab('similar', content=content, table=table)},
         title=_('admin'),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            [_('admin'), f'{url_for('admin_index')}#tab-data'],
             _('check similar names')])
 
 
@@ -199,7 +199,7 @@ def check_dates() -> str:
         tabs=tabs,
         title=_('admin'),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            [_('admin'), f'{url_for('admin_index')}#tab-data'],
             _('check dates')])
 
 
@@ -300,7 +300,7 @@ def orphans() -> str:
         tabs=tabs,
         title=_('admin'),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            [_('admin'), f'{url_for('admin_index')}#tab-data'],
             _('orphans')])
 
 
@@ -371,8 +371,8 @@ def check_files(arche: Optional[str] = None) -> str:
         tabs=tabs,
         title=_('admin'),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
-            [_('export') + ' ARCHE', f"{url_for('export_arche')}"]
+            [_('admin'), f'{url_for('admin_index')}#tab-data'],
+            [f'{_('export')} ARCHE', f'{url_for('export_arche')}']
             if arche else None,
             _('check files')])
 

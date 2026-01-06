@@ -150,7 +150,7 @@ def logo(id_: Optional[int] = None) -> str | Response:
         'tabs.html',
         tabs={'logo': Tab('logo', table=table)},
         title=_('logo'),
-        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-file"], _('logo')])
+        crumbs=[[_('admin'), f'{url_for('admin_index')}#tab-file'], _('logo')])
 
 
 @app.route('/logo/remove')

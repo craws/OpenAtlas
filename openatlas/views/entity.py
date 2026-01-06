@@ -35,8 +35,8 @@ def view(id_: int) -> str | Response:
     match entity.class_.group.get('name'):
         case 'type' if not entity.root:
             return redirect(
-                f"{url_for('index', group='type')}"
-                f"#menu-tab-{entity.category}_collapse-{id_}")
+                url_for('index', group='type') +
+                f'#menu-tab-{entity.category}_collapse-{id_}')
         case 'reference_system':
             entity.class_.relations = {}
             for name in entity.classes:
@@ -254,7 +254,7 @@ def redirect_url_insert(
                 selection_id=entity.id)
         elif not hasattr(form, 'continue_') or form.continue_.data != 'yes':
             url = url_for('view', id_=origin.id) \
-                + f"#tab-{relation_name.replace('_', '-')}"
+                + f'#tab-{relation_name.replace('_', '-')}'
     if hasattr(form, 'continue_') \
             and form.continue_.data in ['sub', 'human_remains']:
         class_ = form.continue_.data
@@ -287,11 +287,11 @@ def redirect_url_delete(entity: Entity) -> str:
                 g.class_groups['artifact']['classes'],
                 True):
             url = \
-                f"{url_for('view', id_=parent.id)}" \
-                f"#tab-{entity.class_.name.replace('_', '-')}"
+                url_for('view', id_=parent.id) + \
+                f'#tab-{entity.class_.name.replace('_', '-')}'
     elif entity.class_.name == 'source_translation':
         source = entity.get_linked_entity_safe('P73', inverse=True)
-        url = f"{url_for('view', id_=source.id)}#tab-text"
+        url = f'{url_for('view', id_=source.id)}#tab-text'
     return url
 
 

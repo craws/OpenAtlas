@@ -467,16 +467,14 @@ def generate_password_field() -> CustomField:
 
 def value_type_expand_icon(type_: Entity) -> str:
     return f"""
-        <span onkeydown="
-            if (onActivateKeyInput(event))
-                switch_value_type({type_.id},this.children[0])"
-        >
+        <span onkeydown="if (onActivateKeyInput(event))
+              switch_value_type({type_.id},this.children[0])">
             <i
-            aria-pressed=false
-            role="button"
-            tabindex="0"
-            onclick="switch_value_type({type_.id},this)"
-            id="value-type-switcher-{type_.id}"
-            class="fa fa-chevron-right value-type-switcher input-height-sm">
+                aria-pressed=false
+                tabindex="0"
+                onclick="switch_value_type({type_.id},this)"
+                id="value-type-switcher-{type_.id}"
+                class="fa fa-chevron-right value-type-switcher input-height-sm"
+                role="button">
             </i>
         </span>"""

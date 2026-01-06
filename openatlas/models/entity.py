@@ -156,8 +156,8 @@ class Entity:
                 range_error = False
             if domain_error or range_error:  # pragma: no cover
                 text = \
-                    f"invalid CIDOC link {domain.class_.cidoc_class.code}" \
-                    f" > {code} > {range_.class_.cidoc_class.code}"
+                    f'invalid CIDOC link {domain.class_.cidoc_class.code}' \
+                    f' > {code} > {range_.class_.cidoc_class.code}'
                 g.logger.log('error', 'model', text)
                 abort(400, text)
             data = {
@@ -294,7 +294,7 @@ class Entity:
             location = self.get_linked_entity_safe('P53')
             db.update({
                 'id': location.id,
-                'name': f"Location of {sanitize(self.name)}"})
+                'name': f'Location of {sanitize(self.name)}'})
             Gis.delete_by_entity(location)
         if gis_data:
             Gis.insert(location, gis_data)

@@ -42,9 +42,7 @@ def vocabs_index() -> str:
                     button(
                         _('show vocabularies'),
                         url_for('show_vocabularies'))])},
-        crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
-            'VOCABS'])
+        crumbs=[[_('admin'), f'{url_for('admin_index')}#tab-data'], 'VOCABS'])
 
 
 def vocabs_form() -> Any:
@@ -80,8 +78,8 @@ def vocabs_update() -> str | Response:
         buttons=[manual('admin/vocabs')],
         content=display_form(form),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
-            ['VOCABS', f"{url_for('vocabs_index')}"],
+            [_('admin'), f'{url_for('admin_index')}#tab-data'],
+            ['VOCABS', url_for('vocabs_index')],
             _('edit')])
 
 
@@ -123,8 +121,8 @@ def show_vocabularies() -> str:
         buttons=[manual('admin/vocabs')],
         title='VOCABS',
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
-            ['VOCABS', f"{url_for('vocabs_index')}"],
+            [_('admin'), f'{url_for('admin_index')}#tab-data'],
+            ['VOCABS', url_for('vocabs_index')],
             _('vocabularies')])
 
 
@@ -178,7 +176,7 @@ def vocabulary_import_view(category: str, id_: str) -> str | Response:
             results = import_vocabs_data(id_, form_data, details, category)
             count = len(results[0])
             g.logger.log('info', 'import', f'import: {count} top concepts')
-            import_str = f"{_('import of')}: {count} {_('top concepts')}"
+            import_str = f'{_('import of')}: {count} {_('top concepts')}'
             if results[1]:
                 import_str += f'. {_("Check log for not imported concepts")}'
                 for duplicate in results[1]:
@@ -203,7 +201,7 @@ def vocabulary_import_view(category: str, id_: str) -> str | Response:
                 buttons=[manual('admin/vocabs')])},
         title=id_,
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
-            ['VOCABS', f"{url_for('vocabs_index')}"],
-            [_('vocabularies'), f"{url_for('show_vocabularies')}"],
+            [_('admin'), f'{url_for('admin_index')}#tab-data'],
+            ['VOCABS', url_for('vocabs_index')],
+            [_('vocabularies'), url_for('show_vocabularies')],
             details['title']])

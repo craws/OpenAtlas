@@ -140,12 +140,12 @@ def sex_update(id_: int) -> str | Response:
     for feature, values in SexEstimation.features.items():
         description = ''
         if values['female'] or values['male']:
-            description = f"Female: {values['female']}, male: {values['male']}"
+            description = f'Female: {values['female']}, male: {values['male']}'
         setattr(
            Form,
            feature,
            SelectField(
-               f"{feature} ({values['category']})",
+               f'{feature} ({values['category']})',
                choices=choices,
                default='Not preserved',
                description=description))
@@ -205,11 +205,11 @@ def carbon_update(id_: int) -> str | Response:
 
     class Form(FlaskForm):
         lab_id = StringField(
-            f"{_('laboratory')} {_('ID')}",
+            f'{_('laboratory')} {_('ID')}',
             [InputRequired()],
             render_kw={'placeholder': 'VERA'})
         spec_id = StringField(
-            f"{_('specimen')} {_('ID')}",
+            f'{_('specimen')} {_('ID')}',
             [InputRequired()],
             render_kw={'placeholder': '23432A'})
         radiocarbon_year = IntegerField(

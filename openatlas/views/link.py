@@ -37,7 +37,7 @@ def link_insert(origin_id: int, name: str) -> str | Response:
                 request.form['checkbox_values'],
                 inverse=relation.inverse)
         return redirect(
-            f"{url_for('view', id_=origin.id)}#tab-" + name.replace('_', '-'))
+            f'{url_for('view', id_=origin.id)}#tab-{name.replace('_', '-')}')
     tabs = {
         'link': Tab(
             'link',
@@ -124,7 +124,7 @@ def link_update(id_: int, origin_id: int, name: str) -> str | Response:
         link_.update(data)
         flash(_('info update'))
         return redirect(
-            f"{url_for('view', id_=origin.id)}#tab-" + name.replace('_', '-'))
+            f'{url_for('view', id_=origin.id)}#tab-{name.replace('_', '-')}')
     return render_template(
         'content.html',
         entity=origin,

@@ -84,7 +84,7 @@ def export_sql() -> str:
                         url_for('export_execute', format_='dump'))])},
         title=_('export SQL'),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            [_('admin'), f'{url_for('admin_index')}#tab-data'],
             _('export SQL')])
 
 
@@ -131,10 +131,10 @@ def export_arche() -> str:
                         _('export') + ' ARCHE',
                         url_for('arche_execute'))
                     if is_authorized('admin') else ''])},
-        title=_('export') + ' ARCHE',
+        title=f'{_('export')} ARCHE',
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
-            _('export') + ' ARCHE'])
+            [_('admin'), f'{url_for('admin_index')}#tab-data'],
+            f'{_('export')} ARCHE'])
 
 
 @app.route('/export/arche/execute')
@@ -167,10 +167,10 @@ def export_rdf() -> str:
                         _('export') + ' RDF/NT',
                         url_for('rdf_execute'))
                 ])},
-        title=_('export') + ' RDF',
+        title=f'{_('export')} RDF',
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
-            _('export') + ' RDF'])
+            [_('admin'), f'{url_for('admin_index')}#tab-data'],
+            f'{_('export')} RDF'])
 
 
 @app.route('/export/rdf/execute')

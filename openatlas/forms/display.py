@@ -68,7 +68,7 @@ def html_form(
             continue
         if field.id == 'save':
             class_ = \
-                f"{app.config['CSS']['button']['primary']} text-wrap uc-first"
+                f'{app.config['CSS']['button']['primary']} text-wrap uc-first'
             buttons = [manual(manual_page)] if manual_page else []
             buttons.append(field(class_=class_))
             if 'insert_and_continue' in form:

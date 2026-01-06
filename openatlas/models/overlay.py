@@ -23,24 +23,24 @@ class Overlay:
         db.insert({
             'image_id': data['image_id'],
             'bounding_box':
-                f"[[{data['top_left_northing']}, "
-                f"{data['top_left_easting']}], "
-                f"[{data['top_right_northing']}, "
-                f"{data['top_right_easting']}], "
-                f"[{data['bottom_left_northing']}, "
-                f"{data['bottom_left_easting']}]]"})
+                f'[[{data['top_left_northing']}, '
+                f'{data['top_left_easting']}], '
+                f'[{data['top_right_northing']}, '
+                f'{data['top_right_easting']}], '
+                f'[{data['bottom_left_northing']}, '
+                f'{data['bottom_left_easting']}]]'})
 
     @staticmethod
     def update(data: dict[str, Any]) -> None:
         db.update({
             'image_id': data['image_id'],
             'bounding_box':
-                f"[[{data['top_left_northing']}, "
-                f"{data['top_left_easting']}], "
-                f"[{data['top_right_northing']}, "
-                f"{data['top_right_easting']}], "
-                f"[{data['bottom_left_northing']}, "
-                f"{data['bottom_left_easting']}]]"})
+                f'[[{data['top_left_northing']}, '
+                f'{data['top_left_easting']}], '
+                f'[{data['top_right_northing']}, '
+                f'{data['top_right_easting']}], '
+                f'[{data['bottom_left_northing']}, '
+                f'{data['bottom_left_easting']}]]'})
 
     @staticmethod
     def get_by_object(object_: Entity) -> dict[int, Overlay]:

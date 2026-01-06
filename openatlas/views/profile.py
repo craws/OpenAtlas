@@ -105,7 +105,7 @@ def profile_index() -> str:
 def profile_settings(category: str) -> str | Response:
     form = getattr(
         importlib.import_module('openatlas.forms.setting'),
-        f"{uc_first(category)}Form")()
+        f'{uc_first(category)}Form')()
     if form.validate_on_submit():
         settings = {}
         for field in form:
@@ -130,7 +130,7 @@ def profile_settings(category: str) -> str | Response:
         content=display_form(form, manual_page='profile'),
         title=_('profile'),
         crumbs=[
-            [_('profile'), f"{url_for('profile_index')}#tab-{category}"],
+            [_('profile'), f'{url_for('profile_index')}#tab-{category}'],
             _(category)])
 
 

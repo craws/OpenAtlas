@@ -114,8 +114,8 @@ class CheckHandler:
     def generate_warning_messages(self) -> None:
         self.clear_warning_messages()
         for key, value in self.warning.items():
-            row_ids = f": {', '.join(value)}" if None not in value else None
-            self.add_warn_message(_(key.replace('_', ' ')) + f"{row_ids}")
+            row_ids = f': {', '.join(value)}' if None not in value else None
+            self.add_warn_message(f'{_(key.replace('_', ' '))}{row_ids}')
 
     def generate_error_messages(self) -> None:
         self.clear_error_messages()
@@ -124,7 +124,7 @@ class CheckHandler:
                 self.add_error_message(_('missing name column'))
             else:
                 self.add_error_message(
-                    f"{_(key.replace('_', ' '))}: {', '.join(value)}")
+                    f'{_(key.replace('_', ' '))}: {', '.join(value)}')
         if self.messages['error']:
             raise ValueError()
 
@@ -147,7 +147,7 @@ def import_index() -> str:
         buttons=buttons,
         title=_('import'),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            [_('admin'), f'{url_for('admin_index')}#tab-data'],
             _('import')])
 
 
@@ -217,7 +217,7 @@ def import_project_view(id_: int) -> str:
         tabs=tabs,
         title=_('import'),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            [_('admin'), f'{url_for('admin_index')}#tab-data'],
             [_('import'), url_for('import_index')],
             project.name])
 
@@ -239,7 +239,7 @@ def import_project_update(id_: int) -> str | Response:
         content=display_form(form, manual_page='admin/import'),
         title=_('import'),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            [_('admin'), f'{url_for('admin_index')}#tab-data'],
             [_('import'), url_for('import_index')],
             project,
             _('edit')])
@@ -295,7 +295,7 @@ def import_data(project_id: int, class_: str) -> str:
                 file_data=file_data,
                 title=_('import'),
                 crumbs=[
-                    [_('admin'), f"{url_for('admin_index')}#tab-data"],
+                    [_('admin'), f'{url_for('admin_index')}#tab-data'],
                     [_('import'), url_for('import_index')],
                     project,
                     class_label])
@@ -316,7 +316,7 @@ def import_data(project_id: int, class_: str) -> str:
         imported=imported,
         messages=checks.messages,
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            [_('admin'), f'{url_for('admin_index')}#tab-data'],
             [_('import'), url_for('import_index')],
             project,
             class_label])

@@ -120,9 +120,7 @@ def api_token(user_id: int = 0) -> str | Response:
         'tabs.html',
         tabs=tabs,
         title=_('admin'),
-        crumbs=[
-            [_('admin'), f"{url_for('admin_index')}"],
-            _('token')])
+        crumbs=[[_('admin'), f'{url_for('admin_index')}'], _('token')])
 
 
 def get_token_valid_column(token: dict[str, Any], user: User) -> str:
@@ -172,8 +170,8 @@ def generate_token() -> str | Response:
         content=display_form(form, manual_page='admin/api'),
         title=_('admin'),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}"],
-            [_('token'), f"{url_for('api_token')}"],
+            [_('admin'), f'{url_for('admin_index')}'],
+            [_('token'), f'{url_for('api_token')}'],
             _('generate')])
 
 

@@ -237,7 +237,7 @@ def admin_content(item: str) -> str | Response:
         tabs={'content': Tab('content', form=form)},
         title=_('content'),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-content"],
+            [_('admin'), f'{url_for('admin_index')}#tab-content'],
             _(item)])
 
 
@@ -248,10 +248,8 @@ def settings(category: str) -> str | Response:
         abort(403)
     form = getattr(
         importlib.import_module('openatlas.forms.setting'),
-        f"{uc_first(category)}Form")()
+        f'{uc_first(category)}Form')()
     tab = category.replace('api', 'data')
-    redirect_url = f"{url_for('admin_index')}#tab-{tab}"
-    crumbs = [[_('admin'), f"{url_for('admin_index')}#tab-{tab}"], _(category)]
     if form.validate_on_submit():
         data = {}
         for field in form:
@@ -266,15 +264,18 @@ def settings(category: str) -> str | Response:
         Settings.update(data)
         g.logger.log('info', 'settings', 'Settings updated')
         flash(_('info update'))
-        return redirect(redirect_url)
+        return redirect(f'{url_for('admin_index')}#tab-{tab}')
     if request.method == 'GET':
         set_form_settings(form)
-    manual_page = f"admin/{category.replace('frontend', 'presentation_site')}"
     return render_template(
         'content.html',
-        content=display_form(form, manual_page=manual_page),
+        content=display_form(
+            form,
+            manual_page=
+            f'admin/{category.replace('frontend', 'presentation_site')}'),
         title=_('admin'),
-        crumbs=crumbs)
+        crumbs=[
+            [_('admin'), f'{url_for('admin_index')}#tab-{tab}'], _(category)])
 
 
 @app.route('/admin/file/delete/<filename>')
@@ -301,7 +302,7 @@ def admin_file_delete(filename: str) -> Response:
                         'error', 'file', f'deletion of {f.name} failed', e)
                     flash(_('error file delete'), 'error')
     return redirect(
-        f"{url_for('orphans')}#tab-orphaned-files")  # pragma: no cover
+        f'{url_for('orphans')}#tab-orphaned-files')  # pragma: no cover
 
 
 @app.route('/admin/annotation/image/delete/<int:id_>')
@@ -389,13 +390,13 @@ def log() -> str:
     for row in logs:
         user = None
         if row['user_id']:
-            user = f"user id: {row['user_id']}"
+            user = f'user id: {row['user_id']}'
             if user_ := User.get_by_id(row['user_id']):
                 user = link(user_)
         table.rows.append([
             row['created'].replace(microsecond=0).isoformat()
             if row['created'] else '',
-            f"{row['priority']} {app.config['LOG_LEVELS'][row['priority']]}",
+            f'{row['priority']} {app.config['LOG_LEVELS'][row['priority']]}',
             row['type'],
             row['message'],
             user,
@@ -410,7 +411,7 @@ def log() -> str:
         tabs={'log': Tab('log', form=form, table=table, buttons=buttons)},
         title=_('admin'),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-general"],
+            [_('admin'), f'{url_for('admin_index')}#tab-general'],
             _('system log')])
 
 
@@ -454,12 +455,12 @@ def newsletter() -> str | Response:
                 code = User.generate_password()
                 user.unsubscribe_code = code
                 user.update()
-                link_ = f"{request.scheme}://{request.headers['Host']}"
+                link_ = f'{request.scheme}://{request.headers['Host']}'
                 link_ += url_for('index_unsubscribe', code=code)
                 if send_mail(
                         form.subject.data,
                         f'{form.body.data}\n\n'
-                        f'{_("To unsubscribe use the link below.")}\n\n'
+                        f'{_('To unsubscribe use the link below.')}\n\n'
                         f'{link_}',
                         user.email):
                     count += 1
@@ -479,7 +480,7 @@ def newsletter() -> str | Response:
         table=table,
         title=_('newsletter'),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-user"],
+            [_('admin'), f'{url_for('admin_index')}#tab-user'],
             _('newsletter')])
 
 
