@@ -28,7 +28,7 @@ def sanitize(
 
 def convert_size(size_bytes: int) -> str:
     if size_bytes <= 0:
-        return '0 B'  # pragma: no cover
+        return '0 B'
     size_name = ('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB')
     i = int(math.floor(math.log(size_bytes, 1024)))
     return f'{int(size_bytes / math.pow(1024, i))} {size_name[i]}'

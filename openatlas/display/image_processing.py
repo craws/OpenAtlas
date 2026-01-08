@@ -21,7 +21,7 @@ def safe_resize_image(name: str, file_format: str, size: str) -> bool:
         if check_if_folder_exist(size, app.config['RESIZED_IMAGES']):
             return image_resizing(name, file_format, size)
         return False  # pragma: no cover
-    except OSError as e:  # pragma: no cover
+    except OSError as e:
         g.logger.log(
             'info',
             'image processing',
@@ -93,7 +93,7 @@ def delete_orphaned_resized_images() -> None:
         for file in path.glob('**/*'):
             file_name = file.name.rsplit('.', 1)[0].lower()
             if not file_name.isdigit() or int(file_name) not in g.files:
-                file.unlink()  # pragma: no cover
+                file.unlink()
 
 
 def create_resized_images() -> None:
