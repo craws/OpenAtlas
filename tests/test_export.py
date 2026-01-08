@@ -157,7 +157,7 @@ class ImportTest(ImportTestCase):
             url_for('check_files', arche='arche'),
             follow_redirects=True)
         assert b'No license' in rv.data
-        assert b'export RDF/NT' in c.get(url_for('export_rdf')).data
+        assert b'Export RDF/NT' in c.get(url_for('export_rdf')).data
 
         rv = c.get(
             url_for('rdf_execute'),

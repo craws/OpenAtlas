@@ -18,7 +18,7 @@ from wtforms.widgets import FileInput, HiddenInput, Input, TextInput
 from openatlas import app
 from openatlas.display.table import Table, entity_table
 from openatlas.display.util import link
-from openatlas.display.util2 import is_authorized
+from openatlas.display.util2 import is_authorized, uc_first
 from openatlas.forms.util import convert
 from openatlas.models.entity import Entity
 
@@ -30,11 +30,10 @@ class RemovableListInput(HiddenInput):
             *args: Any,
             **kwargs: Any) -> str:
         [name, index] = field.id.split('-')
-        classes = kwargs['class'] if 'class' in kwargs else ''
         return render_template(
             'forms/removable_list_field.html',
             value=field.data,
-            classes=classes,
+            classes=kwargs.get('class', ''),
             name=name,
             id=index)
 
@@ -314,7 +313,7 @@ class TableCidocField(HiddenField):
 def table_cidoc(table_id: str, items: list[Any]) -> Table:
     table_ = Table(['code', 'name'])
     for i in items:
-        js = "selectFromTable(" \
+        js = 'selectFromTable(' \
             + f"this, '{table_id}', '{i.code}', '{i.code} {i.name}');"
         table_.rows.append([link(i.code, '#', js=js), i.name])
     return table_
@@ -427,12 +426,10 @@ class SubmitInput(Input):
     input_type = 'submit'
 
     def __call__(self, field: Field, **kwargs: Any) -> str:
-        kwargs['class_'] = (kwargs['class_'] + ' uc-first') \
-            if 'class_' in kwargs else 'uc-first'
         return Markup(f"""
             <button type="submit" id="{field.id}"
                 {self.html_params(name=field.name, **kwargs)}
-            >{field.label.text}</button>""")
+            >{uc_first(field.label.text)}</button>""")
 
 
 class SubmitField(BooleanField):
@@ -443,14 +440,11 @@ class SubmitAnnotationInput(Input):
     input_type = 'submit'
 
     def __call__(self, field: Field, **kwargs: Any) -> str:
-        onclick_event = "saveAnnotationText();"
-        kwargs['class_'] = (kwargs['class_'] + ' uc-first') \
-            if 'class_' in kwargs else 'uc-first'
-        kwargs['onclick'] = onclick_event
+        kwargs['onclick'] = "saveAnnotationText();"
         return Markup(f"""
             <button type="submit" id="{field.id}"
                 {self.html_params(name=field.name, **kwargs)}
-             >{field.label.text}</button>""")
+             >{uc_first(field.label.text)}</button>""")
 
 
 class SubmitAnnotationField(BooleanField):
@@ -461,8 +455,10 @@ def generate_password_field() -> CustomField:
     return CustomField(
         '',
         content=f"""
-            <span class="uc-first {app.config["CSS"]["button"]["primary"]}"
-            id="generate-password">{_("generate password")}</span>""")
+            <span
+                class="{app.config["CSS"]["button"]["primary"]}"
+                id="generate-password"
+            >{uc_first(_('generate password'))}</span>""")
 
 
 def value_type_expand_icon(type_: Entity) -> str:

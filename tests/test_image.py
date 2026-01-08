@@ -80,7 +80,7 @@ class ImageTest(TestBaseCase):
             profile_image(file_pathless)
 
         rv = c.get(url_for('view', id_=file_json.id))
-        assert b'no preview available' in rv.data
+        assert b'No preview available' in rv.data
 
         rv = c.get(url_for('view', id_=file_pathless.id))
         assert b'Missing file' in rv.data

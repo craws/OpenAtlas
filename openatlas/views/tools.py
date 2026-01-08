@@ -12,7 +12,7 @@ from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
     button, display_info, link, remove_link, required_group)
-from openatlas.display.util2 import is_authorized, manual
+from openatlas.display.util2 import is_authorized, manual, uc_first
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity, Link
@@ -47,7 +47,7 @@ def sex_result(entity: Entity) -> str:
     if calculation is None:
         return ''
     return f"""
-        <h1 class="uc-first">{_('sex estimation')}</h1>
+        <h1>{uc_first(_('sex estimation'))}</h1>
         Ferembach et al. 1979:
         <span class="anthro-result">{calculation}</span> -
         {_('corresponds to')} "{name_result(calculation)}" """
@@ -55,7 +55,7 @@ def sex_result(entity: Entity) -> str:
 
 def carbon_result(entity: Entity) -> str:
     if link_ := get_carbon_link(entity):
-        return f'<h1 class="uc-first">{_('radiocarbon dating')}</h1>' + \
+        return f'<h1>{uc_first(_('radiocarbon dating'))}</h1>' + \
             display_info(json.loads(link_.description))
     return ''
 

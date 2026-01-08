@@ -121,7 +121,7 @@ class TypeTest(TestBaseCase):
         rv = c.get(
             url_for('type_unset_selectable', id_=sex_sub.id),
             follow_redirects=True)
-        assert b'set selectable' in rv.data
+        assert b'Set selectable' in rv.data
 
         rv = c.get(url_for('insert', class_='person'))
         assert b'sex' in rv.data
@@ -132,7 +132,7 @@ class TypeTest(TestBaseCase):
         rv = c.get(
             url_for('type_set_selectable', id_=sex_sub.id),
             follow_redirects=True)
-        assert b'set unselectable' in rv.data
+        assert b'Set unselectable' in rv.data
 
         with app.test_request_context():
             app.preprocess_request()

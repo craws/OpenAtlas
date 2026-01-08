@@ -8,7 +8,7 @@ from wtforms import FileField, IntegerField, SelectField, StringField
 from wtforms.validators import Email
 
 from openatlas import app
-from openatlas.display.util2 import manual
+from openatlas.display.util2 import manual, uc_first
 from openatlas.forms.field import ValueTypeField
 
 
@@ -42,10 +42,11 @@ def html_form(
                 reference_systems_added = True
                 html += add_row(
                     label=_('reference system'),
-                    value='<span id="reference-system-switcher" '
-                    'class="uc-first '
-                    f'{app.config["CSS"]["button"]["secondary"]}">{_('show')}'
-                    '</span>')
+                    value=f"""
+                        <span id="reference-system-switcher" '
+                            class="{app.config["CSS"]["button"]["secondary"]}">
+                            {uc_first(_('show'))}
+                        </span>""")
             html += add_row(field, row_css="d-none")
             continue
         if field.id.split('_', 1)[0] in ('begin', 'end'):
@@ -68,7 +69,7 @@ def html_form(
             continue
         if field.id == 'save':
             class_ = \
-                f'{app.config['CSS']['button']['primary']} text-wrap uc-first'
+                f'{app.config['CSS']['button']['primary']} text-wrap'
             buttons = [manual(manual_page)] if manual_page else []
             buttons.append(field(class_=class_))
             if 'insert_and_continue' in form:
@@ -148,7 +149,7 @@ def add_dates(form: Any) -> str:
             for error in getattr(form, field_name).errors:
                 errors[field_name] += error
             errors[field_name] = \
-                f'<label class="error uc-first">{errors[field_name]}</label>'
+                f'<label class="error">{errors[field_name]}</label>'
     return render_template(
         'util/dates.html',
         form=form,

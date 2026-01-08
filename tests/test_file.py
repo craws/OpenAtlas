@@ -105,7 +105,7 @@ class FileTest(TestBaseCase):
         assert b'OpenAtlas logo' in rv.data
 
         rv = c.get(url_for('logo', id_=iiif_id), follow_redirects=True)
-        assert b'remove custom logo' in rv.data
+        assert b'Remove custom logo' in rv.data
 
         rv = c.get(
             url_for('logo_remove', action='remove_logo'),
@@ -154,7 +154,7 @@ class FileTest(TestBaseCase):
         assert b'Updated file' in rv.data
 
         rv = c.get(url_for('view', id_=iiif_id))
-        assert b'enable IIIF view' in rv.data
+        assert b'Enable IIIF view' in rv.data
 
         rv = c.get(
             url_for('make_iiif_available', id_=iiif_id),
@@ -165,7 +165,7 @@ class FileTest(TestBaseCase):
         assert b'View in IIIF' in rv.data
 
         rv = c.get(url_for('view', id_=place.id))
-        assert b'view all IIIF images' in rv.data
+        assert b'View all IIIF images' in rv.data
 
         with app.test_request_context():
             app.preprocess_request()

@@ -17,7 +17,7 @@ class SearchTest(TestBaseCase):
             insert('person', 'Waldo without date')
 
         rv = c.post(url_for('search_index'), data={'global-term': ''})
-        assert b'no entries' in rv.data
+        assert b'No entries' in rv.data
 
         rv = c.post(
             url_for('search_index'),

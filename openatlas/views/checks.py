@@ -17,7 +17,8 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import Table, entity_table
 from openatlas.display.util import (
     button, check_iiif_activation, get_file_path, link, required_group)
-from openatlas.display.util2 import convert_size, is_authorized, manual
+from openatlas.display.util2 import (
+    convert_size, is_authorized, manual, uc_first)
 from openatlas.forms.display import display_form
 from openatlas.forms.setting import SimilarForm
 from openatlas.models import checks
@@ -134,7 +135,7 @@ def check_similar() -> str:
                 len(item['entities']) + 1])
     content = display_form(form, manual_page='admin/data_integrity_checks')
     if not table.rows:  # pragma: no cover
-        content += f'<p class="uc-first">{_('no entries')}</p>'
+        content += f'<p>{uc_first(_('no entries'))}</p>'
     return render_template(
         'tabs.html',
         tabs={'similar': Tab('similar', content=content, table=table)},

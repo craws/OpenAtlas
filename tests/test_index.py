@@ -34,7 +34,7 @@ class IndexTests(TestBaseCase):
         rv = c.get(url_for('view', id_=666), follow_redirects=True)
         assert b'teapot' in rv.data
         assert b'Database version error is needed but current' in rv.data
-        assert b'directory not writable' in rv.data
+        assert b'Directory not writable' in rv.data
 
         rv = c.get('/static/non_existing_file.js')
         assert b'The site does not exist.' in rv.data
@@ -46,7 +46,7 @@ class IndexTests(TestBaseCase):
         assert b'Password' in rv.data
 
         rv = c.get('/')
-        assert b'overview' in rv.data
+        assert b'Overview' in rv.data
 
         rv = c.get(url_for('login'))
         assert b'Password' in rv.data

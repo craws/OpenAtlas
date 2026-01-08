@@ -55,7 +55,7 @@ def reference_systems(entity: Entity) -> str:
             ['reference_system'],
             inverse=True)):
         return ''
-    html = f'<h2 class="uc-first">{_("external reference systems")}</h2>'
+    html = f'<h2>{uc_first(_('external reference systems'))}</h2>'
     html += '<ul class="list-group list-group-flush bg-none">'
     for link_ in links:
         system = g.reference_systems[link_.domain.id]
@@ -72,11 +72,9 @@ def reference_systems(entity: Entity) -> str:
             hide = '<span id="hide" class="d-none">' + \
                 f'{uc_first(_('hide info'))}</span>'
             show_info_button += f"""
-                <button
-                    id="{name}-switch"
-                    class="uc-first mt-1 me-1
-                        {app.config["CSS"]["button"]["secondary"]}"
-                    onclick="ajax{uc_first(name)}Info('{link_.description}')"
+                <button id="{name}-switch"
+                  class="mt-1 me-1 {app.config["CSS"]["button"]["secondary"]}"
+                  onclick="ajax{uc_first(name)}Info('{link_.description}')"
                     >{show}{hide}
                 </button>"""
             info_div = f'<div id="{name}-info-div" class="mt-2"></div>'
@@ -244,7 +242,7 @@ def menu(entity: Optional[Entity]) -> str:
         html += link(
             label,
             url_for('index', group=item),
-            f'nav-item nav-link fw-bold uc-first {active}')
+            f'nav-item nav-link fw-bold {active}')
     return html
 
 
@@ -278,7 +276,7 @@ def profile_image(
     if entity.class_.group['name'] == 'file':
         external = True
         if path.suffix.lower() not in g.display_file_ext:
-            return f'<p class="uc-first">{_('no preview available')}</p>'
+            return f'<p>{uc_first(_('no preview available'))}</p>'
     else:
         url = url_for('view', id_=entity.image_id)
     max_width = '100%' if max_width_100 else '{width}px'
@@ -403,19 +401,13 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
         warnings.append(
             f'Database version {app.config['DATABASE_VERSION']} is needed but'
             f' current version is {g.settings['database_version']}')
-    if hasattr(g, 'writable_paths'):
-        for path in g.writable_paths:
-            check_write_access(path, warnings)
+    for path in g.writable_paths:
+        if not os.access(path, os.W_OK):
+            warnings.append(
+                f'<p>{uc_first(_('directory not writable'))} '
+                f'{str(path).replace(app.root_path, '')}</p>')
     return f'<div class="alert alert-danger">{"<br>".join(warnings)}</div>' \
         if warnings else ''
-
-
-def check_write_access(path: Path, warnings: list[str]) -> list[str]:
-    if not os.access(path, os.W_OK):
-        warnings.append(
-            f'<p class="uc-first">{_('directory not writable')}'
-            f'{str(path).replace(app.root_path, '')}</p>')
-    return warnings
 
 
 @app.template_filter()
@@ -527,7 +519,7 @@ def button(
     tag = 'a' if url else 'span'
     css = variant or ('secondary' if id_ in ['date-switcher'] else 'primary')
     if url and '/insert' in url and label != _('link'):
-        label = f'+ <span class="uc-first d-inline-block">{label}</span>'
+        label = f'+ {uc_first(label)}'
     tooltip_ = ''
     if tooltip_text:
         tooltip_ = \
@@ -540,11 +532,11 @@ def button(
         <{tag}
             {f'href="{url}"' if url else ''}
             {f'id="{id_}"' if id_ else ''}
-            class="{app.config['CSS']['button'][css]} uc-first {css_class}"
+            class="{app.config['CSS']['button'][css]} {css_class}"
             {f'onclick="{onclick}"' if onclick else ''}
             tabindex="0"
             role="button"
-            {tooltip_}>{label}{icon_}</{tag}>"""
+            {tooltip_}>{uc_first(label)}{icon_}</{tag}>"""
 
 
 @app.template_filter()
@@ -552,14 +544,15 @@ def button_bar(buttons: list[Any]) -> str:
     html = ''
     for name in buttons:
         html += \
-            f'<div class="col-auto d-flex align-items-center">{name}</div> '
+            '<div class="col-auto d-flex align-items-center">' \
+            f'  {uc_first(name)}</div> '
     return f'<div class="row my-2 g-1">{html}</div>' if html else ''
 
 
 @app.template_filter()
 def citation_example(code: str) -> str:
     if code == 'reference' and (text := get_translation('citation_example')):
-        return f'<h1 class="uc-first">{_('citation_example')}</h1>{text}'
+        return f'<h1>{uc_first(_('citation_example'))}</h1>{text}'
     return ''
 
 
@@ -571,7 +564,7 @@ def display_info(data: dict[str, Any]) -> str:
 @app.template_filter()
 def description(text: str | None, label: Optional[str] = '') -> str:
     return '' if not text else \
-        f'<h2 class="uc-first fw-bold">{label or _("description")}</h2>' \
+        f'<h2 class="fw-bold">{uc_first(label or _('description'))}</h2>' \
         f'<div class="description more">{"<br>".join(text.splitlines())}</div>'
 
 
@@ -664,9 +657,9 @@ def display_crumbs(crumbs: list[Any]) -> str:
     items = []
     for item in crumbs:
         if isinstance(item, list):
-            items.append(f'<a href="{item[1]}" class="uc-first">{item[0]}</a>')
+            items.append(f'<a href="{item[1]}">{uc_first(item[0])}</a>')
         elif isinstance(item, (str, LazyString)):
-            items.append(f'<span class="uc-first">{item}</span>')
+            items.append(uc_first(item))
         elif item:
             items.append(link(item))
     return '&nbsp;>&nbsp; '.join(items)

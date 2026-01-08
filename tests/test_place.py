@@ -211,7 +211,7 @@ class PlaceTest(TestBaseCase):
             url_for('insert', class_='place'),
             data=data,
             follow_redirects=True)
-        assert b'insert and add strati' in rv.data
+        assert b'Insert and add strati' in rv.data
 
         data['name'] = "It's not a bug, it's a feature!"
         del data['continue_']
@@ -322,8 +322,8 @@ class PlaceTest(TestBaseCase):
         assert b'Changes have been saved' in rv.data
 
         rv = c.get(url_for('view', id_=strati_id))
-        assert b'radiocarbon dating' in rv.data
-        assert b'sex estimation' in rv.data
+        assert b'Radiocarbon dating' in rv.data
+        assert b'Sex estimation' in rv.data
 
         rv = c.get(url_for('carbon_update', id_=strati_id))
         assert b'VERA' in rv.data
@@ -332,7 +332,7 @@ class PlaceTest(TestBaseCase):
         assert b'VERA' in rv.data
 
         rv = c.get(url_for('sex_delete', id_=strati_id), follow_redirects=True)
-        assert b'tools' in rv.data
+        assert b'Tools' in rv.data
 
         rv = c.get(url_for('view', id_=feat_id))
         assert b'not a bug' in rv.data
