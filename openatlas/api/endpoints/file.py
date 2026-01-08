@@ -15,8 +15,8 @@ from openatlas.api.resources.error import (
 from openatlas.api.resources.parser import files, image
 from openatlas.api.resources.resolve_endpoints import download
 from openatlas.api.resources.templates import licensed_file_template
-from openatlas.api.resources.util import get_iiif_manifest_and_path, \
-    get_license_name
+from openatlas.api.resources.util import (
+    get_iiif_manifest_and_path, get_license_name)
 from openatlas.database.overlay import get_by_object
 from openatlas.display.util import (
     check_iiif_activation, check_iiif_file_exist, get_file_path)
@@ -118,10 +118,11 @@ class EntityFiles(Resource):
     def get_file_dict(
             entity: Entity,
             overlay: Optional[Overlay] = None) -> dict[str, Any]:
-        path = get_file_path(entity.id)
+        url = 'N/A'
         mime_type = None
-        if path:
-            mime_type, _ = mimetypes.guess_type(path)  # pragma: no cover
+        if path := get_file_path(entity.id):
+            url = url_for('api.display', filename=path.stem, _external=True)
+            mime_type, _ = mimetypes.guess_type(path)
         data = {
             'id': entity.id,
             'title': entity.name,
@@ -130,10 +131,7 @@ class EntityFiles(Resource):
             'licenseHolder': entity.license_holder,
             'publicShareable': entity.public,
             'mimetype': mime_type,
-            'url': url_for(
-                'api.display',
-                filename=path.stem,
-                _external=True) if path else 'N/A'}
+            'url': url}
         data.update(get_iiif_manifest_and_path(entity.id))
         if overlay:
             data.update({'overlay': overlay.bounding_box})

@@ -4,9 +4,8 @@ from typing import Any, Optional
 from flask import g
 
 from openatlas.api.resources.util import (
-    geometry_to_geojson, get_license_name,
-    get_reference_systems, remove_duplicate_entities,
-    replace_empty_list_values_in_dict_with_none)
+    geometry_to_geojson, get_license_name, get_reference_systems,
+    remove_duplicate_entities, replace_empty_list_values_in_dict_with_none)
 from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import Gis

@@ -52,10 +52,9 @@ def get_file_dict(
         link: Link,
         overlay: Optional[Overlay] = None,
         root: Optional[bool] = False) -> dict[str, Any]:
-    path = get_file_path(link.domain.id)
     url = 'N/A'
     mime_type = None
-    if path:
+    if path := get_file_path(link.domain.id):
         url_for('api.display', filename=path.stem, _external=True)
         mime_type, _ = mimetypes.guess_type(path)
     data = {

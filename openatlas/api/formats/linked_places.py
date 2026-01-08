@@ -1,19 +1,17 @@
 from __future__ import annotations
 
 import mimetypes
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, Optional
 
 from flask import g, url_for
 
+from openatlas.api.endpoints.parser import Parser
 from openatlas.api.resources.util import (
     date_to_str, get_crm_relation, get_crm_relation_label_x,
     get_crm_relation_x, get_iiif_manifest_and_path, get_license_name,
     to_camel_case)
 from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity, Link
-
-if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.api.endpoints.parser import Parser
 
 
 def link_dict(link_: Link, inverse: bool = False) -> dict[str, Any]:
@@ -81,10 +79,9 @@ def get_lp_time(entity: Entity | Link) -> Optional[dict[str, Any]]:
 
 
 def get_lp_file(file: Entity) -> dict[str, Any]:
-    path = get_file_path(file.id)
-    url = "N/A"
+    url = 'N/A'
     mime_type = None
-    if path:
+    if path := get_file_path(file.id):
         url = url_for('api.display', filename=path.stem, _external=True)
         mime_type, _ = mimetypes.guess_type(path)
     data = {

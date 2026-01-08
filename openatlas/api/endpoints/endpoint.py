@@ -264,8 +264,7 @@ class Endpoint:
                 self.formated_entities = [
                     self.get_linked_places_entity(_id)
                     for _id in self.entities_with_links]
-            case _ if self.parser.format \
-                      in app.config['RDF_FORMATS']:  # pragma: no cover
+            case _ if self.parser.format in app.config['RDF_FORMATS']:
                 license_links = get_license_ids_with_links()
                 parsed_context = parse_loud_context()
                 self.generator_entities = (

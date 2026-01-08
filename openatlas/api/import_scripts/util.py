@@ -53,7 +53,7 @@ def vocabs_requests(
         parameter: Optional[dict[str, str]] = None) -> dict[str, Any]:
     base = g.settings['vocabs_base_url']
     url = f'{base}{g.settings['vocabs_endpoint']}{id_}/{endpoint}'
-    sleep(0.1)  # fix connection abort
+    sleep(0.1)  # Fix connection abort
     try:
         resp = requests.get(
             url,
@@ -61,11 +61,11 @@ def vocabs_requests(
             timeout=60,
             auth=(g.settings['vocabs_user'], app.config['VOCABS_PASS']))
         resp.raise_for_status()
-    except requests.exceptions.RequestException as e:  # pragma: no cover
+    except requests.exceptions.RequestException as e:
         abort(400, f'Request failed for {url}: {e}')
 
     try:
         result = resp.json()
-    except ValueError:  # pragma: no cover
+    except ValueError:
         abort(400, f'Invalid JSON from {url}')
     return result
