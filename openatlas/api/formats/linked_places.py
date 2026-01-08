@@ -81,25 +81,20 @@ def get_lp_time(entity: Entity | Link) -> Optional[dict[str, Any]]:
 
 
 def get_lp_file(file: Entity) -> dict[str, Any]:
-    img_id = file.id
-    path = get_file_path(img_id)
+    path = get_file_path(file.id)
+    url = "N/A"
     mime_type = None
     if path:
+        url = url_for('api.display', filename=path.stem, _external=True)
         mime_type, _ = mimetypes.guess_type(path)
     data = {
-        '@id': url_for(
-            'api.entity',
-            id_=img_id,
-            _external=True),
+        '@id': url_for('api.entity', id_=file.id, _external=True),
         'title': file.name,
         'license': get_license_name(file),
         'creator': file.creator,
         'licenseHolder': file.license_holder,
         'publicShareable': file.public,
         'mimetype': mime_type,
-        'url': url_for(
-            'api.display',
-            filename=path.stem,
-            _external=True) if path else "N/A"}
-    data.update(get_iiif_manifest_and_path(img_id))
+        'url': url}
+    data.update(get_iiif_manifest_and_path(file.id))
     return data

@@ -42,7 +42,7 @@ class DisplayImage(Resource):
         size = None
         if parser['image_size']:
             size = app.config['IMAGE_SIZE'][parser['image_size']]
-        filepath = get_file_path(entity, size)
+        filepath = get_file_path(entity.id, size)
         if not filepath:
             raise DisplayFileNotFoundError
         return send_file(filepath, as_attachment=bool(parser['download']))
@@ -60,7 +60,7 @@ class LicensedFileOverview(Resource):
         for entity in entities:
             if not (license_ := get_license_name(entity)):
                 continue
-            if not (path := get_file_path(entity)):
+            if not (path := get_file_path(entity.id)):
                 continue
             iiif_manifest = ''
             if check_iiif_activation() and check_iiif_file_exist(entity.id):

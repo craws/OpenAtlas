@@ -53,9 +53,11 @@ def get_file_dict(
         overlay: Optional[Overlay] = None,
         root: Optional[bool] = False) -> dict[str, Any]:
     path = get_file_path(link.domain.id)
+    url = 'N/A'
     mime_type = None
     if path:
-        mime_type, _ = mimetypes.guess_type(path)  # pragma: no cover
+        url_for('api.display', filename=path.stem, _external=True)
+        mime_type, _ = mimetypes.guess_type(path)
     data = {
         'id': link.domain.id,
         'title': link.domain.name,
@@ -65,10 +67,7 @@ def get_file_dict(
         'publicShareable': link.domain.public,
         'mimetype': mime_type,
         'fromSuperEntity': root,
-        'url': url_for(
-            'api.display',
-            filename=path.stem,
-            _external=True) if path else 'N/A'}
+        'url': url}
     data.update(get_iiif_manifest_and_path(link.domain.id))
     if overlay:
         data.update({'overlay': overlay.bounding_box})

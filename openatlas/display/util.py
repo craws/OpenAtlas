@@ -425,10 +425,7 @@ def tooltip(text: str) -> str:
         </span>"""
 
 
-def get_file_path(
-        entity: int | Entity,
-        size: Optional[str] = None) -> Optional[Path]:
-    id_ = entity if isinstance(entity, int) else entity.id
+def get_file_path(id_: int, size: Optional[str] = None) -> Optional[Path]:
     if not hasattr(g, 'files') or id_ not in g.files:
         return None
     ext = g.files[id_].suffix

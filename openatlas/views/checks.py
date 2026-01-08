@@ -268,7 +268,7 @@ def orphans() -> str:
     entity_file_ids = []
     for entity in Entity.get_by_class('file', types=True):
         entity_file_ids.append(entity.id)
-        if not get_file_path(entity):
+        if not get_file_path(entity.id):
             tabs['missing_files'].table.rows.append([
                 link(entity),
                 link(entity.class_),
@@ -317,7 +317,7 @@ def check_files(arche: Optional[str] = None) -> str:
         'no_license_holder': [],
         'no_license': []}
     for entity in entities:
-        if not get_file_path(entity):
+        if not get_file_path(entity.id):
             result['missing_files'].append(entity)
         if not entity.public:
             result['not_public'].append(entity)
