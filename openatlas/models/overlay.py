@@ -1,12 +1,10 @@
 from __future__ import annotations
 
-from typing import Any, TYPE_CHECKING
+from typing import Any
 
 from openatlas.database import overlay as db
 from openatlas.display.util import get_file_path
-
-if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity
 
 
 class Overlay:

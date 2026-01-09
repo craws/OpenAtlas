@@ -128,24 +128,21 @@ class Gis:
             else:
                 all_[shape].append(item)
             if row['polygon_point']:
-                polygon_point_item = dict(item)  # Make a copy
-                polygon_point_item['geometry'] = json.loads(
-                    row['polygon_point'])
+                polygon_point = dict(item)  # Make a copy
+                polygon_point['geometry'] = json.loads(row['polygon_point'])
                 if row['object_id'] in object_ids:
-                    selected['polygon_point'].append(polygon_point_item)
+                    selected['polygon_point'].append(polygon_point)
                 elif row['object_id'] \
                         and structure \
                         and structure['supers'] \
                         and row['object_id'] == structure['supers'][-1].id:
-                    extra['supers'].append(polygon_point_item)
+                    extra['supers'].append(polygon_point)
                 elif row['object_id'] in subunit_ids:
-                    extra['subs'].append(
-                        polygon_point_item)  # pragma: no cover
+                    extra['subs'].append(polygon_point)  # pragma: no cover
                 elif row['object_id'] in sibling_ids:
-                    extra['siblings'].append(
-                        polygon_point_item)  # pragma: no cover
+                    extra['siblings'].append(polygon_point)  # pragma: no cover
                 else:
-                    all_['point'].append(polygon_point_item)
+                    all_['point'].append(polygon_point)
         return {
             'gisPointAll': json.dumps(all_['point']),
             'gisPointSelected': json.dumps(selected['point']),

@@ -111,7 +111,7 @@ def show_untyped_entities(id_: int) -> str:
             'untyped',
             _('untyped entities'),
             table=table,
-            content=_('no entries') if not table.rows else '')}
+            content=uc_first(_('no entries')) if not table.rows else '')}
     return render_template(
         'tabs.html',
         tabs=tabs,

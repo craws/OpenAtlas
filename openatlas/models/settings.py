@@ -1,9 +1,6 @@
 from typing import Any, Optional
 
-from flask import g
-
 from openatlas.database import settings as db
-from openatlas.database.connect import Transaction
 from openatlas.display.util2 import sanitize
 
 
@@ -34,17 +31,10 @@ class Settings:
 
     @staticmethod
     def update(data: dict[str, str]) -> None:
-        Transaction.begin()
-        try:
-            for name, value in data.items():
-                db.update(
-                    name,
-                    sanitize(value) or '' if isinstance(value, str) else value)
-            Transaction.commit()
-        except Exception as e:  # pragma: no cover
-            Transaction.rollback()
-            g.logger.log('error', 'database', 'transaction failed', e)
-            raise e from None
+        for name, value in data.items():
+            db.update(
+                name,
+                sanitize(value) or '' if isinstance(value, str) else value)
 
     @staticmethod
     def set_logo(file_id: Optional[int] = None) -> None:

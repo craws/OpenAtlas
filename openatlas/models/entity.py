@@ -316,7 +316,7 @@ class Entity:
         """Returns name part of a directed type e.g. parent of (child of)"""
         name_parts = self.name.split(' (')
         if inverse and len(name_parts) > 1:  # Remove closing bracket
-            return sanitize(name_parts[1][:-1])  # pragma: no cover
+            return sanitize(name_parts[1][:-1])
         return name_parts[0]
 
     def check_too_many_single_type_links(self) -> Entity | None:

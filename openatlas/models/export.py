@@ -63,7 +63,6 @@ def sql_export(format_: str, postfix: Optional[str] = '') -> bool:
         file.unlink()
     except Exception:  # pragma: no cover
         return False
-
     return True
 
 

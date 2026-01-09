@@ -10,7 +10,7 @@ class TypeTest(TestBaseCase):
         c = self.client
         with app.test_request_context():
             app.preprocess_request()
-            actor_type = get_hierarchy('Actor relation')
+            relation_type = get_hierarchy('Actor relation')
             dimension_type = get_hierarchy('Dimensions')
             historical_type = get_hierarchy('Historical place')
             place = insert('place', 'Home')
@@ -25,7 +25,7 @@ class TypeTest(TestBaseCase):
             url_for(
                 'insert',
                 class_='type',
-                origin_id=actor_type.id,
+                origin_id=relation_type.id,
                 relation='subs'))
         assert b'Actor relation' in rv.data
 
@@ -33,12 +33,12 @@ class TypeTest(TestBaseCase):
             'name': 'My secret type',
             'name_inverse': 'Do I look inverse?',
             'description': 'Very important!',
-            actor_type.id: actor_type.subs[0]}
+            relation_type.id: relation_type.subs[0]}
         rv = c.post(
             url_for(
                 'insert',
                 class_='type',
-                origin_id=actor_type.id,
+                origin_id=relation_type.id,
                 relation='subs'),
             data=data)
         type_id = rv.location.split('/')[-1]
@@ -70,7 +70,7 @@ class TypeTest(TestBaseCase):
                 class_='type',
                 origin_id=type_id,
                 relation='subs'),
-            data={'name': 'My sub type', actor_type.id: type_id})
+            data={'name': 'My sub type', relation_type.id: type_id})
         sub_type_id = rv.location.split('/')[-1]
 
         rv = c.get(url_for('update', id_=sub_type_id))
@@ -81,7 +81,7 @@ class TypeTest(TestBaseCase):
             url_for(
                 'insert',
                 class_='type',
-                origin_id=actor_type.id,
+                origin_id=relation_type.id,
                 relation='subs'),
             data=data,
             follow_redirects=True)
@@ -92,13 +92,13 @@ class TypeTest(TestBaseCase):
             data={
                 'name': 'New dynamic',
                 'description': 'Hello',
-                'superType': actor_type.id})
+                'superType': relation_type.id})
         assert rv.data.isdigit()
 
-        rv = c.get(url_for('ajax_type_tree', root_id=actor_type.id))
+        rv = c.get(url_for('ajax_type_tree', root_id=relation_type.id))
         assert b'New dynamic' in rv.data
 
-        rv = c.post(url_for('update', id_=actor_type.id), data=data)
+        rv = c.post(url_for('update', id_=relation_type.id), data=data)
         assert b'Forbidden' in rv.data
 
         admin_unit = get_hierarchy('Administrative unit')
@@ -140,20 +140,27 @@ class TypeTest(TestBaseCase):
             actor.link('P2', sex_sub)
 
         rv = c.get(url_for('show_untyped_entities', id_=sex.id))
-        assert b'no entries' in rv.data
+        assert b'No entries' in rv.data
 
         rv = c.get(url_for('show_untyped_entities', id_=admin_unit.id))
         assert b'Home' in rv.data
 
-        rv = c.get(url_for('delete', id_=actor_type.id), follow_redirects=True)
+        rv = c.get(
+            url_for('delete', id_=relation_type.id),
+            follow_redirects=True)
         assert b'Forbidden' in rv.data
 
         with app.test_request_context():
             app.preprocess_request()
+            actor2 = insert('person', 'Kurgan')
+            actor.link('OA7', actor2, type_id=int(type_id))
             place_type = get_hierarchy('Place')
             place.link(
                 'P2',
                 [g.types[place_type.subs[0]], g.types[place_type.subs[1]]])
+
+        rv = c.get(url_for('view', id_=actor2.id))
+        assert b'Connor' in rv.data
 
         rv = c.get(url_for('update', id_=place.id))
         assert b'422' in rv.data
@@ -171,10 +178,10 @@ class TypeTest(TestBaseCase):
 
         with app.test_request_context():
             app.preprocess_request()
-            actor.link('P74', location, type_id=actor_type.subs[0])
+            actor.link('P74', location, type_id=relation_type.subs[0])
 
         rv = c.get(
-            url_for('delete', id_=actor_type.subs[0]),
+            url_for('delete', id_=relation_type.subs[0]),
             follow_redirects=True)
         assert b'Warning' in rv.data
 
@@ -185,6 +192,6 @@ class TypeTest(TestBaseCase):
         assert b'Types deleted' in rv.data
 
         rv = c.post(
-            url_for('type_delete_recursive', id_=actor_type.id),
+            url_for('type_delete_recursive', id_=relation_type.id),
             data={'confirm_delete': True})
         assert b'403 - Forbidden' in rv.data
