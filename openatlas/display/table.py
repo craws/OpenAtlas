@@ -170,6 +170,8 @@ def get_table_cell_content(
             html = format_number(e.count)
         case 'default_precision':
             html = link(next(iter(e.types), None))
+        case 'domain' | 'name' | 'preceding' | 'super':
+            html = format_name_and_aliases(e, str(table_id), forms)
         case 'end':
             html = table_date('last', e, range_, item)
         case 'example_id':
@@ -191,8 +193,6 @@ def get_table_cell_content(
             html = g.file_info.get(e.id, {}).get('license_holder')
         case 'main_image' if origin:
             html = profile_image_table_link(origin, e)
-        case 'name' | 'preceding' | 'super':
-            html = format_name_and_aliases(e, str(table_id), forms)
         case 'page':
             html = str(item.description)
         case 'overlay' if origin:
@@ -237,7 +237,7 @@ def get_table_cell_content(
             html = link(e.standard_type)
             if forms:
                 html = e.standard_type.name if e.standard_type else ''
-        case 'type_link' if isinstance(item, Link):
+        case 'precision' | 'type_link' if isinstance(item, Link):
             html = ''
             if item.type:
                 html = link(
