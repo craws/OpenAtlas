@@ -17,7 +17,7 @@ from openatlas.display.util import get_file_path
 from openatlas.models.cidoc import CidocProperty
 from openatlas.models.dates import Dates
 from openatlas.models.entity import Entity, Link
-from openatlas.models.gis import Gis
+from openatlas.models.gis import get_centroids_by_entities, get_gis_by_entities
 from openatlas.models.overlay import Overlay
 
 
@@ -247,10 +247,9 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         [e for e in related_entities if not (e.id in exists_ or add_(e.id))]
 
     all_entities = related_entities_ + [entity]
-    geoms = Gis.get_by_entities(all_entities)
+    geoms = get_gis_by_entities(all_entities)
     if parser.centroid:
-        for id_, geom in \
-                Gis.get_centroids_by_entities(all_entities).items():
+        for id_, geom in get_centroids_by_entities(all_entities).items():
             geoms[id_].extend(geom)
     relations = defaultdict(list)
     for rel_entity in related_entities_:

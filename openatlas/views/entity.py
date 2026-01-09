@@ -20,7 +20,7 @@ from openatlas.display.util2 import is_authorized, manual, sanitize
 from openatlas.forms.entity_form import get_entity_form, process_form
 from openatlas.forms.util import deletion_possible
 from openatlas.models.entity import Entity
-from openatlas.models.gis import Gis, InvalidGeomException
+from openatlas.models.gis import InvalidGeomException, get_gis_all
 from openatlas.models.openatlas_class import Relation
 from openatlas.models.overlay import Overlay
 
@@ -95,7 +95,7 @@ def insert(
     gis_data = None
     if entity.class_.attributes.get('location'):
         structure = origin.get_structure_for_insert() if origin else None
-        gis_data = Gis.get_all(structure=structure)
+        gis_data = get_gis_all(structure=structure)
     return render_template(
         'entity/insert.html',
         form=form,
@@ -147,7 +147,7 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
     if entity.class_.attributes.get('location'):
         entity.location = entity.location \
             or entity.get_linked_entity_safe('P53')
-        gis_data = Gis.get_all([entity], entity.get_structure())
+        gis_data = get_gis_all([entity], entity.get_structure())
     return render_template(
         'entity/update.html',
         form=form,
@@ -371,7 +371,7 @@ def index(group: str) -> str | Response:
         class_=group,
         table=entity_table(entities),
         buttons=buttons,
-        gis_data=Gis.get_all() if group == 'place' else None,
+        gis_data=get_gis_all() if group == 'place' else None,
         title=_(group.replace('_', ' ')),
         crumbs=[_(group).replace('_', ' ')])
 

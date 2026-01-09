@@ -8,7 +8,7 @@ import pandas as pd
 from flask import Response, g
 
 from openatlas.models.entity import Entity, Link
-from openatlas.models.gis import Gis
+from openatlas.models.gis import get_gis_by_id
 
 
 def build_dataframe(entity: Entity) -> dict[str, Any]:
@@ -88,7 +88,7 @@ def get_csv_geom_entry(entity: Entity) -> dict[str, None]:
 
 def get_csv_geometry(entity: Entity) -> dict[str, Any]:
     dict_: dict[str, Any] = {'type': None, 'coordinates': None}
-    if (geoms := Gis.get_by_id(entity.id)) \
+    if (geoms := get_gis_by_id(entity.id)) \
             and entity.cidoc_class.code == 'E53':
         dict_ = {key: [geom[key] for geom in geoms] for key in geoms[0]}
     return dict_

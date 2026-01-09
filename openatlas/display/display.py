@@ -20,7 +20,7 @@ from openatlas.forms.util import deletion_possible
 from openatlas.models.annotation import AnnotationText
 from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity, Link
-from openatlas.models.gis import Gis
+from openatlas.models.gis import get_gis_all
 from openatlas.models.openatlas_class import Relation
 from openatlas.models.user import User
 from openatlas.views.tools import carbon_result, sex_result
@@ -64,9 +64,9 @@ class Display:
         self.add_data()
         if self.entity.class_.attributes.get('location'):
             self.structure = self.entity.get_structure()
-            self.gis_data = Gis.get_all([self.entity], self.structure)
+            self.gis_data = get_gis_all([self.entity], self.structure)
         elif self.linked_places:
-            self.gis_data = Gis.get_all(list(self.linked_places.values()))
+            self.gis_data = get_gis_all(list(self.linked_places.values()))
         resolver_url = g.settings['frontend_resolver_url']
         if hasattr(current_user, 'settings'):
             self.data |= get_system_data(self.entity)

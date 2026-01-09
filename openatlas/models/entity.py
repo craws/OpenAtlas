@@ -13,7 +13,7 @@ from openatlas.database.connect import Transaction
 from openatlas.display.util2 import convert_size, sanitize
 from openatlas.models.annotation import AnnotationText
 from openatlas.models.dates import Dates
-from openatlas.models.gis import Gis
+from openatlas.models.gis import delete_gis_by_entity, insert_gis
 
 
 class Entity:
@@ -295,9 +295,9 @@ class Entity:
             db.update({
                 'id': location.id,
                 'name': f'Location of {sanitize(self.name)}'})
-            Gis.delete_by_entity(location)
+            delete_gis_by_entity(location)
         if gis_data:
-            Gis.insert(location, gis_data)
+            insert_gis(location, gis_data)
 
     def get_profile_image_id(self) -> Optional[int]:
         if self.class_.name == 'file':

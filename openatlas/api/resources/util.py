@@ -5,7 +5,7 @@ from flask import g, json, url_for
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.display.util import check_iiif_activation, check_iiif_file_exist
 from openatlas.models.entity import Entity, Link
-from openatlas.models.gis import Gis
+from openatlas.models.gis import get_gis_all
 
 
 def get_license_name(entity: Entity) -> Optional[str]:
@@ -200,10 +200,10 @@ def generate_feature(geom: dict[str, Any]) -> dict[str, Any]:
 
 def get_geometries(parser: dict[str, Any]) -> list[dict[str, Any]]:
     choices = [
-        'gisPointAll', 'gisPointSupers', 'gisPointSubs',
-        'gisPointSibling', 'gisLineAll', 'gisPolygonAll']
-    all_geoms = Gis.get_all()
+        'gisPointAll', 'gisPointSupers', 'gisPointSubs', 'gisPointSibling',
+        'gisLineAll', 'gisPolygonAll']
     out = []
+    all_geoms = get_gis_all()
     for item in choices \
             if 'gisAll' in parser['geometry'] else parser['geometry']:
         for geom in json.loads(all_geoms[item]):

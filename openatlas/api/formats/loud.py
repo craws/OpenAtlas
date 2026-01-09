@@ -10,7 +10,7 @@ from openatlas.api.resources.util import (
     get_license_type, remove_spaces_dashes, to_camel_case)
 from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity, Link
-from openatlas.models.gis import Gis
+from openatlas.models.gis import get_wkt_by_id
 
 unit_map = {
     'B': 'bytes',
@@ -227,7 +227,7 @@ def get_loud_entities(
             property_name = get_loud_property_name(loud, link_)
 
         if link_.property.code == 'P53':
-            for geom in Gis.get_wkt_by_id(link_.range.id):
+            for geom in get_wkt_by_id(link_.range.id):
                 base_property = get_range_links() | geom
                 properties_set[property_name].append(base_property)
         else:
@@ -252,7 +252,7 @@ def get_loud_entities(
             property_name = get_loud_property_name(loud, link_, inverse=True)
 
         if link_.property.code == 'P53':
-            for geom in Gis.get_wkt_by_id(link_.range.id):
+            for geom in get_wkt_by_id(link_.range.id):
                 base_property = get_domain_links() | geom
                 properties_set[property_name].append(base_property)
         else:

@@ -8,7 +8,7 @@ from openatlas.api.resources.util import (
     remove_duplicate_entities, replace_empty_list_values_in_dict_with_none)
 from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity, Link
-from openatlas.models.gis import Gis
+from openatlas.models.gis import get_centroids_by_entities, get_gis_by_entities
 
 
 def get_subunit(data: dict[str, Any]) -> dict[str, Any]:
@@ -221,11 +221,10 @@ def get_subunits_from_id(
         link_dict[link_.domain.id]['links'].append(link_)
     for link_ in links_inverse:
         link_dict[link_.range.id]['links_inverse'].append(link_)
-    for id_, geom in Gis.get_by_entities(entities).items():
+    for id_, geom in get_gis_by_entities(entities).items():
         link_dict[id_]['geoms'].extend(geom)
     if parser['centroid']:
-        for id_, geom in \
-                Gis.get_centroids_by_entities(entities).items():
+        for id_, geom in get_centroids_by_entities(entities).items():
             link_dict[id_]['geoms'].extend(geom)
 
     external_reference = get_type_links_inverse(entities)

@@ -27,7 +27,7 @@ from openatlas.api.resources.util import (
     replace_empty_list_values_in_dict_with_none)
 from openatlas.display.table import entity_table
 from openatlas.models.entity import Entity, Link
-from openatlas.models.gis import Gis
+from openatlas.models.gis import get_centroids_by_entities, get_gis_by_entities
 
 
 class Endpoint:
@@ -58,11 +58,10 @@ class Endpoint:
         for link_ in self.link_parser_check(inverse=True):
             self.entities_with_links[
                 link_.range.id]['links_inverse'].append(link_)
-        for id_, geom in Gis.get_by_entities(self.entities).items():
+        for id_, geom in get_gis_by_entities(self.entities).items():
             self.entities_with_links[id_]['geometry'].extend(geom)
         if self.parser.centroid:
-            for id_, geom in \
-                    Gis.get_centroids_by_entities(self.entities).items():
+            for id_, geom in get_centroids_by_entities(self.entities).items():
                 self.entities_with_links[id_]['geometry'].extend(geom)
 
     def get_pagination(self) -> None:
