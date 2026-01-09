@@ -106,12 +106,8 @@ def hierarchy_update(id_: int) -> str | Response:
 def remove_class(id_: int, name: str) -> Response:
     if g.types[id_].get_count_by_class(name):
         abort(403)
-    try:
-        g.types[id_].remove_class(name)
-        flash(_('info update'))
-    except Exception as e:  # pragma: no cover
-        g.logger.log('error', 'database', 'remove hierarchy class failed', e)
-        flash(_('error database'), 'error')
+    g.types[id_].remove_class(name)
+    flash(_('info update'))
     return redirect(url_for('hierarchy_update', id_=id_))
 
 

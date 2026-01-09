@@ -185,7 +185,7 @@ def vocabulary_import_view(category: str, id_: str) -> str | Response:
                         'import',
                         f'Did not import "{duplicate}", duplicate.')
             flash(import_str)
-        except Exception as e:  # pragma: no cover
+        except Exception as e:
             g.logger.log('error', 'import', 'import failed', e)
             flash(_('error transaction'), 'error')
         return redirect(f"{url_for('index', group='type')}#menu-tab-custom")

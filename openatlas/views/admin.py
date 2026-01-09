@@ -275,7 +275,8 @@ def settings(category: str) -> str | Response:
             category.replace('frontend', 'presentation_site')),
         title=_('admin'),
         crumbs=[
-            [_('admin'), f'{url_for('admin_index')}#tab-{tab}'], _(category)])
+            [_('admin'), f'{url_for('admin_index')}#tab-{tab}'],
+            _(category)])
 
 
 @app.route('/admin/file/delete/<filename>')
@@ -284,7 +285,7 @@ def admin_file_delete(filename: str) -> Response:
     if filename != 'all':  # Delete one file
         try:
             (app.config['UPLOAD_PATH'] / filename).unlink()
-            flash(f"{filename} {_('was deleted')}")
+            flash(f'{filename} {_('was deleted')}')
         except Exception as e:
             g.logger.log('error', 'file', f'deletion of {filename} failed', e)
             flash(_('error file delete'), 'error')
@@ -295,12 +296,7 @@ def admin_file_delete(filename: str) -> Response:
         entity_file_ids = [entity.id for entity in Entity.get_by_class('file')]
         for f in app.config['UPLOAD_PATH'].iterdir():
             if f.name != '.gitignore' and int(f.stem) not in entity_file_ids:
-                try:
-                    (app.config['UPLOAD_PATH'] / f.name).unlink()
-                except Exception as e:
-                    g.logger.log(
-                        'error', 'file', f'deletion of {f.name} failed', e)
-                    flash(_('error file delete'), 'error')
+                (app.config['UPLOAD_PATH'] / f.name).unlink()
     return redirect(
         f'{url_for('orphans')}#tab-orphaned-files')  # pragma: no cover
 
@@ -494,8 +490,8 @@ def resize_images() -> Response:
 
 def get_disk_space_info() -> Optional[dict[str, Any]]:
     def upload_ident_with_iiif() -> bool:
-        if not iiif_path:  # pragma: no cover - Mypy
-            return False
+        if not iiif_path:
+            return False  # pragma: no cover
         return app.config['UPLOAD_PATH'].resolve() == iiif_path.resolve()
 
     paths = {
@@ -516,7 +512,7 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
     if os.name == 'posix':
         keys = []
         for key, path in paths.items():
-            if not os.access(path['path'], os.W_OK):  # pragma: no cover
+            if not os.access(path['path'], os.W_OK):
                 continue
             size = run(
                     ['du', '-sb', path['path']],
@@ -530,8 +526,8 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
                 text=True,
                 check=True)
             tmp = mounted.stdout.split()
-            if '/mnt/' in tmp[-1]:  # pragma: no cover
-                path['mounted'] = True
+            if '/mnt/' in tmp[-1]:
+                path['mounted'] = True  # pragma: no cover
             keys.append(key)
         files_size = sum(paths[key]['size'] for key in keys)
     stats = shutil.disk_usage(app.config['UPLOAD_PATH'])

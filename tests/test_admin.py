@@ -132,6 +132,12 @@ class AdminTests(TestBaseCase):
             follow_redirects=True)
         assert b'Oliver Twist' in rv.data
 
+        rv = c.post(
+            url_for('check_similar'),
+            data={'classes': 'place', 'ratio': 100},
+            follow_redirects=True)
+        assert b'No entries' in rv.data
+
         rv = c.get(url_for('settings', category='mail'))
         assert b'mail from' in rv.data
 

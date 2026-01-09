@@ -27,14 +27,12 @@ def download(filename: str) -> Any:
 
 @app.route('/display/<path:filename>')
 @required_group('readonly')
-def display_file(filename: str) -> Any:
+def display_file(name: str) -> Any:
     if size := request.args.get('size'):
         if not size.isdigit() or size not in app.config['IMAGE_SIZE'].values():
             abort(400)
-        return send_from_directory(  # pragma: no cover
-            app.config['RESIZED_IMAGES'] / size,
-            filename)
-    return send_from_directory(app.config['UPLOAD_PATH'], filename)
+        return send_from_directory(app.config['RESIZED_IMAGES'] / size, name)
+    return send_from_directory(app.config['UPLOAD_PATH'], name)
 
 
 @app.route('/display/custom_logo/<ext>')
@@ -138,7 +136,7 @@ def delete_all_iiif_files() -> None:
 @required_group('manager')
 def logo(id_: Optional[int] = None) -> str | Response:
     if g.settings['logo_file_id']:
-        abort(418)  # pragma: no cover - logo already set
+        abort(418)
     if id_:
         set_logo(id_)
         return redirect(f"{url_for('admin_index')}#tab-file")

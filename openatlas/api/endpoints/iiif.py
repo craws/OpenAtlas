@@ -301,8 +301,8 @@ def get_metadata(entity: Entity) -> dict[str, Any]:
     try:
         resp = requests.get(f"{image_url}/info.json", timeout=30)
         resp.raise_for_status()
-    except Exception as exc:  # pragma: no cover
-        raise IIIFMetadataNotFound(image_url) from exc
+    except Exception as e:  # pragma: no cover
+        raise IIIFMetadataNotFound(image_url) from e
 
     return {'entity': entity, 'img_url': image_url, 'img_api': resp.json()}
 

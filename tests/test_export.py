@@ -153,10 +153,11 @@ class ImportTest(ImportTestCase):
             if os.name == 'posix':
                 assert b'File deleted' in rv_.data
 
-        rv = c.get(
-            url_for('check_files', arche='arche'),
-            follow_redirects=True)
-        assert b'No license' in rv.data
+        with c.get(
+                url_for('check_files', arche='arche'),
+                follow_redirects=True) as rv:
+            assert b'No license' in rv.data
+
         assert b'Export RDF/NT' in c.get(url_for('export_rdf')).data
 
         rv = c.get(

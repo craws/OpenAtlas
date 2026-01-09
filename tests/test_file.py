@@ -101,11 +101,14 @@ class FileTest(TestBaseCase):
         with c.get(url_for('download', filename=filename)):
             pass
 
-        rv = c.get(url_for('logo'), data={'file': iiif_id})
+        rv = c.get(url_for('logo'))
         assert b'OpenAtlas logo' in rv.data
 
         rv = c.get(url_for('logo', id_=iiif_id), follow_redirects=True)
         assert b'Remove custom logo' in rv.data
+
+        rv = c.get(url_for('logo', id_=iiif_id), follow_redirects=True)
+        assert b'418' in rv.data
 
         rv = c.get(
             url_for('logo_remove', action='remove_logo'),

@@ -67,12 +67,8 @@ def reference_system_remove_class(system_id: int, name: str) -> Response:
     system = g.reference_systems[system_id]
     if system.get_links('P67', [name]):
         abort(403)  # Abort because there are linked entities
-    try:
-        system.remove_reference_system_class(name)
-        flash(_('info update'))
-    except Exception as e:  # pragma: no cover
-        g.logger.log('error', 'database', 'remove class failed', e)
-        flash(_('error database'), 'error')
+    system.remove_reference_system_class(name)
+    flash(_('info update'))
     return redirect(url_for('view', id_=system_id))
 
 

@@ -134,11 +134,11 @@ def reset_password() -> str | Response:
                 flash(
                     _('A password reset confirmation mail was send '
                         'to %(email)s.', email=email))
-            else:  # pragma: no cover
+            else:
                 flash(
                     _('Failed to send password reset confirmation mail '
                         'to %(email)s.', email=email),
-                    'error')
+                    'error')  # pragma: no cover
             return redirect(url_for('login'))
         g.logger.log(
             'info',
@@ -179,10 +179,10 @@ def reset_confirm(code: str) -> Response:
     body += f'{uc_first(_('password'))}: {password}\n'
     if send_mail(subject, body, user.email, False):
         flash(_('A new password was sent to %(email)s.', email=user.email))
-    else:  # pragma: no cover
+    else:
         flash(
             _('Failed to send password mail to %(email)s.', email=user.email),
-            'error')
+            'error')  # pragma: no cover
     return redirect(url_for('login'))
 
 

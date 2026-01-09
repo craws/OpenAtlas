@@ -15,6 +15,7 @@ from openatlas.models.export import arche_export, rdf_export, sql_export
 
 
 def get_export_path(view: str) -> Path:
+    path = app.config['EXPORT_PATH']
     match view:
         case 'arche':
             path = app.config['ARCHE_PATH']
@@ -22,8 +23,6 @@ def get_export_path(view: str) -> Path:
             path = app.config['RDF_PATH']
         case 'sql':
             path = app.config['SQL_PATH']
-        case _:  # pragma: no cover
-            path = app.config['EXPORT_PATH']
     return path
 
 
