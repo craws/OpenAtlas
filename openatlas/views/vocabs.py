@@ -20,7 +20,7 @@ from openatlas.display.util2 import is_authorized, manual
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
-from openatlas.models.settings import Settings
+from openatlas.models.settings import update_settings
 
 
 @app.route('/vocabs')
@@ -62,7 +62,7 @@ def vocabs_form() -> Any:
 def vocabs_update() -> str | Response:
     form = vocabs_form()
     if form.validate_on_submit():
-        Settings.update({
+        update_settings({
             'vocabs_base_url': form.base_url.data,
             'vocabs_endpoint': form.endpoint.data,
             'vocabs_user': form.vocabs_user.data})

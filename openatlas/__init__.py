@@ -52,7 +52,7 @@ babel = Babel(app, locale_selector=get_locale)
 def before_request() -> Response | None:
     from openatlas.models.cidoc import cidoc_classes, cidoc_properties
     from openatlas.models.entity import Entity
-    from openatlas.models.settings import Settings
+    from openatlas.models.settings import get_settings
 
     if request.path.startswith('/static'):
         return None  # Avoid overheads if not using Apache with static alias
@@ -61,7 +61,7 @@ def before_request() -> Response | None:
     g.db = open_connection(app.config)
     g.db.autocommit = True
     g.cursor = g.db.cursor(cursor_factory=extras.DictCursor)
-    g.settings = Settings.get_settings()
+    g.settings = get_settings()
 
     if request.path.startswith('/display'):
         return None  # Avoid overheads for file display

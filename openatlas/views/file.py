@@ -13,7 +13,7 @@ from openatlas.display.util import (
     check_iiif_activation, check_iiif_file_exist, convert_image_to_iiif,
     delete_iiif_image, required_group)
 from openatlas.models.entity import Entity
-from openatlas.models.settings import Settings
+from openatlas.models.settings import set_logo
 
 
 @app.route('/download/<path:filename>')
@@ -140,7 +140,7 @@ def logo(id_: Optional[int] = None) -> str | Response:
     if g.settings['logo_file_id']:
         abort(418)  # pragma: no cover - logo already set
     if id_:
-        Settings.set_logo(id_)
+        set_logo(id_)
         return redirect(f"{url_for('admin_index')}#tab-file")
     table = entity_table(
         Entity.get_display_files(),
@@ -156,5 +156,5 @@ def logo(id_: Optional[int] = None) -> str | Response:
 @app.route('/logo/remove')
 @required_group('manager')
 def logo_remove() -> Response:
-    Settings.set_logo()
+    set_logo()
     return redirect(f"{url_for('admin_index')}#tab-file")

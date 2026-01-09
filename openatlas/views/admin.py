@@ -38,7 +38,7 @@ from openatlas.models.content import get_content, update_content
 from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Project
-from openatlas.models.settings import Settings
+from openatlas.models.settings import update_settings
 from openatlas.models.user import User
 
 
@@ -261,7 +261,7 @@ def settings(category: str) -> str | Response:
             if field.type == 'BooleanField':
                 value = 'True' if field.data else ''
             data[field.name] = value
-        Settings.update(data)
+        update_settings(data)
         g.logger.log('info', 'settings', 'Settings updated')
         flash(_('info update'))
         return redirect(f'{url_for('admin_index')}#tab-{tab}')
@@ -271,8 +271,8 @@ def settings(category: str) -> str | Response:
         'content.html',
         content=display_form(
             form,
-            manual_page=
-            f'admin/{category.replace('frontend', 'presentation_site')}'),
+            manual_page='admin/' +
+            category.replace('frontend', 'presentation_site')),
         title=_('admin'),
         crumbs=[
             [_('admin'), f'{url_for('admin_index')}#tab-{tab}'], _(category)])
