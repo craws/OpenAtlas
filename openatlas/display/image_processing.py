@@ -21,7 +21,7 @@ def safe_resize_image(name: str, file_format: str, size: str) -> bool:
         if check_if_folder_exist(size, app.config['RESIZED_IMAGES']):
             return image_resizing(name, file_format, size)
         return False  # pragma: no cover
-    except OSError as e:
+    except OSError as e:  # pragma: no cover
         g.logger.log(
             'info',
             'image processing',
@@ -87,7 +87,7 @@ def create_folder(folder: Path) -> bool:  # pragma: no cover
         return False
 
 
-def delete_orphaned_resized_images() -> None:
+def delete_orphaned_resized() -> None:
     for size in app.config['IMAGE_SIZE'].values():
         path = Path(app.config['RESIZED_IMAGES']) / size
         for file in path.glob('**/*'):

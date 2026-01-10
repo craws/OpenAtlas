@@ -6,7 +6,6 @@ from tests.base import TestBaseCase, insert
 
 
 class NoteTest(TestBaseCase):
-
     def test_note(self) -> None:
         c = self.client
         with app.test_request_context():

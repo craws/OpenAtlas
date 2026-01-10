@@ -5,7 +5,6 @@ from tests.base import TestBaseCase, get_hierarchy, insert
 
 
 class TypeTest(TestBaseCase):
-
     def test_type(self) -> None:
         c = self.client
         with app.test_request_context():

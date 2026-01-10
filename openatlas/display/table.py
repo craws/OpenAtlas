@@ -294,7 +294,7 @@ def file_preview(entity_id: int) -> str:
             f'/full/!100,100/0/default.jpg'
         return f'<img src="{url}" {param}>'
     if icon := get_file_path(entity_id, app.config['IMAGE_SIZE']['table']):
-        url = url_for('display_file', filename=icon.name, size=size)
+        url = url_for('display_file', name=icon.name, size=size)
         return f'<img src="{url}" {param}>'
     if g.settings['image_processing']:
         path = get_file_path(entity_id)
@@ -302,7 +302,7 @@ def file_preview(entity_id: int) -> str:
             if icon := get_file_path(
                     entity_id,
                     app.config['IMAGE_SIZE']['table']):
-                url = url_for('display_file', filename=icon.name, size=size)
+                url = url_for('display_file', name=icon.name, size=size)
                 return f'<img src="{url}" {param}>'
     return ''
 

@@ -12,7 +12,6 @@ from tests.base import ImportTestCase
 
 
 class ImportTest(ImportTestCase):
-
     def test_export(self) -> None:
         c = self.client
         assert b'Export SQL' in c.get(url_for('export_sql')).data

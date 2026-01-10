@@ -33,7 +33,6 @@ from openatlas.forms.setting import (
     ApiForm, ContentForm, FileForm, FrontendForm, GeneralForm, IiifForm,
     LogForm, MailForm, MapForm, ModulesForm, TestMailForm)
 from openatlas.forms.util import get_form_settings, set_form_settings
-from openatlas.models.annotation import AnnotationImage, AnnotationText
 from openatlas.models.content import get_content, update_content
 from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity
@@ -277,97 +276,6 @@ def settings(category: str) -> str | Response:
         crumbs=[
             [_('admin'), f'{url_for('admin_index')}#tab-{tab}'],
             _(category)])
-
-
-@app.route('/admin/file/delete/<filename>')
-@required_group('editor')
-def admin_file_delete(filename: str) -> Response:
-    if filename != 'all':  # Delete one file
-        try:
-            (app.config['UPLOAD_PATH'] / filename).unlink()
-            flash(f'{filename} {_('was deleted')}')
-        except Exception as e:
-            g.logger.log('error', 'file', f'deletion of {filename} failed', e)
-            flash(_('error file delete'), 'error')
-        return redirect(f"{url_for('orphans')}#tab-orphaned-files")
-
-    # Delete all files with no corresponding entity
-    if is_authorized('admin'):  # pragma: no cover - don't test, ever
-        entity_file_ids = [entity.id for entity in Entity.get_by_class('file')]
-        for f in app.config['UPLOAD_PATH'].iterdir():
-            if f.name != '.gitignore' and int(f.stem) not in entity_file_ids:
-                (app.config['UPLOAD_PATH'] / f.name).unlink()
-    return redirect(
-        f'{url_for('orphans')}#tab-orphaned-files')  # pragma: no cover
-
-
-@app.route('/admin/annotation/image/delete/<int:id_>')
-@required_group('editor')
-def admin_annotation_image_delete(id_: int) -> Response:
-    annotation = AnnotationImage.get_by_id(id_)
-    annotation.delete()
-    flash(_('annotation deleted'))
-    return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
-
-
-@app.route('/admin/annotation/text/delete/<int:id_>')
-@required_group('editor')
-def admin_annotation_text_delete(id_: int) -> Response:
-    AnnotationText.delete_annotations_text(id_)
-    flash(_('annotation deleted'), 'info')
-    return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
-
-
-@app.route('/admin/annotation/image/relink/<int:origin_id>/<int:entity_id>')
-@required_group('editor')
-def admin_annotation_image_relink(origin_id: int, entity_id: int) -> Response:
-    image = Entity.get_by_id(origin_id)
-    image.link('P67', Entity.get_by_id(entity_id))
-    flash(_('entities relinked'), 'info')
-    return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
-
-
-@app.route('/admin/annotation/text/relink/<int:origin_id>/<int:entity_id>')
-@required_group('editor')
-def admin_annotation_text_relink(origin_id: int, entity_id: int) -> Response:
-    source = Entity.get_by_id(origin_id)
-    source.link('P67', Entity.get_by_id(entity_id))
-    flash(_('entities relinked'))
-    return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
-
-
-@app.route(
-    '/admin/annotation/image/remove/<int:annotation_id>/<int:entity_id>')
-@required_group('editor')
-def admin_annotation_image_remove_entity(
-        annotation_id: int,
-        entity_id: int) -> Response:
-    AnnotationImage.remove_entity_from_annotation(annotation_id, entity_id)
-    flash(_('entity removed from annotation'))
-    return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
-
-
-@app.route(
-    '/admin/annotation/text/remove/<int:annotation_id>/<int:entity_id>')
-@required_group('editor')
-def admin_annotation_text_remove_entity(
-        annotation_id: int,
-        entity_id: int) -> Response:
-    AnnotationText.remove_entity_from_annotation(annotation_id, entity_id)
-    flash(_('entity removed from annotation'), 'info')
-    return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
-
-
-@app.route('/admin/file/iiif/delete/<filename>')
-@required_group('editor')
-def admin_file_iiif_delete(filename: str) -> Response:
-    try:
-        (Path(g.settings['iiif_path']) / filename).unlink()
-        flash(f"{filename} {_('was deleted')}")
-    except Exception as e:
-        g.logger.log('error', 'file', f'deletion of IIIF {filename} failed', e)
-        flash(_('error file delete'), 'error')
-    return redirect(f"{url_for('orphans')}#tab-orphaned-iiif-files")
 
 
 @app.route('/log', methods=['GET', 'POST'])

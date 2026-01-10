@@ -5,7 +5,6 @@ from tests.base import TestBaseCase, insert
 
 
 class ArtifactTest(TestBaseCase):
-
     def test_artifact(self) -> None:
         c = self.client
         with app.test_request_context():

@@ -7,7 +7,6 @@ from tests.base import TestBaseCase, get_hierarchy, insert
 
 
 class HierarchyTest(TestBaseCase):
-
     def test_hierarchy(self) -> None:
         c = self.client
         data: dict[str, Any] = {

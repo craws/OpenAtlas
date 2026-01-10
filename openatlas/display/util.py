@@ -254,7 +254,7 @@ def profile_image(
     if not entity.image_id or not (path := get_file_path(entity.image_id)):
         return ''
     file_id = entity.image_id
-    src = url_for('display_file', filename=path.name)
+    src = url_for('display_file', name=path.name)
     url = src
     width = g.settings["profile_image_width"]
     if g.settings['iiif'] and check_iiif_file_exist(file_id):
@@ -270,7 +270,7 @@ def profile_image(
             src = url_for(
                 'display_file',
                 size=app.config['IMAGE_SIZE']['thumbnail'],
-                filename=path_.name)
+                name=path_.name)
 
     external = False
     if entity.class_.group['name'] == 'file':

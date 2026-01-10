@@ -10,7 +10,6 @@ from tests.base import ApiTestCase
 
 
 class Api(ApiTestCase):
-
     def test_api(self) -> None:
         c = self.client
         logo_path = Path(app.root_path) / 'static' / 'images' / 'layout'

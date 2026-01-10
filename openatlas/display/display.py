@@ -312,7 +312,7 @@ class Display:
                         self.buttons.append(
                             button(
                                 _('download'),
-                                url_for('download', filename=path.name)))
+                                url_for('download', name=path.name)))
                     else:
                         self.buttons.append(
                             '<span class="error">'

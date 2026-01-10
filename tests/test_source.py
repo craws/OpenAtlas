@@ -9,7 +9,6 @@ from tests.base import TestBaseCase, insert
 
 
 class SourceTest(TestBaseCase):
-
     def test_source(self) -> None:
         c = self.client
         with app.test_request_context():
@@ -113,11 +112,11 @@ class SourceTest(TestBaseCase):
             source.delete_links('P67', ['artifact'])
 
         rv = c.get(url_for('orphans'))
-        assert b'/admin/annotation/text/relink' in rv.data
+        assert b'/annotation/text/relink' in rv.data
 
         rv = c.get(
             url_for(
-                'admin_annotation_text_relink',
+                'annotation_text_relink',
                 origin_id=source.id,
                 entity_id=artifact.id),
             follow_redirects=True)
@@ -131,16 +130,14 @@ class SourceTest(TestBaseCase):
 
         rv = c.get(
             url_for(
-                'admin_annotation_text_remove_entity',
+                'annotation_text_remove_entity',
                 annotation_id=annotation_id,
                 entity_id=artifact.id),
             follow_redirects=True)
         assert b'Entity removed from annotation' in rv.data
 
         rv = c.get(
-            url_for(
-                'admin_annotation_text_delete',
-                id_=source.id),
+            url_for('annotation_text_delete', id_=source.id),
             follow_redirects=True)
         assert b'Annotation deleted' in rv.data
 

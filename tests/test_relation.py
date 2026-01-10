@@ -5,7 +5,6 @@ from tests.base import TestBaseCase, get_hierarchy, insert
 
 
 class RelationTests(TestBaseCase):
-
     def test_relation(self) -> None:
         c = self.client
         with app.test_request_context():

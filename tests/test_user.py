@@ -6,7 +6,6 @@ from tests.base import TestBaseCase, insert
 
 
 class UserTests(TestBaseCase):
-
     def test_user(self) -> None:
         c = self.client
         data = {

@@ -12,7 +12,7 @@ from werkzeug.utils import redirect
 
 from openatlas import app
 from openatlas.api.resources.util import filter_by_type
-from openatlas.display.image_processing import delete_orphaned_resized_images
+from openatlas.display.image_processing import delete_orphaned_resized
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table, entity_table
 from openatlas.display.util import (
@@ -294,7 +294,7 @@ def orphans() -> str:
         tabs['orphaned_files'].buttons.append(
             button(
                 _('delete all files'),
-                url_for('admin_file_delete', filename='all'),
+                url_for('file_delete', name='all'),
                 onclick=f"return confirm('{text}')"))
     return render_template(
         'tabs.html',
@@ -378,12 +378,12 @@ def check_files(arche: Optional[str] = None) -> str:
             _('check files')])
 
 
-@app.route('/admin/delete_orphaned_resized_images')
+@app.route('/delete_orphaned_resized_images')
 @required_group('admin')
-def admin_delete_orphaned_resized_images() -> Response:
-    delete_orphaned_resized_images()
+def delete_orphaned_resized_images() -> Response:
+    delete_orphaned_resized()
     flash(_('resized orphaned images were deleted'))
-    return redirect(url_for('admin_index') + '#tab-data')
+    return redirect(f'{url_for('admin_index')}#tab-data')
 
 
 def get_files_without_entity(entity_file_ids: list[int]) -> list[Any]:
@@ -399,10 +399,10 @@ def get_files_without_entity(entity_file_ids: list[int]) -> list[Any]:
                 convert_size(file.stat().st_size),
                 format_date(datetime.fromtimestamp(file.stat().st_ctime)),
                 file.suffix,
-                link(_('download'), url_for('download', filename=file.name)),
+                link(_('download'), url_for('download', name=file.name)),
                 link(
                     _('delete'),
-                    url_for('admin_file_delete', filename=file.name),
+                    url_for('file_delete', name=file.name),
                     js=f"return confirm('{confirm}')")
                 if is_authorized('editor') else ''])
     return rows
@@ -423,7 +423,7 @@ def get_iiif_files_without_entity(entity_file_ids: list[int]) -> list[Any]:
                 file.suffix,
                 link(
                     _('delete'),
-                    url_for('admin_file_iiif_delete', filename=file.name),
+                    url_for('file_iiif_delete', filename=file.name),
                     js=f"return confirm('{confirm}')")
                 if is_authorized('editor') else ''])
     return rows
@@ -442,20 +442,23 @@ def get_orphaned_image_annotations() -> list[Any]:
             link(
                 _('relink entity'),
                 url_for(
-                    'admin_annotation_image_relink',
+                    'annotation_image_relink',
                     origin_id=file.id,
                     entity_id=entity.id),
                 js=f"return confirm('{_('relink entity')}?')"),
             link(
                 _('remove entity'),
                 url_for(
-                    'admin_annotation_image_remove_entity',
+                    'annotation_image_remove_entity',
                     annotation_id=annotation.id,
                     entity_id=entity.id),
                 js=f"return confirm('{_('remove entity')}?')"),
             link(
                 _('delete annotation'),
-                url_for('admin_annotation_image_delete', id_=annotation.id),
+                url_for(
+                    'annotation_image_delete',
+                    id_=annotation.id,
+                    origin='orphan'),
                 js=f"return confirm('{_('delete annotation')}?')")])
     return rows
 
@@ -473,19 +476,19 @@ def get_orphaned_text_annotations() -> list[Any]:
             link(
                 _('relink entity'),
                 url_for(
-                    'admin_annotation_text_relink',
+                    'annotation_text_relink',
                     origin_id=annotation.source_root or source.id,
                     entity_id=entity.id),
                 js=f"return confirm('{_('relink entity')}?')"),
             link(
                 _('remove entity'),
                 url_for(
-                    'admin_annotation_text_remove_entity',
+                    'annotation_text_remove_entity',
                     annotation_id=annotation.id,
                     entity_id=entity.id),
                 js=f"return confirm('{_('remove entity')}?')"),
             link(
                 _('delete annotation'),
-                url_for('admin_annotation_text_delete', id_=source.id),
+                url_for('annotation_text_delete', id_=source.id),
                 js=f"return confirm('{_('delete annotation')}?')")])
     return rows

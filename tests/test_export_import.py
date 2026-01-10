@@ -11,7 +11,6 @@ from tests.base import ImportTestCase
 
 
 class ImportTest(ImportTestCase):
-
     def test_import(self) -> None:
         with app.test_request_context():
             app.preprocess_request()

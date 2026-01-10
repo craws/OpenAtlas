@@ -10,7 +10,6 @@ from tests.base import TestBaseCase, get_hierarchy, insert
 
 
 class PlaceTest(TestBaseCase):
-
     def test_place(self) -> None:
         c = self.client
         with app.test_request_context():

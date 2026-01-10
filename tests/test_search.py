@@ -5,7 +5,6 @@ from tests.base import TestBaseCase, insert
 
 
 class SearchTest(TestBaseCase):
-
     def test_search(self) -> None:
         c = self.client
         with app.test_request_context():

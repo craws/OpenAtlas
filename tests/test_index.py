@@ -8,7 +8,6 @@ from tests.base import TestBaseCase
 
 
 class IndexTests(TestBaseCase):
-
     def test_index(self) -> None:
         c = self.client
         with c.get('/static/favicon.ico') as rv:

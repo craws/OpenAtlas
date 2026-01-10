@@ -12,7 +12,6 @@ from tests.base import TestBaseCase, get_hierarchy, insert
 
 
 class ImageTest(TestBaseCase):
-
     def test_image(self) -> None:
         c = self.client
         app.config['IMAGE_SIZE']['tmp'] = '1'
@@ -61,11 +60,11 @@ class ImageTest(TestBaseCase):
             file_pathless = insert('file', 'Pathless_File')
             file = insert('file', 'Test_File')
             file.link('P2', g.types[get_hierarchy('License').subs[0]])
-            file_name = f'{file.id}.jpeg'
+            filename = f'{file.id}.jpeg'
             copyfile(
                 Path(app.root_path)
                 / 'static' / 'images' / 'layout' / 'logo.png',
-                Path(app.config['UPLOAD_PATH'] / file_name))
+                Path(app.config['UPLOAD_PATH'] / filename))
             file2 = insert('file', 'Test_File2')
             file2.link('P2', g.types[get_hierarchy('License').subs[0]])
             copyfile(
@@ -88,21 +87,21 @@ class ImageTest(TestBaseCase):
         rv = c.get(url_for('index', group='file'))
         assert b'Test_File' in rv.data
 
-        with c.get(url_for('display_file', filename=file_name)) as rv:
+        with c.get(url_for('display_file', name=filename)) as rv:
             assert b'\xff' in rv.data
 
         with c.get(
             url_for(
                 'display_file',
-                filename=file_name,
+                name=filename,
                 size=app.config['IMAGE_SIZE']['thumbnail'])) as _rv:
             assert b'\xff' in rv.data
 
-        rv = c.get(url_for('display_file', filename=file_name, size='500'))
+        rv = c.get(url_for('display_file', name=filename, size='500'))
         assert b'400 Bad Request' in rv.data
 
         rv = c.get(
-            url_for('api.display', filename=file_name, image_size='thumbnail'))
+            url_for('api.display', filename=filename, image_size='thumbnail'))
         assert b'This file is not public shareable' in rv.data
 
         app.config['IMAGE_SIZE']['tmp'] = '<'
@@ -114,7 +113,7 @@ class ImageTest(TestBaseCase):
         assert b'Images were created' in rv.data
 
         rv = c.get(
-            url_for('admin_delete_orphaned_resized_images'),
+            url_for('delete_orphaned_resized_images'),
             follow_redirects=True)
         assert b'Resized orphaned images were deleted' in rv.data
 
