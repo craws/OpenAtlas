@@ -33,33 +33,19 @@ Orphans
 This function is used to find entities with missing connections. The result
 is shown in the following tabs:
 
-Orphans
-*******
-Entries shown have no relation to other entities. Of course that can be
-part of the normal data set, but should be check if correct. An unlinked
-entity could be artifacts of an import or were not linked by accident.
+Entity
+******
+Entities shown here have no relation to other entities. Of course that can be
+part of a valid data set but they could also be artifacts of an import or
+were forgotten to link by mistake.
 
 Type
 ****
-The types listed here were created but have no sub types or associated data.
-They might have been pre-installed before teams have started entering
-information or were created and then never used.
+The types listed here have no sub types or associated data.
+They might have been pre-installed or were created and then never used.
 
-Missing files
-*************
-File entities without a corresponding file are listed here. This is (most
-likely) caused by the deletion of files from the dataset.
-
-Orphaned files
-**************
-Files without a corresponding file entity are listed here.
-
-Orphaned IIIF files
-*******************
-IIIF files without a corresponding entity are listed here.
-
-Orphaned annotations
-********************
+Annotations
+***********
 Annotations that are linked to an entity, but file and entity themselves are
 not linked are listed here. There are three options to proceed:
 
@@ -67,8 +53,8 @@ not linked are listed here. There are three options to proceed:
 * *Remove entity*: Removes the entity from the annotation
 * *Delete annotation*: Deletes the whole annotation
 
-Orphaned subunits
-*****************
+Subunits
+********
 Subunits without a link to the level above, e.g. a feature
 with no connection to a place.
 
@@ -154,3 +140,5 @@ File integrity
 * **Duplicated files**: Lists all files that share the same SHA value.
   In such cases, the files themselves are duplicates, but their metadata
   entries differ.
+* **Orphaned files**: Files without a corresponding file entity
+* **Orphaned IIIF files**: IIIF files without a corresponding entity

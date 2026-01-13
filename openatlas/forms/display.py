@@ -8,7 +8,7 @@ from wtforms import FileField, IntegerField, SelectField, StringField
 from wtforms.validators import Email
 
 from openatlas import app
-from openatlas.display.util2 import manual
+from openatlas.display.util2 import manual, uc_first
 from openatlas.forms.field import ValueTypeField
 
 
@@ -42,10 +42,11 @@ def html_form(
                 reference_systems_added = True
                 html += add_row(
                     label=_('reference system'),
-                    value='<span id="reference-system-switcher" '
-                    'class="uc-first '
-                    f'{app.config["CSS"]["button"]["secondary"]}">{_('show')}'
-                    '</span>')
+                    value=f"""
+                        <span id="reference-system-switcher" '
+                            class="{app.config["CSS"]["button"]["secondary"]}">
+                            {uc_first(_('show'))}
+                        </span>""")
             html += add_row(field, row_css="d-none")
             continue
         if field.id.split('_', 1)[0] in ('begin', 'end'):
@@ -68,7 +69,7 @@ def html_form(
             continue
         if field.id == 'save':
             class_ = \
-                f"{app.config['CSS']['button']['primary']} text-wrap uc-first"
+                f'{app.config['CSS']['button']['primary']} text-wrap'
             buttons = [manual(manual_page)] if manual_page else []
             buttons.append(field(class_=class_))
             if 'insert_and_continue' in form:
@@ -84,7 +85,7 @@ def html_form(
             html += add_row(
                 field,
                 '<div class="row g-1 align-items-center ">'
-                f'{"".join(buttons)}</div>')
+                f'{''.join(buttons)}</div>')
             continue
         if field.type in ['TableField', 'TableMultiField']:
             field.label.text = _(field.label.text.lower())
@@ -109,11 +110,12 @@ def add_row(
             field.label.text += ' *'
         field_css += ' required' if field.flags.required else ''
         field_css += ' integer' if isinstance(field, IntegerField) else ''
-        field_css += f' {app.config["CSS"]["string_field"]}' \
-            if isinstance(
+        if isinstance(
                 field,
-                (StringField, SelectField, FileField, IntegerField)) else ''
-        row_css += f' {field.row_css if hasattr(field, "row_css") else ""}'
+                (StringField, SelectField, FileField, IntegerField)):
+            field_css += f' {app.config["CSS"]["string_field"]}'
+        if hasattr(field, "row_css"):
+            row_css += f' {field.row_css}'
         for validator in field.validators:
             field_css += ' email' if isinstance(validator, Email) else ''
     return render_template(
@@ -147,7 +149,7 @@ def add_dates(form: Any) -> str:
             for error in getattr(form, field_name).errors:
                 errors[field_name] += error
             errors[field_name] = \
-                f'<label class="error uc-first">{errors[field_name]}</label>'
+                f'<label class="error">{errors[field_name]}</label>'
     return render_template(
         'util/dates.html',
         form=form,
@@ -164,8 +166,9 @@ def display_form(
         manual_page: Optional[str] = None) -> str:
     form_id = f'id="{form_id}"' if form_id else ''
     multipart = 'enctype="multipart/form-data"' if 'file' in form else ''
-    return \
-        f'<form method="post" {form_id} {multipart}>' \
-        '<table class="table table-no-style">' \
-        f'{html_form(form, form_id, manual_page)}' \
-        f'</table></form>'
+    return f"""
+        <form method="post" {form_id} {multipart}>
+          <table class="table table-no-style">
+            {html_form(form, form_id, manual_page)}
+          </table>
+        </form>"""

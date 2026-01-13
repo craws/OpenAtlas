@@ -5,7 +5,6 @@ from tests.base import TestBaseCase, insert
 
 
 class ModelTests(TestBaseCase):
-
     def test_model(self) -> None:
         c = self.client
 

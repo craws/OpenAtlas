@@ -307,7 +307,7 @@ def process_form(
             # Add 'a' to prevent emtpy temporary filename, has no side effects
             filename = secure_filename(f'a{file_.filename}')
             ext = filename.rsplit('.', 1)[1].lower()
-            name = f"{entity.id}.{ext}"
+            name = f'{entity.id}.{ext}'
             path = app.config['UPLOAD_PATH'] / name
             file_.save(str(path))
             if f'.{ext}' in g.display_file_ext:

@@ -95,7 +95,7 @@ def login() -> str | Response:
             g.logger.log(
                 'notice',
                 'auth',
-                f"Wrong username: {request.form['username']}")
+                f'Wrong username: {request.form['username']}')
             flash(_('Invalid user or password'), 'error')
     return render_template(
         'login.html',
@@ -116,7 +116,7 @@ def reset_password() -> str | Response:
             user.password_reset_date = datetime.now()
             user.update()
             url = url_for('reset_confirm', code=code)
-            link = f"{request.scheme}://{request.headers['Host']}{url}"
+            link = f'{request.scheme}://{request.headers['Host']}{url}'
             subject = _(
                 'Password reset request for %(site_name)s',
                 site_name=g.settings['site_name'])
@@ -124,21 +124,21 @@ def reset_password() -> str | Response:
                 'We received a password reset request for %(username)s',
                 username=user.username)
             body += \
-                f" {_('at')} {request.headers['Host']}\n\n" \
-                f"{_('reset password link')}:\n\n" \
-                f"{link}\n\n" \
-                f"{_('The link is valid for')} " \
-                f"{g.settings['reset_confirm_hours']} {_('hours')}."
+                f' {_('at')} {request.headers['Host']}\n\n' \
+                f'{_('reset password link')}:\n\n' \
+                f'{link}\n\n' \
+                f'{_('The link is valid for')} ' \
+                f'{g.settings['reset_confirm_hours']} {_('hours')}.'
             email = form.email.data
             if send_mail(subject, body, form.email.data):
                 flash(
                     _('A password reset confirmation mail was send '
                         'to %(email)s.', email=email))
-            else:  # pragma: no cover
+            else:
                 flash(
                     _('Failed to send password reset confirmation mail '
                         'to %(email)s.', email=email),
-                    'error')
+                    'error')  # pragma: no cover
             return redirect(url_for('login'))
         g.logger.log(
             'info',
@@ -174,15 +174,15 @@ def reset_confirm(code: str) -> Response:
     subject = \
         _('New password for %(sitename)s', sitename=g.settings['site_name'])
     body = _('New password for %(username)s', username=user.username) + ' '
-    body += f"{_('at')} {request.scheme}://{request.headers['Host']}:\n\n"
-    body += f"{uc_first(_('username'))}: {user.username}\n"
-    body += f"{uc_first(_('password'))}: {password}\n"
+    body += f'{_('at')} {request.scheme}://{request.headers['Host']}:\n\n'
+    body += f'{uc_first(_('username'))}: {user.username}\n'
+    body += f'{uc_first(_('password'))}: {password}\n'
     if send_mail(subject, body, user.email, False):
         flash(_('A new password was sent to %(email)s.', email=user.email))
-    else:  # pragma: no cover
+    else:
         flash(
             _('Failed to send password mail to %(email)s.', email=user.email),
-            'error')
+            'error')  # pragma: no cover
     return redirect(url_for('login'))
 
 

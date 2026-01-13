@@ -18,7 +18,7 @@ from wtforms.widgets import FileInput, HiddenInput, Input, TextInput
 from openatlas import app
 from openatlas.display.table import Table, entity_table
 from openatlas.display.util import link
-from openatlas.display.util2 import is_authorized
+from openatlas.display.util2 import is_authorized, uc_first
 from openatlas.forms.util import convert
 from openatlas.models.entity import Entity
 
@@ -30,11 +30,10 @@ class RemovableListInput(HiddenInput):
             *args: Any,
             **kwargs: Any) -> str:
         [name, index] = field.id.split('-')
-        classes = kwargs['class'] if 'class' in kwargs else ''
         return render_template(
             'forms/removable_list_field.html',
             value=field.data,
-            classes=classes,
+            classes=kwargs.get('class', ''),
             name=name,
             id=index)
 
@@ -74,9 +73,8 @@ class ValueTypeInput(TextInput):
             **kwargs: Any) -> Markup:
         type_ = g.types[field.type_id]
         padding = len(type_.root)
-        expand_col = \
-            f' <div class="me-1">{value_type_expand_icon(type_)}</div>'
-        return Markup(f'''
+        expand_col = f'<div class="me-1">{value_type_expand_icon(type_)}</div>'
+        return Markup(f"""
             <div class="row g-1" >
               <div class="col-4  d-flex" style="padding-left:{padding}rem">
                 {expand_col if type_.subs else ''}
@@ -90,13 +88,13 @@ class ValueTypeInput(TextInput):
                   type="text"
                   class="{app.config['CSS']['string_field']} value-type"
                   name="{field.id}" id="{field.id}"
-                  value="{field.data or ''}" />
+                  value="{field.data or ''}">
               </div>
               <div
                 class="col-2 text-truncate"
                 title="{type_.description or ''}">{type_.description or ''}
               </div>
-            </div>''')
+            </div>""")
 
 
 class ValueTypeField(FloatField):
@@ -244,9 +242,7 @@ class TableSelect(HiddenInput):
                 setattr(
                     SimpleEntityForm,
                     f'{field.id}-{class_name_}-standard-type-dynamic',
-                    TreeField(
-                        str(standard_type_id),
-                        type_id=standard_type_id))
+                    TreeField(str(standard_type_id), type_id=standard_type_id))
             setattr(
                 SimpleEntityForm,
                 'description_dynamic',
@@ -317,7 +313,7 @@ class TableCidocField(HiddenField):
 def table_cidoc(table_id: str, items: list[Any]) -> Table:
     table_ = Table(['code', 'name'])
     for i in items:
-        js = "selectFromTable(" \
+        js = 'selectFromTable(' \
             + f"this, '{table_id}', '{i.code}', '{i.code} {i.name}');"
         table_.rows.append([link(i.code, '#', js=js), i.name])
     return table_
@@ -398,9 +394,8 @@ class DragNDrop(FileInput):
             field: RemovableListField,
             *args: Any,
             **kwargs: Any) -> str:
-        accept = ', '.join([
-            f'.{filename}' for filename
-            in g.settings['file_upload_allowed_extension']])
+        accept = ', '.join(
+            [f'.{ext}' for ext in g.settings['file_upload_allowed_extension']])
         return super().__call__(field, accept=accept, **kwargs) \
             + Markup(render_template('forms/drag_n_drop_field.html'))
 
@@ -431,14 +426,10 @@ class SubmitInput(Input):
     input_type = 'submit'
 
     def __call__(self, field: Field, **kwargs: Any) -> str:
-        kwargs['class_'] = (kwargs['class_'] + ' uc-first') \
-            if 'class_' in kwargs else 'uc-first'
-        return Markup(
-            f'''<button
-             type="submit"
-             id="{field.id}"
-             {self.html_params(name=field.name, **kwargs)}
-             >{field.label.text}</button>''')
+        return Markup(f"""
+            <button type="submit" id="{field.id}"
+                {self.html_params(name=field.name, **kwargs)}
+            >{uc_first(field.label.text)}</button>""")
 
 
 class SubmitField(BooleanField):
@@ -449,17 +440,11 @@ class SubmitAnnotationInput(Input):
     input_type = 'submit'
 
     def __call__(self, field: Field, **kwargs: Any) -> str:
-        onclick_event = "saveAnnotationText();"
-        kwargs['class_'] = (kwargs['class_'] + ' uc-first') \
-            if 'class_' in kwargs else 'uc-first'
-        kwargs['onclick'] = onclick_event
-        return Markup(
-            f'''
-            <button
-             type="submit"
-             id="{field.id}"
-             {self.html_params(name=field.name, **kwargs)}
-             >{field.label.text}</button>''')
+        kwargs['onclick'] = "saveAnnotationText();"
+        return Markup(f"""
+            <button type="submit" id="{field.id}"
+                {self.html_params(name=field.name, **kwargs)}
+             >{uc_first(field.label.text)}</button>""")
 
 
 class SubmitAnnotationField(BooleanField):
@@ -469,23 +454,23 @@ class SubmitAnnotationField(BooleanField):
 def generate_password_field() -> CustomField:
     return CustomField(
         '',
-        content=f'''
-            <span class="uc-first {app.config["CSS"]["button"]["primary"]}"
-            id="generate-password">{_("generate password")}</span>''')
+        content=f"""
+            <span
+                class="{app.config["CSS"]["button"]["primary"]}"
+                id="generate-password"
+            >{uc_first(_('generate password'))}</span>""")
 
 
 def value_type_expand_icon(type_: Entity) -> str:
-    return f'''
-        <span onkeydown="
-            if (onActivateKeyInput(event))
-                switch_value_type({type_.id},this.children[0])"
-        >
+    return f"""
+        <span onkeydown="if (onActivateKeyInput(event))
+              switch_value_type({type_.id},this.children[0])">
             <i
-            aria-pressed=false
-            role="button"
-            tabindex="0"
-            onclick="switch_value_type({type_.id},this)"
-            id="value-type-switcher-{type_.id}"
-            class="fa fa-chevron-right value-type-switcher input-height-sm">
+                aria-pressed=false
+                tabindex="0"
+                onclick="switch_value_type({type_.id},this)"
+                id="value-type-switcher-{type_.id}"
+                class="fa fa-chevron-right value-type-switcher input-height-sm"
+                role="button">
             </i>
-        </span>'''
+        </span>"""

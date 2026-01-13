@@ -17,7 +17,7 @@ from openatlas.display.util import get_file_path
 from openatlas.models.cidoc import CidocProperty
 from openatlas.models.dates import Dates
 from openatlas.models.entity import Entity, Link
-from openatlas.models.gis import Gis
+from openatlas.models.gis import get_centroids_by_entities, get_gis_by_entities
 from openatlas.models.overlay import Overlay
 
 
@@ -52,10 +52,11 @@ def get_file_dict(
         link: Link,
         overlay: Optional[Overlay] = None,
         root: Optional[bool] = False) -> dict[str, Any]:
-    path = get_file_path(link.domain.id)
+    url = 'N/A'
     mime_type = None
-    if path:
-        mime_type, _ = mimetypes.guess_type(path)  # pragma: no cover
+    if path := get_file_path(link.domain.id):
+        url_for('api.display', filename=path.stem, _external=True)
+        mime_type, _ = mimetypes.guess_type(path)
     data = {
         'id': link.domain.id,
         'title': link.domain.name,
@@ -65,10 +66,7 @@ def get_file_dict(
         'publicShareable': link.domain.public,
         'mimetype': mime_type,
         'fromSuperEntity': root,
-        'url': url_for(
-            'api.display',
-            filename=path.stem,
-            _external=True) if path else 'N/A'}
+        'url': url}
     data.update(get_iiif_manifest_and_path(link.domain.id))
     if overlay:
         data.update({'overlay': overlay.bounding_box})
@@ -127,9 +125,9 @@ def get_relation_types_dict_for_locations(
         entity_id: int,
         property_: CidocProperty,
         parser: Parser) -> dict[str, Any]:
-    property_string = f"i_{property_.i18n_inverse['en'].replace(' ', '_')}"
+    property_string = f'i_{property_.i18n_inverse['en'].replace(' ', '_')}'
     relation_types = {
-        'property': f"crm:{property_.code}{property_string}",
+        'property': f'crm:{property_.code}{property_string}',
         'relationTo': entity_id,
         'type': None,
         'description': None,
@@ -249,10 +247,9 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         [e for e in related_entities if not (e.id in exists_ or add_(e.id))]
 
     all_entities = related_entities_ + [entity]
-    geoms = Gis.get_by_entities(all_entities)
+    geoms = get_gis_by_entities(all_entities)
     if parser.centroid:
-        for id_, geom in \
-                Gis.get_centroids_by_entities(all_entities).items():
+        for id_, geom in get_centroids_by_entities(all_entities).items():
             geoms[id_].extend(geom)
     relations = defaultdict(list)
     for rel_entity in related_entities_:

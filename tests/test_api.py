@@ -10,7 +10,6 @@ from tests.base import ApiTestCase
 
 
 class Api(ApiTestCase):
-
     def test_api(self) -> None:
         c = self.client
         logo_path = Path(app.root_path) / 'static' / 'images' / 'layout'
@@ -802,7 +801,7 @@ class Api(ApiTestCase):
         with c.get(
                 url_for(
                     'api_04.display',
-                    filename=f'{file.id}',
+                    filename=file.id,
                     image_size='table')) as rv:
             self.assertTrue(rv.headers['Content-Type'].startswith('image'))
 
@@ -967,14 +966,14 @@ class Api(ApiTestCase):
         assert 'No search value' in rv.get_json()['title']
 
         rv = c.get(
-            url_for('api_04.display', filename=f'{file_without_licences.id}'))
+            url_for('api_04.display', filename=file_without_licences.id))
         assert 'No license' in rv.get_json()['title']
 
         rv = c.get(url_for('api_04.chained_events', id_=place.id))
         assert 'Entity is not an event' in rv.get_json()['title']
 
         rv = c.get(
-            url_for('api_04.display', filename=f'{file_without_file.id}'))
+            url_for('api_04.display', filename=file_without_file.id))
         assert 'File not found' in rv.get_json()['title']
 
         rv = c.get(url_for('api_04.iiif_manifest', version=2, id_=place.id))
@@ -983,7 +982,7 @@ class Api(ApiTestCase):
         rv = c.get(url_for('api_04.iiif_sequence', version=2, id_=place.id))
         assert 'File not found' in rv.get_json()['title']
 
-        rv = c.get(url_for('api_04.display', filename=f'{file_not_public.id}'))
+        rv = c.get(url_for('api_04.display', filename=file_not_public.id))
         assert 'Not public' in rv.get_json()['title']
         assert b'Endpoint not found' in c.get('/api/entity2').data
 

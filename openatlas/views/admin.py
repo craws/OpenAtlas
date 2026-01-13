@@ -33,12 +33,11 @@ from openatlas.forms.setting import (
     ApiForm, ContentForm, FileForm, FrontendForm, GeneralForm, IiifForm,
     LogForm, MailForm, MapForm, ModulesForm, TestMailForm)
 from openatlas.forms.util import get_form_settings, set_form_settings
-from openatlas.models.annotation import AnnotationImage, AnnotationText
 from openatlas.models.content import get_content, update_content
 from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Project
-from openatlas.models.settings import Settings
+from openatlas.models.settings import update_settings
 from openatlas.models.user import User
 
 
@@ -92,11 +91,11 @@ def admin_index() -> str:
                 manual('admin/iiif'),
                 button(_('edit'), url_for('settings', category='iiif')),
                 button(
-                    _('convert all files') + f' ({count_files_to_convert()})',
+                    f'{_('convert all files')} ({count_files_to_convert()})',
                     url_for('convert_iiif_files')),
                 button(
-                    _('delete all IIIF files') +
-                    f' ({count_files_to_delete()})',
+                    f'{_('delete all IIIF files')} '
+                    f'({count_files_to_delete()})',
                     url_for('delete_iiif_files'))])
     if is_authorized('manager'):
         tabs['modules'] = Tab(
@@ -237,7 +236,7 @@ def admin_content(item: str) -> str | Response:
         tabs={'content': Tab('content', form=form)},
         title=_('content'),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-content"],
+            [_('admin'), f'{url_for('admin_index')}#tab-content'],
             _(item)])
 
 
@@ -248,10 +247,8 @@ def settings(category: str) -> str | Response:
         abort(403)
     form = getattr(
         importlib.import_module('openatlas.forms.setting'),
-        f"{uc_first(category)}Form")()
+        f'{uc_first(category)}Form')()
     tab = category.replace('api', 'data')
-    redirect_url = f"{url_for('admin_index')}#tab-{tab}"
-    crumbs = [[_('admin'), f"{url_for('admin_index')}#tab-{tab}"], _(category)]
     if form.validate_on_submit():
         data = {}
         for field in form:
@@ -263,114 +260,22 @@ def settings(category: str) -> str | Response:
             if field.type == 'BooleanField':
                 value = 'True' if field.data else ''
             data[field.name] = value
-        Settings.update(data)
+        update_settings(data)
         g.logger.log('info', 'settings', 'Settings updated')
         flash(_('info update'))
-        return redirect(redirect_url)
+        return redirect(f'{url_for('admin_index')}#tab-{tab}')
     if request.method == 'GET':
         set_form_settings(form)
-    manual_page = f"admin/{category.replace('frontend', 'presentation_site')}"
     return render_template(
         'content.html',
-        content=display_form(form, manual_page=manual_page),
+        content=display_form(
+            form,
+            manual_page='admin/' +
+            category.replace('frontend', 'presentation_site')),
         title=_('admin'),
-        crumbs=crumbs)
-
-
-@app.route('/admin/file/delete/<filename>')
-@required_group('editor')
-def admin_file_delete(filename: str) -> Response:
-    if filename != 'all':  # Delete one file
-        try:
-            (app.config['UPLOAD_PATH'] / filename).unlink()
-            flash(f"{filename} {_('was deleted')}")
-        except Exception as e:
-            g.logger.log('error', 'file', f'deletion of {filename} failed', e)
-            flash(_('error file delete'), 'error')
-        return redirect(f"{url_for('orphans')}#tab-orphaned-files")
-
-    # Delete all files with no corresponding entity
-    if is_authorized('admin'):  # pragma: no cover - don't test, ever
-        entity_file_ids = [entity.id for entity in Entity.get_by_class('file')]
-        for f in app.config['UPLOAD_PATH'].iterdir():
-            if f.name != '.gitignore' and int(f.stem) not in entity_file_ids:
-                try:
-                    (app.config['UPLOAD_PATH'] / f.name).unlink()
-                except Exception as e:
-                    g.logger.log(
-                        'error', 'file', f'deletion of {f.name} failed', e)
-                    flash(_('error file delete'), 'error')
-    return redirect(
-        f"{url_for('orphans')}#tab-orphaned-files")  # pragma: no cover
-
-
-@app.route('/admin/annotation/image/delete/<int:id_>')
-@required_group('editor')
-def admin_annotation_image_delete(id_: int) -> Response:
-    annotation = AnnotationImage.get_by_id(id_)
-    annotation.delete()
-    flash(_('annotation deleted'))
-    return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
-
-
-@app.route('/admin/annotation/text/delete/<int:id_>')
-@required_group('editor')
-def admin_annotation_text_delete(id_: int) -> Response:
-    AnnotationText.delete_annotations_text(id_)
-    flash(_('annotation deleted'), 'info')
-    return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
-
-
-@app.route('/admin/annotation/image/relink/<int:origin_id>/<int:entity_id>')
-@required_group('editor')
-def admin_annotation_image_relink(origin_id: int, entity_id: int) -> Response:
-    image = Entity.get_by_id(origin_id)
-    image.link('P67', Entity.get_by_id(entity_id))
-    flash(_('entities relinked'), 'info')
-    return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
-
-
-@app.route('/admin/annotation/text/relink/<int:origin_id>/<int:entity_id>')
-@required_group('editor')
-def admin_annotation_text_relink(origin_id: int, entity_id: int) -> Response:
-    source = Entity.get_by_id(origin_id)
-    source.link('P67', Entity.get_by_id(entity_id))
-    flash(_('entities relinked'))
-    return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
-
-
-@app.route(
-    '/admin/annotation/image/remove/<int:annotation_id>/<int:entity_id>')
-@required_group('editor')
-def admin_annotation_image_remove_entity(
-        annotation_id: int,
-        entity_id: int) -> Response:
-    AnnotationImage.remove_entity_from_annotation(annotation_id, entity_id)
-    flash(_('entity removed from annotation'))
-    return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
-
-
-@app.route(
-    '/admin/annotation/text/remove/<int:annotation_id>/<int:entity_id>')
-@required_group('editor')
-def admin_annotation_text_remove_entity(
-        annotation_id: int,
-        entity_id: int) -> Response:
-    AnnotationText.remove_entity_from_annotation(annotation_id, entity_id)
-    flash(_('entity removed from annotation'), 'info')
-    return redirect(f"{url_for('orphans')}#tab-orphaned-annotations")
-
-
-@app.route('/admin/file/iiif/delete/<filename>')
-@required_group('editor')
-def admin_file_iiif_delete(filename: str) -> Response:
-    try:
-        (Path(g.settings['iiif_path']) / filename).unlink()
-        flash(f"{filename} {_('was deleted')}")
-    except Exception as e:
-        g.logger.log('error', 'file', f'deletion of IIIF {filename} failed', e)
-        flash(_('error file delete'), 'error')
-    return redirect(f"{url_for('orphans')}#tab-orphaned-iiif-files")
+        crumbs=[
+            [_('admin'), f'{url_for('admin_index')}#tab-{tab}'],
+            _(category)])
 
 
 @app.route('/log', methods=['GET', 'POST'])
@@ -389,13 +294,13 @@ def log() -> str:
     for row in logs:
         user = None
         if row['user_id']:
-            user = f"user id: {row['user_id']}"
+            user = f'user id: {row['user_id']}'
             if user_ := User.get_by_id(row['user_id']):
                 user = link(user_)
         table.rows.append([
             row['created'].replace(microsecond=0).isoformat()
             if row['created'] else '',
-            f"{row['priority']} {app.config['LOG_LEVELS'][row['priority']]}",
+            f'{row['priority']} {app.config['LOG_LEVELS'][row['priority']]}',
             row['type'],
             row['message'],
             user,
@@ -410,7 +315,7 @@ def log() -> str:
         tabs={'log': Tab('log', form=form, table=table, buttons=buttons)},
         title=_('admin'),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-general"],
+            [_('admin'), f'{url_for('admin_index')}#tab-general'],
             _('system log')])
 
 
@@ -454,12 +359,12 @@ def newsletter() -> str | Response:
                 code = User.generate_password()
                 user.unsubscribe_code = code
                 user.update()
-                link_ = f"{request.scheme}://{request.headers['Host']}"
+                link_ = f'{request.scheme}://{request.headers['Host']}'
                 link_ += url_for('index_unsubscribe', code=code)
                 if send_mail(
                         form.subject.data,
                         f'{form.body.data}\n\n'
-                        f'{_("To unsubscribe use the link below.")}\n\n'
+                        f'{_('To unsubscribe use the link below.')}\n\n'
                         f'{link_}',
                         user.email):
                     count += 1
@@ -472,14 +377,14 @@ def newsletter() -> str | Response:
                 user.username,
                 user.email,
                 f'<input value="{user.id}" name="recipient" type="checkbox" '
-                f'checked="checked">'])
+                'checked="checked">'])
     return render_template(
         'admin/newsletter.html',
         form=form,
         table=table,
         title=_('newsletter'),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-user"],
+            [_('admin'), f'{url_for('admin_index')}#tab-user'],
             _('newsletter')])
 
 
@@ -493,8 +398,8 @@ def resize_images() -> Response:
 
 def get_disk_space_info() -> Optional[dict[str, Any]]:
     def upload_ident_with_iiif() -> bool:
-        if not iiif_path:  # pragma: no cover - Mypy
-            return False
+        if not iiif_path:
+            return False  # pragma: no cover
         return app.config['UPLOAD_PATH'].resolve() == iiif_path.resolve()
 
     paths = {
@@ -515,7 +420,7 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
     if os.name == 'posix':
         keys = []
         for key, path in paths.items():
-            if not os.access(path['path'], os.W_OK):  # pragma: no cover
+            if not os.access(path['path'], os.W_OK):
                 continue
             size = run(
                     ['du', '-sb', path['path']],
@@ -529,8 +434,8 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
                 text=True,
                 check=True)
             tmp = mounted.stdout.split()
-            if '/mnt/' in tmp[-1]:  # pragma: no cover
-                path['mounted'] = True
+            if '/mnt/' in tmp[-1]:
+                path['mounted'] = True  # pragma: no cover
             keys.append(key)
         files_size = sum(paths[key]['size'] for key in keys)
     stats = shutil.disk_usage(app.config['UPLOAD_PATH'])

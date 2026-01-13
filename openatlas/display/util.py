@@ -40,7 +40,7 @@ def remove_link(
     url = url_for('link_delete', id_=link_.id, origin_id=origin.id)
     return link(
         _('remove'),
-        f"{url}#tab-{tab.replace('_', '-')}" if tab else url,
+        f'{url}#tab-{tab.replace('_', '-')}' if tab else url,
         js=f"return confirm('{confirm}')")
 
 
@@ -55,7 +55,7 @@ def reference_systems(entity: Entity) -> str:
             ['reference_system'],
             inverse=True)):
         return ''
-    html = f'<h2 class="uc-first">{_("external reference systems")}</h2>'
+    html = f'<h2>{uc_first(_('external reference systems'))}</h2>'
     html += '<ul class="list-group list-group-flush bg-none">'
     for link_ in links:
         system = g.reference_systems[link_.domain.id]
@@ -68,36 +68,37 @@ def reference_systems(entity: Entity) -> str:
             </div>"""
         if system.name in ['GeoNames', 'GND', 'Wikidata']:
             name = system.name.lower()
-            show = '<span id="show">' + uc_first(_('show info')) + '</span>'
+            show = f'<span id="show">{uc_first(_('show info'))}</span>'
             hide = '<span id="hide" class="d-none">' + \
-                uc_first(_('hide info')) + '</span>'
-            show_info_button += (
-                f' <button id="{name}-switch" class="uc-first mt-1 me-1 '
-                f'{app.config["CSS"]["button"]["secondary"]}"'
-                f'onclick="ajax{uc_first(name)}Info'
-                f'(\'{link_.description}\')">{show}{hide}</button>')
+                f'{uc_first(_('hide info'))}</span>'
+            show_info_button += f"""
+                <button id="{name}-switch"
+                  class="mt-1 me-1 {app.config["CSS"]["button"]["secondary"]}"
+                  onclick="ajax{uc_first(name)}Info('{link_.description}')"
+                    >{show}{hide}
+                </button>"""
             info_div = f'<div id="{name}-info-div" class="mt-2"></div>'
             logo = f"""<img src="/static/images/logos/{system.name}.svg" alt=""
-                class="rounded-circle object-fit-cover my-1" width="16"/>"""
+                class="rounded-circle object-fit-cover my-1" width="16">"""
         entry = f"""
             <li class="list-group-item bg-transparent">
-                <div class="d-flex gap-2 align-items-center">
+              <div class="d-flex gap-2 align-items-center">
                 {logo}
                 <span><b>{link(link_.domain)}</b>: {link_.description}</span>
                 <span class="badge badge-pill rounded-pill
                     badge-secondary bg-secondary">
-                    {g.types[link_.type.id].name if link_.type else ''}
+                  {g.types[link_.type.id].name if link_.type else ''}
                 </span>
-                </div>
-                {show_info_button}
-                {link(
+              </div>
+              {show_info_button}
+              {link(
                 _('show on %(system_name)s', system_name=link_.domain.name),
-                f'{system.resolver_url}{link_.description}',
+                system.resolver_url + link_.description,
                 external=True,
                 icon='fa-external-link-alt',
                 class_="btn btn-sm btn-outline-primary mt-1")
-                if system.resolver_url else ''}
-                {info_div}
+               if system.resolver_url else ''}
+              {info_div}
             </li>
             """
         html += entry
@@ -116,7 +117,7 @@ def get_appearance(entity: Entity) -> tuple[str, str]:
             inverse=True):
         event = link_.domain
         actor = link_.range
-        html = f" {_('at an')} " + \
+        html = f' {_('at an')} ' + \
             link(_('event'), url_for('view', id_=event.id))
         if not actor.dates.first:
             if link_.dates.first and (
@@ -167,10 +168,10 @@ def get_system_data(entity: Entity) -> dict[str, Any]:
     if 'entity_show_dates' in current_user.settings \
             and current_user.settings['entity_show_dates']:
         data[_('created')] = \
-            f"{format_date(entity.created)} {link(info['creator'])} "
+            f'{format_date(entity.created)} {link(info['creator'])}'
         if info['modified']:
             data[_('modified')] = \
-                f"{format_date(info['modified'])} {link(info['modifier'])}"
+                f'{format_date(info['modified'])} {link(info['modifier'])}'
         data[_('activity')] = link(
             _('log'),
             url_for('user_activity', user_id=0, entity_id=entity.id))
@@ -186,7 +187,7 @@ def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
     label = _('bookmark remove') \
         if current_user.bookmarks and entity_id in current_user.bookmarks \
         else _('bookmark')
-    onclick = f"ajaxBookmark('{entity_id}');"
+    onclick = f'ajaxBookmark("{entity_id}");'
     if for_table:
         return \
             f'<a href="#" id="bookmark{entity_id}" onclick="{onclick}">' \
@@ -241,7 +242,7 @@ def menu(entity: Optional[Entity]) -> str:
         html += link(
             label,
             url_for('index', group=item),
-            f'nav-item nav-link fw-bold uc-first {active}')
+            f'nav-item nav-link fw-bold {active}')
     return html
 
 
@@ -253,15 +254,15 @@ def profile_image(
     if not entity.image_id or not (path := get_file_path(entity.image_id)):
         return ''
     file_id = entity.image_id
-    src = url_for('display_file', filename=path.name)
+    src = url_for('display_file', name=path.name)
     url = src
     width = g.settings["profile_image_width"]
     if g.settings['iiif'] and check_iiif_file_exist(file_id):
         iiif_ext = '.tiff' if g.settings['iiif_conversion'] \
             else g.files[file_id].suffix
         src = \
-            f"{g.settings['iiif_url']}{file_id}{iiif_ext}" \
-            f"/full/!{width},{width}/0/default.jpg"
+            f'{g.settings['iiif_url']}{file_id}{iiif_ext}' \
+            f'/full/!{width},{width}/0/default.jpg'
     elif g.settings['image_processing'] and check_processed_image(path.name):
         if path_ := get_file_path(
                 file_id,
@@ -269,18 +270,16 @@ def profile_image(
             src = url_for(
                 'display_file',
                 size=app.config['IMAGE_SIZE']['thumbnail'],
-                filename=path_.name)
+                name=path_.name)
 
     external = False
     if entity.class_.group['name'] == 'file':
         external = True
         if path.suffix.lower() not in g.display_file_ext:
-            return f'<p class="uc-first">{_('no preview available')}</p>'
+            return f'<p>{uc_first(_('no preview available'))}</p>'
     else:
         url = url_for('view', id_=entity.image_id)
-    max_width = f"{width}px"
-    if max_width_100:
-        max_width = "100%"
+    max_width = '100%' if max_width_100 else '{width}px'
     html =  \
         f'<img style="max-width:{max_width}" alt="{entity.name}" src="{src}">'
     if not link_image:
@@ -349,7 +348,7 @@ def send_mail(
     recipients = recipients if isinstance(recipients, list) else [recipients]
     if not g.settings['mail'] or not recipients:
         return False  # pragma: no cover
-    from_ = f"{g.settings['mail_from_name']} <{g.settings['mail_from_email']}>"
+    from_ = f'{g.settings['mail_from_name']} <{g.settings['mail_from_email']}>'
     if app.testing:
         return True  # To test mail functions without sending them
     try:  # pragma: no cover
@@ -379,14 +378,14 @@ def send_mail(
         g.logger.log(
             'error',
             'mail',
-            f"Error mail login for {g.settings['mail_transport_username']}", e)
+            f'Error mail login for {g.settings['mail_transport_username']}', e)
         flash(_('error mail login'), 'error')
         return False
     except Exception as e:  # pragma: no cover
         g.logger.log(
             'error',
             'mail',
-            f"Error send mail for {g.settings['mail_transport_username']}", e)
+            f'Error send mail for {g.settings['mail_transport_username']}', e)
         flash(_('error mail send'), 'error')
         return False  # pragma: no cover
     return True  # pragma: no cover
@@ -400,22 +399,15 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
     warnings = []
     if app.config['DATABASE_VERSION'] != g.settings['database_version']:
         warnings.append(
-            f"Database version {app.config['DATABASE_VERSION']} is needed but "
-            f"current version is {g.settings['database_version']}")
-    if hasattr(g, 'writable_paths'):
-        for path in g.writable_paths:
-            check_write_access(path, warnings)
-    return \
-        '<div class="alert alert-danger">' \
-        f'{"<br>".join(warnings)}</div>' if warnings else ''
-
-
-def check_write_access(path: Path, warnings: list[str]) -> list[str]:
-    if not os.access(path, os.W_OK):
-        warnings.append(
-            f'<p class="uc-first">{_('directory not writable')}'
-            f"{str(path).replace(app.root_path, '')}</p>")
-    return warnings
+            f'Database version {app.config['DATABASE_VERSION']} is needed but'
+            f' current version is {g.settings['database_version']}')
+    for path in g.writable_paths:
+        if not os.access(path, os.W_OK):
+            warnings.append(
+                f'<p>{uc_first(_('directory not writable'))} '
+                f'{str(path).replace(app.root_path, '')}</p>')
+    return f'<div class="alert alert-danger">{"<br>".join(warnings)}</div>' \
+        if warnings else ''
 
 
 @app.template_filter()
@@ -423,29 +415,25 @@ def tooltip(text: str) -> str:
     if not text:
         return ''
     title = text.replace('"', "'")
-    return (
-        f"""<span
-        data-bs-toggle="tooltip"
-        data-bs-placement="top"
-        data-bs-custom-class="custom-tooltip"
-        data-bs-title="{title}">"""
-        '<i class="fas fa-info-circle fs-6 tooltipicon"></i>'
-        '</span>')
+    return f"""
+        <span
+            data-bs-toggle="tooltip"
+            data-bs-placement="top"
+            data-bs-custom-class="custom-tooltip"
+            data-bs-title="{title}">
+          <i class="fas fa-info-circle fs-6 tooltipicon"></i>
+        </span>"""
 
 
-def get_file_path(
-        entity: int | Entity,
-        size: Optional[str] = None) -> Optional[Path]:
-    id_ = entity if isinstance(entity, int) else entity.id
+def get_file_path(id_: int, size: Optional[str] = None) -> Optional[Path]:
     if not hasattr(g, 'files') or id_ not in g.files:
         return None
     ext = g.files[id_].suffix
+    path = app.config['UPLOAD_PATH'] / f'{id_}{ext}'
     if size:
         if ext in app.config['PROCESSABLE_EXT']:
             ext = app.config['PROCESSED_EXT']  # pragma: no cover
-        path = app.config['RESIZED_IMAGES'] / size / f"{id_}{ext}"
-    else:
-        path = app.config['UPLOAD_PATH'] / f"{id_}{ext}"
+        path = app.config['RESIZED_IMAGES'] / size / f'{id_}{ext}'
     return path if os.path.exists(path) else None
 
 
@@ -528,7 +516,7 @@ def button(
     tag = 'a' if url else 'span'
     css = variant or ('secondary' if id_ in ['date-switcher'] else 'primary')
     if url and '/insert' in url and label != _('link'):
-        label = f'+ <span class="uc-first d-inline-block">{label}</span>'
+        label = f'+ {uc_first(label)}'
     tooltip_ = ''
     if tooltip_text:
         tooltip_ = \
@@ -541,30 +529,28 @@ def button(
         <{tag}
             {f'href="{url}"' if url else ''}
             {f'id="{id_}"' if id_ else ''}
-            class="{app.config['CSS']['button'][css]} uc-first {css_class}"
+            class="{app.config['CSS']['button'][css]} {css_class}"
             {f'onclick="{onclick}"' if onclick else ''}
             tabindex="0"
             role="button"
-            {tooltip_}>{label}{icon_}</{tag}>"""
+            {tooltip_}>{uc_first(label)}{icon_}</{tag}>"""
 
 
 @app.template_filter()
 def button_bar(buttons: list[Any]) -> str:
-    def add_col(input_: str) -> str:
-        return \
-            f'<div class="col-auto d-flex align-items-center">{input_}</div>'
-    return \
-        '<div class="row my-2 g-1">' \
-        f'{" ".join([str(b) for b in list(map(add_col, buttons))])}' \
-        '</div>' if buttons else ''
+    html = ''
+    for name in buttons:
+        html += \
+            '<div class="col-auto d-flex align-items-center">' \
+            f'  {uc_first(name)}</div> '
+    return f'<div class="row my-2 g-1">{html}</div>' if html else ''
 
 
 @app.template_filter()
 def citation_example(code: str) -> str:
-    html = ''
     if code == 'reference' and (text := get_translation('citation_example')):
-        html = f'<h1 class="uc-first">{_('citation_example')}</h1>{text}'
-    return html
+        return f'<h1>{uc_first(_('citation_example'))}</h1>{text}'
+    return ''
 
 
 @app.template_filter()
@@ -575,7 +561,7 @@ def display_info(data: dict[str, Any]) -> str:
 @app.template_filter()
 def description(text: str | None, label: Optional[str] = '') -> str:
     return '' if not text else \
-        f'<h2 class="uc-first fw-bold">{label or _("description")}</h2>' \
+        f'<h2 class="fw-bold">{uc_first(label or _('description'))}</h2>' \
         f'<div class="description more">{"<br>".join(text.splitlines())}</div>'
 
 
@@ -668,10 +654,9 @@ def display_crumbs(crumbs: list[Any]) -> str:
     items = []
     for item in crumbs:
         if isinstance(item, list):
-            items.append(
-                f'<a href="{item[1]}" class="uc-first">{str(item[0])}</a>')
+            items.append(f'<a href="{item[1]}">{uc_first(item[0])}</a>')
         elif isinstance(item, (str, LazyString)):
-            items.append(f'<span class="uc-first">{item}</span>')
+            items.append(uc_first(item))
         elif item:
             items.append(link(item))
     return '&nbsp;>&nbsp; '.join(items)

@@ -47,7 +47,7 @@ def note_view(id_: int) -> str:
         tabs={
             'info': Tab(
                 'info',
-                content='<h1>' + uc_first(_('note')) + f"</h1>{note['text']}",
+                content=f'<h1>{uc_first(_('note'))}</h1>{note['text']}',
                 buttons=buttons)},
         entity=entity,
         crumbs=[link(entity, index=True), link(entity), _('note')])

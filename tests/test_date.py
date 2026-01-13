@@ -5,7 +5,6 @@ from tests.base import TestBaseCase
 
 
 class DateTest(TestBaseCase):
-
     def test_date(self) -> None:
         c = self.client
         with app.app_context():

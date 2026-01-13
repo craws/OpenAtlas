@@ -12,10 +12,8 @@ def cidoc_classes(with_count: bool = False) -> list[dict[str, Any]]:
             comment
             {', COUNT(e.id) AS count' if with_count else ''}
         FROM model.cidoc_class c
-            {
-            '''
-            LEFT JOIN model.entity e ON c.code = e.cidoc_class_code
-            GROUP BY (c.code, c.name, c.comment)''' if with_count else ''}
+        {''' LEFT JOIN model.entity e ON c.code = e.cidoc_class_code
+        GROUP BY (c.code, c.name, c.comment)''' if with_count else ''}
         ;
         """)
     return list(g.cursor)
@@ -58,8 +56,7 @@ def cidoc_properties(with_count: bool = False) -> list[dict[str, Any]]:
                 p.domain_class_code,
                 p.range_class_code,
                 p.name,
-                p.name_inverse)''' if with_count else ''}
-        ;
+                p.name_inverse)''' if with_count else ''};
         """)
     return list(g.cursor)
 

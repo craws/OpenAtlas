@@ -113,7 +113,7 @@ class GetOpenAPISchema(Resource):
         if parser == 'yaml':
             data = yaml.dump(data)
         response = make_response(data)
-        response.headers["Content-Disposition"] = \
-            f"attachment; filename=openapi.{parser}"
-        response.headers["Content-Type"] = f"application/{parser}"
+        response.headers['Content-Disposition'] = \
+            f'attachment; filename=openapi.{parser}'
+        response.headers['Content-Type'] = f'application/{parser}'
         return response

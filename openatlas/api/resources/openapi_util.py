@@ -17,9 +17,9 @@ def write_openapi_instance() -> None:
         if original['info']['version'] != instance['info']['version']:
             shutil.copy(openapi, openapi_instance)
         server = {
-            "url": request.host_url + 'api/{basePath}',
-            "description": f"{g.settings['site_name']} Server",
-            "variables": {"basePath": {"default": "0.4", "enum": ["0.4"]}}}
+            'url': request.host_url + 'api/{basePath}',
+            'description': f'{g.settings['site_name']} Server',
+            'variables': {'basePath': {'default': '0.4', 'enum': ['0.4']}}}
         modified = False
         if len(instance['servers']) == 2:
             instance['servers'].insert(0, server)

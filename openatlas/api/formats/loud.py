@@ -10,7 +10,7 @@ from openatlas.api.resources.util import (
     get_license_type, remove_spaces_dashes, to_camel_case)
 from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity, Link
-from openatlas.models.gis import Gis
+from openatlas.models.gis import get_wkt_by_id
 
 unit_map = {
     'B': 'bytes',
@@ -120,8 +120,8 @@ def get_loud_entities(
                 system = g.reference_systems[link_.domain.id]
                 match_case = to_camel_case(
                     g.types[link_.type.id].name).replace(' ', '_')
-                link_url = f"{system.resolver_url or ''}{link_.description}"
-                property_[f"skos:{match_case}"] = link_url
+                property_[f"skos:{match_case}"] = \
+                    f'{system.resolver_url or ''}{link_.description}'
         if code_ == 'OA7':
             relationship = {
                 'type': 'Event',
@@ -176,9 +176,8 @@ def get_loud_entities(
                     system = g.reference_systems[link_.domain.id]
                     match_case = to_camel_case(
                         g.types[link_.type.id].name).replace(' ', '_')
-                    link_url = \
-                        f"{system.resolver_url or ''}{link_.description}"
-                    property_[f"skos:{match_case}"] = link_url
+                    property_[f"skos:{match_case}"] = \
+                        f'{system.resolver_url or ''}{link_.description}'
             if link_.domain.class_.name == 'external_reference':
                 property_ = {
                     "type": "LinguisticObject",
@@ -191,8 +190,7 @@ def get_loud_entities(
                         "format": "text/html",
                         "_label": link_.description,
                         "access_point": [{
-                            "id":
-                                link_.domain.name,
+                            "id": link_.domain.name,
                             "type": "DigitalObject"}]}]}
         if code_ == 'OA7':
             relationship = {
@@ -229,7 +227,7 @@ def get_loud_entities(
             property_name = get_loud_property_name(loud, link_)
 
         if link_.property.code == 'P53':
-            for geom in Gis.get_wkt_by_id(link_.range.id):
+            for geom in get_wkt_by_id(link_.range.id):
                 base_property = get_range_links() | geom
                 properties_set[property_name].append(base_property)
         else:
@@ -254,7 +252,7 @@ def get_loud_entities(
             property_name = get_loud_property_name(loud, link_, inverse=True)
 
         if link_.property.code == 'P53':
-            for geom in Gis.get_wkt_by_id(link_.range.id):
+            for geom in get_wkt_by_id(link_.range.id):
                 base_property = get_domain_links() | geom
                 properties_set[property_name].append(base_property)
         else:

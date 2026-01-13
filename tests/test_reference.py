@@ -5,7 +5,6 @@ from tests.base import TestBaseCase, insert
 
 
 class ReferenceTest(TestBaseCase):
-
     def test_reference(self) -> None:
         c = self.client
         with app.test_request_context():

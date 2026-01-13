@@ -31,7 +31,7 @@ def safe_resize_image(name: str, file_format: str, size: str) -> bool:
 
 
 def image_resizing(name: str, format_: str, size: str) -> bool:
-    filename = Path(app.config['UPLOAD_PATH']) / f"{name}{format_}[0]"
+    filename = Path(app.config['UPLOAD_PATH']) / f'{name}{format_}[0]'
     with Image(filename=filename) as src:
         if format_ in app.config['PROCESSABLE_EXT']:
             format_ = app.config['PROCESSED_EXT']  # pragma: no cover
@@ -40,7 +40,7 @@ def image_resizing(name: str, format_: str, size: str) -> bool:
             img.compression_quality = 75
             img.save(
                 filename=Path(
-                    app.config['RESIZED_IMAGES']) / size / f"{name}{format_}")
+                    app.config['RESIZED_IMAGES']) / size / f'{name}{format_}')
             return True
 
 
@@ -66,7 +66,7 @@ def loop_through_processed_folders(name: str, file_format: str) -> bool:
     if file_format in app.config['PROCESSABLE_EXT']:
         ext = app.config['PROCESSED_EXT']  # pragma: no cover
     for size in app.config['IMAGE_SIZE'].values():
-        path = Path(app.config['RESIZED_IMAGES']) / size / f"{name}{ext}"
+        path = Path(app.config['RESIZED_IMAGES']) / size / f'{name}{ext}'
         if not path.is_file() \
                 and not safe_resize_image(name, file_format, size):
             return False  # pragma: no cover
@@ -87,13 +87,13 @@ def create_folder(folder: Path) -> bool:  # pragma: no cover
         return False
 
 
-def delete_orphaned_resized_images() -> None:
+def delete_orphaned_resized() -> None:
     for size in app.config['IMAGE_SIZE'].values():
         path = Path(app.config['RESIZED_IMAGES']) / size
         for file in path.glob('**/*'):
             file_name = file.name.rsplit('.', 1)[0].lower()
             if not file_name.isdigit() or int(file_name) not in g.files:
-                file.unlink()  # pragma: no cover
+                file.unlink()
 
 
 def create_resized_images() -> None:

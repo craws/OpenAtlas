@@ -27,7 +27,7 @@
     <h1 class="mb-1">{{ _('image processing')|uc_first }}</h1>
     <div class="col-auto">{{ 'admin/file'|manual|safe }}</div>
     <div class="col-auto">{{ _('create resized images')|button(url_for('resize_images'))|safe }}</div>
-    <div class="col-auto">{{ _('delete orphaned resized images')|button(url_for('admin_delete_orphaned_resized_images'))|safe }}</div>
+    <div class="col-auto">{{ _('delete orphaned resized images')|button(url_for('delete_orphaned_resized_images'))|safe }}</div>
   </div>
 {% endif %}
 {% if 'manager'|is_authorized %}

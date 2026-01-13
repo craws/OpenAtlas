@@ -5,7 +5,6 @@ from tests.base import TestBaseCase, get_hierarchy, insert
 
 
 class ActorTests(TestBaseCase):
-
     def test_actor(self) -> None:
         c = self.client
         with app.test_request_context():

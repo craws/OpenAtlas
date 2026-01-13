@@ -1,3 +1,5 @@
+import json
+
 from flask import url_for
 
 from openatlas import app
@@ -7,7 +9,6 @@ from tests.base import TestBaseCase, insert
 
 
 class SourceTest(TestBaseCase):
-
     def test_source(self) -> None:
         c = self.client
         with app.test_request_context():
@@ -15,15 +16,17 @@ class SourceTest(TestBaseCase):
             gillian = insert('person', 'Gillian Anderson Gillian Anderson')
             artifact = insert('artifact', 'Artifact with inscription')
 
+        annotation_data = {
+            'annotation_id': 'c27',
+            'comment': 'whatever',
+            'entityId': artifact.id}
         rv = c.post(
             url_for('insert', class_='source'),
             data={
                 'name': 'Necronomicon',
-                'description': (
-                    'The <mark meta="{"annotationId":"c27",'
-                    f'"entityId":{artifact.id},'
-                    '"comment":"asdf"}">Necronomicon</mark>,'
-                    ' also referred to as the Book of the Dead')})
+                'description':
+                    f'The <mark meta="{json.dumps(annotation_data)}">'
+                    'Necronomicon</mark>, the Book of the Dead.'})
         source_id = rv.location.split('/')[-1]
 
         rv = c.get(url_for('insert', class_='source'))
@@ -41,14 +44,14 @@ class SourceTest(TestBaseCase):
         rv = c.get(url_for('update', id_=source_id))
         assert b'Necronomicon' in rv.data
 
+        del annotation_data['entityId']
         rv = c.post(
             url_for('update', id_=source_id),
             data={
                 'name': 'Source updated',
-                'description': (
-                    'The <mark meta="{"annotationId":"c27",'
-                    '"comment":"asdf"}">Necronomicon</mark>,'
-                    ' also referred to as the Book of the Dead'),
+                'description':
+                    f'The <mark meta="{json.dumps(annotation_data)}">'
+                    'Necronomicon</mark>, the Book of the Dead.',
                 'artifact': [artifact.id]},
             follow_redirects=True)
         assert b'Source updated' in rv.data
@@ -109,11 +112,11 @@ class SourceTest(TestBaseCase):
             source.delete_links('P67', ['artifact'])
 
         rv = c.get(url_for('orphans'))
-        assert b'/admin/annotation/text/relink' in rv.data
+        assert b'/annotation/text/relink' in rv.data
 
         rv = c.get(
             url_for(
-                'admin_annotation_text_relink',
+                'annotation_text_relink',
                 origin_id=source.id,
                 entity_id=artifact.id),
             follow_redirects=True)
@@ -127,16 +130,14 @@ class SourceTest(TestBaseCase):
 
         rv = c.get(
             url_for(
-                'admin_annotation_text_remove_entity',
+                'annotation_text_remove_entity',
                 annotation_id=annotation_id,
                 entity_id=artifact.id),
             follow_redirects=True)
         assert b'Entity removed from annotation' in rv.data
 
         rv = c.get(
-            url_for(
-                'admin_annotation_text_delete',
-                id_=source.id),
+            url_for('annotation_text_delete', id_=source.id),
             follow_redirects=True)
         assert b'Annotation deleted' in rv.data
 

@@ -24,8 +24,7 @@ def get_by_id(id_: int) -> list[dict[str, Any]]:
     return [get_geometry_dict(row) for row in list(g.cursor)]
 
 
-def get_by_entity_ids(
-        ids: list[int]) -> defaultdict[int, list[dict[str, Any]]]:
+def get_by_entity_ids(ids: list[int]) -> dict[int, list[dict[str, Any]]]:
     g.cursor.execute(
         """
         SELECT
@@ -73,7 +72,7 @@ def get_geometry_dict(row: dict[str, Any]) -> dict[str, Any]:
     return geometry
 
 
-def get_centroids_by_entities(ids: list[int]) -> defaultdict[int, list[Any]]:
+def get_centroids_by_entities(ids: list[int]) -> dict[int, list[Any]]:
     g.cursor.execute(
         """
         SELECT

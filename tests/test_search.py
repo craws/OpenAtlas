@@ -5,7 +5,6 @@ from tests.base import TestBaseCase, insert
 
 
 class SearchTest(TestBaseCase):
-
     def test_search(self) -> None:
         c = self.client
         with app.test_request_context():
@@ -17,7 +16,7 @@ class SearchTest(TestBaseCase):
             insert('person', 'Waldo without date')
 
         rv = c.post(url_for('search_index'), data={'global-term': ''})
-        assert b'no entries' in rv.data
+        assert b'No entries' in rv.data
 
         rv = c.post(
             url_for('search_index'),

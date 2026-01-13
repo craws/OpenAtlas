@@ -1,17 +1,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Optional, TYPE_CHECKING
-
+from typing import Optional
 
 from flask_babel import gettext as _
 from flask_wtf import FlaskForm
 
 from openatlas.display.table import Table
 from openatlas.display.util2 import uc_first
-
-if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity
 
 
 @dataclass
