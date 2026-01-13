@@ -33,8 +33,8 @@ Orphans
 This function is used to find entities with missing connections. The result
 is shown in the following tabs:
 
-Orphans
-*******
+Entity
+******
 Entities shown here have no relation to other entities. Of course that can be
 part of a valid data set but they could also be artifacts of an import or
 were forgotten to link by mistake.
@@ -44,8 +44,8 @@ Type
 The types listed here have no sub types or associated data.
 They might have been pre-installed or were created and then never used.
 
-Orphaned annotations
-********************
+Annotations
+***********
 Annotations that are linked to an entity, but file and entity themselves are
 not linked are listed here. There are three options to proceed:
 
@@ -53,8 +53,8 @@ not linked are listed here. There are three options to proceed:
 * *Remove entity*: Removes the entity from the annotation
 * *Delete annotation*: Deletes the whole annotation
 
-Orphaned subunits
-*****************
+Subunits
+********
 Subunits without a link to the level above, e.g. a feature
 with no connection to a place.
 
