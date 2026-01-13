@@ -138,28 +138,14 @@ package which uses the
 is shown in the following tabs:</p>
 <section id="id1">
 <h3>Orphans<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
-<p>Entries shown have no relation to other entities. Of course that can be
-part of the normal data set, but should be check if correct. An unlinked
-entity could be artifacts of an import or were not linked by accident.</p>
+<p>Entities shown here have no relation to other entities. Of course that can be
+part of a valid data set but they could also be artifacts of an import or
+were forgotten to link by mistake.</p>
 </section>
 <section id="type">
 <h3>Type<a class="headerlink" href="#type" title="Link to this heading"></a></h3>
-<p>The types listed here were created but have no sub types or associated data.
-They might have been pre-installed before teams have started entering
-information or were created and then never used.</p>
-</section>
-<section id="missing-files">
-<h3>Missing files<a class="headerlink" href="#missing-files" title="Link to this heading"></a></h3>
-<p>File entities without a corresponding file are listed here. This is (most
-likely) caused by the deletion of files from the dataset.</p>
-</section>
-<section id="orphaned-files">
-<h3>Orphaned files<a class="headerlink" href="#orphaned-files" title="Link to this heading"></a></h3>
-<p>Files without a corresponding file entity are listed here.</p>
-</section>
-<section id="orphaned-iiif-files">
-<h3>Orphaned IIIF files<a class="headerlink" href="#orphaned-iiif-files" title="Link to this heading"></a></h3>
-<p>IIIF files without a corresponding entity are listed here.</p>
+<p>The types listed here have no sub types or associated data.
+They might have been pre-installed or were created and then never used.</p>
 </section>
 <section id="orphaned-annotations">
 <h3>Orphaned annotations<a class="headerlink" href="#orphaned-annotations" title="Link to this heading"></a></h3>
@@ -261,6 +247,8 @@ Further information about file entities can be found in the manual under
 <li><p><strong>Duplicated files</strong>: Lists all files that share the same SHA value.
 In such cases, the files themselves are duplicates, but their metadata
 entries differ.</p></li>
+<li><p><strong>Orphaned files</strong>: Files without a corresponding file entity</p></li>
+<li><p><strong>Orphaned IIIF files</strong>: IIIF files without a corresponding entity</p></li>
 </ul>
 </section>
 </section>

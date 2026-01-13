@@ -35,28 +35,14 @@ is shown in the following tabs:
 
 Orphans
 *******
-Entries shown have no relation to other entities. Of course that can be
-part of the normal data set, but should be check if correct. An unlinked
-entity could be artifacts of an import or were not linked by accident.
+Entities shown here have no relation to other entities. Of course that can be
+part of a valid data set but they could also be artifacts of an import or
+were forgotten to link by mistake.
 
 Type
 ****
-The types listed here were created but have no sub types or associated data.
-They might have been pre-installed before teams have started entering
-information or were created and then never used.
-
-Missing files
-*************
-File entities without a corresponding file are listed here. This is (most
-likely) caused by the deletion of files from the dataset.
-
-Orphaned files
-**************
-Files without a corresponding file entity are listed here.
-
-Orphaned IIIF files
-*******************
-IIIF files without a corresponding entity are listed here.
+The types listed here have no sub types or associated data.
+They might have been pre-installed or were created and then never used.
 
 Orphaned annotations
 ********************
@@ -154,3 +140,5 @@ File integrity
 * **Duplicated files**: Lists all files that share the same SHA value.
   In such cases, the files themselves are duplicates, but their metadata
   entries differ.
+* **Orphaned files**: Files without a corresponding file entity
+* **Orphaned IIIF files**: IIIF files without a corresponding entity
