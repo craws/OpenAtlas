@@ -207,13 +207,6 @@ def check_dates() -> str:
 @app.route('/orphans')
 @required_group('contributor')
 def orphans() -> str:
-    columns = [
-        'name',
-        'class',
-        'type',
-        'created',
-        'updated',
-        'description']
     tabs = {
         'orphans': Tab(
             'orphans',
@@ -227,10 +220,6 @@ def orphans() -> str:
                 ['name', 'root'],
                 [[link(type_), link(g.types[type_.root[0]])]
                  for type_ in checks.type_orphans()])),
-        'missing_files': Tab(
-            'missing_files',
-            _('missing files'),
-            table=Table(columns)),
         'orphaned_files': Tab(
             'orphaned_files',
             _('orphaned files'),
@@ -268,15 +257,6 @@ def orphans() -> str:
     entity_file_ids = []
     for entity in Entity.get_by_class('file', types=True):
         entity_file_ids.append(entity.id)
-        if not get_file_path(entity.id):
-            tabs['missing_files'].table.rows.append([
-                link(entity),
-                link(entity.class_),
-                link(entity.standard_type),
-                entity.class_.label,
-                format_date(entity.created),
-                format_date(entity.modified),
-                entity.description])
 
     tabs['orphaned_files'].table.rows = \
         get_files_without_entity(entity_file_ids)
