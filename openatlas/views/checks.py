@@ -208,46 +208,39 @@ def check_dates() -> str:
 @required_group('contributor')
 def orphans() -> str:
     tabs = {
-        'orphans': Tab(
-            'orphans',
-            _('orphans'),
+        'entities': Tab(
+            'entities',
+            _('entities'),
             table=entity_table(
                 checks.orphans(),
                 columns=['name', 'class', 'type', 'description'])),
         'types': Tab(
-            'type',
+            'types',
+            _('types'),
             table=Table(
                 ['name', 'root'],
                 [[link(type_), link(g.types[type_.root[0]])]
                  for type_ in checks.type_orphans()])),
-        'orphaned_files': Tab(
-            'orphaned_files',
-            _('orphaned files'),
-            table=Table(['name', 'size', 'date', 'ext'])),
-        'orphaned_iiif_files': Tab(
-            'orphaned_iiif_files',
-            _('orphaned iiif files'),
-            table=Table(['name', 'size', 'date', 'ext'])),
-        'orphaned_image_annotations': Tab(
-            'orphaned_image_annotations',
-            _('orphaned image annotations'),
+        'image_annotations': Tab(
+            'image_annotations',
+            _('image annotations'),
             table=Table(
                 ['image', 'entity', 'annotation', 'creation'],
                 get_orphaned_image_annotations())),
-        'orphaned_text_annotations': Tab(
-            'orphaned_text_annotations',
-            _('orphaned text annotations'),
+        'text_annotations': Tab(
+            'text_annotations',
+            _('text annotations'),
             table=Table(
                 ['image', 'entity', 'annotation', 'creation'],
                 get_orphaned_text_annotations())),
-        'orphaned_subunits': Tab(
-            'orphaned_subunits',
-            _('orphaned subunits'),
+        'subunits': Tab(
+            'subunits',
+            _('subunits'),
             table=Table(
                 ['id', 'name', 'class', 'created', 'modified', 'description'],
                 [[
                     e.id,
-                    e.name,
+                    link(e),
                     e.class_.label,
                     format_date(e.created),
                     format_date(e.modified),
@@ -257,25 +250,9 @@ def orphans() -> str:
     entity_file_ids = []
     for entity in Entity.get_by_class('file', types=True):
         entity_file_ids.append(entity.id)
-
-    tabs['orphaned_files'].table.rows = \
-        get_files_without_entity(entity_file_ids)
-
-    if check_iiif_activation():
-        tabs['orphaned_iiif_files'].table.rows = \
-            get_iiif_files_without_entity(entity_file_ids)
-
     for tab in tabs.values():
         if not tab.table.rows:
             tab.content = _('Congratulations, everything looks fine!')
-
-    if tabs['orphaned_files'].table.rows and is_authorized('admin'):
-        text = _('delete all files without corresponding entities?')
-        tabs['orphaned_files'].buttons.append(
-            button(
-                _('delete all files'),
-                url_for('file_delete', name='all'),
-                onclick=f"return confirm('{text}')"))
     return render_template(
         'tabs.html',
         tabs=tabs,
@@ -331,7 +308,21 @@ def check_files(arche: Optional[str] = None) -> str:
         'duplicates': Tab(
             'duplicates',
             _('duplicated files'),
-            table=Table(['domain', 'range']))}
+            table=Table(['domain', 'range'])),
+        'orphaned_files': Tab(
+            'orphaned_files',
+            _('orphaned files'),
+            table=Table(['name', 'size', 'date', 'ext'])),
+        'orphaned_iiif_files': Tab(
+            'orphaned_iiif_files',
+            _('orphaned iiif files'),
+            table=Table(['name', 'size', 'date', 'ext']))}
+    entity_ids = [entity.id for entity in entities]
+    tabs['orphaned_files'].table.rows = \
+        get_files_without_entity(entity_ids)
+    if check_iiif_activation():
+        tabs['orphaned_iiif_files'].table.rows = \
+            get_iiif_files_without_entity(entity_ids)
     for tab in tabs.values():
         tab.buttons = [manual('admin/data_integrity_checks')]
     if arche:
@@ -342,11 +333,16 @@ def check_files(arche: Optional[str] = None) -> str:
     duplicate_ids = set().union(*duplicates)
     mapping = {e.id: e for e in Entity.get_by_ids(list(duplicate_ids))}
     for values in duplicates:
-        if entity1 := mapping.get(values[0]):
-            if entity2 := mapping.get(values[1]):
-                tabs['duplicates'].table.rows.append([
-                    link(entity1),
-                    link(entity2)])
+        if e1 := mapping.get(values[0]):
+            if e2 := mapping.get(values[1]):
+                tabs['duplicates'].table.rows.append([link(e1), link(e2)])
+    if tabs['orphaned_files'].table.rows and is_authorized('admin'):
+        text = _('delete all files without corresponding entities?')
+        tabs['orphaned_files'].buttons.append(
+            button(
+                _('delete all files'),
+                url_for('file_delete', name='all'),
+                onclick=f"return confirm('{text}')"))
     return render_template(
         'tabs.html',
         tabs=tabs,

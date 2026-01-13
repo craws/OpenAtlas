@@ -170,7 +170,7 @@ def file_delete(name: str) -> Response:
         except Exception as e:
             g.logger.log('error', 'file', f'deletion of {name} failed', e)
             flash(_('error file delete'), 'error')
-        return redirect(f'{url_for('orphans')}#tab-orphaned-files')
+        return redirect(f'{url_for('check_files')}#tab-orphaned-files')
 
     # Delete all files with no corresponding entity
     if is_authorized('admin'):  # pragma: no cover - don't test, ever
@@ -179,7 +179,7 @@ def file_delete(name: str) -> Response:
             if f.name != '.gitignore' and int(f.stem) not in entity_file_ids:
                 (app.config['UPLOAD_PATH'] / f.name).unlink()
     return redirect(
-        f'{url_for('orphans')}#tab-orphaned-files')  # pragma: no cover
+        f'{url_for('check_files')}#tab-orphaned-files')  # pragma: no cover
 
 
 @app.route('/file/iiif/delete/<filename>')
@@ -191,4 +191,4 @@ def file_iiif_delete(filename: str) -> Response:
     except Exception as e:
         g.logger.log('error', 'file', f'deletion of IIIF {filename} failed', e)
         flash(_('error file delete'), 'error')
-    return redirect(f"{url_for('orphans')}#tab-orphaned-iiif-files")
+    return redirect(f"{url_for('check_files')}#tab-orphaned-iiif-files")
