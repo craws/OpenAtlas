@@ -7,18 +7,17 @@ from openatlas import app
 from openatlas.api.resources.error import (
     AccessDeniedError, DisplayFileNotFoundError, EntityDoesNotExistError,
     EntityNotAFileError, EntityNotAnEventError, FileIdNotInteger,
-    IIIFMetadataNotFound,
-    InvalidCidocClassCodeError,
-    InvalidLimitError, InvalidSearchCategoryError, InvalidSearchSyntax,
-    InvalidSearchValueError, InvalidSystemClassError, InvalidViewClassError,
-    LastEntityError, LogicalOperatorError, NoLicenseError, NoSearchStringError,
-    NotAPlaceError, NotATypeError, NotPublicError, OperatorError,
-    OperatorNotSupported, QueryEmptyError, UrlNotValid, ValueNotIntegerError)
+    IIIFMetadataNotFound, InvalidCidocClassCodeError, InvalidLimitError,
+    InvalidSearchCategoryError, InvalidSearchSyntax, InvalidSearchValueError,
+    InvalidSystemClassError, InvalidViewClassError, LastEntityError,
+    LogicalOperatorError, NoLicenseError, NoSearchStringError, NotAPlaceError,
+    NotATypeError, NotPublicError, OperatorError, OperatorNotSupported,
+    QueryEmptyError, UrlNotValid, ValueNotIntegerError)
 
 
 @app.errorhandler(400)
 def bad_request(e: Exception) -> tuple[str, int]:
-    return render_template(  # pragma: no cover
+    return render_template(
         'error/400.html',
         crumbs=['400 - Bad Request'],
         e=e), 400

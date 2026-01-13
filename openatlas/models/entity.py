@@ -13,7 +13,7 @@ from openatlas.database.connect import Transaction
 from openatlas.display.util2 import convert_size, sanitize
 from openatlas.models.annotation import AnnotationText
 from openatlas.models.dates import Dates
-from openatlas.models.gis import Gis
+from openatlas.models.gis import delete_gis_by_entity, insert_gis
 
 
 class Entity:
@@ -156,8 +156,8 @@ class Entity:
                 range_error = False
             if domain_error or range_error:  # pragma: no cover
                 text = \
-                    f"invalid CIDOC link {domain.class_.cidoc_class.code}" \
-                    f" > {code} > {range_.class_.cidoc_class.code}"
+                    f'invalid CIDOC link {domain.class_.cidoc_class.code}' \
+                    f' > {code} > {range_.class_.cidoc_class.code}'
                 g.logger.log('error', 'model', text)
                 abort(400, text)
             data = {
@@ -294,10 +294,10 @@ class Entity:
             location = self.get_linked_entity_safe('P53')
             db.update({
                 'id': location.id,
-                'name': f"Location of {sanitize(self.name)}"})
-            Gis.delete_by_entity(location)
+                'name': f'Location of {sanitize(self.name)}'})
+            delete_gis_by_entity(location)
         if gis_data:
-            Gis.insert(location, gis_data)
+            insert_gis(location, gis_data)
 
     def get_profile_image_id(self) -> Optional[int]:
         if self.class_.name == 'file':
@@ -316,7 +316,7 @@ class Entity:
         """Returns name part of a directed type e.g. parent of (child of)"""
         name_parts = self.name.split(' (')
         if inverse and len(name_parts) > 1:  # Remove closing bracket
-            return sanitize(name_parts[1][:-1])  # pragma: no cover
+            return sanitize(name_parts[1][:-1])
         return name_parts[0]
 
     def check_too_many_single_type_links(self) -> Entity | None:

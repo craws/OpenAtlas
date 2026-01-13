@@ -20,7 +20,7 @@ from openatlas.display.util2 import is_authorized, manual, sanitize
 from openatlas.forms.entity_form import get_entity_form, process_form
 from openatlas.forms.util import deletion_possible
 from openatlas.models.entity import Entity
-from openatlas.models.gis import Gis, InvalidGeomException
+from openatlas.models.gis import InvalidGeomException, get_gis_all
 from openatlas.models.openatlas_class import Relation
 from openatlas.models.overlay import Overlay
 
@@ -35,8 +35,8 @@ def view(id_: int) -> str | Response:
     match entity.class_.group.get('name'):
         case 'type' if not entity.root:
             return redirect(
-                f"{url_for('index', group='type')}"
-                f"#menu-tab-{entity.category}_collapse-{id_}")
+                url_for('index', group='type') +
+                f'#menu-tab-{entity.category}_collapse-{id_}')
         case 'reference_system':
             entity.class_.relations = {}
             for name in entity.classes:
@@ -67,12 +67,8 @@ def reference_system_remove_class(system_id: int, name: str) -> Response:
     system = g.reference_systems[system_id]
     if system.get_links('P67', [name]):
         abort(403)  # Abort because there are linked entities
-    try:
-        system.remove_reference_system_class(name)
-        flash(_('info update'))
-    except Exception as e:  # pragma: no cover
-        g.logger.log('error', 'database', 'remove class failed', e)
-        flash(_('error database'), 'error')
+    system.remove_reference_system_class(name)
+    flash(_('info update'))
     return redirect(url_for('view', id_=system_id))
 
 
@@ -95,7 +91,7 @@ def insert(
     gis_data = None
     if entity.class_.attributes.get('location'):
         structure = origin.get_structure_for_insert() if origin else None
-        gis_data = Gis.get_all(structure=structure)
+        gis_data = get_gis_all(structure=structure)
     return render_template(
         'entity/insert.html',
         form=form,
@@ -147,7 +143,7 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
     if entity.class_.attributes.get('location'):
         entity.location = entity.location \
             or entity.get_linked_entity_safe('P53')
-        gis_data = Gis.get_all([entity], entity.get_structure())
+        gis_data = get_gis_all([entity], entity.get_structure())
     return render_template(
         'entity/update.html',
         form=form,
@@ -254,7 +250,7 @@ def redirect_url_insert(
                 selection_id=entity.id)
         elif not hasattr(form, 'continue_') or form.continue_.data != 'yes':
             url = url_for('view', id_=origin.id) \
-                + f"#tab-{relation_name.replace('_', '-')}"
+                + f'#tab-{relation_name.replace('_', '-')}'
     if hasattr(form, 'continue_') \
             and form.continue_.data in ['sub', 'human_remains']:
         class_ = form.continue_.data
@@ -287,11 +283,11 @@ def redirect_url_delete(entity: Entity) -> str:
                 g.class_groups['artifact']['classes'],
                 True):
             url = \
-                f"{url_for('view', id_=parent.id)}" \
-                f"#tab-{entity.class_.name.replace('_', '-')}"
+                url_for('view', id_=parent.id) + \
+                f'#tab-{entity.class_.name.replace('_', '-')}'
     elif entity.class_.name == 'source_translation':
         source = entity.get_linked_entity_safe('P73', inverse=True)
-        url = f"{url_for('view', id_=source.id)}#tab-text"
+        url = f'{url_for('view', id_=source.id)}#tab-text'
     return url
 
 
@@ -371,7 +367,7 @@ def index(group: str) -> str | Response:
         class_=group,
         table=entity_table(entities),
         buttons=buttons,
-        gis_data=Gis.get_all() if group == 'place' else None,
+        gis_data=get_gis_all() if group == 'place' else None,
         title=_(group.replace('_', ' ')),
         crumbs=[_(group).replace('_', ' ')])
 

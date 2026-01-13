@@ -8,11 +8,10 @@ from openatlas.display.util import link
 
 
 def fetch_gnd(id_: str) -> dict[str, Any]:
-    url = f'{g.gnd.resolver_url}{id_}.json'
     info: dict[str, str] = {}
     try:
         data = requests.get(
-            url,
+            f'{g.gnd.resolver_url}{id_}.json',
             proxies=app.config['PROXIES'],
             timeout=10).json()
     except Exception:  # pragma: no cover

@@ -40,14 +40,13 @@ class ArcheFileMetadata:
             publications: list[tuple[Entity, str]],
             license_: str) -> 'ArcheFileMetadata':
         metadata = app.config['ARCHE_METADATA']
-        part_of = "https://id.acdh.oeaw.ac.at/" \
-                  f"{metadata['topCollection'].replace(' ', '_')}"
-        titles = [(entity.name, 'und')]
+        part_of = 'https://id.acdh.oeaw.ac.at/' \
+            f'{metadata['topCollection'].replace(' ', '_')}'
         file_info = (g.files[entity.id].suffix[1:], g.files[entity.id].name)
         obj = cls(
-            uri=f"{part_of}/{type_name.replace(' ', '_')}/"
-                f"{file_info[0]}/{file_info[1]}",
-            titles=titles)
+            uri=f'{part_of}/{type_name.replace(' ', '_')}/'
+                f'{file_info[0]}/{file_info[1]}',
+            titles=[(entity.name, 'und')])
         obj.depositors = metadata['depositor']
         obj.language = metadata['language']
         obj.license = license_

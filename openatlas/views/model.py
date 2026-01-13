@@ -127,7 +127,7 @@ def openatlas_class_index() -> str:
         title=_('model'),
         crumbs=[
             [_('model'), url_for('model_index')],
-            f"OpenAtlas {_('classes')}"])
+            f'OpenAtlas {_('classes')}'])
 
 
 @app.route('/overview/model/cidoc_class_index')

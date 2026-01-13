@@ -4,7 +4,6 @@ from tests.base import TestBaseCase
 
 
 class MailTests(TestBaseCase):
-
     def test_mail(self) -> None:
         c = self.client
         rv = c.post(

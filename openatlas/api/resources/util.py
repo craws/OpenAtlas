@@ -5,7 +5,7 @@ from flask import g, json, url_for
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.display.util import check_iiif_activation, check_iiif_file_exist
 from openatlas.models.entity import Entity, Link
-from openatlas.models.gis import Gis
+from openatlas.models.gis import get_gis_all
 
 
 def get_license_name(entity: Entity) -> Optional[str]:
@@ -138,7 +138,7 @@ def get_reference_systems(links_inverse: list[Link]) -> list[dict[str, Any]]:
                 'id': link_.description,
                 'resolverURL': system.resolver_url,
                 'identifier':
-                    f"{system.resolver_url or ''}{link_.description}",
+                    f'{system.resolver_url or ''}{link_.description}',
                 'type': to_camel_case(g.types[link_.type.id].name),
                 'referenceSystem': system.name})
     return ref
@@ -155,7 +155,7 @@ def get_iiif_manifest_and_path(img_id: int) -> dict[str, str]:
             _external=True)
         if g.files.get(img_id):
             iiif_base_path = \
-                f"{g.settings['iiif_url']}{img_id}{g.files[img_id].suffix}"
+                f'{g.settings['iiif_url']}{img_id}{g.files[img_id].suffix}'
     return {'IIIFManifest': iiif_manifest, 'IIIFBasePath': iiif_base_path}
 
 
@@ -200,10 +200,10 @@ def generate_feature(geom: dict[str, Any]) -> dict[str, Any]:
 
 def get_geometries(parser: dict[str, Any]) -> list[dict[str, Any]]:
     choices = [
-        'gisPointAll', 'gisPointSupers', 'gisPointSubs',
-        'gisPointSibling', 'gisLineAll', 'gisPolygonAll']
-    all_geoms = Gis.get_all()
+        'gisPointAll', 'gisPointSupers', 'gisPointSubs', 'gisPointSibling',
+        'gisLineAll', 'gisPolygonAll']
     out = []
+    all_geoms = get_gis_all()
     for item in choices \
             if 'gisAll' in parser['geometry'] else parser['geometry']:
         for geom in json.loads(all_geoms[item]):
@@ -216,10 +216,10 @@ def date_to_str(date: Any) -> Optional[str]:
 
 
 def get_crm_relation(link_: Link, inverse: bool = False) -> str:
-    property_ = f"i {link_.property.i18n_inverse['en']}" \
-        if inverse and link_.property.i18n_inverse['en'] \
-        else f" {link_.property.i18n['en']}"
-    return f"crm:{link_.property.code}{property_}"
+    property_ = f' {link_.property.i18n['en']}'
+    if inverse and link_.property.i18n_inverse['en']:
+        property_ = f'i {link_.property.i18n_inverse['en']}'
+    return f'crm:{link_.property.code}{property_}'
 
 
 def get_crm_relation_label_x(link_: Link, inverse: bool = False) -> str:
@@ -229,10 +229,10 @@ def get_crm_relation_label_x(link_: Link, inverse: bool = False) -> str:
 
 
 def get_crm_relation_x(link_: Link, inverse: bool = False) -> str:
-    property_ = f"_{link_.property.i18n['en']}"
+    property_ = f'_{link_.property.i18n['en']}'
     if inverse and link_.property.i18n_inverse['en']:
-        property_ = f"i_{link_.property.i18n_inverse['en']}"
-    return f"crm:{link_.property.code}{property_.replace(' ', '_')}"
+        property_ = f'i_{link_.property.i18n_inverse['en']}'
+    return f'crm:{link_.property.code}{property_.replace(' ', '_')}'
 
 
 def get_crm_code(link_: Link, inverse: bool = False) -> str:
@@ -242,7 +242,7 @@ def get_crm_code(link_: Link, inverse: bool = False) -> str:
     code = link_.range.cidoc_class.code
     if inverse:
         code = link_.domain.cidoc_class.code
-    return f"crm:{code} {name}"
+    return f'crm:{code} {name}'
 
 
 def flatten_list_and_remove_duplicates(list_: list[Any]) -> list[Any]:

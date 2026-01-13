@@ -9,7 +9,6 @@ from tests.base import TestBaseCase, get_hierarchy, insert
 
 
 class FileTest(TestBaseCase):
-
     def test_file(self) -> None:
         c = self.client
         with app.test_request_context():
@@ -98,14 +97,17 @@ class FileTest(TestBaseCase):
         with c.get(url_for('display_custom_logo', ext=".png")):
             pass
 
-        with c.get(url_for('download', filename=filename)):
+        with c.get(url_for('download', name=filename)):
             pass
 
-        rv = c.get(url_for('logo'), data={'file': iiif_id})
+        rv = c.get(url_for('logo'))
         assert b'OpenAtlas logo' in rv.data
 
         rv = c.get(url_for('logo', id_=iiif_id), follow_redirects=True)
-        assert b'remove custom logo' in rv.data
+        assert b'Remove custom logo' in rv.data
+
+        rv = c.get(url_for('logo', id_=iiif_id), follow_redirects=True)
+        assert b'418' in rv.data
 
         rv = c.get(
             url_for('logo_remove', action='remove_logo'),
@@ -154,7 +156,7 @@ class FileTest(TestBaseCase):
         assert b'Updated file' in rv.data
 
         rv = c.get(url_for('view', id_=iiif_id))
-        assert b'enable IIIF view' in rv.data
+        assert b'Enable IIIF view' in rv.data
 
         rv = c.get(
             url_for('make_iiif_available', id_=iiif_id),
@@ -165,7 +167,7 @@ class FileTest(TestBaseCase):
         assert b'View in IIIF' in rv.data
 
         rv = c.get(url_for('view', id_=place.id))
-        assert b'view all IIIF images' in rv.data
+        assert b'View all IIIF images' in rv.data
 
         with app.test_request_context():
             app.preprocess_request()
@@ -231,8 +233,7 @@ class FileTest(TestBaseCase):
             data={
                 'coordinate': '1.6,1.6,1.4,9.6,8.6,9.6,8.6,1.6',
                 'text': '<h1>Test Annotation</h1>',
-                'entity': place.id
-                },
+                'entity': place.id},
             follow_redirects=True)
         assert b'<h1>Test Annotation</h1>' not in rv.data
         assert b'Test Annotation' in rv.data
@@ -283,7 +284,7 @@ class FileTest(TestBaseCase):
 
         rv = c.get(
             url_for(
-                'admin_annotation_image_relink',
+                'annotation_image_relink',
                 origin_id=iiif_id,
                 entity_id=place.id),
             follow_redirects=True)
@@ -295,7 +296,7 @@ class FileTest(TestBaseCase):
 
         rv = c.get(
             url_for(
-                'admin_annotation_image_remove_entity',
+                'annotation_image_remove_entity',
                 annotation_id=1,
                 entity_id=place.id),
             follow_redirects=True)
@@ -324,7 +325,7 @@ class FileTest(TestBaseCase):
             iiif_file.delete_links('P67', classes=['file', 'place'])
 
         rv = c.get(
-            url_for('admin_annotation_image_delete', id_=2),
+            url_for('annotation_image_delete', id_=2, origin='orphan'),
             follow_redirects=True)
         assert b'Annotation deleted' in rv.data
 

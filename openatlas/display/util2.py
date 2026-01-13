@@ -28,10 +28,10 @@ def sanitize(
 
 def convert_size(size_bytes: int) -> str:
     if size_bytes <= 0:
-        return "0 B"  # pragma: no cover
-    size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+        return '0 B'
+    size_name = ('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB')
     i = int(math.floor(math.log(size_bytes, 1024)))
-    return f"{int(size_bytes / math.pow(1024, i))} {size_name[i]}"
+    return f'{int(size_bytes / math.pow(1024, i))} {size_name[i]}'
 
 
 def display_bool(value: bool, show_false: bool = True) -> str:
@@ -78,8 +78,10 @@ def manual(site: str) -> str:
     if not path.exists():
         # print(f'Missing manual link: {path}')
         return ''
-    return \
-        '<a title="' + uc_first(_('manual')) + '" ' \
-        f'href="/static/manual/{site}.html" class="manual" ' \
-        f'target="_blank" rel="noopener noreferrer">' \
-        f'<i class="fas fs-4 fa-book"></i></a>'
+    return f"""
+        <a title="{uc_first(_('manual'))}"
+            href="/static/manual/{site}.html" class="manual"
+            target="_blank"
+            rel="noopener noreferrer">
+          <i class="fas fs-4 fa-book"></i>
+        </a>"""

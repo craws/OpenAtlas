@@ -22,9 +22,9 @@
   <div class="col-auto">
     <span
       id="{{ field.id }}-button"
-      class="{{ config.CSS.button.secondary }} uc-first"
+      class="{{ config.CSS.button.secondary }}"
       onclick="$('#{{ field.id }}-modal').modal('show')"
-      tabindex="0">{{ _('change') }}
+      tabindex="0">{{ _('change')|uc_first }}
     </span>
   </div>
 </div>

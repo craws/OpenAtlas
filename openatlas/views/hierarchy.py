@@ -33,7 +33,7 @@ def hierarchy_insert(category: str) -> str | Response:
             g.logger.log_user(hierarchy.id, 'insert')
             flash(_('entity created'))
             return redirect(
-                f"{url_for('index', group='type')}#menu-tab-{category}")
+                f'{url_for('index', group='type')}#menu-tab-{category}')
     return render_template(
         'content.html',
         content=display_form(form, manual_page='entity/type'),
@@ -73,8 +73,8 @@ def hierarchy_update(id_: int) -> str | Response:
             g.logger.log_user(hierarchy.id, 'update')
             flash(_('info update'))
             return redirect(
-                f"{url_for('index', group='type')}"
-                f"#menu-tab-{g.types[id_].category}_collapse-{hierarchy.id}")
+                url_for('index', group='type') +
+                f'#menu-tab-{g.types[id_].category}_collapse-{hierarchy.id}')
     if hasattr(form, 'multiple') and has_multiple_links and hierarchy.multiple:
         form.multiple.render_kw = {'disabled': 'disabled'}
     table = Table(['class', 'count'], paging=False)
@@ -106,12 +106,8 @@ def hierarchy_update(id_: int) -> str | Response:
 def remove_class(id_: int, name: str) -> Response:
     if g.types[id_].get_count_by_class(name):
         abort(403)
-    try:
-        g.types[id_].remove_class(name)
-        flash(_('info update'))
-    except Exception as e:  # pragma: no cover
-        g.logger.log('error', 'database', 'remove hierarchy class failed', e)
-        flash(_('error database'), 'error')
+    g.types[id_].remove_class(name)
+    flash(_('info update'))
     return redirect(url_for('hierarchy_update', id_=id_))
 
 
@@ -126,7 +122,7 @@ def hierarchy_delete(id_: int) -> Response:
     type_.delete()
     flash(_('entity deleted'))
     return redirect(
-        f"{url_for('index', group='type')}#menu-tab-{type_.category}")
+        f'{url_for('index', group='type')}#menu-tab-{type_.category}')
 
 
 @app.route('/hierarchy/required_risk/<int:id_>')

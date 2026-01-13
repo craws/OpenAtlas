@@ -96,7 +96,7 @@ def overview() -> str:
                 'feature', 'stratigraphic_unit', 'source_translation']:
             url = url_for('index', group=g.classes[name].group['name'])
         if name == 'administrative_unit':
-            url = f"{url_for('index', group='type')}#menu-tab-place"
+            url = f'{url_for('index', group='type')}#menu-tab-place'
         tables['overview'].rows.append([
             link(g.classes[name].label, url) if url else g.classes[name].label,
             format_number(count)])
@@ -145,7 +145,7 @@ def index_feedback() -> str | Response:
             f'{request.headers["Host"]}\n\n' \
             f'{form.description.data}'
         if send_mail(
-                form.subject.data + f" from {g.settings['site_name']}",
+                f'{form.subject.data} from {g.settings['site_name']}',
                 body,
                 g.settings['mail_recipients_feedback']):
             flash(_('info feedback thanks'))

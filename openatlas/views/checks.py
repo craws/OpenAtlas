@@ -12,12 +12,13 @@ from werkzeug.utils import redirect
 
 from openatlas import app
 from openatlas.api.resources.util import filter_by_type
-from openatlas.display.image_processing import delete_orphaned_resized_images
+from openatlas.display.image_processing import delete_orphaned_resized
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table, entity_table
 from openatlas.display.util import (
     button, check_iiif_activation, get_file_path, link, required_group)
-from openatlas.display.util2 import convert_size, is_authorized, manual
+from openatlas.display.util2 import (
+    convert_size, is_authorized, manual, uc_first)
 from openatlas.forms.display import display_form
 from openatlas.forms.setting import SimilarForm
 from openatlas.models import checks
@@ -95,7 +96,7 @@ def check_links() -> str:
         tabs=tabs,
         title=_('admin'),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            [_('admin'), f'{url_for('admin_index')}#tab-data'],
             _('check links')])
 
 
@@ -111,7 +112,7 @@ def delete_single_type_duplicate(entity_id: int, type_id: int) -> Response:
 @required_group('contributor')
 def delete_link_duplicates() -> Response:
     count = checks.delete_link_duplicates()
-    g.logger.log('info', 'admin', f"Deleted duplicate links: {count}")
+    g.logger.log('info', 'admin', f'Deleted duplicate links: {count}')
     flash(f"{_('deleted links')}: {count}")
     return redirect(url_for('check_links') + '#tab-duplicates')
 
@@ -130,17 +131,17 @@ def check_similar() -> str:
                 form.ratio.data if form.ratio.data else 100).values():
             similar = [link(entity) for entity in item['entities']]
             table.rows.append([
-                f"{link(item['entity'])}<br>{'<br>'.join(similar)}",
+                f'{link(item['entity'])}<br>{'<br>'.join(similar)}',
                 len(item['entities']) + 1])
     content = display_form(form, manual_page='admin/data_integrity_checks')
-    if not table.rows:  # pragma: no cover
-        content += f'<p class="uc-first">{_('no entries')}</p>'
+    if not table.rows:
+        content += f'<p>{uc_first(_('no entries'))}</p>'
     return render_template(
         'tabs.html',
         tabs={'similar': Tab('similar', content=content, table=table)},
         title=_('admin'),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            [_('admin'), f'{url_for('admin_index')}#tab-data'],
             _('check similar names')])
 
 
@@ -199,65 +200,47 @@ def check_dates() -> str:
         tabs=tabs,
         title=_('admin'),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            [_('admin'), f'{url_for('admin_index')}#tab-data'],
             _('check dates')])
 
 
 @app.route('/orphans')
 @required_group('contributor')
 def orphans() -> str:
-    columns = [
-        'name',
-        'class',
-        'type',
-        'created',
-        'updated',
-        'description']
     tabs = {
-        'orphans': Tab(
-            'orphans',
-            _('orphans'),
+        'entities': Tab(
+            'entities',
+            _('entities'),
             table=entity_table(
                 checks.orphans(),
                 columns=['name', 'class', 'type', 'description'])),
         'types': Tab(
-            'type',
+            'types',
+            _('types'),
             table=Table(
                 ['name', 'root'],
                 [[link(type_), link(g.types[type_.root[0]])]
                  for type_ in checks.type_orphans()])),
-        'missing_files': Tab(
-            'missing_files',
-            _('missing files'),
-            table=Table(columns)),
-        'orphaned_files': Tab(
-            'orphaned_files',
-            _('orphaned files'),
-            table=Table(['name', 'size', 'date', 'ext'])),
-        'orphaned_iiif_files': Tab(
-            'orphaned_iiif_files',
-            _('orphaned iiif files'),
-            table=Table(['name', 'size', 'date', 'ext'])),
-        'orphaned_image_annotations': Tab(
-            'orphaned_image_annotations',
-            _('orphaned image annotations'),
+        'image_annotations': Tab(
+            'image_annotations',
+            _('image annotations'),
             table=Table(
                 ['image', 'entity', 'annotation', 'creation'],
                 get_orphaned_image_annotations())),
-        'orphaned_text_annotations': Tab(
-            'orphaned_text_annotations',
-            _('orphaned text annotations'),
+        'text_annotations': Tab(
+            'text_annotations',
+            _('text annotations'),
             table=Table(
                 ['image', 'entity', 'annotation', 'creation'],
                 get_orphaned_text_annotations())),
-        'orphaned_subunits': Tab(
-            'orphaned_subunits',
-            _('orphaned subunits'),
+        'subunits': Tab(
+            'subunits',
+            _('subunits'),
             table=Table(
                 ['id', 'name', 'class', 'created', 'modified', 'description'],
                 [[
                     e.id,
-                    e.name,
+                    link(e),
                     e.class_.label,
                     format_date(e.created),
                     format_date(e.modified),
@@ -267,40 +250,15 @@ def orphans() -> str:
     entity_file_ids = []
     for entity in Entity.get_by_class('file', types=True):
         entity_file_ids.append(entity.id)
-        if not get_file_path(entity):
-            tabs['missing_files'].table.rows.append([
-                link(entity),
-                link(entity.class_),
-                link(entity.standard_type),
-                entity.class_.label,
-                format_date(entity.created),
-                format_date(entity.modified),
-                entity.description])
-
-    tabs['orphaned_files'].table.rows = \
-        get_files_without_entity(entity_file_ids)
-
-    if check_iiif_activation():
-        tabs['orphaned_iiif_files'].table.rows = \
-            get_iiif_files_without_entity(entity_file_ids)
-
     for tab in tabs.values():
         if not tab.table.rows:
             tab.content = _('Congratulations, everything looks fine!')
-
-    if tabs['orphaned_files'].table.rows and is_authorized('admin'):
-        text = _('delete all files without corresponding entities?')
-        tabs['orphaned_files'].buttons.append(
-            button(
-                _('delete all files'),
-                url_for('admin_file_delete', filename='all'),
-                onclick=f"return confirm('{text}')"))
     return render_template(
         'tabs.html',
         tabs=tabs,
         title=_('admin'),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            [_('admin'), f'{url_for('admin_index')}#tab-data'],
             _('orphans')])
 
 
@@ -316,7 +274,7 @@ def check_files(arche: Optional[str] = None) -> str:
         'no_license_holder': [],
         'no_license': []}
     for entity in entities:
-        if not get_file_path(entity):
+        if not get_file_path(entity.id):
             result['missing_files'].append(entity)
         if not entity.public:
             result['not_public'].append(entity)
@@ -350,7 +308,21 @@ def check_files(arche: Optional[str] = None) -> str:
         'duplicates': Tab(
             'duplicates',
             _('duplicated files'),
-            table=Table(['domain', 'range']))}
+            table=Table(['domain', 'range'])),
+        'orphaned_files': Tab(
+            'orphaned_files',
+            _('orphaned files'),
+            table=Table(['name', 'size', 'date', 'ext'])),
+        'orphaned_iiif_files': Tab(
+            'orphaned_iiif_files',
+            _('orphaned iiif files'),
+            table=Table(['name', 'size', 'date', 'ext']))}
+    entity_ids = [entity.id for entity in entities]
+    tabs['orphaned_files'].table.rows = \
+        get_files_without_entity(entity_ids)
+    if check_iiif_activation():
+        tabs['orphaned_iiif_files'].table.rows = \
+            get_iiif_files_without_entity(entity_ids)
     for tab in tabs.values():
         tab.buttons = [manual('admin/data_integrity_checks')]
     if arche:
@@ -361,28 +333,33 @@ def check_files(arche: Optional[str] = None) -> str:
     duplicate_ids = set().union(*duplicates)
     mapping = {e.id: e for e in Entity.get_by_ids(list(duplicate_ids))}
     for values in duplicates:
-        if entity1 := mapping.get(values[0]):
-            if entity2 := mapping.get(values[1]):
-                tabs['duplicates'].table.rows.append([
-                    link(entity1),
-                    link(entity2)])
+        if e1 := mapping.get(values[0]):
+            if e2 := mapping.get(values[1]):
+                tabs['duplicates'].table.rows.append([link(e1), link(e2)])
+    if tabs['orphaned_files'].table.rows and is_authorized('admin'):
+        text = _('delete all files without corresponding entities?')
+        tabs['orphaned_files'].buttons.append(
+            button(
+                _('delete all files'),
+                url_for('file_delete', name='all'),
+                onclick=f"return confirm('{text}')"))
     return render_template(
         'tabs.html',
         tabs=tabs,
         title=_('admin'),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
-            [_('export') + ' ARCHE', f"{url_for('export_arche')}"]
+            [_('admin'), f'{url_for('admin_index')}#tab-data'],
+            [f'{_('export')} ARCHE', f'{url_for('export_arche')}']
             if arche else None,
             _('check files')])
 
 
-@app.route('/admin/delete_orphaned_resized_images')
+@app.route('/delete_orphaned_resized_images')
 @required_group('admin')
-def admin_delete_orphaned_resized_images() -> Response:
-    delete_orphaned_resized_images()
+def delete_orphaned_resized_images() -> Response:
+    delete_orphaned_resized()
     flash(_('resized orphaned images were deleted'))
-    return redirect(url_for('admin_index') + '#tab-data')
+    return redirect(f'{url_for('admin_index')}#tab-data')
 
 
 def get_files_without_entity(entity_file_ids: list[int]) -> list[Any]:
@@ -398,10 +375,10 @@ def get_files_without_entity(entity_file_ids: list[int]) -> list[Any]:
                 convert_size(file.stat().st_size),
                 format_date(datetime.fromtimestamp(file.stat().st_ctime)),
                 file.suffix,
-                link(_('download'), url_for('download', filename=file.name)),
+                link(_('download'), url_for('download', name=file.name)),
                 link(
                     _('delete'),
-                    url_for('admin_file_delete', filename=file.name),
+                    url_for('file_delete', name=file.name),
                     js=f"return confirm('{confirm}')")
                 if is_authorized('editor') else ''])
     return rows
@@ -422,7 +399,7 @@ def get_iiif_files_without_entity(entity_file_ids: list[int]) -> list[Any]:
                 file.suffix,
                 link(
                     _('delete'),
-                    url_for('admin_file_iiif_delete', filename=file.name),
+                    url_for('file_iiif_delete', filename=file.name),
                     js=f"return confirm('{confirm}')")
                 if is_authorized('editor') else ''])
     return rows
@@ -441,20 +418,23 @@ def get_orphaned_image_annotations() -> list[Any]:
             link(
                 _('relink entity'),
                 url_for(
-                    'admin_annotation_image_relink',
+                    'annotation_image_relink',
                     origin_id=file.id,
                     entity_id=entity.id),
                 js=f"return confirm('{_('relink entity')}?')"),
             link(
                 _('remove entity'),
                 url_for(
-                    'admin_annotation_image_remove_entity',
+                    'annotation_image_remove_entity',
                     annotation_id=annotation.id,
                     entity_id=entity.id),
                 js=f"return confirm('{_('remove entity')}?')"),
             link(
                 _('delete annotation'),
-                url_for('admin_annotation_image_delete', id_=annotation.id),
+                url_for(
+                    'annotation_image_delete',
+                    id_=annotation.id,
+                    origin='orphan'),
                 js=f"return confirm('{_('delete annotation')}?')")])
     return rows
 
@@ -472,19 +452,19 @@ def get_orphaned_text_annotations() -> list[Any]:
             link(
                 _('relink entity'),
                 url_for(
-                    'admin_annotation_text_relink',
+                    'annotation_text_relink',
                     origin_id=annotation.source_root or source.id,
                     entity_id=entity.id),
                 js=f"return confirm('{_('relink entity')}?')"),
             link(
                 _('remove entity'),
                 url_for(
-                    'admin_annotation_text_remove_entity',
+                    'annotation_text_remove_entity',
                     annotation_id=annotation.id,
                     entity_id=entity.id),
                 js=f"return confirm('{_('remove entity')}?')"),
             link(
                 _('delete annotation'),
-                url_for('admin_annotation_text_delete', id_=source.id),
+                url_for('annotation_text_delete', id_=source.id),
                 js=f"return confirm('{_('delete annotation')}?')")])
     return rows

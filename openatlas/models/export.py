@@ -63,7 +63,6 @@ def sql_export(format_: str, postfix: Optional[str] = '') -> bool:
         file.unlink()
     except Exception:  # pragma: no cover
         return False
-
     return True
 
 
@@ -87,8 +86,8 @@ def arche_export() -> bool:
             files_by_extension[entity_id][ext].add(f)
 
     archive_name = (
-        f"{current_date_for_filename()}_"
-        f"{external_metadata['topCollection'].replace(' ', '_')}.zip")
+        f'{current_date_for_filename()}_'
+        f'{external_metadata['topCollection'].replace(' ', '_')}.zip')
 
     tempfile.tempdir = str(app.config['TMP_PATH'])
 
@@ -156,11 +155,11 @@ def arche_export() -> bool:
             total_entries = len(infos)
 
             stat_md = (
-                f"# Archive Statistics\n"
-                f"- **Total size**: {total_size} bytes\n"
-                f"- **Total entries**: {total_entries}\n"
-                f"- **Files**: {total_files}\n"
-                f"- **Directories**: {total_dirs}\n")
+                f'# Archive Statistics\n'
+                f'- **Total size**: {total_size} bytes\n'
+                f'- **Total entries**: {total_entries}\n'
+                f'- **Files**: {total_files}\n'
+                f'- **Directories**: {total_dirs}\n')
             archive.writestr('debug/file_statistic.md', stat_md)
 
         shutil.move(str(tmp_archive_path), str(final_archive_path))

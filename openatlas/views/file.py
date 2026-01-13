@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any, Optional
 
 from flask import (
@@ -12,29 +13,28 @@ from openatlas.display.table import entity_table
 from openatlas.display.util import (
     check_iiif_activation, check_iiif_file_exist, convert_image_to_iiif,
     delete_iiif_image, required_group)
+from openatlas.display.util2 import is_authorized
 from openatlas.models.entity import Entity
-from openatlas.models.settings import Settings
+from openatlas.models.settings import set_logo
 
 
-@app.route('/download/<path:filename>')
+@app.route('/download/<path:name>')
 @required_group('readonly')
-def download(filename: str) -> Any:
+def download(name: str) -> Any:
     return send_from_directory(
         app.config['UPLOAD_PATH'],
-        filename,
+        name,
         as_attachment=True)
 
 
-@app.route('/display/<path:filename>')
+@app.route('/display/<path:name>')
 @required_group('readonly')
-def display_file(filename: str) -> Any:
+def display_file(name: str) -> Any:
     if size := request.args.get('size'):
         if not size.isdigit() or size not in app.config['IMAGE_SIZE'].values():
             abort(400)
-        return send_from_directory(  # pragma: no cover
-            app.config['RESIZED_IMAGES'] / size,
-            filename)
-    return send_from_directory(app.config['UPLOAD_PATH'], filename)
+        return send_from_directory(app.config['RESIZED_IMAGES'] / size, name)
+    return send_from_directory(app.config['UPLOAD_PATH'], name)
 
 
 @app.route('/display/custom_logo/<ext>')
@@ -138,9 +138,9 @@ def delete_all_iiif_files() -> None:
 @required_group('manager')
 def logo(id_: Optional[int] = None) -> str | Response:
     if g.settings['logo_file_id']:
-        abort(418)  # pragma: no cover - logo already set
+        abort(418)
     if id_:
-        Settings.set_logo(id_)
+        set_logo(id_)
         return redirect(f"{url_for('admin_index')}#tab-file")
     table = entity_table(
         Entity.get_display_files(),
@@ -150,11 +150,45 @@ def logo(id_: Optional[int] = None) -> str | Response:
         'tabs.html',
         tabs={'logo': Tab('logo', table=table)},
         title=_('logo'),
-        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-file"], _('logo')])
+        crumbs=[[_('admin'), f'{url_for('admin_index')}#tab-file'], _('logo')])
 
 
 @app.route('/logo/remove')
 @required_group('manager')
 def logo_remove() -> Response:
-    Settings.set_logo()
+    set_logo()
     return redirect(f"{url_for('admin_index')}#tab-file")
+
+
+@app.route('/file/delete/<name>')
+@required_group('editor')
+def file_delete(name: str) -> Response:
+    if name != 'all':  # Delete one file
+        try:
+            (app.config['UPLOAD_PATH'] / name).unlink()
+            flash(f'{name} {_('was deleted')}')
+        except Exception as e:
+            g.logger.log('error', 'file', f'deletion of {name} failed', e)
+            flash(_('error file delete'), 'error')
+        return redirect(f'{url_for('check_files')}#tab-orphaned-files')
+
+    # Delete all files with no corresponding entity
+    if is_authorized('admin'):  # pragma: no cover - don't test, ever
+        entity_file_ids = [entity.id for entity in Entity.get_by_class('file')]
+        for f in app.config['UPLOAD_PATH'].iterdir():
+            if f.name != '.gitignore' and int(f.stem) not in entity_file_ids:
+                (app.config['UPLOAD_PATH'] / f.name).unlink()
+    return redirect(
+        f'{url_for('check_files')}#tab-orphaned-files')  # pragma: no cover
+
+
+@app.route('/file/iiif/delete/<filename>')
+@required_group('editor')
+def file_iiif_delete(filename: str) -> Response:
+    try:
+        (Path(g.settings['iiif_path']) / filename).unlink()
+        flash(f"{filename} {_('was deleted')}")
+    except Exception as e:
+        g.logger.log('error', 'file', f'deletion of IIIF {filename} failed', e)
+        flash(_('error file delete'), 'error')
+    return redirect(f"{url_for('check_files')}#tab-orphaned-iiif-files")

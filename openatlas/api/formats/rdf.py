@@ -30,20 +30,20 @@ def _add_namespaces(graph: Graph, context: dict[str, Any]) -> None:
     graph.bind("rdf", Namespace("http://www.w3.org/1999/02/22-rdf-syntax-ns#"))
 
 
-def _expand_curie(curie: str) -> str:  # pragma: no cover
+def _expand_curie(curie: str) -> str:
     if ":" not in curie:
-        return curie
+        return curie  # pragma: no cover
     ctx = _linked_art_context.get("@context", {})
     prefix, local = curie.split(":", 1)
     base = ctx.get(prefix)
     if isinstance(base, str):
         return base + local
-    return curie
+    return curie  # pragma: no cover
 
 
 def _resolve_predicate(
         key: str,
-        data_type: str | None = None) -> URIRef | None:  # pragma: no cover
+        data_type: str | None = None) -> URIRef | None:
     ctx = _linked_art_context.get("@context", {})
 
     if data_type and data_type in ctx:
@@ -54,16 +54,15 @@ def _resolve_predicate(
                 entry = tctx[key]
                 if isinstance(entry, dict) and "@id" in entry:
                     return URIRef(_expand_curie(entry["@id"]))
-                if isinstance(entry, str):
+                if isinstance(entry, str):  # pragma: no cover
                     return URIRef(_expand_curie(entry))
 
     entry = ctx.get(key)
     if isinstance(entry, dict) and "@id" in entry:
         return URIRef(_expand_curie(entry["@id"]))
-    if isinstance(entry, str):
+    if isinstance(entry, str):  # pragma: no cover
         return URIRef(_expand_curie(entry))
-
-    return None
+    return None  # pragma: no cover
 
 
 def _get_subject(
@@ -106,41 +105,36 @@ def _add_triples_from_linked_art(
         graph: Graph,
         data: list[dict[str, Any]] | dict[str, Any],
         parent_subject: URIRef | BNode | None = None,
-        parent_predicate: URIRef | None = None) -> None:  # pragma: no cover
-    if not isinstance(data, dict):  # pragma: no cover - mypy
-        return
+        parent_predicate: URIRef | None = None) -> None:
+    if not isinstance(data, dict):
+        return  # pragma: no cover
 
     subject = _get_subject(data, graph, parent_subject, parent_predicate)
-
-    data_type = data.get("type")
-    if data_type:
+    if data_type := data.get("type"):
         ctx = _linked_art_context.get("@context", {})
         type_uri: str | None = None
 
         if ":" in data_type:
-            type_uri = _expand_curie(data_type)
-
+            type_uri = _expand_curie(data_type)  # pragma: no cover
         elif isinstance(ctx.get(data_type), dict):
             entry = ctx[data_type]
             if "@id" in entry:
                 type_uri = _expand_curie(entry["@id"])
 
-        if not type_uri:
+        if not type_uri:  # pragma: no cover
             la_base = ctx.get("la") or "https://linked.art/ns/terms/"
             type_uri = la_base + data_type
 
-        if not type_uri:  # pragma: no cover - mypy
-            return
+        if not type_uri:
+            return  # pragma: no cover
 
         graph.add((subject, RDF.type, URIRef(type_uri)))
 
     for key, value in data.items():
         if key in {"id", "type", "@context"}:
             continue
-
-        predicate = _resolve_predicate(key, data_type)
-        if not predicate:  # pragma: no cover - mypy
-            continue
+        if not (predicate := _resolve_predicate(key, data_type)):
+            continue  # pragma: no cover
 
         _handle_value(graph, subject, predicate, value)
 

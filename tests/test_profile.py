@@ -4,7 +4,6 @@ from tests.base import TestBaseCase
 
 
 class ProfileTests(TestBaseCase):
-
     def test_profile(self) -> None:
         c = self.client
         rv = c.get(url_for('profile_settings', category='profile'))

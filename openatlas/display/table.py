@@ -37,7 +37,7 @@ class Table:
 
     def display(self, name: str = 'default') -> str:
         if not self.rows:
-            return f'<p class="uc-first">{_('no entries')}</p>'
+            return f'<p>{uc_first(_('no entries'))}</p>'
         no_title = ['checkbox', 'remove', 'set logo', 'update']
         data = {
             'data': self.rows,
@@ -170,6 +170,8 @@ def get_table_cell_content(
             html = format_number(e.count)
         case 'default_precision':
             html = link(next(iter(e.types), None))
+        case 'domain' | 'name' | 'preceding' | 'super':
+            html = format_name_and_aliases(e, str(table_id), forms)
         case 'end':
             html = table_date('last', e, range_, item)
         case 'example_id':
@@ -191,8 +193,6 @@ def get_table_cell_content(
             html = g.file_info.get(e.id, {}).get('license_holder')
         case 'main_image' if origin:
             html = profile_image_table_link(origin, e)
-        case 'name' | 'preceding' | 'super':
-            html = format_name_and_aliases(e, str(table_id), forms)
         case 'page':
             html = str(item.description)
         case 'overlay' if origin:
@@ -237,7 +237,7 @@ def get_table_cell_content(
             html = link(e.standard_type)
             if forms:
                 html = e.standard_type.name if e.standard_type else ''
-        case 'type_link' if isinstance(item, Link):
+        case 'precision' | 'type_link' if isinstance(item, Link):
             html = ''
             if item.type:
                 html = link(
@@ -268,8 +268,7 @@ def format_name_and_aliases(
         forms: dict[str, Any]) -> str:
     if forms.get('mode') == 'single':
         link_ = f"""
-            <a value="{entity.name}"
-                href="#"
+            <a value="{entity.name}" href="#"
                 onclick="selectFromTable(this,'{table_id}', {entity.id})"
             >{entity.name}</a>"""
         if not entity.aliases:
@@ -281,9 +280,7 @@ def format_name_and_aliases(
     name = entity.name if forms else link(entity)
     if not entity.aliases or not get_user_setting('table_show_aliases', False):
         return name
-    return \
-        f'{name}' \
-        f'{"".join(f"<p>{alias}</p>" for alias in entity.aliases.values())}'
+    return f'{name}{''.join(f'<p>{i}</p>' for i in entity.aliases.values())}'
 
 
 def file_preview(entity_id: int) -> str:
@@ -292,21 +289,21 @@ def file_preview(entity_id: int) -> str:
     if g.settings['iiif'] and check_iiif_file_exist(entity_id):
         ext = '.tiff' if g.settings['iiif_conversion'] \
             else g.files[entity_id].suffix
-        url =\
-            f"{g.settings['iiif_url']}{entity_id}{ext}" \
-            f"/full/!100,100/0/default.jpg"
-        return f"<img src='{url}' {param}>"
+        url = \
+            f'{g.settings['iiif_url']}{entity_id}{ext}' \
+            f'/full/!100,100/0/default.jpg'
+        return f'<img src="{url}" {param}>'
     if icon := get_file_path(entity_id, app.config['IMAGE_SIZE']['table']):
-        url = url_for('display_file', filename=icon.name, size=size)
-        return f"<img src='{url}' {param}>"
+        url = url_for('display_file', name=icon.name, size=size)
+        return f'<img src="{url}" {param}>'
     if g.settings['image_processing']:
         path = get_file_path(entity_id)
         if path and check_processed_image(path.name):
             if icon := get_file_path(
                     entity_id,
                     app.config['IMAGE_SIZE']['table']):
-                url = url_for('display_file', filename=icon.name, size=size)
-                return f"<img src='{url}' {param}>"
+                url = url_for('display_file', name=icon.name, size=size)
+                return f'<img src="{url}" {param}>'
     return ''
 
 

@@ -86,8 +86,8 @@ def change_type(id_: int) -> str | Response:
         type_.change_type(type_field.data, form.checkbox_values.data)
         flash(_('Entities were updated'), 'success')
         return redirect(
-            f"{url_for('index', group='type')}"
-            f"#menu-tab-{type_.category}_collapse-{root.id}")
+            url_for('index', group='type') +
+            f'#menu-tab-{type_.category}_collapse-{root.id}')
     return render_template(
         'type/move.html',
         table=Table(
@@ -111,7 +111,7 @@ def show_untyped_entities(id_: int) -> str:
             'untyped',
             _('untyped entities'),
             table=table,
-            content=_('no entries') if not table.rows else '')}
+            content=uc_first(_('no entries')) if not table.rows else '')}
     return render_template(
         'tabs.html',
         tabs=tabs,

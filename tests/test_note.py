@@ -6,7 +6,6 @@ from tests.base import TestBaseCase, insert
 
 
 class NoteTest(TestBaseCase):
-
     def test_note(self) -> None:
         c = self.client
         with app.test_request_context():
@@ -46,7 +45,7 @@ class NoteTest(TestBaseCase):
             url_for('login'),
             data={'username': 'manager', 'password': 'test'})
         rv = c.get(url_for('note_view', id_=note_id))
-        assert b'set private' in rv.data
+        assert b'Set private' in rv.data
 
         rv = c.get(
             url_for('note_set_private', id_=note_id),

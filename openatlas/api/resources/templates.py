@@ -310,8 +310,7 @@ def subunit_template(id_: str) -> dict[str, List]:
         'description': fields.String,
         'standardType': fields.Nested(standard_type),
         'timespan': fields.Nested(timespan),
-        'externalReferences': fields.List(
-            fields.Nested(external_references)),
+        'externalReferences': fields.List(fields.Nested(external_references)),
         'references': fields.List(fields.Nested(references)),
         'files': fields.List(fields.Nested(files)),
         'types': fields.List(fields.Nested(types))}

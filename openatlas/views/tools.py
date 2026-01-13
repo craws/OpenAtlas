@@ -12,7 +12,7 @@ from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
     button, display_info, link, remove_link, required_group)
-from openatlas.display.util2 import is_authorized, manual
+from openatlas.display.util2 import is_authorized, manual, uc_first
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity, Link
@@ -46,16 +46,16 @@ def sex_result(entity: Entity) -> str:
     calculation = SexEstimation.calculate(entity)
     if calculation is None:
         return ''
-    return \
-        f'<h1 class="uc-first">{_('sex estimation')}</h1>' \
-        'Ferembach et al. 1979: ' \
-        f'<span class="anthro-result">{calculation}</span> - ' + \
-        _('corresponds to') + f' "{name_result(calculation)}"'
+    return f"""
+        <h1>{uc_first(_('sex estimation'))}</h1>
+        Ferembach et al. 1979:
+        <span class="anthro-result">{calculation}</span> -
+        {_('corresponds to')} "{name_result(calculation)}" """
 
 
 def carbon_result(entity: Entity) -> str:
     if link_ := get_carbon_link(entity):
-        return f'<h1 class="uc-first">{_('radiocarbon dating')}</h1>' + \
+        return f'<h1>{uc_first(_('radiocarbon dating'))}</h1>' + \
             display_info(json.loads(link_.description))
     return ''
 
@@ -140,12 +140,12 @@ def sex_update(id_: int) -> str | Response:
     for feature, values in SexEstimation.features.items():
         description = ''
         if values['female'] or values['male']:
-            description = f"Female: {values['female']}, male: {values['male']}"
+            description = f'Female: {values['female']}, male: {values['male']}'
         setattr(
            Form,
            feature,
            SelectField(
-               f"{feature} ({values['category']})",
+               f'{feature} ({values['category']})',
                choices=choices,
                default='Not preserved',
                description=description))
@@ -205,11 +205,11 @@ def carbon_update(id_: int) -> str | Response:
 
     class Form(FlaskForm):
         lab_id = StringField(
-            f"{_('laboratory')} {_('ID')}",
+            f'{_('laboratory')} {_('ID')}',
             [InputRequired()],
             render_kw={'placeholder': 'VERA'})
         spec_id = StringField(
-            f"{_('specimen')} {_('ID')}",
+            f'{_('specimen')} {_('ID')}',
             [InputRequired()],
             render_kw={'placeholder': '23432A'})
         radiocarbon_year = IntegerField(

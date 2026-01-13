@@ -121,11 +121,11 @@ def user_activity(user_id: int = 0, entity_id: Optional[int] = None) -> str:
             entity_name = link(entity)
         except AttributeError:  # Entity already deleted
             entity = None
-            entity_name = f"id {row['entity_id']}"
+            entity_name = f'id {row['entity_id']}'
         user = User.get_by_id(row['user_id'])
         table.rows.append([
             format_date(row['created']),
-            link(user) if user else f"id {row['user_id']}",
+            link(user) if user else f'id {row['user_id']}',
             _(row['action']),
             entity.class_.label if entity else '',
             entity_name])
@@ -170,7 +170,7 @@ def user_view(id_: int) -> str:
             buttons.append(
                 button(
                     _('delete'),
-                    f"{url_for('user_delete', id_=user.id)}#tab-user",
+                    f'{url_for('user_delete', id_=user.id)}#tab-user',
                     onclick=""
                     f"return confirm('{_('Delete %(name)s?', name=name)}')"))
     return render_template(
@@ -182,7 +182,7 @@ def user_view(id_: int) -> str:
                 buttons=buttons)},
         title=user.username,
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-user"],
+            [_('admin'), f'{url_for('admin_index')}#tab-user'],
             user.username])
 
 
@@ -211,7 +211,7 @@ def user_entities(id_: int) -> str:
         'content.html',
         content=table.display(),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-user"],
+            [_('admin'), f'{url_for('admin_index')}#tab-user'],
             user,
             _('created entities')])
 
@@ -252,7 +252,7 @@ def user_update(id_: int) -> str | Response:
         content=display_form(form, manual_page='admin/user'),
         title=user.username,
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-user"],
+            [_('admin'), f'{url_for('admin_index')}#tab-user'],
             user,
             _('edit')])
 
@@ -283,10 +283,10 @@ def user_insert() -> str | Response:
             body = \
                 _('Account information for %(username)s',
                   username=form.username.data) + \
-                f" {_('at')} {request.scheme}" \
-                f"://{request.headers['Host']}\n\n" \
-                f"{uc_first(_('username'))}: {form.username.data}\n" \
-                f"{uc_first(_('password'))}: {form.password.data}\n"
+                f' {_('at')} {request.scheme}' \
+                f'://{request.headers['Host']}\n\n' \
+                f'{uc_first(_('username'))}: {form.username.data}\n' \
+                f'{uc_first(_('password'))}: {form.password.data}\n'
             if send_mail(subject, body, form.email.data, False):
                 flash(
                     _('Sent account information mail to %(email)s.',
@@ -310,9 +310,8 @@ def user_insert() -> str | Response:
                     manual_page='admin/user'))},
         title=_('user'),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-user"],
-            f'+&nbsp;<span class="uc-first d-inline-block">{_('user')}'
-            + '</span>'])
+            [_('admin'), f'{url_for('admin_index')}#tab-user'],
+            f'+ {uc_first(_('user'))}'])
 
 
 @app.route('/install', methods=['GET', 'POST'])

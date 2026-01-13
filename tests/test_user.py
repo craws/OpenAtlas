@@ -6,7 +6,6 @@ from tests.base import TestBaseCase, insert
 
 
 class UserTests(TestBaseCase):
-
     def test_user(self) -> None:
         c = self.client
         data = {
@@ -70,7 +69,7 @@ class UserTests(TestBaseCase):
         rv = c.post(
             url_for('user_activity', user_id=user_id),
             data={'limit': 100, 'user': 0, 'action': 'all'})
-        assert b'activity' in rv.data
+        assert b'Activity' in rv.data
 
         rv = c.get(url_for('user_delete', id_=self.alice_id))
         assert b'403 - Forbidden' in rv.data

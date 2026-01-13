@@ -5,7 +5,6 @@ from tests.base import TestBaseCase, insert
 
 
 class EventTest(TestBaseCase):
-
     def test_event(self) -> None:
         c = self.client
         with app.test_request_context():

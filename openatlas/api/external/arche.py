@@ -27,7 +27,7 @@ def is_arche_likeable_uri(uri: str) -> bool:
     for rule in g.arche_uri_rules:
         if search(rule['match'], uri):
             return True
-    return False  # pragma: no cover
+    return False
 
 
 def is_valid_url(url: str) -> bool:
@@ -56,12 +56,9 @@ def create_uri(value: str | list[str]) -> list[URIRef]:
     return [create_single_uri(value)]
 
 
-def ensure_person_exist(
-        graph: Graph,
-        names: str | list[str]) -> None:
+def ensure_person_exist(graph: Graph, names: str | list[str]) -> None:
     names = names if isinstance(names, list) else [names]
     for name in names:
-
         if not name or is_valid_url(name):
             continue  # pragma: no cover
         uri = create_single_uri(name)
@@ -117,13 +114,11 @@ def ensure_entity_exist(
 
 def transliterate_url(url: str) -> str:
     parsed = urlparse(url)
-    path = parsed.path
-    ascii_path = unidecode(path)
-    ascii_path = ascii_path.replace(' ', '_')
+    ascii_path = unidecode(parsed.path)
     return urlunparse((
         parsed.scheme,
         parsed.netloc,
-        ascii_path,
+        ascii_path.replace(' ', '_'),
         parsed.params,
         parsed.query,
         parsed.fragment))

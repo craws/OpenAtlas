@@ -9,7 +9,6 @@ from tests.base import TestBaseCase, get_hierarchy, insert
 
 
 class AdminTests(TestBaseCase):
-
     def test_admin(self) -> None:
         c = self.client
         with app.test_request_context():
@@ -62,22 +61,22 @@ class AdminTests(TestBaseCase):
             pass
 
         rv = c.get(
-            url_for('admin_file_delete', filename=file_),
+            url_for('file_delete', name=file_),
             follow_redirects=True)
         assert b'Test77.txt was deleted' in rv.data
 
         rv = c.get(
-            url_for('admin_file_delete', filename=file_),
+            url_for('file_delete', name=file_),
             follow_redirects=True)
         assert b'An error occurred when trying to delete' in rv.data
 
         rv = c.get(
-            url_for('admin_file_iiif_delete', filename=file_),
+            url_for('file_iiif_delete', filename=file_),
             follow_redirects=True)
         assert b'Test77.txt was deleted' in rv.data
 
         rv = c.get(
-            url_for('admin_file_iiif_delete', filename=file_),
+            url_for('file_iiif_delete', filename=file_),
             follow_redirects=True)
         assert b'An error occurred when trying to delete' in rv.data
 
@@ -131,6 +130,12 @@ class AdminTests(TestBaseCase):
             data={'classes': 'person', 'ratio': 100},
             follow_redirects=True)
         assert b'Oliver Twist' in rv.data
+
+        rv = c.post(
+            url_for('check_similar'),
+            data={'classes': 'place', 'ratio': 100},
+            follow_redirects=True)
+        assert b'No entries' in rv.data
 
         rv = c.get(url_for('settings', category='mail'))
         assert b'mail from' in rv.data

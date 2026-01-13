@@ -78,7 +78,7 @@ mapInputForm.onAdd = () => {
             <input type="text" id="nameField" class="${style.stringField}"
               placeholder="${translate["map_info_name"]}">
             <textarea rows="3" cols="70" id="descriptionField"  class="${style.stringField}"
-              placeholder="${translate["map_info_description"]}"/></textarea>
+              placeholder="${translate["map_info_description"]}"></textarea>
             <div id="coordinatesDiv">
             <div class="markerInput">
                 <label for='easting'>${translate["map_info_easting"]}</label>
@@ -105,37 +105,37 @@ let wktInputForm = L.control();
 wktInputForm.onAdd = () => {
   let div = L.DomUtil.create('div');
   div.innerHTML = `
-    <div class="mapFormDiv" 
+    <div class="mapFormDiv"
     onmouseover="interactionOff()" onmouseout="interactionOn()">
-      <span id="closeButton" title="${translate["map_info_close"]}" 
+      <span id="closeButton" title="${translate["map_info_close"]}"
       onclick="closeWktForm()" class="fad">X</span>
       <p id="inputFormInfo"></p>
       <div class="wktInput">
         <b>${translate["import_wkt"]}</b>
         <label for='wktInput'>${translate["map_info_wkt"]}</label>
-        <input type="text" oninput="checkAndToggleDrawButton()" 
-        class="${style.stringField}" id="wktInput"  
+        <input type="text" oninput="checkAndToggleDrawButton()"
+        class="${style.stringField}" id="wktInput"
         placeholder="POLYGON((lat1 lon1, lat2 lon2, ...))">
         <div id="chooseShape" style="display: none;">
           <label>${translate["polygon"]}:</label>
           <div class="form-check">
-           <input class="form-check-input" type="radio" name="wktType" 
-           value="shape" id="shape" style="width: 10px; height: 10px;" 
+           <input class="form-check-input" type="radio" name="wktType"
+           value="shape" id="shape" style="width: 10px; height: 10px;"
            checked="checked">
             <label class="form-check-label" for="shape">
               Shape
             </label>
           </div>
           <div class="form-check">
-           <input class="form-check-input" type="radio" name="wktType" 
+           <input class="form-check-input" type="radio" name="wktType"
            value="area" style="width: 10px; height: 10px;" id="area">
             <label class="form-check-label" for="area">
               Area
             </label>
           </div>
-        </div>    
+        </div>
       </div>
-      <button id="drawButton" title="${translate["draw_geometry"]}" 
+      <button id="drawButton" title="${translate["draw_geometry"]}"
       onclick="closeWktForm(true)" class="fad" disabled>${translate["draw_geometry"]}</button>
     </div>
   `;

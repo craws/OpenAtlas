@@ -74,8 +74,7 @@ def overlay_update(place_id: int, overlay_id: int) -> str | Response:
             'bottom_left_northing': form.bottom_left_northing.data,
             'bottom_left_easting': form.bottom_left_easting.data})
         flash(_('info update'))
-        return redirect(
-            f"{url_for('view', id_=place.id)}#tab-file")
+        return redirect(f'{url_for('view', id_=place.id)}#tab-file')
     bounding = [[0, 0], [0, 0], [0, 0]]  # For data entered before 6.4.0
     bounding_values = ast.literal_eval(overlay.bounding_box)
     if len(bounding_values) == 3:
