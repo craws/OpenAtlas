@@ -3,4 +3,5 @@ precision=2
 omit=
     ../openatlas/api/import_scripts/*
     ../openatlas/views/vocabs.py
+skip_covered=True
 sort=cover
