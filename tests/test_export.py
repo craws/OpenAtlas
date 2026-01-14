@@ -1,4 +1,3 @@
-import os
 import shutil
 from pathlib import Path
 from typing import Any
@@ -47,8 +46,7 @@ class ImportTest(ImportTestCase):
                 view='sql',
                 filename=f'{date_}_export.sql.7z'),
             follow_redirects=True)
-        if os.name == 'posix':
-            assert b'File deleted' in rv.data
+        assert b'File deleted' in rv.data
 
         rv = c.get(
             url_for(
@@ -56,8 +54,7 @@ class ImportTest(ImportTestCase):
                 view='sql',
                 filename=f'{date_}_export.dump.7z'),
             follow_redirects=True)
-        if os.name == 'posix':
-            assert b'File deleted' in rv.data
+        assert b'File deleted' in rv.data
 
         rv = c.get(
             url_for('delete_export', view='sql', filename='non_existing'),
@@ -149,8 +146,7 @@ class ImportTest(ImportTestCase):
         with c.get(
                 url_for('delete_export', view='arche', filename=filename),
                 follow_redirects=True) as rv_:
-            if os.name == 'posix':
-                assert b'File deleted' in rv_.data
+            assert b'File deleted' in rv_.data
 
         with c.get(
                 url_for('check_files', arche='arche'),
@@ -170,8 +166,7 @@ class ImportTest(ImportTestCase):
                 view='rdf',
                 filename=f'{date_}_export.nt'),
             follow_redirects=True)
-        if os.name == 'posix':
-            assert b'File deleted' in rv.data
+        assert b'File deleted' in rv.data
 
         openatlas_logo_path.unlink()
         file_without_license_path.unlink()

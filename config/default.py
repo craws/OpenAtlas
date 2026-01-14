@@ -71,16 +71,13 @@ CSS = {
         'secondary': 'btn btn-outline-secondary btn-sm',
         'danger': 'btn btn-outline-danger btn-sm'}}
 
-# Tests
-LOAD_WINDOWS_TEST_SQL = False
-
 # External APIs
 API_WIKIDATA = 'https://www.wikidata.org/w/api.php'
 API_GEONAMES = 'http://api.geonames.org/get'
 USER_AGENT = {
-    "User-Agent":
-        f"OpenAtlas/{VERSION} (https://github.com/craws/OpenAtlas; "
-        "openatlas@oeaw.ac.at)"}
+    'User-Agent':
+        f'OpenAtlas/{VERSION} (https://github.com/craws/OpenAtlas; '
+        'openatlas@oeaw.ac.at)'}
 
 CSP_HEADER = "frame-ancestors 'self'"
 

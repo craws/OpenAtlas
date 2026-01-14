@@ -587,8 +587,9 @@ def get_entities_linked_to_type_recursive(
 
 def check_iiif_activation() -> bool:
     return bool(
-        g.settings['iiif'] and
-        os.access(Path(g.settings['iiif_path']), os.W_OK))
+        g.settings['iiif'] and os.access(
+            Path(g.settings['iiif_path']),
+            os.W_OK))
 
 
 def check_iiif_file_exist(id_: int) -> bool:
@@ -607,8 +608,8 @@ def delete_iiif_image(id_: int) -> None:
 
 
 def convert_image_to_iiif(id_: int, path: Optional[Path] = None) -> bool:
-    command: list[Any] = ["vips" if os.name == 'posix' else "vips.exe"]
-    command.extend([
+    command = [
+        'vips',
         'tiffsave',
         path or get_file_path(id_),
         get_iiif_file_path(id_),
@@ -619,7 +620,7 @@ def convert_image_to_iiif(id_: int, path: Optional[Path] = None) -> bool:
         '--tile-width',
         '128',
         '--tile-height',
-        '128'])
+        '128']
     try:
         with subprocess.Popen(command) as sub_process:
             sub_process.wait()

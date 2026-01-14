@@ -1,4 +1,3 @@
-import os
 from typing import Any
 
 import pandas as pd
@@ -347,8 +346,7 @@ class ImportTest(ImportTestCase):
                 view='sql',
                 filename=f'{date_}_export.sql.7z'),
             follow_redirects=True)
-        if os.name == 'posix':
-            assert b'File deleted' in rv.data
+        assert b'File deleted' in rv.data
 
         rv = c.get(
             url_for(
@@ -356,8 +354,7 @@ class ImportTest(ImportTestCase):
                 view='sql',
                 filename=f'{date_}_export.dump.7z'),
             follow_redirects=True)
-        if os.name == 'posix':
-            assert b'File deleted' in rv.data
+        assert b'File deleted' in rv.data
 
         rv = c.get(
             url_for(
