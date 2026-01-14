@@ -20,7 +20,8 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.display.image_processing import check_processed_image
-from openatlas.display.util2 import convert_size, is_authorized, uc_first
+from openatlas.display.util2 import (
+    convert_size, get_file_path, is_authorized, uc_first)
 from openatlas.models.cidoc import CidocClass, CidocProperty
 from openatlas.models.content import get_translation
 from openatlas.models.dates import Dates, format_date
@@ -423,18 +424,6 @@ def tooltip(text: str) -> str:
             data-bs-title="{title}">
           <i class="fas fa-info-circle fs-6 tooltipicon"></i>
         </span>"""
-
-
-def get_file_path(id_: int, size: Optional[str] = None) -> Optional[Path]:
-    if not hasattr(g, 'files') or id_ not in g.files:
-        return None
-    ext = g.files[id_].suffix
-    path = app.config['UPLOAD_PATH'] / f'{id_}{ext}'
-    if size:
-        if ext in app.config['PROCESSABLE_EXT']:
-            ext = app.config['PROCESSED_EXT']  # pragma: no cover
-        path = app.config['RESIZED_IMAGES'] / size / f'{id_}{ext}'
-    return path if os.path.exists(path) else None
 
 
 @pass_context  # Prevent Jinja2 context caching

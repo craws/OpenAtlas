@@ -10,10 +10,10 @@ from flask_login import current_user
 from openatlas import app
 from openatlas.display.image_processing import check_processed_image
 from openatlas.display.util import (
-    check_iiif_file_exist, edit_link, get_file_path, get_user_setting, link,
+    check_iiif_file_exist, edit_link, get_user_setting, link,
     remove_link)
 from openatlas.display.util2 import (
-    display_bool, is_authorized, sanitize, uc_first)
+    display_bool, get_file_path, is_authorized, sanitize, uc_first)
 from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity, Link
 from openatlas.models.openatlas_class import Relation
@@ -112,7 +112,7 @@ def entity_table(
                 or not relation.reverse_relation.required:
             columns.append('remove')
 
-    overlays = Overlay.get_by_object(origin) \
+    overlays = origin.get_overlays() \
         if origin and 'overlay' in columns else {}
     table = Table(columns, order=order)
     for item in items:
@@ -197,10 +197,8 @@ def get_table_cell_content(
             html = str(item.description)
         case 'overlay' if origin:
             html = ''
-            if is_authorized('editor') \
-                    and current_user.settings['module_map_overlay'] \
-                    and e.get_file_ext() \
-                    in app.config['DISPLAY_FILE_EXT']:
+            if is_authorized('editor') and \
+                    e.get_file_ext() in app.config['DISPLAY_FILE_EXT']:
                 if e.id in overlays:
                     html = edit_link(
                         url_for(

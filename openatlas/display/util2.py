@@ -2,11 +2,13 @@
 from __future__ import annotations
 
 import math
+import os
 import re
 from pathlib import Path
 from typing import Optional
 
 from bs4 import BeautifulSoup
+from flask import g
 from flask_babel import gettext as _
 from flask_login import current_user
 from jinja2 import pass_context
@@ -85,3 +87,15 @@ def manual(site: str) -> str:
             rel="noopener noreferrer">
           <i class="fas fs-4 fa-book"></i>
         </a>"""
+
+
+def get_file_path(id_: int, size: Optional[str] = None) -> Optional[Path]:
+    if not hasattr(g, 'files') or id_ not in g.files:
+        return None
+    ext = g.files[id_].suffix
+    path = app.config['UPLOAD_PATH'] / f'{id_}{ext}'
+    if size:
+        if ext in app.config['PROCESSABLE_EXT']:
+            ext = app.config['PROCESSED_EXT']  # pragma: no cover
+        path = app.config['RESIZED_IMAGES'] / size / f'{id_}{ext}'
+    return path if os.path.exists(path) else None

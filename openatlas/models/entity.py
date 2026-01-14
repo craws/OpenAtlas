@@ -14,6 +14,7 @@ from openatlas.display.util2 import convert_size, sanitize
 from openatlas.models.annotation import AnnotationText
 from openatlas.models.dates import Dates
 from openatlas.models.gis import delete_gis_by_entity, insert_gis
+from openatlas.models.overlay import Overlay
 
 
 class Entity:
@@ -449,6 +450,9 @@ class Entity:
             else:
                 db.remove_type(self.id, delete_ids)
         Transaction.commit()
+
+    def get_overlays(self) -> dict[int, Overlay]:
+        return Overlay.get_by_entity(self)
 
     @staticmethod
     def get_file_info() -> dict[int, Any]:

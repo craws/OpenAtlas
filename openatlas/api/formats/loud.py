@@ -8,7 +8,7 @@ from openatlas import app
 from openatlas.api.resources.util import (
     date_to_str, get_crm_code, get_crm_relation, get_iiif_manifest_and_path,
     get_license_type, remove_spaces_dashes, to_camel_case)
-from openatlas.display.util import get_file_path
+from openatlas.display.util2 import get_file_path
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import get_wkt_by_id
 
