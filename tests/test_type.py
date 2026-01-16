@@ -11,14 +11,9 @@ class TypeTest(TestBaseCase):
             app.preprocess_request()
             relation_type = get_hierarchy('Actor relation')
             dimension_type = get_hierarchy('Dimensions')
-            historical_type = get_hierarchy('Historical place')
             place = insert('place', 'Home')
             place.link('P2', g.types[dimension_type.subs[0]], '46')
             location = place.get_linked_entity_safe('P53')
-            location.link('P89', g.types[historical_type.subs[0]])
-
-        rv = c.get(url_for('view', id_=historical_type.subs[0]))
-        assert b'Historical place' in rv.data
 
         rv = c.get(
             url_for(
@@ -157,6 +152,10 @@ class TypeTest(TestBaseCase):
             place.link(
                 'P2',
                 [g.types[place_type.subs[0]], g.types[place_type.subs[1]]])
+            location.link('P89', g.types[admin_unit.subs[0]])
+
+        rv = c.get(url_for('view', id_=admin_unit.subs[0]))
+        assert b'Administrative unit' in rv.data
 
         rv = c.get(url_for('view', id_=actor2.id))
         assert b'Connor' in rv.data

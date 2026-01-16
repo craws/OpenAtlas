@@ -200,7 +200,7 @@ def add_relations(
                         'name_inverse',
                         StringField(_('inverse')))
             else:  # It's a root type (hierarchy)
-                if entity.category == 'custom':
+                if entity.category in ('custom', 'place'):
                     form.multiple = BooleanField(
                         _('multiple'),
                         description=_('tooltip hierarchy multiple'))

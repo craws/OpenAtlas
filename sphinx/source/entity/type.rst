@@ -84,5 +84,5 @@ Please keep in mind that not all users can add new types when making a type
 required. This might lead to situations where a user is unable to choose a
 fitting type for an entity and might therefore reduce data quality.
 
-Existing entries that were entered before a typ was set to required and have
+Existing entries that were entered before a type was set to required and have
 no set values for this specific type can not be updated anymore afterwards.

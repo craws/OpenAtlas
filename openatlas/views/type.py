@@ -29,9 +29,8 @@ def type_delete_recursive(id_: int) -> str | Response:
 
     type_ = g.types[id_]
     root = g.types[type_.root[0]] if type_.root else None
-    root_name = root.name if root else type_.name
-    if type_.category == 'system' or \
-            type_.category in ('standard', 'place') and not root:
+    if type_.category == 'system' or (
+            type_.category == 'standard' and not root):
         abort(403)
     form = DeleteRecursiveTypesForm()
     if form.validate_on_submit() and form.confirm_delete.data:
@@ -56,7 +55,7 @@ def type_delete_recursive(id_: int) -> str | Response:
     for sub_id in type_.get_sub_ids_recursive():
         sub = g.types[sub_id]
         tabs['subs'].table.rows.append([link(sub), sub.count, sub.description])
-    if root_name in app.config['PROPERTY_TYPES']:
+    if root and root.name in app.config['PROPERTY_TYPES']:
         for row in Link.get_links_by_type_recursive(type_, []):
             tabs['entities'].table.columns = [_('domain'), _('range')]
             tabs['entities'].table.rows.append([

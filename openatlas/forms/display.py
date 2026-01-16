@@ -55,8 +55,6 @@ def html_form(
             continue
         if field.type in ['TreeField', 'TreeMultiField', 'ValueTypeRootField']:
             type_ = g.types[field.type_id]
-            if not type_.subs:
-                continue
             label = type_.name
             if type_.category == 'standard' and type_.name != 'License':
                 label = _('type')

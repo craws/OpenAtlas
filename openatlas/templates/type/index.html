@@ -24,9 +24,9 @@
     {% for category in types %}
       <div class="tab-pane fade" role="tabpanel" id="menu-tab-{{ category }}" style="padding: 0;">
         <div class="accordion accordion-flush" id="TypeAccordion-{{ category }}">
-          {% if category in ['custom', 'value'] and 'manager'|is_authorized %}
+          {% if category in ['custom', 'place', 'value'] and 'manager'|is_authorized %}
             <div style="padding:0.5rem 1.25rem;">
-              {{ (_('type') + ' ' + _('hierarchy'))|button(url_for('hierarchy_insert', category=category))|safe }}
+              {{ (category + ' ' + _('hierarchy'))|button(url_for('hierarchy_insert', category=category))|safe }}
             </div>
           {% endif %}
           {% for type_, tree in types[category].items() %}
@@ -62,7 +62,7 @@
                             {{ _('type')|button(url_for('insert', class_=type_.class_.name, origin_id=type_.id, relation='subs'))|safe }}
                           </div>
                         {% endif %}
-                        {% if category in ['custom', 'value'] and 'manager'|is_authorized %}
+                        {% if category in ['custom', 'place', 'value'] and 'manager'|is_authorized %}
                           <div class="col-auto">{{ _('edit')|button(url_for('hierarchy_update', id_=type_.id))|safe }}</div>
                           {% if not type_.system %}
                             <div class="col-auto">
@@ -70,8 +70,8 @@
                                 {{ _('delete')|button(url_for('hierarchy_delete', id_=type_.id))|safe }}
                               {% else %}
                                 {{ _('delete')|button(
-                              url_for('hierarchy_delete', id_=type_.id),
-                              onclick="return confirm('" + _('delete')|uc_first + " " + type_.name.replace("'", '').replace('"', '') + "?');")|safe }}
+                                  url_for('hierarchy_delete', id_=type_.id),
+                                  onclick="return confirm('" + _('delete')|uc_first + " " + type_.name.replace("'", '').replace('"', '') + "?');")|safe }}
                               {% endif %}
                             </div>
                           {% endif %}
