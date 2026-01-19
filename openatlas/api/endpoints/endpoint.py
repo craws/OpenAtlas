@@ -380,7 +380,7 @@ class Endpoint:
                 feature['depictions'] = get_lp_file(entity)
             else:
                 feature['depictions'] = [
-                    get_lp_file(link.domain) for link in links_inverse
+                    get_lp_file(link.domain, entity) for link in links_inverse
                     if link.domain.class_.name == 'file']
         return {
             'type': 'FeatureCollection',

@@ -98,7 +98,8 @@ def linked_places_template(parser: Parser) -> dict[str, Type[String]]:
         'url': fields.String,
         'mimetype': fields.String,
         'IIIFBasePath': fields.String,
-        'IIIFManifest': fields.String}
+        'IIIFManifest': fields.String,
+        'mainImage': fields.Boolean,}
     links = {
         'referenceURL': fields.String,
         'id': fields.String,
@@ -228,6 +229,7 @@ def presentation_template() -> dict[str, Any]:
         'fromSuperEntity': fields.Boolean,
         'IIIFManifest': fields.String,
         'IIIFBasePath': fields.String,
+        'mainImage': fields.Boolean,
         'overlay': fields.String}
     relation_types = {
         'property': fields.String,
