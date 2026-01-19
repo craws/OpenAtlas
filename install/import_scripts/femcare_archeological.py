@@ -11,7 +11,7 @@ from docx import Document
 
 from openatlas import app
 from openatlas.api.import_scripts.util import get_exact_match
-from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity, insert
 
 FILE_PATH = Path('files/femcare')
 SKELETON_PATH = FILE_PATH / '06_SE Protokollblätter' / ('Elisabethinen_SE '
@@ -95,6 +95,7 @@ class StratigraphicUnit:
     age: Optional[str] = None
     extraction: Optional[str] = None
 
+
 def build_se_ind_map(root: Path) -> dict[str, Path]:
     """
     Scan 'Schnitte' recursively and return mapping
@@ -108,6 +109,7 @@ def build_se_ind_map(root: Path) -> dict[str, Path]:
         if name.startswith("SE_") and "_Ind_" in name:
             out[name] = path
     return out
+
 
 def parse_features() -> list[Feature]:
     df = pd.read_csv(FILE_PATH / 'features.csv', delimiter=',')
@@ -194,7 +196,7 @@ def parse_finds() -> list[Find]:
 
 def parse_individual_docx(file_path: Path) -> Optional[Individual]:
     """Parse one DOCX file by reading table 2 and 4 directly."""
-    doc = Document(file_path)
+    doc = Document(str(file_path))
     tables = doc.tables
     if len(tables) < 4:
         return None
@@ -316,7 +318,8 @@ def build_types(
         key_ = getattr(entry_, attribute, None)
         if not key_ or key_ in types:
             continue
-        type_ = Entity.insert('type', key_)
+        # type_ = Entity.insert('type', key_)
+        type_ = insert({'name': key_, 'openatlas_class_name': 'type'})
         type_.link('P127', hierarchy)
         types[key_] = type_
     return types
@@ -333,7 +336,8 @@ def build_find_types(
         key_ = getattr(entry_, attribute, None)
         if not key_ or key_ in types:
             continue
-        type_ = Entity.insert('type', key_)
+        # type_ = Entity.insert('type', key_)
+        type_ = insert({'name': key_, 'openatlas_class_name': 'type'})
         type_.link('P127', hierarchy)
         types[key_] = type_
     return types
@@ -346,7 +350,7 @@ with app.test_request_context():
     folder_map = build_se_ind_map(SCHNITTE_PATH)
 
     print('Remove former data')
-    for item in case_study.get_linked_entities('P2', True):
+    for item in case_study.get_linked_entities('P2', inverse=True):
         item.delete()
     print('\nFormer data removed')
 
@@ -362,16 +366,24 @@ with app.test_request_context():
 
     place = Entity.get_by_id(145)
     feature_main_type = Entity.get_by_id(72)
-    import_feature_type = Entity.insert('type', 'imported')
+    # import_feature_type = Entity.insert('type', 'imported')
+    import_feature_type = insert(
+        {'name': 'imported', 'openatlas_class_name': 'type'})
     import_feature_type.link('P127', feature_main_type)
     artifact_main_type = Entity.get_by_id(21)
-    import_artifact_type = Entity.insert('type', 'imported')
+    # import_artifact_type = Entity.insert('type', 'imported')
+    import_artifact_type = insert(
+        {'name': 'imported', 'openatlas_class_name': 'type'})
     import_artifact_type.link('P127', artifact_main_type)
     hr_main_type = Entity.get_by_id(78)
-    import_hr_type = Entity.insert('type', 'imported')
+    # import_hr_type = Entity.insert('type', 'imported')
+    import_hr_type = insert(
+        {'name': 'imported', 'openatlas_class_name': 'type'})
     import_hr_type.link('P127', hr_main_type)
     su_main_type = Entity.get_by_id(75)
-    import_su_type = Entity.insert('type', 'imported')
+    # import_su_type = Entity.insert('type', 'imported')
+    import_su_type = insert(
+        {'name': 'imported', 'openatlas_class_name': 'type'})
     import_su_type.link('P127', su_main_type)
 
     # Get OpenAtlas reference systems
@@ -430,7 +442,11 @@ with app.test_request_context():
 
     added_features: dict[str, Entity] = {}
     for entry in features:
-        feature = Entity.insert('feature', entry.name, entry.description)
+        # feature = Entity.insert('feature', entry.name, entry.description)
+        feature = insert({
+            'name': entry.name,
+            'description': entry.description,
+            'openatlas_class_name': 'feature'})
         feature.link('P2', case_study)
         feature.link('P2', feature_types[entry.type])
         if entry.cut:
@@ -441,18 +457,25 @@ with app.test_request_context():
             feature,
             str(entry.obj_id),
             type_id=exact_match.id)
-        location = Entity.insert(
-            'object_location',
-            f"Location of {entry.name}")
+        # location = Entity.insert(
+        #     'object_location',
+        #     f"Location of {entry.name}")
+        location = insert({
+            'name': f'Location of {entry.name}',
+            'openatlas_class_name': 'object_location'})
         feature.link('P53', location)
         added_features[entry.id_] = feature
 
     added_stratigraphic: dict[str, Entity] = {}
     for entry in merged_units:
-        su = Entity.insert(
-            'stratigraphic_unit',
-            entry.name,
-            '\n'.join(entry.description))
+        # su = Entity.insert(
+        #     'stratigraphic_unit',
+        #     entry.name,
+        #     '\n'.join(entry.description))
+        su = insert({
+            'name': entry.name,
+            'description': '\n'.join(entry.description),
+            'openatlas_class_name': 'stratigraphic_unit'})
         su.link('P2', case_study)
         su.link('P46', added_features[entry.feature], inverse=True)
         ref_sys_su.link(
@@ -466,9 +489,12 @@ with app.test_request_context():
                 su,
                 str(entry.individual_id),
                 type_id=exact_match.id)
-        location = Entity.insert(
-            'object_location',
-            f"Location of {entry.name}")
+        # location = Entity.insert(
+        #     'object_location',
+        #     f"Location of {entry.name}")
+        location = insert({
+            'name': f'Location of {entry.name}',
+            'openatlas_class_name': 'object_location'})
         su.link('P53', location)
 
         if entry.type:
@@ -494,7 +520,14 @@ with app.test_request_context():
 
         skelett_file = skelett_maenchens_files.get(f'SE_{entry.se_id}')
         if skelett_file:
-            file = Entity.insert('file', f'SE {entry.se_id} Ind {entry.individual_id} Skelettmännchen')
+            # file = Entity.insert(
+            #     'file',
+            #     f'SE {entry.se_id} Ind '
+            #     f'{entry.individual_id} Skelettmännchen')
+            file = insert({
+                'name': f'SE {entry.se_id} Ind '
+                        f'{entry.individual_id} Skelettmännchen',
+                'openatlas_class_name': 'file'})
             # Todo: License, Creator, Holder, Public viewable
             su.link('P67', file, inverse=True)
 
@@ -510,7 +543,14 @@ with app.test_request_context():
                 p for p in folder.iterdir()
                 if p.is_file() and p.suffix.lower() in {".jpg", ".jpeg"}]
             for idx, image in enumerate(images):
-                file = Entity.insert('file', f'SE {entry.se_id} Ind {entry.individual_id} {idx}')
+                # file = Entity.insert(
+                #       'file',
+                #       f'SE {entry.se_id} Ind '
+                #       f'{entry.individual_id} {idx}')
+                file = insert({
+                    'name': f'SE {entry.se_id} Ind '
+                            f'{entry.individual_id} {idx}',
+                    'openatlas_class_name': 'file'})
                 # Todo: License, Creator, Holder, Public viewable
                 su.link('P67', file, inverse=True)
                 ext = image.suffix
@@ -535,7 +575,11 @@ with app.test_request_context():
         system_class = 'artifact'
         if entry.material == 'menschl. Kn.':
             system_class = 'human_remains'
-        find = Entity.insert(system_class, entry.name, entry.description)
+        # find = Entity.insert(system_class, entry.name, entry.description)
+        find = insert({
+            'name': entry.name,
+            'description': entry.description,
+            'openatlas_class_name': system_class})
         find.link('P2', case_study)
         find.link('P46', link_to_entity, inverse=True)
 
@@ -544,9 +588,12 @@ with app.test_request_context():
             find,
             str(entry.f_id),
             type_id=exact_match.id)
-        location = Entity.insert(
-            'object_location',
-            f"Location of {entry.name}")
+        # location = Entity.insert(
+        #     'object_location',
+        #     f"Location of {entry.name}")
+        location = insert({
+            'name': f'Location of {entry.name}',
+            'openatlas_class_name': 'object_location'})
         find.link('P53', location)
 
         if entry.material:

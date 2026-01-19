@@ -18,7 +18,7 @@ def get_or_create_type(hierarchy: Any, type_name: str) -> Entity:
 
 
 def get_type_by_name(type_name: str) -> Optional[Entity]:
-    for type_ in g.types.items():
+    for type_ in g.types.values():
         if type_.name == type_name:
             return type_
     return None
