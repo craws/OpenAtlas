@@ -204,13 +204,14 @@ def add_relations(
                     form.multiple = BooleanField(
                         _('multiple'),
                         description=_('tooltip hierarchy multiple'))
-                # noinspection PyTypeChecker
-                form.classes = SelectMultipleField(
-                    _('classes'),
-                    description=_('tooltip hierarchy forms'),
-                    choices=Entity.get_class_choices(entity),
-                    option_widget=widgets.CheckboxInput(),
-                    widget=widgets.ListWidget(prefix_label=False))
+                if entity.category in ('custom', 'value'):
+                    # noinspection PyTypeChecker
+                    form.classes = SelectMultipleField(
+                        _('classes'),
+                        description=_('tooltip hierarchy forms'),
+                        choices=Entity.get_class_choices(entity),
+                        option_widget=widgets.CheckboxInput(),
+                        widget=widgets.ListWidget(prefix_label=False))
         elif relation.multiple:
             selection: Any = []
             if entity.id:

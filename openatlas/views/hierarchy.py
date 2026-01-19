@@ -16,7 +16,9 @@ from openatlas.models.entity import Entity
 @app.route('/hierarchy/insert/<category>', methods=['GET', 'POST'])
 @required_group('manager')
 def hierarchy_insert(category: str) -> str | Response:
-    hierarchy = Entity({'openatlas_class_name': 'type'})
+    hierarchy = Entity({
+        'openatlas_class_name': 'administrative_unit'
+        if category == 'place' else 'type'})
     hierarchy.category = category
     form = get_entity_form(hierarchy)
     if form.validate_on_submit():
@@ -26,7 +28,7 @@ def hierarchy_insert(category: str) -> str | Response:
             Entity.insert_hierarchy(
                 process_form(hierarchy, form),
                 category,
-                form.classes.data,
+                form.classes.data if hasattr(form, 'classes') else ['place'],
                 bool(
                     category == 'value'
                     or (hasattr(form, 'multiple') and form.multiple.data)))
@@ -64,7 +66,7 @@ def hierarchy_update(id_: int) -> str | Response:
         else:
             hierarchy.update_hierarchy(
                 form.name.data,
-                form.classes.data,
+                form.classes.data if hasattr(form, 'classes') else [],
                 multiple=(
                     hierarchy.category == 'value'
                     or (hasattr(form, 'multiple') and form.multiple.data)

@@ -17,6 +17,7 @@ def index_changelog() -> str:
 versions = {
     '9.1.0': ['TBA', {
         'feature': {
+            '2505': 'Custom place hierarchies',
             '2700': 'Restructured data integrity check',
             '2703': 'Removed overlay option',
             '2695': 'Refactor and minor improvements'
