@@ -66,7 +66,8 @@ def get_file_dict(
         'publicShareable': link.domain.public,
         'mimetype': mime_type,
         'fromSuperEntity': root,
-        'url': url}
+        'url': url,
+        'mainImage': link.range.get_profile_image_id() == link.domain.id}
     data.update(get_iiif_manifest_and_path(link.domain.id))
     if overlay:
         data.update({'overlay': overlay.bounding_box})
