@@ -67,11 +67,10 @@ for further information.
 
 Map Overlay
 -----------
-If the module map overlay is activated in the :doc:`profile` settings, added
-overlays for places will be visible on the map by default and can be toggled
-with the map layer button at the upper right corner.
+Added overlays for places will be visible on the map by default and can be
+toggled with the map layer button at the upper right corner.
 
-To insert new overlays (only available for editors and admins) go to the view
+To insert new overlays (only available for editors or above) go to the view
 of a specific place. After adding an image file in the file tab you can click
 **link** in the overlay column to enter coordinates (Easting and Northing) for:
 

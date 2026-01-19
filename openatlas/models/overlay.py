@@ -1,10 +1,12 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from openatlas.database import overlay as db
-from openatlas.display.util import get_file_path
-from openatlas.models.entity import Entity
+from openatlas.display.util2 import get_file_path
+
+if TYPE_CHECKING:  # pragma: no cover
+    from openatlas.models.entity import Entity
 
 
 class Overlay:
@@ -41,9 +43,11 @@ class Overlay:
                 f'{data['bottom_left_easting']}]]'})
 
     @staticmethod
-    def get_by_object(object_: Entity) -> dict[int, Overlay]:
-        places = [object_] + list(
-            object_.get_linked_entities_recursive('P46', True))
+    def get_by_entity(entity: Entity) -> dict[int, Overlay]:
+        if entity.class_.group['name'] != 'place':
+            return {}
+        places = [entity] + list(
+            entity.get_linked_entities_recursive('P46', True))
         ids = []
         for place in places:
             ids += [

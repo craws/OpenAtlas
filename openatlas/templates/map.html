@@ -28,7 +28,7 @@
   const maxClusterRadius        = {{ g.settings.map_cluster_max_radius }};
   const disableClusteringAtZoom = {{ g.settings.map_cluster_disable_at_zoom }};
   overlays = [];
-  {% if current_user.settings.module_map_overlay and overlays is defined and overlays and overlays|length %}
+  {% if overlays is defined and overlays and overlays|length %}
     overlays = [
       {% for image_id, overlay in overlays.items() %}
       {

@@ -3,7 +3,7 @@ from typing import Any, Optional
 from openatlas.database import settings as db
 from openatlas.display.util2 import sanitize
 
-MODULES = ['map_overlay', 'time']
+MODULES = ['time']
 
 
 def get_settings() -> dict[str, Any]:

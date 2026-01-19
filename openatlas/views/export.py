@@ -44,7 +44,10 @@ def delete_export(view: str, filename: str) -> Response:
         flash(_('file deleted'))
     except Exception as e:
         g.logger.log(
-            'error', 'file', f'{view.upper()} file deletion failed', e)
+            'error',
+            'file',
+            f'{view.upper()} file deletion failed',
+            e)
         flash(_('error file delete'), 'error')
     return redirect(url_for(f'export_{view}', _anchor='tab-export'))
 
@@ -65,14 +68,13 @@ def export_execute(format_: str) -> Response:
 @app.route('/export/sql')
 @required_group('manager')
 def export_sql() -> str:
-    table = build_export_table('sql')
     return render_template(
         'tabs.html',
         tabs={
             'export': Tab(
                 'export',
                 _('export'),
-                content=table.display(),
+                content=build_export_table('sql').display(),
                 buttons=[
                     manual('admin/export'),
                     button(
@@ -90,7 +92,6 @@ def export_sql() -> str:
 @app.route('/export/arche')
 @required_group('manager')
 def export_arche() -> str:
-    table = build_export_table('arche')
     metadata = app.config['ARCHE_METADATA']
     info_content = {
         'topCollection': metadata.get('topCollection'),
@@ -107,28 +108,27 @@ def export_arche() -> str:
         'excludeReferenceSystems':
             ', '.join(metadata.get('excludeReferenceSystems', [])),
         'typeIds':
-            ', '.join(
-                [link(str(type_id), url_for('view', id_=type_id))
-                 for type_id in metadata.get('typeIds', [])])}
+            ', '.join([
+                link(str(type_id), url_for('view', id_=type_id))
+                for type_id in metadata.get('typeIds', [])])}
     return render_template(
         'tabs.html',
         tabs={
             'info': Tab(
                 'info',
                 content=display_info(info_content),
-                buttons=[manual('admin/export'),
-                         button(
-                             f'ARCHE {_('file checker')}',
-                             url_for('check_files', arche='arche'))]),
-            'export': Tab(
-                'export',
-                _('export'),
-                content=table.display(),
                 buttons=[
                     manual('admin/export'),
                     button(
-                        _('export') + ' ARCHE',
-                        url_for('arche_execute'))
+                        f'ARCHE {_('file checker')}',
+                        url_for('check_files', arche='arche'))]),
+            'export': Tab(
+                'export',
+                _('export'),
+                content=build_export_table('arche').display(),
+                buttons=[
+                    manual('admin/export'),
+                    button(f'{_('export')} ARCHE', url_for('arche_execute'))
                     if is_authorized('admin') else ''])},
         title=f'{_('export')} ARCHE',
         crumbs=[
@@ -152,20 +152,16 @@ def arche_execute() -> Response:
 @app.route('/export/rdf')
 @required_group('manager')
 def export_rdf() -> str:
-    table = build_export_table('rdf')
     return render_template(
         'tabs.html',
         tabs={
             'export': Tab(
                 'export',
                 _('export'),
-                content=table.display(),
+                content=build_export_table('rdf').display(),
                 buttons=[
                     manual('admin/export'),
-                    button(
-                        _('export') + ' RDF/NT',
-                        url_for('rdf_execute'))
-                ])},
+                    button(f'{_('export')} RDF/NT', url_for('rdf_execute'))])},
         title=f'{_('export')} RDF',
         crumbs=[
             [_('admin'), f'{url_for('admin_index')}#tab-data'],

@@ -5,7 +5,6 @@ from flask import g, url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from openatlas.models.overlay import Overlay
 from tests.base import TestBaseCase, get_hierarchy, insert
 
 
@@ -162,8 +161,7 @@ class PlaceTest(TestBaseCase):
 
         with app.test_request_context():
             app.preprocess_request()
-            overlay = Overlay.get_by_object(place)
-            overlay_id = overlay[list(overlay.keys())[0]].id
+            overlay_id = next(iter(place.get_overlays().values())).id
 
         rv = c.get(
             url_for(

@@ -35,9 +35,7 @@ def current_date_for_filename() -> str:
 def sql_export(format_: str, postfix: Optional[str] = '') -> bool:
     file = app.config['SQL_PATH'] \
            / f'{current_date_for_filename()}_export{postfix}.{format_}'
-    command: Any = [
-        "pg_dump" if os.name == 'posix'
-        else Path(str(shutil.which("pg_dump.exe")))]
+    command: list[Any] = ['pg_dump']
     if format_ == 'dump':
         command.append('-Fc')
     command.extend([
@@ -47,13 +45,13 @@ def sql_export(format_: str, postfix: Optional[str] = '') -> bool:
         '-p', str(app.config['DATABASE_PORT']),
         '-f', file])
     try:
-        root = os.environ['SYSTEMROOT'] if 'SYSTEMROOT' in os.environ else ''
         with subprocess.Popen(
                 command,
                 stdin=subprocess.PIPE,
                 env={
                     'PGPASSWORD': app.config['DATABASE_PASS'],
-                    'SYSTEMROOT': root}) as sub_process:
+                    'SYSTEMROOT': os.environ.get('SYSTEMROOT', '')}) \
+                as sub_process:
             sub_process.wait()
         with open(os.devnull, 'w', encoding='utf8') as null:
             with subprocess.Popen(
@@ -386,8 +384,7 @@ def open_tmp_sql_file() -> str:
             stdout=tmp_sql,
             env={
                 'PGPASSWORD': app.config['DATABASE_PASS'],
-                'SYSTEMROOT': os.environ[
-                    'SYSTEMROOT'] if 'SYSTEMROOT' in os.environ else ''},
+                'SYSTEMROOT': os.environ.get('SYSTEMROOT', '')},
             check=True)
         return tmp_sql.name
 
