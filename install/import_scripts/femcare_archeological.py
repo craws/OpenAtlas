@@ -25,6 +25,11 @@ SCHNITTE_PATH = FILE_PATH / "17_Fotodokumentation" / "Schnitte"
 
 DEBUG_MSG = defaultdict(list)
 
+FILE_INFO = {
+    'creator': 'LH Novetus',
+    'license_holder': 'LH Novetus',
+    'public': True}
+
 
 @dataclass
 class Individual:
@@ -116,18 +121,18 @@ def parse_features() -> list[Feature]:
     features_ = []
     current_cut = ''
     for index, row in df.iterrows():
-        if "Schnitt" in row[0]:
-            current_cut = row[0]
+        if "Schnitt" in row.iloc[0]:
+            current_cut = row.iloc[0]
             continue
-        se_raw = row[2]
+        se_raw = row.iloc[2]
         se_list = se_raw.split(", ") if pd.notna(se_raw) else []
         entry_obj = Feature(
-            id_=f"feature_{int(row[0])}".strip(),
-            obj_id=int(row[0]),
-            name=f'Objekt {str(int(row[0])).strip()}',
-            type=row[1].strip(),
+            id_=f"feature_{int(row.iloc[0])}".strip(),
+            obj_id=int(row.iloc[0]),
+            name=f'Objekt {str(int(row.iloc[0])).strip()}',
+            type=row.iloc[1].strip(),
             se=se_list,
-            description=row[3] if pd.notna(row[3]) else None,
+            description=row.iloc[3] if pd.notna(row.iloc[3]) else None,
             cut=current_cut.strip())
         features_.append(entry_obj)
     return features_
@@ -137,21 +142,21 @@ def parse_stratigraphic_units() -> list[ParsedStratigraphicUnit]:
     df = pd.read_csv(FILE_PATH / 'se.csv', delimiter=',')
     se = []
     for index, row in df.iterrows():
-        if pd.isna(row[2]) or row[2] == '':
+        if pd.isna(row.iloc[2]) or row.iloc[2] == '':
             continue
-        if pd.isna(row[4]) or row[4] == 0:
-            DEBUG_MSG['no_feature_available'].append(int(row[0]))
+        if pd.isna(row.iloc[4]) or row.iloc[4] == 0:
+            DEBUG_MSG['no_feature_available'].append(int(row.iloc[0]))
             continue
         entry_obj = ParsedStratigraphicUnit(
-            id_=f"stratigraphic_{int(row[0])}".strip(),
-            se_id=int(row[0]),
-            name=f'SE {str(int(row[0])).strip()}',
+            id_=f"stratigraphic_{int(row.iloc[0])}".strip(),
+            se_id=int(row.iloc[0]),
+            name=f'SE {str(int(row.iloc[0])).strip()}',
             # convert to int cause of the leading zeros
-            type=row[1],
-            layer=row[2].strip(),
-            individual_id=int(row[3]) if pd.notna(row[3]) else None,
-            feature=f"feature_{int(row[4])}".strip()
-            if pd.notna(row[4]) else '')
+            type=row.iloc[1],
+            layer=row.iloc[2].strip(),
+            individual_id=int(row.iloc[3]) if pd.notna(row.iloc[3]) else None,
+            feature=f"feature_{int(row.iloc[4])}".strip()
+            if pd.notna(row.iloc[4]) else '')
         se.append(entry_obj)
     return se
 
@@ -162,34 +167,35 @@ def parse_finds() -> list[Find]:
     for index, row in df.iterrows():
 
         stratigraphic_unit = ''
-        if pd.notna(row[1]):
-            if row[1] == '-':
+        if pd.notna(row.iloc[1]):
+            if row.iloc[1] == '-':
                 stratigraphic_unit = ''
-            elif '/' in row[1]:
-                DEBUG_MSG['multiple_SE_in_finds'].append(row[0])
-            elif '?' in row[1]:
-                DEBUG_MSG['undecided_SE_in_finds'].append(row[0])
+            elif '/' in row.iloc[1]:
+                DEBUG_MSG['multiple_SE_in_finds'].append(row.iloc[0])
+            elif '?' in row.iloc[1]:
+                DEBUG_MSG['undecided_SE_in_finds'].append(row.iloc[0])
             else:
-                stratigraphic_unit = f"stratigraphic_{int(row[1])}".strip()
+                stratigraphic_unit = (f"stratigraphic_"
+                                      f"{int(row.iloc[1])}").strip()
         feature_ = ''
-        if pd.notna(row[4]):
-            if row[4] == '-':
+        if pd.notna(row.iloc[4]):
+            if row.iloc[4] == '-':
                 feature_ = ''
             else:
-                feature_ = f"feature_{int(row[4])}".strip()
+                feature_ = f"feature_{int(row.iloc[4])}".strip()
 
         entry_obj = Find(
-            id_=f"find_{int(row[0])}".strip(),
-            f_id=int(row[0]),
+            id_=f"find_{int(row.iloc[0])}".strip(),
+            f_id=int(row.iloc[0]),
             stratigraphic_unit=stratigraphic_unit,
             feature_id=feature_,
-            name=f"FNR {int(row[0])}",
-            material=row[6] if pd.notna(row[6]) else '',
-            designation=row[7] if pd.notna(row[7]) else '',
-            description=row[8] if pd.notna(row[8]) else '',
-            dating=row[9] if pd.notna(row[9]) else '',
+            name=f"FNR {int(row.iloc[0])}",
+            material=row.iloc[6] if pd.notna(row.iloc[6]) else '',
+            designation=row.iloc[7] if pd.notna(row.iloc[7]) else '',
+            description=row.iloc[8] if pd.notna(row.iloc[8]) else '',
+            dating=row.iloc[9] if pd.notna(row.iloc[9]) else '',
             openatlas_class='human_remains'
-            if row[6] == 'menschl. Kn.' else 'artifact')
+            if row.iloc[6] == 'menschl. Kn.' else 'artifact')
         finds_.append(entry_obj)
     return finds_
 
@@ -348,6 +354,7 @@ with app.test_request_context():
     exact_match = get_exact_match()
     case_study = Entity.get_by_id(16305)
     folder_map = build_se_ind_map(SCHNITTE_PATH)
+    cc_by_sa_type = Entity.get_by_id(50)
 
     print('Remove former data')
     for item in case_study.get_linked_entities('P2', inverse=True):
@@ -528,7 +535,8 @@ with app.test_request_context():
                 'name': f'SE {entry.se_id} Ind '
                         f'{entry.individual_id} Skelettmännchen',
                 'openatlas_class_name': 'file'})
-            # Todo: License, Creator, Holder, Public viewable
+            file.save_file_info(FILE_INFO)
+            file.link('P2', cc_by_sa_type)
             su.link('P67', file, inverse=True)
 
             ext = skelett_file.suffix
@@ -551,7 +559,8 @@ with app.test_request_context():
                     'name': f'SE {entry.se_id} Ind '
                             f'{entry.individual_id} {idx}',
                     'openatlas_class_name': 'file'})
-                # Todo: License, Creator, Holder, Public viewable
+                file.save_file_info(FILE_INFO)
+                file.link('P2', cc_by_sa_type)
                 su.link('P67', file, inverse=True)
                 ext = image.suffix
                 dest = UPLOAD / f"{file.id}{ext.lower()}"
