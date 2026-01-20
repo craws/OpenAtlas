@@ -21,6 +21,7 @@ def hierarchy_insert(category: str) -> str | Response:
         if category == 'place' else 'type'})
     hierarchy.category = category
     form = get_entity_form(hierarchy)
+    del form.insert_and_continue
     if form.validate_on_submit():
         if Entity.check_hierarchy_exists(form.name.data):
             form.name.errors.append(_('error name exists'))
@@ -79,14 +80,16 @@ def hierarchy_update(id_: int) -> str | Response:
                 f'#menu-tab-{g.types[id_].category}_collapse-{hierarchy.id}')
     if hasattr(form, 'multiple') and has_multiple_links and hierarchy.multiple:
         form.multiple.render_kw = {'disabled': 'disabled'}
-    table = Table(['class', 'count'], paging=False)
-    for name in hierarchy.classes:
-        count = hierarchy.get_count_by_class(name)
-        table.rows.append([
-            g.classes[name].label,
-            format_number(count) if count else link(
-                _('remove'),
-                url_for('remove_class', id_=hierarchy.id, name=name))])
+    table = None
+    if hierarchy.category != 'place':
+        table = Table(['class', 'count'], paging=False)
+        for name in hierarchy.classes:
+            count = hierarchy.get_count_by_class(name)
+            table.rows.append([
+                g.classes[name].label,
+                format_number(count) if count else link(
+                    _('remove'),
+                    url_for('remove_class', id_=hierarchy.id, name=name))])
     return render_template(
         'content.html',
         content=f'''
@@ -94,7 +97,9 @@ def hierarchy_update(id_: int) -> str | Response:
               <div class="col-12 col-sm-6">
                 {display_form(form, manual_page='entity/type')}
               </div>
-              <div class="col-12 col-sm-6">{table.display()}</div>
+              <div class="col-12 col-sm-6">
+                {table.display() if table else ''}
+              </div>
             </div>''',
         title=_('type'),
         crumbs=[
