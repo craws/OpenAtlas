@@ -14,12 +14,19 @@ from openatlas.api.import_scripts.util import get_exact_match
 from openatlas.models.entity import Entity, insert
 
 FILE_PATH = Path('files/femcare')
-SKELETON_PATH = FILE_PATH / '06_SE Protokollblätter' / ('Elisabethinen_SE '
-                                                        'Protokolle')
+SKELETON_PATH = FILE_PATH / 'Elisabethinen_SE_Protokolle'
+SCHNITTE_PATH = FILE_PATH / "Schnitte"
 SKELETON_IMAGE_PATH = FILE_PATH / 'skelett_mannchen'
 UPLOAD = FILE_PATH / 'uploads'
+# todo: get both funfotos sorted to finds
+#   FUNDFOTOS_AMULETTE has a special docx where the name of the image can be
+#       linked to the acutal FDNR with additional data (Katalog_fundfotos.docx)
+#   Create a file dict with {FNR: [{'file_name': 'xxx', 'file_path': xxx}]
+FUNDFOTOS = FILE_PATH / 'Fundfotos'
+FUNDFOTOS_AMULETTE = FILE_PATH / 'Fundfotos_Medaillien'
+FUNDFOTOS_KATALOG = FILE_PATH / 'Katalog_fundfotos.docx'
 
-SCHNITTE_PATH = FILE_PATH / "17_Fotodokumentation" / "Schnitte"
+
 
 # pylint: skip-file
 
@@ -355,12 +362,16 @@ with app.test_request_context():
     case_study = Entity.get_by_id(16305)
     folder_map = build_se_ind_map(SCHNITTE_PATH)
     cc_by_sa_type = Entity.get_by_id(50)
+    file_excavation_type = Entity.get_by_id(19068)
+    file_skeletonman_type = Entity.get_by_id(19069)
+    file_find_type = Entity.get_by_id(19072)
 
     print('Remove former data')
     for item in case_study.get_linked_entities('P2', inverse=True):
         item.delete()
     print('\nFormer data removed')
 
+    # Skelettmännchen
     skelett_maenchens = {}
     for file_ in SKELETON_IMAGE_PATH.iterdir():
         skelett_maenchens[file_.stem] = file_
@@ -371,24 +382,31 @@ with app.test_request_context():
         if key not in skelett_maenchens_files:
             skelett_maenchens_files[key] = v
 
+    # Fundfotos
+    fundfotos = {}
+    for file_ in FUNDFOTOS.iterdir():
+        fundfotos[file_.stem] = file_
+
+    # fundfotos_files = {}
+    # for k, v in fundfotos.items():
+    #     key = f"{k}"
+    #     if key not in fundfotos_files:
+    #         fundfotos_files[key] = v
+
     place = Entity.get_by_id(145)
     feature_main_type = Entity.get_by_id(72)
-    # import_feature_type = Entity.insert('type', 'imported')
     import_feature_type = insert(
         {'name': 'imported', 'openatlas_class_name': 'type'})
     import_feature_type.link('P127', feature_main_type)
     artifact_main_type = Entity.get_by_id(21)
-    # import_artifact_type = Entity.insert('type', 'imported')
     import_artifact_type = insert(
         {'name': 'imported', 'openatlas_class_name': 'type'})
     import_artifact_type.link('P127', artifact_main_type)
     hr_main_type = Entity.get_by_id(78)
-    # import_hr_type = Entity.insert('type', 'imported')
     import_hr_type = insert(
         {'name': 'imported', 'openatlas_class_name': 'type'})
     import_hr_type.link('P127', hr_main_type)
     su_main_type = Entity.get_by_id(75)
-    # import_su_type = Entity.insert('type', 'imported')
     import_su_type = insert(
         {'name': 'imported', 'openatlas_class_name': 'type'})
     import_su_type.link('P127', su_main_type)
@@ -449,7 +467,6 @@ with app.test_request_context():
 
     added_features: dict[str, Entity] = {}
     for entry in features:
-        # feature = Entity.insert('feature', entry.name, entry.description)
         feature = insert({
             'name': entry.name,
             'description': entry.description,
@@ -464,9 +481,6 @@ with app.test_request_context():
             feature,
             str(entry.obj_id),
             type_id=exact_match.id)
-        # location = Entity.insert(
-        #     'object_location',
-        #     f"Location of {entry.name}")
         location = insert({
             'name': f'Location of {entry.name}',
             'openatlas_class_name': 'object_location'})
@@ -475,10 +489,6 @@ with app.test_request_context():
 
     added_stratigraphic: dict[str, Entity] = {}
     for entry in merged_units:
-        # su = Entity.insert(
-        #     'stratigraphic_unit',
-        #     entry.name,
-        #     '\n'.join(entry.description))
         su = insert({
             'name': entry.name,
             'description': '\n'.join(entry.description),
@@ -496,9 +506,6 @@ with app.test_request_context():
                 su,
                 str(entry.individual_id),
                 type_id=exact_match.id)
-        # location = Entity.insert(
-        #     'object_location',
-        #     f"Location of {entry.name}")
         location = insert({
             'name': f'Location of {entry.name}',
             'openatlas_class_name': 'object_location'})
@@ -527,16 +534,13 @@ with app.test_request_context():
 
         skelett_file = skelett_maenchens_files.get(f'SE_{entry.se_id}')
         if skelett_file:
-            # file = Entity.insert(
-            #     'file',
-            #     f'SE {entry.se_id} Ind '
-            #     f'{entry.individual_id} Skelettmännchen')
             file = insert({
                 'name': f'SE {entry.se_id} Ind '
                         f'{entry.individual_id} Skelettmännchen',
                 'openatlas_class_name': 'file'})
             file.save_file_info(FILE_INFO)
             file.link('P2', cc_by_sa_type)
+            file.link('P2', file_skeletonman_type)
             su.link('P67', file, inverse=True)
 
             ext = skelett_file.suffix
@@ -551,16 +555,13 @@ with app.test_request_context():
                 p for p in folder.iterdir()
                 if p.is_file() and p.suffix.lower() in {".jpg", ".jpeg"}]
             for idx, image in enumerate(images):
-                # file = Entity.insert(
-                #       'file',
-                #       f'SE {entry.se_id} Ind '
-                #       f'{entry.individual_id} {idx}')
                 file = insert({
                     'name': f'SE {entry.se_id} Ind '
                             f'{entry.individual_id} {idx}',
                     'openatlas_class_name': 'file'})
                 file.save_file_info(FILE_INFO)
                 file.link('P2', cc_by_sa_type)
+                file.link('P2', file_excavation_type)
                 su.link('P67', file, inverse=True)
                 ext = image.suffix
                 dest = UPLOAD / f"{file.id}{ext.lower()}"
@@ -584,7 +585,6 @@ with app.test_request_context():
         system_class = 'artifact'
         if entry.material == 'menschl. Kn.':
             system_class = 'human_remains'
-        # find = Entity.insert(system_class, entry.name, entry.description)
         find = insert({
             'name': entry.name,
             'description': entry.description,
@@ -597,13 +597,25 @@ with app.test_request_context():
             find,
             str(entry.f_id),
             type_id=exact_match.id)
-        # location = Entity.insert(
-        #     'object_location',
-        #     f"Location of {entry.name}")
         location = insert({
             'name': f'Location of {entry.name}',
             'openatlas_class_name': 'object_location'})
         find.link('P53', location)
+
+        if fundfoto_file := fundfotos.get(entry.name):
+            # todo: include files with _n at the end.
+            file = insert({
+                'name': f'{entry.name}',
+                'openatlas_class_name': 'file'})
+            file.save_file_info(FILE_INFO)
+            file.link('P2', cc_by_sa_type)
+            file.link('P2', file_find_type)
+            find.link('P67', file, inverse=True)
+
+            ext = fundfoto_file.suffix
+            dest = UPLOAD / f"{file.id}{ext}"
+            UPLOAD.mkdir(parents=True, exist_ok=True)
+            shutil.copy(fundfoto_file, dest)
 
         if entry.material:
             find.link('P2', material_types[entry.material])
