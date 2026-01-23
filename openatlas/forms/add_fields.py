@@ -289,11 +289,9 @@ def selection_available(
 def add_date_fields(
         form_class: Any,
         item: Optional[Entity | Link] = None) -> None:
-    if item \
-            and isinstance(item, Entity) \
-            and item.class_.group['name'] == 'type' \
-            and not item.root:
-        return
+    if isinstance(item, Entity) and item.class_.group['name'] == 'type' and (
+            (item.id and not item.root) or (not item.id and item.category)):
+        return  # No dates because it's a type hierarchy
     validator_second = [OptionalValidator(), NumberRange(min=0, max=59)]
     validator_minute = [OptionalValidator(), NumberRange(min=0, max=59)]
     validator_hour = [OptionalValidator(), NumberRange(min=0, max=23)]
