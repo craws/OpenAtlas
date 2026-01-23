@@ -23,8 +23,6 @@ class ImportTest(ImportTestCase):
                         austria = entity
                     case 'Height':
                         height = entity
-                    case 'Carantania':
-                        carantania = entity
                     case 'Place':
                         place_type = entity
                     case 'https://lotr.fandom.com/':
@@ -244,8 +242,6 @@ class ImportTest(ImportTestCase):
         data_frame.at[0, 'id'] = 'new_place_1'
         data_frame.at[1, 'id'] = 'new_place_2'
         data_frame.at[2, 'id'] = 'new_place_3'
-        data_frame.at[0, 'administrative_unit_id'] = austria.id
-        data_frame.at[0, 'historical_place_id'] = carantania.id
         data_frame.at[0, 'wkt'] = "POLYGON((16.1203 BLA, 16.606275))"
         data_frame.at[0, 'reference_ids'] = \
             f'{reference.id};IV {height.id};IV lit_1;55'
@@ -268,8 +264,6 @@ class ImportTest(ImportTestCase):
         data_frame.at[0, 'id'] = 'new_place_11'
         data_frame.at[1, 'id'] = 'new_place_22'
         data_frame.at[2, 'id'] = 'new_place_33'
-        data_frame.at[0, 'administrative_unit_id'] = austria.id
-        data_frame.at[0, 'historical_place_id'] = carantania.id
         type_ids = [
             boundary_mark.id,
             infrastructure.id,

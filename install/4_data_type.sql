@@ -193,38 +193,6 @@ INSERT INTO model.link (property_code, range_id, domain_id) VALUES
   ('P127', (SELECT id FROM model.entity WHERE name='Human remains' AND cidoc_class_code = 'E55'), (SELECT id FROM model.entity WHERE name='Upper Body')),
   ('P127', (SELECT id FROM model.entity WHERE name='Human remains' AND cidoc_class_code = 'E55'), (SELECT id FROM model.entity WHERE name='Lower Body'));
 
-INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, description) VALUES
-  ('E53', 'administrative_unit', 'Administrative unit', 'Hierarchy of administrative units like "Austria", "Germany", "Italy" and their respective subunits like "Lower Austria", "Styria" and their subunits etc.'),
-  ('E53', 'administrative_unit', 'Austria', Null),
-  ('E53', 'administrative_unit', 'Wien', Null),
-  ('E53', 'administrative_unit', 'Niederösterreich', Null),
-  ('E53', 'administrative_unit', 'Germany', Null),
-  ('E53', 'administrative_unit', 'Italy', Null),
-  ('E53', 'administrative_unit', 'Czech Republic', Null),
-  ('E53', 'administrative_unit', 'Slovakia', Null),
-  ('E53', 'administrative_unit', 'Slovenia', Null);
-INSERT INTO model.link (property_code, range_id, domain_id) VALUES
-  ('P89', (SELECT id FROM model.entity WHERE name='Administrative unit'), (SELECT id FROM model.entity WHERE name='Austria')),
-  ('P89', (SELECT id FROM model.entity WHERE name='Administrative unit'), (SELECT id FROM model.entity WHERE name='Italy')),
-  ('P89', (SELECT id FROM model.entity WHERE name='Administrative unit'), (SELECT id FROM model.entity WHERE name='Germany')),
-  ('P89', (SELECT id FROM model.entity WHERE name='Administrative unit'), (SELECT id FROM model.entity WHERE name='Czech Republic')),
-  ('P89', (SELECT id FROM model.entity WHERE name='Administrative unit'), (SELECT id FROM model.entity WHERE name='Slovakia')),
-  ('P89', (SELECT id FROM model.entity WHERE name='Administrative unit'), (SELECT id FROM model.entity WHERE name='Slovenia')),
-  ('P89', (SELECT id FROM model.entity WHERE name='Austria'), (SELECT id FROM model.entity WHERE name='Wien')),
-  ('P89', (SELECT id FROM model.entity WHERE name='Austria'), (SELECT id FROM model.entity WHERE name='Niederösterreich'));
-
-INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, description) VALUES
-  ('E53', 'administrative_unit', 'Historical place', 'Hierarchy of historical places respectively historical administrative units like: Duchy of Bavaria, Lombard Kingdom etc.'),
-  ('E53', 'administrative_unit', 'Carantania', Null),
-  ('E53', 'administrative_unit', 'Marcha Orientalis', Null),
-  ('E53', 'administrative_unit', 'Comitatus Iauntal', Null),
-  ('E53', 'administrative_unit', 'Kingdom of Serbia', Null);
-INSERT INTO model.link (property_code, range_id, domain_id) VALUES
-  ('P89', (SELECT id FROM model.entity WHERE name='Historical place'), (SELECT id FROM model.entity WHERE name='Carantania')),
-  ('P89', (SELECT id FROM model.entity WHERE name='Historical place'), (SELECT id FROM model.entity WHERE name='Marcha Orientalis')),
-  ('P89', (SELECT id FROM model.entity WHERE name='Historical place'), (SELECT id FROM model.entity WHERE name='Comitatus Iauntal')),
-  ('P89', (SELECT id FROM model.entity WHERE name='Historical place'), (SELECT id FROM model.entity WHERE name='Kingdom of Serbia'));
-
 INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name) VALUES
   ('E55', 'type', 'Source translation'),
   ('E55', 'type', 'Original Text'),
@@ -340,7 +308,6 @@ INSERT INTO model.link (property_code, domain_id, range_id) VALUES
 INSERT INTO web.hierarchy (id, name, category, multiple, directional) VALUES
   ((SELECT id FROM model.entity WHERE name='Actor function'), 'Actor function', 'standard', False, False),
   ((SELECT id FROM model.entity WHERE name='Actor relation'), 'Actor relation', 'standard', False, True),
-  ((SELECT id FROM model.entity WHERE name='Administrative unit'), 'Administrative unit', 'place', True, False),
   ((SELECT id FROM model.entity WHERE name='Artifact'), 'Artifact', 'standard', False, False),
   ((SELECT id FROM model.entity WHERE name='Bibliography'), 'Bibliography', 'standard', False, False),
   ((SELECT id FROM model.entity WHERE name='Dimensions'), 'Dimensions', 'value', True, False),
@@ -350,7 +317,6 @@ INSERT INTO web.hierarchy (id, name, category, multiple, directional) VALUES
   ((SELECT id FROM model.entity WHERE name='External reference match'), 'External reference match', 'system', False, False),
   ((SELECT id FROM model.entity WHERE name='Feature'), 'Feature', 'standard', False, False),
   ((SELECT id FROM model.entity WHERE name='Features for sexing'), 'Features for sexing', 'tools', False, False),
-  ((SELECT id FROM model.entity WHERE name='Historical place'), 'Historical place', 'place', True, False),
   ((SELECT id FROM model.entity WHERE name='Human remains' AND cidoc_class_code = 'E55'), 'Human remains', 'standard', False, False),
   ((SELECT id FROM model.entity WHERE name='Involvement'), 'Involvement', 'standard', False, False),
   ((SELECT id FROM model.entity WHERE name='License'), 'License', 'standard', False, False),
@@ -386,7 +352,6 @@ INSERT INTO model.openatlas_class (name, cidoc_class_code, new_types_allowed, wr
   ('stratigraphic_unit',   'E18', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Stratigraphic unit' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1));
 
 INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) VALUES
-  ((SELECT id FROM web.hierarchy WHERE name='Administrative unit'), 'place'),
   ((SELECT id FROM web.hierarchy WHERE name='Artifact'), 'artifact'),
   ((SELECT id FROM web.hierarchy WHERE name='Bibliography'), 'bibliography'),
   ((SELECT id FROM web.hierarchy WHERE name='Dimensions'), 'artifact'),
@@ -398,7 +363,6 @@ INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) V
   ((SELECT id FROM web.hierarchy WHERE name='Event'), 'production'),
   ((SELECT id FROM web.hierarchy WHERE name='External reference'), 'external_reference'),
   ((SELECT id FROM web.hierarchy WHERE name='Feature'), 'feature'),
-  ((SELECT id FROM web.hierarchy WHERE name='Historical place'), 'place'),
   ((SELECT id FROM web.hierarchy WHERE name='Human remains'), 'human_remains'),
   ((SELECT id FROM web.hierarchy WHERE name='License'), 'file'),
   ((SELECT id FROM web.hierarchy WHERE name='Place'), 'place'),
