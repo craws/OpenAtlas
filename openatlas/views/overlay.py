@@ -10,7 +10,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.display.util import button, link, required_group
-from openatlas.display.util2 import manual, uc_first
+from openatlas.display.util2 import manual
 from openatlas.forms.field import SubmitField
 from openatlas.models.entity import Entity
 from openatlas.models.overlay import Overlay

@@ -316,8 +316,8 @@ def index(group: str) -> str | Response:
         types: dict[str, dict[Entity, str]] = {
             'standard': {},
             'custom': {},
-            'place': {},
             'value': {},
+            'place': {},
             'system': {}}
         for type_ in [type_ for type_ in g.types.values() if not type_.root]:
             if type_.category in types:

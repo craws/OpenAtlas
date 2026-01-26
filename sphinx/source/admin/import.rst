@@ -21,8 +21,6 @@ Lists containing the following fields can be imported currently:
 * References
 * Origin references
 * Reference systems
-* Administrative unit
-* Historical place
 * Place hierarchy
 * Type hierarchy
 
@@ -95,10 +93,6 @@ imported and an error message will be displayed
 * **wkt** - only available for places and artifacts, see :ref:`WKT import`
 * **reference_system_*** - used for linking data to already existing external
   reference systems in the database, see :ref:`Reference systems import`
-* **administrative_unit_id** - only available for places, ID of existing
-  administrative unit
-* **historical_place_id** - only available for places, ID of existing
-  historical place
 * **parent_id** - only available for place, ID of a super unit in a place
   hierarchy, see :ref:`Place hierarchy import`
 * **openatlas_parent_id** - only available for place, ID of a super unit
@@ -151,8 +145,6 @@ can link all of the imported data to this.
 
 Origin types
 ++++++++++++
-
-
 It is possible to link entities to one or multiple :doc:`/entity/type`, which
 were imported in the same project by their origin id.
 
@@ -209,7 +201,6 @@ The imported data can be linked to an already existing
   56-78 5678;
 * the ID of each :doc:`/entity/reference` can be found at the detail view of
   said reference in your OpenAtlas instance
-
 
 .. _Origin references import:
 

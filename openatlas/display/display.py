@@ -53,7 +53,7 @@ class Display:
             if self.entity.standard_type \
                     and type_.id == self.entity.standard_type.id:
                 continue  # Standard type is already included
-            title = " > ".join([g.types[i].name for i in type_.root])
+            title = ' > '.join([g.types[i].name for i in type_.root])
             html = f'<span title="{title}">{link(type_)}</span>'
             if type_.category == 'value':
                 html += f' {float(value):g} {type_.description or ''}'
