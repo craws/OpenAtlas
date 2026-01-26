@@ -65,6 +65,12 @@ artifact: dict[str, Any] = {
             'multiple': True,
             'tab': {
                 'buttons': ['link', 'insert']}},
+        'carrier_of_source': {
+            'label': _('carrier of source'),
+            'mode': 'direct',
+            'classes': ['source'],
+            'property': 'P128',
+            'multiple': True},
         'reference': standard_relations['reference'],
         'file': standard_relations['file']},
     'display': {
