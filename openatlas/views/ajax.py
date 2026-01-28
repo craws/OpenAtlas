@@ -6,6 +6,7 @@ from flask_babel import gettext as _
 from openatlas import app
 from openatlas.api.external.geonames import fetch_geonames
 from openatlas.api.external.gnd import fetch_gnd
+from openatlas.api.external.kataster import fetch_kataster
 from openatlas.api.external.wikidata import fetch_wikidata
 from openatlas.display.util import display_info, required_group
 from openatlas.display.util2 import uc_first
@@ -72,3 +73,9 @@ def ajax_geonames_info() -> str:
 @required_group('readonly')
 def ajax_gnd_info() -> str:
     return display_info(fetch_gnd(request.form['id_']))
+
+
+@app.route('/ajax/info/kataster', methods=['POST'])
+@required_group('readonly')
+def ajax_kataster_info() -> str:
+    return display_info(fetch_kataster(request.form['id_']))

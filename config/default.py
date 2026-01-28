@@ -74,6 +74,8 @@ CSS = {
 # External APIs
 API_WIKIDATA = 'https://www.wikidata.org/w/api.php'
 API_GEONAMES = 'http://api.geonames.org/get'
+API_KATASTER = 'https://kataster.bev.gv.at/api/'
+
 USER_AGENT = {
     'User-Agent':
         f'OpenAtlas/{VERSION} (https://github.com/craws/OpenAtlas; '

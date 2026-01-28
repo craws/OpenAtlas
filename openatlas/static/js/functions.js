@@ -276,6 +276,14 @@ async function ajaxGndInfo(data) {
   }, "gnd");
 }
 
+async function ajaxKatasterInfo(data) {
+  ajaxAPICall({
+    type: 'post',
+    url: '/ajax/info/kataster',
+    data: 'id_=' + data
+  }, "kataster");
+}
+
 async function ajaxAddType(data, fieldId, typeId, multiple=false) {
   const newTypeId = await $.ajax({
     type: 'post',
