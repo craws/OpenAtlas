@@ -8,9 +8,7 @@ from openatlas.display.util import link
 
 
 def fetch_kataster(id_: str) -> dict[str, Any]:
-    endpoint = 'kgnr/'
-    if '/' in id_:
-        endpoint = 'gst/'
+    endpoint = 'gst/' if '/' in id_ else 'kgnr/'
     info = {}
     try:
         data = requests.get(
@@ -48,8 +46,9 @@ def fetch_kataster(id_: str) -> dict[str, Any]:
         pass
     try:
         geometry = shape(data['geometry']).centroid
+        zoom = '18.1' if '/' in id_ else '12.9'
         url = f'https://kataster.bev.gv.at/#/center/' \
-              f'{geometry.x},{geometry.y}/zoom/18.1/vermv/0.6'
+              f'{geometry.x},{geometry.y}/zoom/{zoom}/vermv/0.6'
         info['geometry'] = link(url, url, external=True)
     except KeyError:  # pragma: no cover
         pass

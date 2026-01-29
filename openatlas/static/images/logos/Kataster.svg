@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <title>Kataster Logo (CC-BY 4.0)</title>
+
+  <metadata>
+    <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+             xmlns:dc="http://purl.org/dc/elements/1.1/"
+             xmlns:cc="http://creativecommons.org/ns#">
+      <cc:Work rdf:about="">
+        <dc:title>Kataster Logo Rot-Weiß-Rot</dc:title>
+        <dc:creator><cc:Agent><dc:title>Benhard Koschicek-Krombholz</dc:title></cc:Agent></dc:creator>
+        <cc:license rdf:resource="http://creativecommons.org/licenses/by/4.0/" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+
+  <g transform="rotate(45 8 8)">
+    <rect x="2.5" y="2.5" width="11" height="11"
+          fill="#ffffff"
+          stroke="#E60000"
+          stroke-width="1"
+          stroke-linecap="square"/>
+
+    <g fill="none" stroke="#E60000" stroke-width="1" stroke-linecap="square">
+      <line x1="6.5" y1="2.5" x2="6.5" y2="13.5" />
+      <line x1="6.5" y1="9.5" x2="13.5" y2="9.5" />
+      <line x1="10.5" y1="2.5" x2="10.5" y2="9.5" />
+    </g>
+  </g>
+</svg>
