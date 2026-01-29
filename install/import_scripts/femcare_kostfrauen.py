@@ -60,6 +60,7 @@ with app.test_request_context():
     case_study = Entity.get_by_id(19073)
     death = Entity.get_by_id(361)
     kostfrauen_group = Entity.get_by_id(19074)
+    elisabethinen_location = Entity.get_by_id(146)
 
     print('Remove former data')
     for item in case_study.get_linked_entities('P2', inverse=True):
@@ -67,15 +68,15 @@ with app.test_request_context():
     print('\nFormer data removed')
 
     for entry in entries:
-        entity = insert({
+        person = insert({
             'name': entry.name,
             'description': entry.description,
             'openatlas_class_name': 'person'})
-        entity.link('P2', case_study)
+        person.link('P2', case_study)
 
         kostfrauen_group.link(
             'P107',
-            entity,
+            person,
             dates={
                 'begin_from': entry.entry_date,
                 'begin_to': None,
@@ -83,3 +84,21 @@ with app.test_request_context():
                 'end_from': entry.leave_date,
                 'end_to': None,
                 'end_comment': None})
+
+        activity = insert({
+            'name': f'Kostfrau visit of {entry.name}',
+            # 'description': entry.description,
+            'openatlas_class_name': 'activity'})
+        activity.link('P2', case_study)
+        activity.link('P2', death)
+        activity.link(
+            'P14',
+            person,
+            dates={
+                'begin_from': entry.entry_date,
+                'begin_to': None,
+                'begin_comment': None,
+                'end_from': entry.leave_date,
+                'end_to': None,
+                'end_comment': None})
+        activity.link('P7', elisabethinen_location)
