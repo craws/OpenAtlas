@@ -18,7 +18,7 @@ def get_or_create_type(hierarchy: Any, type_name: str) -> Entity:
 
 
 def get_type_by_name(type_name: str) -> Optional[Entity]:
-    for type_ in g.types.items():
+    for type_ in g.types.values():
         if type_.name == type_name:
             return type_
     return None
@@ -53,7 +53,7 @@ def vocabs_requests(
         parameter: Optional[dict[str, str]] = None) -> dict[str, Any]:
     base = g.settings['vocabs_base_url']
     url = f'{base}{g.settings['vocabs_endpoint']}{id_}/{endpoint}'
-    sleep(0.1)  # Fix connection abort
+    sleep(0.2)  # Fix connection abort
     try:
         resp = requests.get(
             url,

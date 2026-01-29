@@ -188,7 +188,7 @@ def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
     label = _('bookmark remove') \
         if current_user.bookmarks and entity_id in current_user.bookmarks \
         else _('bookmark')
-    onclick = f'ajaxBookmark("{entity_id}");'
+    onclick = f"ajaxBookmark('{entity_id}');"  # Don't change the quotes!
     if for_table:
         return \
             f'<a href="#" id="bookmark{entity_id}" onclick="{onclick}">' \

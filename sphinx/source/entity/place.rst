@@ -16,26 +16,11 @@ Form fields
 -----------
 * :doc:`/ui/name`
 * :doc:`/ui/alias`
-* :doc:`type`
+* :doc:`type` including place hierarchies
 * :doc:`/ui/date`
 * :doc:`/ui/description`
 * :doc:`/tools/map`
-* **Administrative Unit**
-* **Historical Place**
 * :doc:`reference_system`
-
-You can edit administrative units and historical places under **Types** in the
-**Places** tab.
-
-Administrative Unit
-*******************
-Hierarchy of administrative units in which the place is located, e.g. Austria,
-Italy and their respective subunits like Lower Austria or Styria.
-
-Historical Place
-****************
-Hierarchy of historical places respectively historical administrative units in
-which the place is located e.g. Duchy of Bavaria or Lombard Kingdom.
 
 Can be linked via tabs to
 -------------------------

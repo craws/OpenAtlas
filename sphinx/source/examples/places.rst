@@ -21,8 +21,7 @@ to the respective form. The following information can be entered:
 * Select a fitting :doc:`/entity/type` from the list. If none can be found,
   you can add new types (depending on your user group). You can find more
   information on types and how to add new ones :doc:`here<types>`
-* Add an **administrative unit** or **historical place** and/or link the
-  place to an :doc:`/entity/reference_system` (see a tutorial
+* Link the place to an :doc:`/entity/reference_system` (see a tutorial
   :doc:`here<reference_systems>`)
 * You can also add a :doc:`/ui/date` and a free text :doc:`/ui/description`
 

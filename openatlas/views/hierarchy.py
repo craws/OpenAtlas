@@ -43,7 +43,7 @@ def hierarchy_insert(category: str) -> str | Response:
         title=_('type'),
         crumbs=[
             [_('type'), url_for('index', group='type')],
-            '+ ' + uc_first(_(category))])
+            f'+ {uc_first(_(category))} {_('hierarchy')}'])
 
 
 @app.route('/hierarchy/update/<int:id_>', methods=['GET', 'POST'])

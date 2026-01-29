@@ -40,3 +40,21 @@ UPDATE web.settings SET value = 'https://frontend-demo.openatlas.eu/entity/' WHE
 INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) VALUES
   ((SELECT id FROM web.hierarchy WHERE name='Dimensions'), 'place');
 
+-- Custom place hierarchy: Administrative Unit
+INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, description) VALUES
+  ('E53', 'administrative_unit', 'Administrative unit', 'Hierarchy of administrative units'),
+  ('E53', 'administrative_unit', 'Austria', Null),
+  ('E53', 'administrative_unit', 'Wien', Null),
+  ('E53', 'administrative_unit', 'Italy', Null);
+
+INSERT INTO model.link (property_code, range_id, domain_id) VALUES
+  ('P89', (SELECT id FROM model.entity WHERE name='Administrative unit'), (SELECT id FROM model.entity WHERE name='Austria')),
+  ('P89', (SELECT id FROM model.entity WHERE name='Administrative unit'), (SELECT id FROM model.entity WHERE name='Italy')),
+  ('P89', (SELECT id FROM model.entity WHERE name='Austria'), (SELECT id FROM model.entity WHERE name='Wien'));
+
+INSERT INTO web.hierarchy (id, name, category, multiple, directional) VALUES
+  ((SELECT id FROM model.entity WHERE name='Administrative unit'), 'Administrative unit', 'place', True, False);
+
+INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) VALUES
+  ((SELECT id FROM web.hierarchy WHERE name='Administrative unit'), 'place');
+

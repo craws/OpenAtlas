@@ -16,6 +16,7 @@ Form fields
 * :doc:`type`
 * :doc:`/ui/date`
 * :doc:`/ui/description`
+* **Carrier of source** - if a :doc:`source` is depicted on the artifact
 * :doc:`/tools/map`
 * :doc:`reference_system`
 * **Super** - A :doc:`place`, :doc:`feature`, :doc:`stratigraphic_unit`, or
@@ -31,6 +32,3 @@ Can be linked via tabs to
 * **Subs** - Use, to add sub artifacts
 * :doc:`reference` - Use to add citation
 * :doc:`file` - Add a file, e.g. a picture of the artifact
-
-If an artifact is a carrier of information **create or edit a source** and
-choose the artifact that carries the source **within the source form**.
