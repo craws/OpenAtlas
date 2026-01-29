@@ -7,9 +7,6 @@ from typing import Final
 from openatlas import app
 from openatlas.models.entity import Entity, insert
 
-# todo:
-#   * handle death
-#   * Should we make events instead of membership to a group to handle death
 
 FILE_PATH: Final = Path("install/import_scripts/Kostfrauen.csv")
 
@@ -61,11 +58,9 @@ with app.test_request_context():
     death = Entity.get_by_id(361)
     kostfrauen_group = Entity.get_by_id(19074)
     elisabethinen_location = Entity.get_by_id(146)
+    kostfrau_involvement = Entity.get_by_id(19076)
+    boarding_event = Entity.get_by_id(19077)
 
-    print('Remove former data')
-    for item in case_study.get_linked_entities('P2', inverse=True):
-        item.delete()
-    print('\nFormer data removed')
 
     for entry in entries:
         person = insert({
@@ -86,7 +81,7 @@ with app.test_request_context():
                 'end_comment': None})
 
         activity = insert({
-            'name': f'Kostfrau visit of {entry.name}',
+            'name': f'Boarding of {entry.name}',
             # 'description': entry.description,
             'openatlas_class_name': 'activity'})
         activity.link('P2', case_study)
@@ -94,6 +89,7 @@ with app.test_request_context():
         activity.link(
             'P14',
             person,
+            type_id=kostfrau_involvement.id,
             dates={
                 'begin_from': entry.entry_date,
                 'begin_to': None,
@@ -102,3 +98,5 @@ with app.test_request_context():
                 'end_to': None,
                 'end_comment': None})
         activity.link('P7', elisabethinen_location)
+
+        boarding_event.link('P9', activity)
