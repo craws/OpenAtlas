@@ -7,8 +7,7 @@ from typing import Final
 from openatlas import app
 from openatlas.models.entity import Entity, insert
 
-
-FILE_PATH: Final = Path("install/import_scripts/Kostfrauen.csv")
+FILE_PATH: Final = Path("files/Kostfrauen.csv")
 
 
 @dataclass
