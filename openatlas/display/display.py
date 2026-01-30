@@ -12,8 +12,7 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import entity_table
 from openatlas.display.util import (
     bookmark_toggle, button, button_bar, description, format_entity_date,
-    get_appearance, get_chart_data, get_system_data, link,
-    reference_systems)
+    get_appearance, get_chart_data, get_system_data, link, reference_systems)
 from openatlas.display.util2 import (
     display_bool, get_file_path, is_authorized, manual, sanitize, uc_first)
 from openatlas.forms.util import deletion_possible

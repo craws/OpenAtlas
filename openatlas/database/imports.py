@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Optional
 
 from flask import g
 
@@ -25,17 +25,17 @@ def insert_project(name: str | None, description: str | None) -> int:
     return g.cursor.fetchone()['id']
 
 
-def get_all_projects() -> list[dict[str, Any]]:
+def get_all_projects() -> list[dict[str, object]]:
     g.cursor.execute(f'{SQL} GROUP BY p.id ORDER BY name;')
     return list(g.cursor)
 
 
-def get_project_by_id(id_: int) -> dict[str, Any]:
+def get_project_by_id(id_: int) -> dict[str, object]:
     g.cursor.execute(f'{SQL} WHERE p.id = %(id)s GROUP BY p.id;', {'id': id_})
     return g.cursor.fetchone()
 
 
-def get_project_by_name(name: str) -> dict[str, Any]:
+def get_project_by_name(name: str) -> dict[str, object]:
     g.cursor.execute(
         f'{SQL} WHERE p.name = %(name)s GROUP BY p.id;',
         {'name': name})

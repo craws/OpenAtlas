@@ -1,11 +1,9 @@
-from typing import Any
-
 from flask import g
 
 from openatlas import app
 
 
-def update(data: dict[str, Any]) -> None:
+def update(data: dict[str, object]) -> None:
     g.cursor.execute(
         """
         UPDATE model.link
@@ -38,7 +36,7 @@ def update(data: dict[str, Any]) -> None:
         data)
 
 
-def get_by_id(id_: int) -> dict[str, Any]:
+def get_by_id(id_: int) -> dict[str, object]:
     g.cursor.execute(
         """
         SELECT
@@ -67,7 +65,7 @@ def get_by_id(id_: int) -> dict[str, Any]:
     return g.cursor.fetchone()
 
 
-def get_links_by_type(type_id: int) -> list[dict[str, Any]]:
+def get_links_by_type(type_id: int) -> list[dict[str, object]]:
     g.cursor.execute(
         """
         SELECT id, domain_id, range_id
@@ -96,7 +94,7 @@ def delete_(id_: int) -> None:
     g.cursor.execute('DELETE FROM model.link WHERE id = %(id)s;', {'id': id_})
 
 
-def get_all_links() -> list[dict[str, Any]]:
+def get_all_links() -> list[dict[str, object]]:
     g.cursor.execute(
         """
         SELECT l.id,
@@ -125,7 +123,7 @@ def get_all_links() -> list[dict[str, Any]]:
 
 
 def get_all_links_for_network(
-        system_classes: list[str]) -> list[dict[str, Any]]:
+        system_classes: list[str]) -> list[dict[str, object]]:
     g.cursor.execute(
         """
         SELECT l.id,
@@ -148,7 +146,7 @@ def get_all_links_for_network(
     return [dict(row) for row in g.cursor.fetchall()]
 
 
-def get_links_by_id_network(ids: set[int]) -> list[dict[str, Any]]:
+def get_links_by_id_network(ids: set[int]) -> list[dict[str, object]]:
     g.cursor.execute(
         """
         SELECT l.id,
@@ -170,7 +168,7 @@ def get_links_by_id_network(ids: set[int]) -> list[dict[str, Any]]:
     return [dict(row) for row in g.cursor.fetchall()]
 
 
-def get_place_linked_to_location_id(ids: list[int]) -> list[dict[str, Any]]:
+def get_place_linked_to_location_id(ids: list[int]) -> list[dict[str, object]]:
     g.cursor.execute(
         """
         SELECT l.id,

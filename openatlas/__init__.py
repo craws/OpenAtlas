@@ -1,6 +1,6 @@
 import datetime
 import locale
-from typing import Any, Optional
+from typing import Optional
 
 from flask import Flask, g, redirect, request, session, url_for
 from flask_babel import Babel
@@ -40,7 +40,7 @@ def get_locale() -> str:
             and request.args.get('locale') in app.config['LANGUAGES']:
         return str(request.args.get('locale'))
     if 'language' in session:
-        return session['language']
+        return str(session['language'])
     best_match = request.accept_languages.best_match(app.config['LANGUAGES'])
     return best_match or g.settings['default_language']
 
@@ -154,15 +154,15 @@ def apply_caching(response: Response) -> Response:
 
 
 @app.teardown_request
-def teardown_request(_exception: Optional[Any]) -> None:
+def teardown_request(_exception: Optional[object]) -> None:
     close_connection()
 
 
 @jwt.token_in_blocklist_loader
 def check_incoming_tokens(
-        jwt_header: dict[str, Any],
-        jwt_payload: dict[str, Any]) -> bool:
-    if not jwt_header['typ'] == 'JWT':
+        jwt_header: dict[str, str],
+        jwt_payload: dict[str, str]) -> bool:
+    if jwt_header['typ'] != 'JWT':
         return True
     token_ = check_token_revoked(jwt_payload["jti"])
     if token_['revoked'] \
