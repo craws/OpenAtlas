@@ -139,7 +139,9 @@ class Display:
             columns = relation.tab['columns']
             if self.entity.category == 'value' and relation.name == 'entities':
                 columns = ['name', 'value', 'class', 'description']
-            if self.entity.root and g.types[self.entity.root[0]].name \
+            if name == 'entities' \
+                    and self.entity.root \
+                    and g.types[self.entity.root[0]].name \
                     in app.config['PROPERTY_TYPES']:
                 columns = ['domain', 'range']
                 items = [
