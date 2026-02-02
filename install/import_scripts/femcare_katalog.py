@@ -19,7 +19,7 @@ class FundEntity:
 
     _current_index: int = field(default=0, init=False, repr=False)
 
-    def add_entry(self, text: str):
+    def add_entry(self, text: str) -> None:
         field_names = [
             'type',
             'date',
@@ -54,6 +54,8 @@ def parse_katalog(file_path: Path) -> dict[str, FundEntity]:
             if row_id:
                 if current is None or current.id != row_id:
                     is_new_entity = True
+            else:
+                continue
 
             if is_new_entity:
                 current = FundEntity(id=row_id)

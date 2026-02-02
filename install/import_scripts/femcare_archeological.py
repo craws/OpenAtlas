@@ -4,7 +4,7 @@ import shutil
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Sequence
 
 import pandas as pd
 from docx import Document
@@ -41,7 +41,7 @@ FILE_INFO = {
 @dataclass
 class Individual:
     se_id: int
-    description: list
+    description: list[str]
     probe_type: str
     # find_type: str
     position: str
@@ -70,7 +70,7 @@ class Feature:
     name: str
     type: str
     se: list[str]
-    description: str
+    description: str | None
     cut: str
 
 
@@ -323,7 +323,7 @@ def merge_units(
 
 
 def build_types(
-        entities: list,
+        entities: Sequence[Feature | StratigraphicUnit | Find],
         hierarchy: Entity,
         attribute: str) -> dict[str, Entity]:
     types: dict[str, Entity] = {}
@@ -339,7 +339,7 @@ def build_types(
 
 
 def build_find_types(
-        entities: list,
+        entities: list[Find],
         attribute: str) -> dict[str, Entity]:
     types: dict[str, Entity] = {}
     for entry_ in entities:
@@ -466,32 +466,33 @@ with app.test_request_context():
     designation_types = build_find_types(finds, 'designation')
 
     added_features: dict[str, Entity] = {}
-    for entry in features:
+    for fe_entry in features:
         feature = insert({
-            'name': entry.name,
-            'description': entry.description,
+            'name': fe_entry.name,
+            'description': fe_entry.description,
             'openatlas_class_name': 'feature'})
         feature.link('P2', case_study)
-        feature.link('P2', feature_types[entry.type])
-        if entry.cut:
-            feature.link('P2', cut_types[entry.cut])
+        feature.link('P2', feature_types[fe_entry.type])
+        if fe_entry.cut:
+            feature.link('P2', cut_types[fe_entry.cut])
         feature.link('P46', place, inverse=True)
         ref_sys_feat.link(
             'P67',
             feature,
-            str(entry.obj_id),
+            str(fe_entry.obj_id),
             type_id=exact_match.id)
         location = insert({
-            'name': f'Location of {entry.name}',
+            'name': f'Location of {fe_entry.name}',
             'openatlas_class_name': 'object_location'})
         feature.link('P53', location)
-        added_features[entry.id_] = feature
+        added_features[fe_entry.id_] = feature
 
     added_stratigraphic: dict[str, Entity] = {}
     for entry in merged_units:
+        desc = '\n'.join(entry.description) if entry.description else ''
         su = insert({
             'name': entry.name,
-            'description': '\n'.join(entry.description),
+            'description': desc,
             'openatlas_class_name': 'stratigraphic_unit'})
         su.link('P2', case_study)
         su.link('P46', added_features[entry.feature], inverse=True)
@@ -571,23 +572,23 @@ with app.test_request_context():
         added_stratigraphic[entry.id_] = su
 
     added_finds: dict[str, Entity] = {}
-    for entry in finds:
-        if entry.stratigraphic_unit:
-            link_to_entity = added_stratigraphic.get(entry.stratigraphic_unit)
-        elif entry.feature_id:
-            link_to_entity = added_features.get(entry.feature_id)
+    for fi_entry in finds:
+        if fi_entry.stratigraphic_unit:
+            link_to_entity = added_stratigraphic.get(fi_entry.stratigraphic_unit)
+        elif fi_entry.feature_id:
+            link_to_entity = added_features.get(fi_entry.feature_id)
         else:
             link_to_entity = place
         if not link_to_entity:
-            DEBUG_MSG['no_super_for_finds'].append(entry.f_id)
+            DEBUG_MSG['no_super_for_finds'].append(fi_entry.f_id)
             continue
 
         system_class = 'artifact'
-        if entry.material == 'menschl. Kn.':
+        if fi_entry.material == 'menschl. Kn.':
             system_class = 'human_remains'
         find = insert({
-            'name': entry.name,
-            'description': entry.description,
+            'name': fi_entry.name,
+            'description': fi_entry.description,
             'openatlas_class_name': system_class})
         find.link('P2', case_study)
         find.link('P46', link_to_entity, inverse=True)
@@ -595,17 +596,17 @@ with app.test_request_context():
         ref_sys_finds.link(
             'P67',
             find,
-            str(entry.f_id),
+            str(fi_entry.f_id),
             type_id=exact_match.id)
         location = insert({
-            'name': f'Location of {entry.name}',
+            'name': f'Location of {fi_entry.name}',
             'openatlas_class_name': 'object_location'})
         find.link('P53', location)
 
-        if fundfoto_file := fundfotos.get(entry.name):
+        if fundfoto_file := fundfotos.get(fi_entry.name):
             # todo: include files with _n at the end.
             file = insert({
-                'name': f'{entry.name}',
+                'name': f'{fi_entry.name}',
                 'openatlas_class_name': 'file'})
             file.save_file_info(FILE_INFO)
             file.link('P2', cc_by_sa_type)
@@ -617,11 +618,11 @@ with app.test_request_context():
             UPLOAD.mkdir(parents=True, exist_ok=True)
             shutil.copy(fundfoto_file, dest)
 
-        if entry.material:
-            find.link('P2', material_types[entry.material])
-        if entry.designation:
-            find.link('P2', designation_types[entry.designation])
-        if entry.dating:
-            find.link('P2', dating_types[entry.dating])
+        if fi_entry.material:
+            find.link('P2', material_types[fi_entry.material])
+        if fi_entry.designation:
+            find.link('P2', designation_types[fi_entry.designation])
+        if fi_entry.dating:
+            find.link('P2', dating_types[fi_entry.dating])
 
     print(DEBUG_MSG)
