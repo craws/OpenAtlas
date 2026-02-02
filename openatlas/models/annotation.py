@@ -83,7 +83,7 @@ class AnnotationText:
         def replace_mark(match: Any) -> str:
             nonlocal current_offset
             metadata = json.loads(match.group(1))
-            inner_text = match.group(2)
+            inner_text: str = match.group(2)
             start, end = match.span()
             adjusted_start = start + current_offset
             adjusted_end = adjusted_start + len(inner_text)

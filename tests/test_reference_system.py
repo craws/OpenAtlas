@@ -1,5 +1,3 @@
-from typing import Any
-
 from flask import g, url_for
 
 from tests.base import TestBaseCase
@@ -23,7 +21,7 @@ class ReferenceSystemTest(TestBaseCase):
         rv = c.get(url_for('insert', class_='reference_system'))
         assert b'resolver URL' in rv.data
 
-        data: Any = {
+        data: dict[str, str | list[str]] = {
             'name': 'Wikipedia',
             'website_url': 'https://wikipedia.org',
             'resolver_url': 'https://wikipedia.org'}

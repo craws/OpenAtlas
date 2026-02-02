@@ -3,7 +3,7 @@ from typing import Any
 from flask import g
 
 
-def log(data: dict[str, Any]) -> None:
+def log(data: dict[str, object]) -> None:
     g.cursor.execute(
         """
         INSERT INTO web.system_log (priority, type, message, user_id, info)
@@ -15,7 +15,7 @@ def log(data: dict[str, Any]) -> None:
 def get_system_logs(
         limit: str,
         priority: str,
-        user_id: str) -> list[dict[str, Any]]:
+        user_id: str) -> list[dict[str, object]]:
     g.cursor.execute(
         f"""
         SELECT id, priority, type, message, user_id, info, created

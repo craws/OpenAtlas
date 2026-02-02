@@ -1,5 +1,3 @@
-from typing import Any
-
 from flask import g
 
 ANNOTATION_IMAGE_SELECT = \
@@ -28,21 +26,21 @@ ANNOTATION_TEXT_SELECT = \
     """
 
 
-def get_annotation_image_by_id(id_: int) -> dict[str, Any]:
+def get_annotation_image_by_id(id_: int) -> dict[str, object]:
     g.cursor.execute(
         ANNOTATION_IMAGE_SELECT + ' WHERE id =  %(id)s;',
         {'id': id_})
     return g.cursor.fetchone()
 
 
-def get_annotation_image_by_file_id(id_: int) -> list[dict[str, Any]]:
+def get_annotation_image_by_file_id(id_: int) -> list[dict[str, object]]:
     g.cursor.execute(
         ANNOTATION_IMAGE_SELECT + ' WHERE image_id =  %(id)s;',
         {'id': id_})
     return list(g.cursor)
 
 
-def get_annotation_text_by_source_id(id_: int) -> list[dict[str, Any]]:
+def get_annotation_text_by_source_id(id_: int) -> list[dict[str, object]]:
     g.cursor.execute(
         ANNOTATION_TEXT_SELECT +
         """
@@ -54,7 +52,7 @@ def get_annotation_text_by_source_id(id_: int) -> list[dict[str, Any]]:
     return list(g.cursor)
 
 
-def get_annotation_text_orphans() -> list[dict[str, Any]]:
+def get_annotation_text_orphans() -> list[dict[str, object]]:
     g.cursor.execute(
         """
         SELECT
@@ -80,7 +78,7 @@ def get_annotation_text_orphans() -> list[dict[str, Any]]:
     return list(g.cursor)
 
 
-def get_annotation_image_orphans() -> list[dict[str, Any]]:
+def get_annotation_image_orphans() -> list[dict[str, object]]:
     g.cursor.execute(
         """
         SELECT
@@ -99,7 +97,7 @@ def get_annotation_image_orphans() -> list[dict[str, Any]]:
     return list(g.cursor)
 
 
-def insert_annotation_image(data: dict[str, Any]) -> None:
+def insert_annotation_image(data: dict[str, object]) -> None:
     g.cursor.execute(
         """
         INSERT INTO model.annotation_image (
@@ -116,7 +114,7 @@ def insert_annotation_image(data: dict[str, Any]) -> None:
         data)
 
 
-def update_annotation_image(data: dict[str, Any]) -> None:
+def update_annotation_image(data: dict[str, object]) -> None:
     g.cursor.execute(
         """
         UPDATE model.annotation_image
@@ -162,7 +160,7 @@ def remove_entity_from_annotation_text(
         {'annotation_id': annotation_id, 'entity_id': entity_id})
 
 
-def insert_annotation_text(data: dict[str, Any]) -> None:
+def insert_annotation_text(data: dict[str, object]) -> None:
     g.cursor.execute(
         """
         INSERT INTO model.annotation_text (
