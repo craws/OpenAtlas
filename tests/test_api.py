@@ -145,7 +145,7 @@ class Api(ApiTestCase):
         assert len(rv['results']) == 15
         rv = c.get(url_for('api_04.network_visualisation', download=True))
         rv = rv.get_json()
-        assert len(rv['results']) == 156
+        assert len(rv['results']) == 157
 
         rv = c.get(
             url_for(

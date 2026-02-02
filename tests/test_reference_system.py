@@ -15,7 +15,7 @@ class ReferenceSystemTest(TestBaseCase):
         rv = c.post(url_for('ajax_gnd_info'), data={'id_': '118584596'})
         assert b'Mozart' in rv.data
 
-        rv = c.post(url_for('ajax_kataster_info'), data={'id_': '01004/784/1'})
+        rv = c.post(url_for('ajax_cadaster_info'), data={'id_': '01004/784/1'})
         assert b'784/1' in rv.data
 
         rv = c.get(url_for('insert', class_='reference_system'))

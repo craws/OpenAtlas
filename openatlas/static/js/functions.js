@@ -276,12 +276,12 @@ async function ajaxGndInfo(data) {
   }, "gnd");
 }
 
-async function ajaxKatasterInfo(data) {
+async function ajaxCadasterInfo(data) {
   ajaxAPICall({
     type: 'post',
-    url: '/ajax/info/kataster',
+    url: '/ajax/info/cadaster',
     data: 'id_=' + data
-  }, "kataster");
+  }, "cadaster");
 }
 
 async function ajaxAddType(data, fieldId, typeId, multiple=false) {

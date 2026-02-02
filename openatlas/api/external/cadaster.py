@@ -7,12 +7,12 @@ from openatlas import app
 from openatlas.display.util import link
 
 
-def fetch_kataster(id_: str) -> dict[str, Any]:
+def fetch_cadaster(id_: str) -> dict[str, Any]:
     endpoint = 'gst/' if '/' in id_ else 'kgnr/'
     info = {}
     try:
         data = requests.get(
-            f'{app.config['API_KATASTER']}{endpoint}{id_}',
+            f'{app.config['API_CADASTER']}{endpoint}{id_}',
             headers=app.config['USER_AGENT'],
             proxies=app.config['PROXIES'],
             timeout=10).json()
@@ -50,6 +50,10 @@ def fetch_kataster(id_: str) -> dict[str, Any]:
         url = f'https://kataster.bev.gv.at/#/center/' \
               f'{geometry.x},{geometry.y}/zoom/{zoom}/vermv/0.6'
         info['geometry'] = link(url, url, external=True)
+    except KeyError:  # pragma: no cover
+        pass
+    try:
+        info['Error'] = data['message']
     except KeyError:  # pragma: no cover
         pass
     return info
