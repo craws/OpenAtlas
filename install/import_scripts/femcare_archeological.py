@@ -27,7 +27,6 @@ FUNDFOTOS_AMULETTE = FILE_PATH / 'Fundfotos_Medaillien'
 FUNDFOTOS_KATALOG = FILE_PATH / 'Katalog_fundfotos.docx'
 
 
-
 # pylint: skip-file
 
 DEBUG_MSG = defaultdict(list)
@@ -127,7 +126,7 @@ def parse_features() -> list[Feature]:
     df = pd.read_csv(FILE_PATH / 'features.csv', delimiter=',')
     features_ = []
     current_cut = ''
-    for index, row in df.iterrows():
+    for _ , row in df.iterrows():
         if "Schnitt" in row.iloc[0]:
             current_cut = row.iloc[0]
             continue
@@ -148,7 +147,7 @@ def parse_features() -> list[Feature]:
 def parse_stratigraphic_units() -> list[ParsedStratigraphicUnit]:
     df = pd.read_csv(FILE_PATH / 'se.csv', delimiter=',')
     se = []
-    for index, row in df.iterrows():
+    for _ , row in df.iterrows():
         if pd.isna(row.iloc[2]) or row.iloc[2] == '':
             continue
         if pd.isna(row.iloc[4]) or row.iloc[4] == 0:
@@ -171,7 +170,7 @@ def parse_stratigraphic_units() -> list[ParsedStratigraphicUnit]:
 def parse_finds() -> list[Find]:
     df = pd.read_csv(FILE_PATH / 'finds.csv', delimiter=',')
     finds_ = []
-    for index, row in df.iterrows():
+    for _ , row in df.iterrows():
 
         stratigraphic_unit = ''
         if pd.notna(row.iloc[1]):
@@ -428,9 +427,17 @@ with app.test_request_context():
     extraction_hierarchy = Entity.get_by_id(16316)
     layer_hierarchy = Entity.get_by_id(16317)
     material_hierarchy = Entity.get_by_id(16318)
-    designation_hierarchy = Entity.get_by_id(16319)
+    # designation_hierarchy = Entity.get_by_id(16319)
     dating_hierarchy = Entity.get_by_id(16320)
     cut_hierarchy = Entity.get_by_id(16323)
+
+    # For finds
+    additional_find_hierarchy = Entity.get_by_id(19207)
+    coin_orientation = Entity.get_by_id(19206)
+    diameter = Entity.get_by_id(19205)
+    height = Entity.get_by_id(19202)
+    weight = Entity.get_by_id(19204)
+    width = Entity.get_by_id(19203)
 
     # Get data out of documents
     features = parse_features()
@@ -574,7 +581,8 @@ with app.test_request_context():
     added_finds: dict[str, Entity] = {}
     for fi_entry in finds:
         if fi_entry.stratigraphic_unit:
-            link_to_entity = added_stratigraphic.get(fi_entry.stratigraphic_unit)
+            link_to_entity = added_stratigraphic.get(
+                fi_entry.stratigraphic_unit)
         elif fi_entry.feature_id:
             link_to_entity = added_features.get(fi_entry.feature_id)
         else:

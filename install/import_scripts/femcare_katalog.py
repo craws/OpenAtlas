@@ -1,3 +1,4 @@
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
@@ -5,6 +6,9 @@ from docx import Document
 
 FILE_PATH = Path('files/femcare')
 FUNDFOTOS_KATALOG = FILE_PATH / 'Katalog_fundfotos.docx'
+FUNDFOTOS_MEDAILLIEN = FILE_PATH / 'Fundfotos_Medaillien'
+
+# pylint: skip-file
 
 
 @dataclass
@@ -97,6 +101,20 @@ class KatalogEntity:
     length: str = ''
     height: str = ''
     identifications: str = ''
+    fndnr: str = ''
+    se: str = ''
+    image_id: str = ''
+
+
+def parse_find_entry(entry: str) -> dict[str, str]:
+    fndnr_match = re.search(r'Fund-Nr\.\s*([\d/]+)', entry)
+    se_match = re.search(r'SE\s*(\d+)', entry)
+    id_match = re.search(r'ID\s*(\d+)', entry)
+
+    return {
+        'fndnr': fndnr_match.group(1) if fndnr_match else '',
+        'se': se_match.group(1) if se_match else '',
+        'id': id_match.group(1) if id_match else ''}
 
 
 def get_fundkatalog_entries(
@@ -112,7 +130,7 @@ def get_fundkatalog_entries(
         coin_ = ''
         description_ = ''
         if entry.date:
-            date = entry.date.split('-')
+            date = entry.date.split('\u2013')  # en dash, not hyphen!
             start_date = date[0]
             if len(date) > 1:
                 end_date = date[1]
@@ -133,20 +151,27 @@ def get_fundkatalog_entries(
                 else:
                     diameter = dimensions[0].strip()
             if len(dim_tmp) == 2:
-                description_ = dim_tmp[1].strip()
+                description_ = f'{dim_tmp[1].strip()}\n'
 
+        # todo: check out fundnummer with subcategories e.g. 1489/4. Add
+        #  for each a new artifact?
+
+        idendification = parse_find_entry(entry.identifications)
         result_.append(KatalogEntity(
             id=entry.id,
             type=entry.type or 'Medaille',
             start_date=start_date,
             end_date=end_date,
             location=entry.location,
-            description=f'{description_}\n{entry.description}',
+            description=f'{description_}{entry.description}',
             weight=weight,
             coin=coin_,
             length=length,
             height=height,
-            diameter=diameter))
+            diameter=diameter,
+            fndnr=idendification['fndnr'],
+            se=idendification['se'],
+            image_id=idendification['id']))
     return result_
 
 
@@ -155,7 +180,12 @@ if __name__ == '__main__':
         result: dict[str, FundEntity] = parse_katalog(FUNDFOTOS_KATALOG)
         fundkatalog_entries = get_fundkatalog_entries(result)
         for e in fundkatalog_entries:
-            print(e)
+            # print(e)
             pass
+        # todo: next steps: move to main function, add to finds, update finds
+        #   with data and images
+        fundfotos_medaillien = {}
+        for file_ in FUNDFOTOS_MEDAILLIEN.iterdir():
+            fundfotos_medaillien[file_.stem] = file_
     else:
         print(f'Datei nicht gefunden: {FUNDFOTOS_KATALOG}')
