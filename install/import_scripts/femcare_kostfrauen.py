@@ -15,7 +15,7 @@ class Entry:
     name: str
     entry_date: str
     death: bool
-    leave_date: str
+    leave_date: str | None
     description: str
 
 
