@@ -400,7 +400,7 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
     def upload_ident_with_iiif() -> bool:
         if not iiif_path:
             return False  # pragma: no cover
-        return app.config['UPLOAD_PATH'].resolve() == iiif_path.resolve()
+        return bool(app.config['UPLOAD_PATH'].resolve() == iiif_path.resolve())
 
     paths = {
         'export': {

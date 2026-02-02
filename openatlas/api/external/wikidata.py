@@ -1,5 +1,3 @@
-from typing import Any
-
 import requests
 from flask import g
 
@@ -11,7 +9,7 @@ def add_resolver_url(id_: str) -> str:
     return link(f'Q{id_}', f'{g.wikidata.resolver_url}Q{id_}', external=True)
 
 
-def fetch_wikidata(id_: str) -> dict[str, Any]:
+def fetch_wikidata(id_: str) -> dict[str, object]:
     params = {
         'action': 'wbgetentities',
         'ids': id_,

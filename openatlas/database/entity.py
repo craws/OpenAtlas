@@ -556,7 +556,7 @@ def get_types(with_count: bool) -> list[dict[str, Any]]:
             e.created,
             e.modified,
             es.id AS super_id,
-            {'COUNT(l2.id)' if with_count else '0'} AS count,
+            {'COUNT(e2.id)' if with_count else '0'} AS count,
             {'COUNT(l3.id)' if with_count else '0'} AS count_property,
             COALESCE(to_char(e.begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
                 AS begin_from,
@@ -585,6 +585,8 @@ def get_types(with_count: bool) -> list[dict[str, Any]]:
             -- Get count
             LEFT JOIN model.link l2 ON e.id = l2.range_id
                 AND l2.property_code IN ('P2', 'P89')
+            LEFT JOIN model.entity e2 ON l2.domain_id = e2.id
+                AND e2.openatlas_class_name != 'administrative_unit'
             LEFT JOIN model.link l3 ON e.id = l3.type_id
             """
     sql += """

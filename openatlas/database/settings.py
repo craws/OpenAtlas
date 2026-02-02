@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Optional
 
 from flask import g
 from psycopg2.extras import DictCursor
@@ -10,7 +10,7 @@ def get_settings(cursor: Optional[DictCursor] = None) -> dict[str, str]:
     return {row['name']: row['value'] for row in list(cursor)}
 
 
-def update(field_name: str, value: Any) -> None:
+def update(field_name: str, value: object) -> None:
     g.cursor.execute(
         """
         INSERT INTO web.settings (name, value)
