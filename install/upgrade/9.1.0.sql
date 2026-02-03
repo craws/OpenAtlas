@@ -8,13 +8,13 @@ DELETE FROM web.settings WHERE name = 'module_map_overlay';
 DELETE FROM web.user_settings WHERE name = 'module_map_overlay';
 
 -- Add Austrian cadastre (#2290)
-INSERT INTO model.entity (name, class_code, description) VALUES
-    ('Cadaster', 'E32', 'Austrian cadastre from the Federal Office of Metrology and Surveying Austria');
+INSERT INTO model.entity (name, cidoc_class_code, description, openatlas_class_name) VALUES
+    ('Cadaster', 'E32', 'Austrian cadastre from the Federal Office of Metrology and Surveying Austria', 'reference_system');
 
 INSERT INTO web.reference_system (system, name, entity_id, resolver_url, website_url, identifier_example)
 VALUES (true,
         'Cadaster',
-        (SELECT id FROM model.entity WHERE name = 'Cadaster' AND class_code = 'E32'),
+        (SELECT id FROM model.entity WHERE name = 'Cadaster' AND cidoc_class_code = 'E32'),
         'https://kataster.bev.gv.at/api/gst/',
         'https://kataster.bev.gv.at/',
         '01004/781/1');

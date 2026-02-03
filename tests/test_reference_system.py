@@ -18,6 +18,9 @@ class ReferenceSystemTest(TestBaseCase):
         rv = c.post(url_for('ajax_cadaster_info'), data={'id_': '01004/784/1'})
         assert b'784/1' in rv.data
 
+        rv = c.post(url_for('ajax_cadaster_info'), data={'id_': '01004/78/99'})
+        assert b'nicht vorhanden' in rv.data
+
         rv = c.get(url_for('insert', class_='reference_system'))
         assert b'resolver URL' in rv.data
 
