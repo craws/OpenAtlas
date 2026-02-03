@@ -67,7 +67,7 @@ def reference_systems(entity: Entity) -> str:
                 class="circle bg-gray fw-bold text-black-50"
                 style="height: 16px; font-size: 12px;">{system.name.upper()[0]}
             </div>"""
-        if system.name in ['GeoNames', 'GND', 'Wikidata']:
+        if system.name in ['GeoNames', 'GND', 'Wikidata', 'Cadaster']:
             name = system.name.lower()
             show = f'<span id="show">{uc_first(_('show info'))}</span>'
             hide = '<span id="hide" class="d-none">' + \
