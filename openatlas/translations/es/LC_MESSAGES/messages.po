@@ -74,7 +74,7 @@ msgstr "localización del objeto"
 
 #: config/model/model.py:34
 msgid "type tools"
-msgstr "tipo de herramientas"
+msgstr "tipos auxiliares"
 
 #: config/model/classes/actor.py:9 openatlas/views/model.py:105
 #: openatlas/views/user.py:36 openatlas/views/user.py:150
@@ -91,21 +91,19 @@ msgstr "empieza en"
 
 #: config/model/classes/actor.py:31 config/model/classes/place.py:83
 msgid "ends in"
-msgstr "termina en"
+msgstr "finaliza en"
 
 #: config/model/classes/actor.py:38
-#, fuzzy
 msgid "performed"
-msgstr "proceder"
+msgstr "realitzado"
 
 #: config/model/classes/actor.py:51
-#, fuzzy
 msgid "participated"
-msgstr "participó en un evento"
+msgstr "ha participado"
 
 #: config/model/classes/actor.py:64 config/model/classes/event.py:133
 msgid "move"
-msgstr "trasladar"
+msgstr "traslado"
 
 #: config/model/classes/actor.py:71 config/model/classes/event.py:90
 msgid "donor"
@@ -161,7 +159,7 @@ msgstr "subs"
 
 #: config/model/classes/artifact.py:69
 msgid "carrier of source"
-msgstr ""
+msgstr "soporte de fuente de información"
 
 #: config/model/classes/artifact.py:83 openatlas/forms/add_fields.py:509
 msgid "human remains"
@@ -169,12 +167,11 @@ msgstr "restos humanos"
 
 #: config/model/classes/event.py:18
 msgid "performer"
-msgstr ""
+msgstr "ejecutante"
 
 #: config/model/classes/event.py:30
-#, fuzzy
 msgid "participant"
-msgstr "artefacto"
+msgstr "participante"
 
 #: config/model/classes/event.py:49
 msgid "sub event of"
@@ -227,9 +224,8 @@ msgid "modification of artifacts"
 msgstr "modificación de artefactos"
 
 #: config/model/classes/event.py:119
-#, fuzzy
 msgid "modified object"
-msgstr "modificado"
+msgstr "objeto modificado"
 
 #: config/model/classes/event.py:125
 msgid "modified place"
@@ -245,16 +241,15 @@ msgstr "lugar desde"
 
 #: config/model/classes/event.py:143
 msgid "place to"
-msgstr "Lugar hacia"
+msgstr "lugar hacia"
 
 #: config/model/classes/event.py:149
 msgid "moved person"
 msgstr "persona trasladada"
 
 #: config/model/classes/event.py:155
-#, fuzzy
 msgid "moved object"
-msgstr "objeto dado"
+msgstr "objeto trasladado"
 
 #: config/model/classes/event.py:162
 msgid "production"
@@ -265,9 +260,8 @@ msgid "creation of artifacts"
 msgstr "creación de artefactos"
 
 #: config/model/classes/event.py:166
-#, fuzzy
 msgid "produced artifact"
-msgstr "artefacto dado"
+msgstr "artefacto creado"
 
 #: config/model/classes/file.py:24
 msgid "public sharing allowed"
@@ -291,19 +285,16 @@ msgid "extension"
 msgstr "extensión"
 
 #: config/model/classes/place.py:47
-#, fuzzy
 msgid "event location"
-msgstr "localización del objeto"
+msgstr "localización del evento"
 
 #: config/model/classes/place.py:55
-#, fuzzy
 msgid "move from location"
-msgstr "localización del objeto"
+msgstr "traslado desde el lugar"
 
-#: config/model/classes/place.py:62
-#, fuzzy
+#: config/model/classes/place.py:6
 msgid "move to location"
-msgstr "localización del objeto"
+msgstr "traslado al lugar"
 
 #: config/model/classes/place.py:101
 msgid "feature"
@@ -322,9 +313,8 @@ msgid "bibliography"
 msgstr "bibliografía"
 
 #: config/model/classes/reference.py:56
-#, fuzzy
 msgid "edition"
-msgstr "edita"
+msgstr "edición"
 
 #: config/model/classes/reference.py:59
 msgid "external reference"
@@ -335,17 +325,14 @@ msgid "URL"
 msgstr "URL"
 
 #: config/model/classes/reference_system.py:12 openatlas/forms/setting.py:108
-#, fuzzy
 msgid "website url"
 msgstr "URL del sitio web"
 
 #: config/model/classes/reference_system.py:15 openatlas/forms/setting.py:109
-#, fuzzy
 msgid "resolver url"
 msgstr "URL de resolución"
 
 #: config/model/classes/reference_system.py:18
-#, fuzzy
 msgid "example id"
 msgstr "ID de ejemplo"
 
@@ -377,7 +364,7 @@ msgstr "mencionado en la fuente"
 
 #: config/model/classes/source.py:39
 msgid "information carrier"
-msgstr ""
+msgstr "portador de información"
 
 #: config/model/classes/source.py:46
 msgid "Link artifacts as the information carrier of the source"
@@ -403,9 +390,8 @@ msgid "presentation site"
 msgstr "web de presentación"
 
 #: openatlas/display/display.py:187
-#, fuzzy
 msgid "add"
-msgstr "DD"
+msgstr "añadir"
 
 #: openatlas/display/display.py:207 openatlas/display/table.py:210
 #: openatlas/display/util.py:507
@@ -538,11 +524,11 @@ msgstr "finaliza"
 
 #: openatlas/display/display.py:407
 msgid "appears first"
-msgstr "aparece primero"
+msgstr "primera aparición"
 
 #: openatlas/display/display.py:408
 msgid "appears last"
-msgstr "aparece último"
+msgstr "última aparición"
 
 #: openatlas/display/display.py:427
 msgid "but license is missing "
@@ -577,12 +563,12 @@ msgstr "muestra"
 
 #: openatlas/display/table.py:26
 msgid "entries"
-msgstr "ítems"
+msgstr "registros"
 
 #: openatlas/display/table.py:27
 #, python-format
 msgid "showing %(first)s to %(last)s of %(all)s entries"
-msgstr "mostrando del %(first)s a %(last)s de %(all)s ítems"
+msgstr "mostrando del %(first)s a %(last)s de %(all)s registros"
 
 #: openatlas/display/table.py:28
 msgid "value"
@@ -595,7 +581,7 @@ msgstr "no hay registros"
 
 #: openatlas/display/table.py:231 openatlas/display/table.py:336
 msgid "set"
-msgstr "Seleccionar"
+msgstr "aplica"
 
 #: openatlas/display/table.py:332
 msgid "main image"
@@ -611,19 +597,17 @@ msgid "external reference systems"
 msgstr "sistemas de referencia externos"
 
 #: openatlas/display/util.py:72
-#, fuzzy
 msgid "show info"
-msgstr "muestra más"
+msgstr "muestra la información"
 
 #: openatlas/display/util.py:74
-#, fuzzy
 msgid "hide info"
-msgstr "info de notas"
+msgstr "oculta la información"
 
 #: openatlas/display/util.py:96
-#, fuzzy, python-format
+#, python-format
 msgid "show on %(system_name)s"
-msgstr "Prueba de correo desde %(site_name)s"
+msgstr "muestra en %(system_name)s"
 
 #: openatlas/display/util.py:121
 msgid "at an"
@@ -745,17 +729,17 @@ msgstr "múltiple"
 
 #: openatlas/forms/add_fields.py:206 openatlas/views/vocabs.py:155
 msgid "tooltip hierarchy multiple"
-msgstr "Si está marcada, se pueden usar múltiples opciones para una entidad."
+msgstr "Si está activado, se pueden usar múltiples opciones para una entidad."
 
 #: openatlas/forms/add_fields.py:211 openatlas/views/vocabs.py:149
 msgid "tooltip hierarchy forms"
-msgstr "Elija en qué formularios estará disponible este tipo."
+msgstr "elija en qué formularios estará disponible este tipo."
 
 #: openatlas/forms/add_fields.py:311 openatlas/forms/add_fields.py:348
 #: openatlas/forms/add_fields.py:389 openatlas/forms/add_fields.py:426
 #: openatlas/views/search.py:42 openatlas/views/search.py:51
 msgid "YYYY"
-msgstr "YYYY"
+msgstr "AAAA"
 
 #: openatlas/forms/add_fields.py:317 openatlas/forms/add_fields.py:354
 #: openatlas/forms/add_fields.py:395 openatlas/forms/add_fields.py:432
@@ -814,7 +798,7 @@ msgstr "insertar"
 
 #: openatlas/forms/add_fields.py:489 openatlas/views/user.py:46
 msgid "insert and continue"
-msgstr "insertar y continuar"
+msgstr "inserta y continua"
 
 #: openatlas/forms/add_fields.py:503 openatlas/forms/add_fields.py:509
 msgid "insert and add"
@@ -874,11 +858,11 @@ msgstr "restablecer horario de confirmación"
 
 #: openatlas/forms/setting.py:36
 msgid "failed login tries"
-msgstr "Inicio de sesión fallido"
+msgstr "inicio de sesión fallido"
 
 #: openatlas/forms/setting.py:38
 msgid "failed login forget minutes"
-msgstr "Error de inicio de sesión, olvidar minutos"
+msgstr "error de inicio de sesión, olvidar minutos"
 
 #: openatlas/forms/setting.py:39
 msgid "minimum jstree search"
@@ -906,19 +890,19 @@ msgstr "nombre de usuario"
 
 #: openatlas/forms/setting.py:52
 msgid "mail transport host"
-msgstr "host"
+msgstr "hoservidor de correo"
 
 #: openatlas/forms/setting.py:53
 msgid "mail transport port"
-msgstr "puerto"
+msgstr "puerto de conexión al servidor de correo"
 
 #: openatlas/forms/setting.py:54
 msgid "mail from email"
-msgstr "correo del mail"
+msgstr "remitente del mail"
 
 #: openatlas/forms/setting.py:55
 msgid "mail from name"
-msgstr "correo del nombre"
+msgstr "remitente del nombre"
 
 #: openatlas/forms/setting.py:62
 msgid "tooltip IIIF enabled"
@@ -1073,7 +1057,7 @@ msgstr "muestra correo electrónico"
 
 #: openatlas/forms/setting.py:139
 msgid "tooltip show email"
-msgstr "Si está marcado, su correo electrónico se puede mostrar a otros usuarios"
+msgstr "si está marcado, su correo electrónico se puede mostrar a otros usuarios"
 
 #: openatlas/forms/setting.py:141 openatlas/views/admin.py:180
 #: openatlas/views/admin.py:385 openatlas/views/admin.py:388
@@ -1150,12 +1134,12 @@ msgstr "fecha no válida"
 
 #: openatlas/forms/validation.py:79
 msgid "First date cannot be after second."
-msgstr "La primera fecha no puede ser después de la segunda"
+msgstr "La primera fecha no puede ser posterior a la segunda"
 
 #: openatlas/forms/validation.py:86 openatlas/forms/validation.py:95
 #: openatlas/views/search.py:74
 msgid "Begin dates cannot start after end dates."
-msgstr "Fecha de inicio no debe ser después de fecha final"
+msgstr "la fechas de inicio no puede ser posteriores a las fecha finales"
 
 #: openatlas/templates/file.html:5
 msgid "local disk usage"
@@ -1179,7 +1163,7 @@ msgstr "archivos de proyecto"
 
 #: openatlas/templates/file.html:59
 msgid "distribution of project files"
-msgstr "archivos que no son de proyecto"
+msgstr "distribución de les ficheros de proyecto"
 
 #: openatlas/templates/file.html:102
 msgid "upload folder"
@@ -1213,7 +1197,7 @@ msgstr "última copia de seguridad"
 #: openatlas/templates/import_data.html:11
 #: openatlas/templates/sql/execute.html:11
 msgid "There seems to be no recent backup, please make one"
-msgstr "Parece que no hay una copia de seguridad reciente, haz una"
+msgstr "parece que no hay una copia de seguridad reciente, haz una"
 
 #: openatlas/templates/import_data.html:12
 #: openatlas/templates/sql/execute.html:12
@@ -1429,7 +1413,7 @@ msgstr "eliminar imágenes redimensionadas huérfanas"
 #: openatlas/templates/admin/data.html:41 openatlas/views/token.py:123
 #: openatlas/views/token.py:174
 msgid "token"
-msgstr "clave"
+msgstr "token"
 
 #: openatlas/templates/entity/insert.html:25
 msgid "max size"
@@ -1635,14 +1619,12 @@ msgid "wrong range"
 msgstr "rango incorrecto"
 
 #: openatlas/templates/model/index.html:59
-#, fuzzy
 msgid "relations"
-msgstr "relación"
+msgstr "relaciones"
 
 #: openatlas/templates/model/index.html:63
-#, fuzzy
 msgid "invalid relations"
-msgstr "fechas inválidas"
+msgstr "realcions inválidas"
 
 #: openatlas/templates/model/network.html:56
 msgid "no data to display"
@@ -1969,18 +1951,16 @@ msgid "changelog"
 msgstr "changelog"
 
 #: openatlas/views/checks.py:37
-#, fuzzy
 msgid "invalid CIDOC links"
-msgstr "columnas inválidas"
+msgstr "enlaces a CIDOC inválidos"
 
 #: openatlas/views/checks.py:43
 msgid "link duplicates"
 msgstr "enlace duplicado"
 
 #: openatlas/views/checks.py:50
-#, fuzzy
 msgid "invalid multiple types"
-msgstr "tipos de valores no válidos"
+msgstr "tipos múltiples inválidos"
 
 #: openatlas/views/checks.py:54
 msgid "circular dependencies"
@@ -2040,24 +2020,20 @@ msgid "check dates"
 msgstr "comprobar fechas"
 
 #: openatlas/views/checks.py:219
-#, fuzzy
 msgid "types"
-msgstr "tipo"
+msgstr "tipos"
 
 #: openatlas/views/checks.py:226
-#, fuzzy
 msgid "image annotations"
-msgstr "anotación"
+msgstr "anotaciones de imagen"
 
 #: openatlas/views/checks.py:232
-#, fuzzy
 msgid "text annotations"
-msgstr "eliminar anotación"
+msgstr "anotaciones de texto"
 
 #: openatlas/views/checks.py:238
-#, fuzzy
 msgid "subunits"
-msgstr "envia"
+msgstr "subunidades"
 
 #: openatlas/views/checks.py:290
 msgid "no creator"
@@ -2375,7 +2351,7 @@ msgstr "error en la importación"
 
 #: openatlas/views/imports.py:307 openatlas/views/vocabs.py:179
 msgid "import of"
-msgstr "se han importado"
+msgstr "importación de"
 
 #: openatlas/views/index.py:46 openatlas/views/model.py:73
 #: openatlas/views/model.py:78 openatlas/views/model.py:90
@@ -2444,7 +2420,7 @@ msgstr "cancelar la suscripción al boletín"
 
 #: openatlas/views/link.py:82
 msgid "Can't link to itself"
-msgstr ""
+msgstr "no puede enlazarse a si mismo"
 
 #: openatlas/views/login.py:38 openatlas/views/login.py:179
 #: openatlas/views/profile.py:26 openatlas/views/profile.py:153
@@ -2588,7 +2564,7 @@ msgstr "clásico"
 
 #: openatlas/views/note.py:43
 msgid "set private"
-msgstr "Establecer privado"
+msgstr "establecer privado"
 
 #: openatlas/views/note.py:63 openatlas/views/note.py:98
 msgid "note updated"
@@ -2674,20 +2650,20 @@ msgstr "Incluir entidades sin fecha"
 #: openatlas/views/token.py:34 openatlas/views/token.py:37
 #: openatlas/views/token.py:93
 msgid "revoked"
-msgstr "revoca"
+msgstr "revocado"
 
 #: openatlas/views/token.py:38
 msgid "not revoked"
-msgstr "no revocada"
+msgstr "no revocado"
 
 #: openatlas/views/token.py:40 openatlas/views/token.py:43
 #: openatlas/views/token.py:86
 msgid "valid"
-msgstr "válido/a"
+msgstr "válido"
 
 #: openatlas/views/token.py:44
 msgid "not valid"
-msgstr "no válido/a"
+msgstr "no válido"
 
 #: openatlas/views/token.py:64 openatlas/views/token.py:148
 #: openatlas/views/token.py:175
@@ -2752,27 +2728,27 @@ msgstr "se ha guardado el token para"
 
 #: openatlas/views/token.py:182
 msgid "token revoked"
-msgstr "clave revocada"
+msgstr "token revocado"
 
 #: openatlas/views/token.py:190
 msgid "token authorized"
-msgstr "clave autorizada"
+msgstr "token autorizado"
 
 #: openatlas/views/token.py:198
 msgid "token deleted"
-msgstr "clave eliminada"
+msgstr "token eliminado"
 
 #: openatlas/views/token.py:206 openatlas/views/token.py:214
 msgid "tokens deleted"
-msgstr "claves eliminadas"
+msgstr "tokens eliminados"
 
 #: openatlas/views/token.py:222
 msgid "all tokens revoked"
-msgstr "todos los tokens revocadas"
+msgstr "todos los tokens revocados"
 
 #: openatlas/views/token.py:230
 msgid "all tokens authorized"
-msgstr "todos los tokens autorizadas"
+msgstr "todos los tokens autorizados"
 
 #: openatlas/views/tools.py:23
 msgid "female"
@@ -2850,7 +2826,7 @@ msgstr "dominio"
 
 #: openatlas/views/type.py:86
 msgid "Entities were updated"
-msgstr "Se actualizaron las entidades"
+msgstr "se actualizaron las entidades"
 
 #: openatlas/views/user.py:31
 msgid "active"
@@ -2862,11 +2838,11 @@ msgstr "enviar información de cuenta"
 
 #: openatlas/views/user.py:58
 msgid "error username exists"
-msgstr "Este nombre de usuario ya existe"
+msgstr "este nombre de usuario ya existe"
 
 #: openatlas/views/user.py:62
 msgid "error email exists"
-msgstr "Este correo electrónico ya está en uso"
+msgstr "este correo electrónico ya está en uso"
 
 #: openatlas/views/user.py:87 openatlas/views/user.py:129
 msgid "action"
@@ -2957,4 +2933,4 @@ msgstr "revisa en el fichero de los conceptos no importados"
 
 #: openatlas/views/vocabs.py:197
 msgid "You are about to import following hierarchy"
-msgstr "Estás a punto de importar la siguiente jerarquía"
+msgstr "estás a punto de importar la siguiente jerarquía"
