@@ -276,6 +276,14 @@ async function ajaxGndInfo(data) {
   }, "gnd");
 }
 
+async function ajaxCadasterInfo(data) {
+  ajaxAPICall({
+    type: 'post',
+    url: '/ajax/info/cadaster',
+    data: 'id_=' + data
+  }, "cadaster");
+}
+
 async function ajaxAddType(data, fieldId, typeId, multiple=false) {
   const newTypeId = await $.ajax({
     type: 'post',
@@ -371,8 +379,8 @@ function selectFromTreeMulti(name, value_type = false) {
 }
 
 function deselectNode(fieldId,nodeId){
- $(`#${fieldId}-tree`).jstree('deselect_node', nodeId);
- selectFromTreeMulti(fieldId)
+  $(`#${fieldId}-tree`).jstree('deselect_node', nodeId);
+  selectFromTreeMulti(fieldId)
 }
 
 function selectFromTable(element, table, id, label=undefined) {

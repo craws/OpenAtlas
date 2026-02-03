@@ -62,20 +62,22 @@ class ApiTestCase(TestBaseCase):
 
     @staticmethod
     def get_classes(data: list[dict[str, Any]]) -> bool:
-        return (data[0]['systemClass']
-                and data[0]['crmClass']
-                and data[0]['view']
-                and data[0]['icon']
-                and data[0]['en'])
+        return bool(
+            data[0]['systemClass']
+            and data[0]['crmClass']
+            and data[0]['view']
+            and data[0]['icon']
+            and data[0]['en'])
 
     @staticmethod
     def get_class_mapping(data: dict[str, Any], locale: str) -> bool:
-        return (data['locale'] == locale
-                and data['results'][0]['systemClass']
-                and data['results'][0]['crmClass']
-                and data['results'][0]['view']
-                and data['results'][0]['icon']
-                and data['results'][0]['label'])
+        return bool(
+            data['locale'] == locale
+            and data['results'][0]['systemClass']
+            and data['results'][0]['crmClass']
+            and data['results'][0]['view']
+            and data['results'][0]['icon']
+            and data['results'][0]['label'])
 
 
 class ImportTestCase(TestBaseCase):

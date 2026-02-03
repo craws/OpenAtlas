@@ -3,7 +3,7 @@ from typing import Any
 from flask import g
 
 
-def insert(data: dict[str, Any]) -> None:
+def insert(data: dict[str, object]) -> None:
     g.cursor.execute(
         """
         INSERT INTO web.map_overlay (image_id, bounding_box)
@@ -12,7 +12,7 @@ def insert(data: dict[str, Any]) -> None:
         data)
 
 
-def update(data: dict[str, Any]) -> None:
+def update(data: dict[str, object]) -> None:
     g.cursor.execute(
         """
         UPDATE web.map_overlay
@@ -34,7 +34,7 @@ def get_by_object(ids: list[int]) -> list[dict[str, Any]]:
     return list(g.cursor)
 
 
-def get_by_id(id_: int) -> dict[str, Any]:
+def get_by_id(id_: int) -> dict[str, object]:
     g.cursor.execute(
         """
         SELECT id, image_id, bounding_box

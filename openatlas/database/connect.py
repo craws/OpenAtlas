@@ -1,11 +1,9 @@
-from typing import Any
-
 from flask import g
 from psycopg2 import connect
 from psycopg2.extensions import connection
 
 
-def open_connection(config: dict[str, Any]) -> connection:
+def open_connection(config: dict[str, object]) -> connection:
     return connect(
         database=config['DATABASE_NAME'],
         user=config['DATABASE_USER'],

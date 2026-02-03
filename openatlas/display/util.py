@@ -67,7 +67,7 @@ def reference_systems(entity: Entity) -> str:
                 class="circle bg-gray fw-bold text-black-50"
                 style="height: 16px; font-size: 12px;">{system.name.upper()[0]}
             </div>"""
-        if system.name in ['GeoNames', 'GND', 'Wikidata']:
+        if system.name in ['GeoNames', 'GND', 'Wikidata', 'Cadaster']:
             name = system.name.lower()
             show = f'<span id="show">{uc_first(_('show info'))}</span>'
             hide = '<span id="hide" class="d-none">' + \
@@ -188,7 +188,7 @@ def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
     label = _('bookmark remove') \
         if current_user.bookmarks and entity_id in current_user.bookmarks \
         else _('bookmark')
-    onclick = f'ajaxBookmark("{entity_id}");'
+    onclick = f"ajaxBookmark('{entity_id}');"  # Don't change the quotes!
     if for_table:
         return \
             f'<a href="#" id="bookmark{entity_id}" onclick="{onclick}">' \

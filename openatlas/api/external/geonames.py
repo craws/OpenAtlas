@@ -1,5 +1,3 @@
-from typing import Any
-
 import requests
 import xmltodict
 from flask import g
@@ -7,7 +5,7 @@ from flask import g
 from openatlas import app
 
 
-def fetch_geonames(id_: str) -> dict[str, Any]:
+def fetch_geonames(id_: str) -> dict[str, object]:
     params = {
         'geonameId': {id_},
         'username': {g.settings['geonames_username']}}
@@ -20,7 +18,7 @@ def fetch_geonames(id_: str) -> dict[str, Any]:
         data_dict = xmltodict.parse(data)['geoname']
     except Exception:  # pragma: no cover
         return {}
-    info = {}
+    info: dict[str, object] = {}
     for key, value in data_dict.items():
         if key == 'alternateNames' and value:
             info[key] = '<br>'.join(value.split(','))

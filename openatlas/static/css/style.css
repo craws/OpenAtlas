@@ -8,6 +8,11 @@ a {
   text-decoration: none;
 }
 
+a:not([href]):not([class]), a:not([href]):not([class]):hover {
+  color: #0d6efd;
+  cursor: pointer;
+}
+
 h1, h2, h3 {
   font-size: 100%;
 }

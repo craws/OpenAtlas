@@ -18,10 +18,12 @@ versions = {
     '9.1.0': ['TBA', {
         'feature': {
             '2505': 'Custom place hierarchies',
+            '2290': 'Cadaster API (kataster.bev.gv.at)',
             '2700': 'Restructured data integrity check',
             '2703': 'Removed overlay option',
-            '2695': 'Refactor and minor improvements'
-        }}],
+            '2695': 'Refactor and minor improvements'},
+        'fix': {
+            '2714': 'View jumping at table select fields'}}],
     '9.0.0': ['2026-01-01', {
         'feature': {
             '2464': 'OpenAtlas major version 9.0.0',

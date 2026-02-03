@@ -86,7 +86,7 @@ def html_form(
                 f'{''.join(buttons)}</div>')
             continue
         if field.type in ['TableField', 'TableMultiField']:
-            field.label.text = _(field.label.text.lower())
+            field.label.text = _(field.label.text)
         html += add_row(field, form_id=form_id)
     return html
 

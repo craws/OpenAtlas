@@ -266,9 +266,9 @@ def format_name_and_aliases(
         forms: dict[str, Any]) -> str:
     if forms.get('mode') == 'single':
         link_ = f"""
-            <a value="{entity.name}" href="#"
-                onclick="selectFromTable(this,'{table_id}', {entity.id})"
-            >{entity.name}</a>"""
+          <a value="{entity.name}"
+            onclick="selectFromTable(this,'{table_id}', {entity.id})"
+          >{entity.name}</a>"""
         if not entity.aliases:
             return link_
         html = f'<p>{link_}</p>'
