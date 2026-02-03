@@ -19,10 +19,6 @@ SKELETON_PATH = FILE_PATH / 'Elisabethinen_SE_Protokolle'
 SCHNITTE_PATH = FILE_PATH / "Schnitte"
 SKELETON_IMAGE_PATH = FILE_PATH / 'skelett_mannchen'
 UPLOAD = FILE_PATH / 'uploads'
-# todo: get both funfotos sorted to finds
-#   FUNDFOTOS_AMULETTE has a special docx where the name of the image can be
-#       linked to the acutal FDNR with additional data (Katalog_fundfotos.docx)
-#   Create a file dict with {FNR: [{'file_name': 'xxx', 'file_path': xxx}]
 FUNDFOTOS = FILE_PATH / 'Fundfotos'
 FUNDFOTOS_KATALOG = FILE_PATH / 'Katalog_fundfotos.docx'
 FUNDFOTOS_MEDAILLIEN = FILE_PATH / 'Fundfotos_Medaillien'
@@ -343,11 +339,11 @@ def get_fundkatalog_entries(
             end_date=end_date,
             location=entry.location,
             description=f'{description_}{entry.description}',
-            weight=weight,
-            coin=coin_,
-            length=length,
-            height=height,
-            diameter=diameter,
+            weight=weight.replace(',', '.'),
+            coin=coin_.replace(',', '.'),
+            length=length.replace(',', '.'),
+            height=height.replace(',', '.'),
+            diameter=diameter.replace(',', '.'),
             fndnr=idendification['fndnr'],
             se=idendification['se'],
             image_id=idendification['id']))
@@ -574,11 +570,11 @@ with (app.test_request_context()):
 
     # For finds
     additional_find_hierarchy = Entity.get_by_id(19207)
-    coin_orientation = Entity.get_by_id(19206)
-    diameter = Entity.get_by_id(19205)
-    height = Entity.get_by_id(19202)
-    weight = Entity.get_by_id(19204)
-    width = Entity.get_by_id(19203)
+    coin_orientation_type = Entity.get_by_id(19206)
+    diameter_type = Entity.get_by_id(19205)
+    height_type = Entity.get_by_id(19202)
+    weight_type = Entity.get_by_id(19204)
+    length_type = Entity.get_by_id(19203)
 
     # Get data out of documents
     features = parse_features()
@@ -781,14 +777,72 @@ with (app.test_request_context()):
     if FUNDFOTOS_KATALOG.exists():
         result: dict[str, FundEntity] = parse_katalog(FUNDFOTOS_KATALOG)
         fundkatalog_entries = get_fundkatalog_entries(result)
-        for additional_finds in fundkatalog_entries:
-            # todo: problem with 1489/1 fndnr
-            find = added_finds[additional_finds.fndnr].name
-            print('++++++++++++++++')
-            print(find)
-            pass
-        # todo: next steps:  add to finds, update finds
-        #   with data and images
+        for fundkatalog_entry in fundkatalog_entries:
+            find_entity = added_finds[fundkatalog_entry.fndnr.split('/')[0]]
+            # todo: add count for name, so it should be name_1, name_2 etc.
+            new_name = find_entity.name
+            inser_data = {
+                'name': new_name,
+                'description': fundkatalog_entry.description.strip(),
+                'openatlas_class_name': 'artifact'}
+            if fundkatalog_entry.start_date:
+                inser_data.update({
+                    'begin_from': f'{fundkatalog_entry.start_date}-01-01',
+                    'begin_to': f'{fundkatalog_entry.start_date}-12-01'})
+            if fundkatalog_entry.end_date:
+                inser_data.update({
+                    'end_from': f'{fundkatalog_entry.end_date}-01-01',
+                    'end_to': f'{fundkatalog_entry.end_date}-12-01'})
+            additional_find = insert(inser_data)
+
+            additional_find.link('P2', case_study)
+            additional_find.link('P46', find_entity, inverse=True)
+            location = insert({
+                'name': f'Location of {new_name}',
+                'openatlas_class_name': 'object_location'})
+
+            if fundkatalog_entry.weight:
+                additional_find.link(
+                    'P2',
+                    weight_type,
+                    description=fundkatalog_entry.weight)
+            if fundkatalog_entry.diameter:
+                additional_find.link(
+                    'P2',
+                    diameter_type,
+                    description=fundkatalog_entry.diameter)
+            if fundkatalog_entry.coin:
+                additional_find.link(
+                    'P2',
+                    coin_orientation_type,
+                    description=fundkatalog_entry.coin)
+            if fundkatalog_entry.length:
+                additional_find.link(
+                    'P2',
+                    length_type,
+                    description=fundkatalog_entry.length)
+            if fundkatalog_entry.height:
+                additional_find.link(
+                    'P2',
+                    height_type,
+                    description=fundkatalog_entry.height)
+            for fund_foto, path_ in fundfotos_medaillien.items():
+                fund_foto_name = fund_foto.split('_')[0]
+
+                if fund_foto_name == fundkatalog_entry.image_id:
+                    fundfoto_file = path_
+                    file = insert({
+                        'name': f'{fi_entry.name} {fundkatalog_entry.image_id}',
+                        'openatlas_class_name': 'file'})
+                    file.save_file_info(FILE_INFO)
+                    file.link('P2', cc_by_sa_type)
+                    file.link('P2', file_find_type)
+                    additional_find.link('P67', file, inverse=True)
+
+                    ext = fundfoto_file.suffix
+                    dest = UPLOAD / f"{file.id}{ext}"
+                    UPLOAD.mkdir(parents=True, exist_ok=True)
+                    shutil.copy(fundfoto_file, dest)
     else:
         print(f'Datei nicht gefunden: {FUNDFOTOS_KATALOG}')
     print(DEBUG_MSG)
