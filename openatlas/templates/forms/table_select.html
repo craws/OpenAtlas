@@ -13,7 +13,6 @@
   </div>
   <div id="{{ field.id }}-clear-field" class="col-auto" {% if not field.selection %}style="display: none;"{% endif %}>
     <a
-        href="#"
         id="{{ field.id }}-clear"
         class="{{ config.CSS.button.secondary }} col-auto"
         onclick="clearSelect('{{ field.id }}');">

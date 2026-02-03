@@ -371,8 +371,8 @@ function selectFromTreeMulti(name, value_type = false) {
 }
 
 function deselectNode(fieldId,nodeId){
- $(`#${fieldId}-tree`).jstree('deselect_node', nodeId);
- selectFromTreeMulti(fieldId)
+  $(`#${fieldId}-tree`).jstree('deselect_node', nodeId);
+  selectFromTreeMulti(fieldId)
 }
 
 function selectFromTable(element, table, id, label=undefined) {
