@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-02-02 15:07+0100\n"
-"PO-Revision-Date: 2025-12-30 20:20+0100\n"
+"POT-Creation-Date: 2026-02-02 16:58+0100\n"
+"PO-Revision-Date: 2026-02-02 15:31+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: de\n"
 "Language-Team: de <LL@li.org>\n"
@@ -159,7 +159,7 @@ msgstr "Subs"
 
 #: config/model/classes/artifact.py:69
 msgid "carrier of source"
-msgstr ""
+msgstr "Informationsträger"
 
 #: config/model/classes/artifact.py:83 openatlas/forms/add_fields.py:509
 msgid "human remains"
@@ -2021,24 +2021,20 @@ msgid "check dates"
 msgstr "Datumswerte kontrollieren"
 
 #: openatlas/views/checks.py:219
-#, fuzzy
 msgid "types"
 msgstr "Typ"
 
 #: openatlas/views/checks.py:226
-#, fuzzy
 msgid "image annotations"
-msgstr "verwaiste Image Annotationen"
+msgstr "Bildannotationen"
 
 #: openatlas/views/checks.py:232
-#, fuzzy
 msgid "text annotations"
-msgstr "Annotation löschen"
+msgstr "Textannotationen"
 
 #: openatlas/views/checks.py:238
-#, fuzzy
 msgid "subunits"
-msgstr "Abschicken"
+msgstr "Subunits"
 
 #: openatlas/views/checks.py:290
 msgid "no creator"
@@ -2942,115 +2938,4 @@ msgstr "Kontrolliere das Log für nicht importierte Konzepte"
 #: openatlas/views/vocabs.py:197
 msgid "You are about to import following hierarchy"
 msgstr "Du bist dabei folgende Hierarchien zu importieren"
-
-#~ msgid "document"
-#~ msgstr "Dokument"
-
-#~ msgid "object"
-#~ msgstr "Objekt"
-
-#~ msgid "produced"
-#~ msgstr "produzierte"
-
-#~ msgid "entity"
-#~ msgstr "Entität"
-
-#~ msgid "icon"
-#~ msgstr "Icon"
-
-#~ msgid "moved"
-#~ msgstr "bewegte"
-
-#~ msgid "add subunit"
-#~ msgstr "Subunit hinzufügen"
-
-#~ msgid "unset"
-#~ msgstr "abwählen"
-
-#~ msgid "show icons in tables"
-#~ msgstr "Zeige Icons in Tabellen"
-
-#~ msgid "actor relation"
-#~ msgstr "Beziehung"
-
-#~ msgid "actor function"
-#~ msgstr "Funktion"
-
-#~ msgid "appellation"
-#~ msgstr "Bezeichnung"
-
-#~ msgid "creation"
-#~ msgstr "Kreation"
-
-#~ msgid "involvement"
-#~ msgstr "Beteiligung"
-
-#~ msgid "events not performed by actors, e.g. a natural disaster"
-#~ msgstr "Ereignisse ohne Akteure, z.B. eine Naturkatastrophe"
-
-#~ msgid "creation of documents (files)"
-#~ msgstr "Erzeugung von Dokumenten (Dateien)"
-
-#~ msgid "types"
-#~ msgstr "Typen"
-
-#~ msgid "true"
-#~ msgstr "Ja"
-
-#~ msgid "false"
-#~ msgstr "Nein"
-
-#~ msgid "check link duplicates"
-#~ msgstr "Link-Duplikate prüfen"
-
-#~ msgid "settings"
-#~ msgstr "einstellungen"
-
-#~ msgid "unlinked"
-#~ msgstr "Entitäten ohne Verlinkung"
-
-#~ msgid "fetch"
-#~ msgstr "Update"
-
-#~ msgid "import ARCHE data"
-#~ msgstr "ARCHE Daten importieren"
-
-#~ msgid "no entities to retrieve"
-#~ msgstr "Keine Einträge zu holen"
-
-#~ msgid "Deletion not possible if classes are attached"
-#~ msgstr "Löschen nicht ist möglich solange Klassen verknüpft sind"
-
-#~ msgid "Deletion not possible if subunits exists"
-#~ msgstr "Löschung nicht möglich solange Subunits existieren"
-
-#~ msgid "public without license"
-#~ msgstr "öffentlich ohne Lizenz"
-
-#~ msgid "public with license but without creator"
-#~ msgstr "öffentlich mit Lizenz aber ohne Urheber"
-
-#~ msgid "list"
-#~ msgstr "Liste"
-
-#~ msgid "link text"
-#~ msgstr "Linktext"
-
-#~ msgid "page / link text"
-#~ msgstr "Seite / Linktext"
-
-#~ msgid "color"
-#~ msgstr "Farbe"
-
-#~ msgid "map overlay"
-#~ msgstr "Karten-Overlay"
-
-#~ msgid "orphaned text annotations"
-#~ msgstr "verwaiste Text Annotationen"
-
-#~ msgid "orphaned subunits"
-#~ msgstr "verwaiste Subunits"
-
-#~ msgid "error database"
-#~ msgstr "Ein Datenbankfehler ist aufgetreten"
 
