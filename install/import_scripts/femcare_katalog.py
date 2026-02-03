@@ -46,44 +46,32 @@ def parse_katalog(file_path: Path) -> dict[str, FundEntity]:
         for row in table.rows:
             if not row.cells:
                 continue
-
             first_text = row.cells[0].text.strip()
-
             row_id = None
             if (first_text
                     and first_text[0].isdigit() and first_text.endswith('.')):
                 row_id = first_text.rstrip('.')
-
             is_new_entity = False
             if row_id:
                 if current is None or current.id != row_id:
                     is_new_entity = True
             else:
                 continue
-
             if is_new_entity:
                 current = FundEntity(id=row_id)
                 entities[row_id] = current
-
             if not current:
                 continue
-
             row_seen_tc: set[int] = set()
-
             for cell in row.cells:
                 tc_id = id(cell._tc)
-
                 if tc_id in row_seen_tc:
                     continue
                 row_seen_tc.add(tc_id)
-
                 text = cell.text.strip()
-
                 if text == f'{current.id}.':
                     continue
-
                 current.add_entry(text)
-
     return entities
 
 
