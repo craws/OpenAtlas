@@ -26,7 +26,7 @@
         "leaflet-imageoverlay-rotated": "^v0.2.1",
         "leaflet.fullscreen": "2.2.0",
         "leaflet.markercluster": "^1.5.3",
-        "mirador": "^3.3.0",
+        "mirador": "^4.0.0",
         "save-svg-as-png": "^1.4.17",
         "tinymce": "^5.10.3",
         "wellknown": "^0.5.0"
