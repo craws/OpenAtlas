@@ -34,8 +34,8 @@
   "name": "openatlas",
   "overrides": {
     "mirador": {
-      "react": "$react",
-      "react-dom": "$react-dom"
+      "react": "^19.0.0",
+      "react-dom": "^19.0.0"
     }
   }
 }
