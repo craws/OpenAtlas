@@ -30,12 +30,5 @@
     "save-svg-as-png": "^1.4.17",
     "tinymce": "^8.3.2",
     "wellknown": "^0.5.0"
-  },
-  "name": "openatlas",
-  "overrides": {
-    "mirador": {
-      "react": "^18.0.0 || ^19.0.0",
-      "react-dom": "^18.0.0 || ^19.0.0"
-    }
   }
 }
