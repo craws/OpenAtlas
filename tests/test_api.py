@@ -514,6 +514,23 @@ class Api(ApiTestCase):
             assert rv['properties']['@id']
             assert rv['properties']['systemClass']
 
+        # Test entities with gpkg Format
+        for rv in [
+            c.get(
+                url_for(
+                    'api_04.query',
+                    entities=place.id,
+                    format='gpkg')),
+            c.get(
+                url_for(
+                    'api_04.query',
+                    entities=location.id,
+                    cidoc_classes='E18',
+                    view_classes='artifact',
+                    system_classes='person',
+                    format='gpkg'))]:
+            assert b'SQLite format' in rv.data
+
         for rv in [
                 c.get(
                     url_for(
