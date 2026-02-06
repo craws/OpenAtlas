@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-02-02 16:58+0100\n"
+"POT-Creation-Date: 2026-02-06 14:08+0100\n"
 "PO-Revision-Date: 2025-08-27 15:58+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: pl\n"
@@ -60,7 +60,7 @@ msgstr "źródło"
 
 #: config/model/class_groups.py:60 config/model/classes/type_.py:6
 #: openatlas/display/display.py:412 openatlas/display/util.py:232
-#: openatlas/forms/display.py:60 openatlas/templates/forms/tree_select.html:56
+#: openatlas/forms/display.py:60 openatlas/templates/forms/tree_select.html:55
 #: openatlas/templates/type/index.html:62 openatlas/templates/type/move.html:7
 #: openatlas/views/entity.py:334 openatlas/views/entity.py:335
 #: openatlas/views/hierarchy.py:43 openatlas/views/hierarchy.py:45
@@ -656,11 +656,11 @@ msgstr "importowane z"
 msgid "imported by"
 msgstr "importowane przez"
 
-#: openatlas/display/util.py:188 openatlas/views/ajax.py:20
+#: openatlas/display/util.py:188 openatlas/views/ajax.py:21
 msgid "bookmark remove"
 msgstr "usuń zakładke"
 
-#: openatlas/display/util.py:190 openatlas/views/ajax.py:20
+#: openatlas/display/util.py:190 openatlas/views/ajax.py:21
 msgid "bookmark"
 msgstr "zakładka"
 
@@ -804,12 +804,12 @@ msgid "save"
 msgstr "zapisz"
 
 #: openatlas/forms/add_fields.py:480 openatlas/forms/form.py:104
-#: openatlas/templates/forms/table_select.html:94
-#: openatlas/templates/forms/table_select.html:126
+#: openatlas/templates/forms/table_select.html:93
+#: openatlas/templates/forms/table_select.html:125
 #: openatlas/templates/forms/tree_multi_select.html:111
 #: openatlas/templates/forms/tree_multi_select.html:132
-#: openatlas/templates/forms/tree_select.html:97
-#: openatlas/templates/forms/tree_select.html:124 openatlas/views/imports.py:76
+#: openatlas/templates/forms/tree_select.html:96
+#: openatlas/templates/forms/tree_select.html:123 openatlas/views/imports.py:76
 #: openatlas/views/user.py:90
 msgid "insert"
 msgstr "wstawić"
@@ -1284,9 +1284,9 @@ msgid "login"
 msgstr "login"
 
 #: openatlas/templates/forms/table_multi_select.html:53
-#: openatlas/templates/forms/table_select.html:60
+#: openatlas/templates/forms/table_select.html:59
 #: openatlas/templates/forms/tree_multi_select.html:76
-#: openatlas/templates/forms/tree_select.html:64
+#: openatlas/templates/forms/tree_select.html:63
 #: openatlas/templates/layout.html:211
 msgid "close"
 msgstr "zamknąć"
@@ -1482,32 +1482,32 @@ msgstr "precyzja"
 msgid "change"
 msgstr "zmiana"
 
-#: openatlas/templates/forms/table_select.html:20
-#: openatlas/templates/forms/tree_select.html:20
+#: openatlas/templates/forms/table_select.html:19
+#: openatlas/templates/forms/tree_select.html:19
 msgid "clear"
 msgstr "wyczyść"
 
-#: openatlas/templates/forms/table_select.html:88
+#: openatlas/templates/forms/table_select.html:87
 #: openatlas/templates/forms/tree_multi_select.html:107
-#: openatlas/templates/forms/tree_select.html:91
+#: openatlas/templates/forms/tree_select.html:90
 msgid "back"
 msgstr "wstecz"
 
-#: openatlas/templates/forms/table_select.html:118
+#: openatlas/templates/forms/table_select.html:117
 #: openatlas/templates/forms/tree_multi_select.html:125
-#: openatlas/templates/forms/tree_select.html:117
+#: openatlas/templates/forms/tree_select.html:116
 #: openatlas/templates/util/translations.html:13
 msgid "in progress"
 msgstr "w trakcie"
 
 #: openatlas/templates/forms/tree_multi_select.html:55
-#: openatlas/templates/forms/tree_select.html:49
+#: openatlas/templates/forms/tree_select.html:48
 #: openatlas/templates/type/index.html:57
 msgid "type to search"
 msgstr "wpisz do wyszukiwania"
 
 #: openatlas/templates/forms/tree_multi_select.html:91
-#: openatlas/templates/forms/tree_select.html:75
+#: openatlas/templates/forms/tree_select.html:74
 #, python-format
 msgid "Add Type to %(hierarchy)s"
 msgstr "Dodaj typ do %(hierarchy)s"
@@ -2930,3 +2930,4 @@ msgstr ""
 #: openatlas/views/vocabs.py:197
 msgid "You are about to import following hierarchy"
 msgstr "Zamierzasz zaimportować następującą hierarchię"
+
