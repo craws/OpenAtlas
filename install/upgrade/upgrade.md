@@ -27,8 +27,8 @@ No database update is required but an additional Python package is needed:
 
 Node packages are updated. Please run following command in *openatlas/static/*
 
+    cd openatlas/static
     npm install --legacy-peer-deps
-
 
 ### 8.15.x to 9.0.0
 WARNING - this is a major release and requires software upgrades. If you are
