@@ -15,7 +15,7 @@ def index_changelog() -> str:
 
 
 versions = {
-    '9.1.0': ['TBA', {
+    '9.1.0': ['2026-02-06', {
         'feature': {
             '2505': 'Custom place hierarchies',
             '2290': 'Cadaster API (kataster.bev.gv.at)',
