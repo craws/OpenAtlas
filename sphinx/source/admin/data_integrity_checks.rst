@@ -33,8 +33,8 @@ Orphans
 This function is used to find entities with missing connections. The result
 is shown in the following tabs:
 
-Entity
-******
+Entities
+********
 Entities shown here have no relation to other entities. Of course that can be
 part of a valid data set but they could also be artifacts of an import or
 were forgotten to link by mistake.
@@ -121,8 +121,8 @@ check the database as this can happen through data imports or bugs. If you
 find circular dependencies in your dataset regularly please report the issue
 e.g. via the `OpenAtlas Redmine <https://redmine.openatlas.eu/>`_.
 
-Check files
------------
+Files
+-----
 In this section, all files are checked for completeness and consistency.
 Further information about file entities can be found in the manual under
 :doc:`/entity/file`.
