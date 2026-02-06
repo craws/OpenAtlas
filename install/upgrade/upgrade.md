@@ -17,6 +17,14 @@ then run the database upgrade script, then restart Apache:
     sudo python3 install/upgrade/database_upgrade.py
     sudo service apache2 restart
 
+### 9.0.0 to 9.1.0
+9.1.0.sql is needed but will be taken care of by the database upgrade script.
+
+Node packages are updated. Please run following command in *openatlas/static/*
+
+    npm install --legacy-peer-deps
+
+
 ### 8.15.x to 9.0.0
 WARNING - this is a major release and requires software upgrades. If you are
 using a Debian system upgrade it to 13 (Trixie).
