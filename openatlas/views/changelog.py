@@ -19,9 +19,12 @@ versions = {
         'feature': {
             '2505': 'Custom place hierarchies',
             '2290': 'Cadaster API (kataster.bev.gv.at)',
+            '2713': 'Improved information carrier functionality',
             '2700': 'Restructured data integrity check',
             '2703': 'Removed overlay option',
             '2720': 'Updated Catalan and Spanish translations',
+            '2698': 'Update NPM libraries',
+            '2706': 'API 0.4.12',
             '2695': 'Refactor and minor improvements'},
         'fix': {
             '2714': 'View jumping at table select fields'}}],
