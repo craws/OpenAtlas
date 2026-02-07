@@ -8,6 +8,7 @@ a {
   text-decoration: none;
 }
 
+/* Override Bootstrap reset.css to color links without href, e.g. at table select */
 a:not([href]):not([class]), a:not([href]):not([class]):hover {
   color: #0d6efd;
   cursor: pointer;

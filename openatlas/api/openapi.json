@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.12b",
+    "version": "0.4.13a",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -4469,6 +4469,7 @@
             "loud",
             "geojson",
             "geojson-v2",
+            "gpkg",
             "table_row",
             "pretty-xml",
             "n3",
