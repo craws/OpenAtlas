@@ -17,3 +17,22 @@ Steps:
 * Test everything and once looking ok upload online to be tested by others too
 
 """
+import time
+
+from openatlas import app
+from openatlas.models.entity import Entity
+
+
+start = time.time()
+with app.test_request_context():
+    app.preprocess_request()
+    places = Entity.get_by_class('place')
+    print(len(places))
+    for place in places:
+        name_parts = place.name.split('_')
+        if len(name_parts) < 2 or len(name_parts[0]) != 5:
+            print('on no! ' + place.name)
+        else:
+            print(name_parts[0] + ' ' + name_parts[1])
+
+print(f'Execution time: {int(time.time() - start)} seconds')
