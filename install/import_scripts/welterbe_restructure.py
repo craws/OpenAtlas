@@ -19,20 +19,71 @@ Steps:
 """
 import time
 
-from openatlas import app
-from openatlas.models.entity import Entity
+from flask import g
 
+from openatlas import app
+from openatlas.models.entity import Entity, insert
+from tests.base import get_hierarchy
 
 start = time.time()
-with app.test_request_context():
-    app.preprocess_request()
-    places = Entity.get_by_class('place')
-    print(len(places))
+
+
+def prepare_cadasters() -> None:
+    hierarchy = insert({
+        'name': 'Cadaster',
+        'openatlas_class_name': 'administrative_unit'})
+    Entity.insert_hierarchy(hierarchy, 'place', ['place'], True)
     for place in places:
+        if ' ' in place.name:
+            print(f'Whitespace! in {place.name}')
         name_parts = place.name.split('_')
         if len(name_parts) < 2 or len(name_parts[0]) != 5:
             print('on no! ' + place.name)
-        else:
-            print(name_parts[0] + ' ' + name_parts[1])
+            return
+        place.name = name_parts[1]
+        place.cadaster_name = name_parts[0]
+        cadaster_supers.add(name_parts[0])
+    for item in cadaster_supers:
+        entity = insert({
+            'name': item,
+            'openatlas_class_name': 'administrative_unit'})
+        entity.link('P89', hierarchy)
+        entity.unset_selectable()
+        cadaster_mapping[item] = entity
+
+
+def insert_cadasters() -> None:
+    for place in places:
+        name = place.name.replace('F', '.').replace('G', '/').replace('N', '')
+        entity = insert({
+            'name': name,
+            'openatlas_class_name': 'administrative_unit',
+            'description': place.description})
+        entity.link('P89', cadaster_mapping[place.cadaster_name])
+
+
+def clean_up():
+    count = 0
+    try:
+        hierarchy = get_hierarchy('Cadaster')
+        for sub_id in hierarchy.get_sub_ids_recursive():
+            g.types[sub_id].delete()
+            count += 1
+        hierarchy.delete()
+        count += 1
+    except:
+        pass
+    print(f'{count} former cadaster place types deleted')
+
+
+with app.test_request_context():
+    app.preprocess_request()
+    # system = Entity.get_by_id(11611)
+    clean_up()
+    places = Entity.get_by_class('place')
+    cadaster_supers = set()
+    cadaster_mapping = {}
+    prepare_cadasters()
+    insert_cadasters()
 
 print(f'Execution time: {int(time.time() - start)} seconds')
