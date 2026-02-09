@@ -87,10 +87,11 @@ spec:
       dnsPolicy: ClusterFirst
       initContainers:
         - args:
-            - mkdir -p /var/www/openatlas/files/export/sql; \
-              mkdir -p /var/www/openatlas/files/export/arche; \
-              mkdir -p /var/www/openatlas/files/export/rdf; \
-              chown -R 33:33 /var/www/openatlas/files/
+          - |
+            mkdir -p /var/www/openatlas/files/export/sql
+            mkdir -p /var/www/openatlas/files/export/arche
+            mkdir -p /var/www/openatlas/files/export/rdf
+            chown -R 33:33 /var/www/openatlas/files/
           command:
             - /bin/sh
             - '-c'
