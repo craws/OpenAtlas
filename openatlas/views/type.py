@@ -63,8 +63,13 @@ def type_delete_recursive(id_: int) -> str | Response:
                 link(Entity.get_by_id(row['range_id']))])
     else:
         for item in get_entities_linked_to_type_recursive(type_.id, []):
-            data = [link(item), item.class_.label, item.description]
-            tabs['entities'].table.rows.append(data)
+            if item.class_.name != 'administrative_unit':
+                item = item.get_linked_entity_safe('P53', inverse=True) \
+                    if item.class_.name == 'object_location' else item
+                tabs['entities'].table.rows.append([
+                    link(item),
+                    item.class_.label,
+                    item.description])
     crumbs = [[_('type'), url_for('index', group='type')]]
     if root:
         crumbs += [g.types[type_id] for type_id in type_.root]
