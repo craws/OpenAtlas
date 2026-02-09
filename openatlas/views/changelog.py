@@ -15,7 +15,10 @@ def index_changelog() -> str:
 
 
 versions = {
-    '9.2.0': ['TBA', {'feature': {}}],
+    '9.2.0': ['TBA', {
+        'feature': {
+            '2722': 'API: Download geometries as .gpkg',
+            '2729': 'Refactor and minor improvements'}}],
     '9.1.0': ['2026-02-06', {
         'feature': {
             '2505': 'Custom place hierarchies',
