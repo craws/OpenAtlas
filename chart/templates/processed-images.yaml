@@ -6,7 +6,7 @@ metadata:
   name: {{ print ( include "fullname" . ) "-processed-images"| quote }}
 spec:
   accessModes:
-    - ReadWriteOnce
+    - {{ .Values.storage.accessMode | default "ReadWriteOnce" }}
   resources:
     requests:
       storage: {{ .Values.storage.processedImages.size }}
