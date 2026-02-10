@@ -27,10 +27,10 @@ const node = g.append('g')
   .data(graph.nodes)
   .enter().append('g')
 
-// This was unused
-// const circles = node.append('circle')
-//   .attr('r', 12)
-//   .attr('fill', function(d) { return d.color; });
+
+const circles = node.append('circle')
+  .attr('r', 12)
+  .attr('fill', function(d) { return d.color; });
 
 const labels = node.append('text')
   .text(function(d) { return d.name; })
