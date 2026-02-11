@@ -432,7 +432,7 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
                 check=True)
             path['mounted'] = '/mnt/' in mounted.stdout.split()[-1]
             keys.append(key)
-    files_size = sum(paths[key]['size'] for key in keys) or 0.1
+    files_size: Any = sum(paths[key]['size'] for key in keys) or 0.1
     stats = shutil.disk_usage(app.config['UPLOAD_PATH'])
     percent: dict[str, int | Any] = {
         'free': 100 - math.ceil(stats.free / (stats.total / 100)),
