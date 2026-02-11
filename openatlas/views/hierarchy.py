@@ -16,9 +16,12 @@ from openatlas.models.entity import Entity
 @app.route('/hierarchy/insert/<category>', methods=['GET', 'POST'])
 @required_group('manager')
 def hierarchy_insert(category: str) -> str | Response:
-    hierarchy = Entity({'openatlas_class_name': 'type'})
+    hierarchy = Entity({
+        'openatlas_class_name': 'administrative_unit'
+        if category == 'place' else 'type'})
     hierarchy.category = category
     form = get_entity_form(hierarchy)
+    del form.insert_and_continue
     if form.validate_on_submit():
         if Entity.check_hierarchy_exists(form.name.data):
             form.name.errors.append(_('error name exists'))
@@ -26,7 +29,7 @@ def hierarchy_insert(category: str) -> str | Response:
             Entity.insert_hierarchy(
                 process_form(hierarchy, form),
                 category,
-                form.classes.data,
+                form.classes.data if hasattr(form, 'classes') else ['place'],
                 bool(
                     category == 'value'
                     or (hasattr(form, 'multiple') and form.multiple.data)))
@@ -40,7 +43,7 @@ def hierarchy_insert(category: str) -> str | Response:
         title=_('type'),
         crumbs=[
             [_('type'), url_for('index', group='type')],
-            '+ ' + uc_first(_(category))])
+            f'+ {uc_first(_(category))} {_('hierarchy')}'])
 
 
 @app.route('/hierarchy/update/<int:id_>', methods=['GET', 'POST'])
@@ -64,7 +67,7 @@ def hierarchy_update(id_: int) -> str | Response:
         else:
             hierarchy.update_hierarchy(
                 form.name.data,
-                form.classes.data,
+                form.classes.data if hasattr(form, 'classes') else [],
                 multiple=(
                     hierarchy.category == 'value'
                     or (hasattr(form, 'multiple') and form.multiple.data)
@@ -77,14 +80,16 @@ def hierarchy_update(id_: int) -> str | Response:
                 f'#menu-tab-{g.types[id_].category}_collapse-{hierarchy.id}')
     if hasattr(form, 'multiple') and has_multiple_links and hierarchy.multiple:
         form.multiple.render_kw = {'disabled': 'disabled'}
-    table = Table(['class', 'count'], paging=False)
-    for name in hierarchy.classes:
-        count = hierarchy.get_count_by_class(name)
-        table.rows.append([
-            g.classes[name].label,
-            format_number(count) if count else link(
-                _('remove'),
-                url_for('remove_class', id_=hierarchy.id, name=name))])
+    table = None
+    if hierarchy.category != 'place':
+        table = Table(['class', 'count'], paging=False)
+        for name in hierarchy.classes:
+            count = hierarchy.get_count_by_class(name)
+            table.rows.append([
+                g.classes[name].label,
+                format_number(count) if count else link(
+                    _('remove'),
+                    url_for('remove_class', id_=hierarchy.id, name=name))])
     return render_template(
         'content.html',
         content=f'''
@@ -92,7 +97,9 @@ def hierarchy_update(id_: int) -> str | Response:
               <div class="col-12 col-sm-6">
                 {display_form(form, manual_page='entity/type')}
               </div>
-              <div class="col-12 col-sm-6">{table.display()}</div>
+              <div class="col-12 col-sm-6">
+                {table.display() if table else ''}
+              </div>
             </div>''',
         title=_('type'),
         crumbs=[
@@ -115,7 +122,7 @@ def remove_class(id_: int, name: str) -> Response:
 @required_group('manager')
 def hierarchy_delete(id_: int) -> Response:
     type_ = g.types[id_]
-    if type_.category in ('standard', 'system', 'place'):
+    if type_.category in ('standard', 'system'):
         abort(403)
     if type_.subs:
         return redirect(url_for('type_delete_recursive', id_=id_))

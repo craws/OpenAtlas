@@ -27,8 +27,6 @@ Here you can adjust shown interface elements to your preferences. You still see
 unselected elements such as hours, minutes and seconds in a form, when data
 was already entered in those fields.
 
-* **Map Overlay** - needed to see overlays on the :doc:`/tools/map` as
-  well as insert new overlays and edit them
 * **Time** - show time fields in forms, see :doc:`/ui/date`
 
 .. _display:

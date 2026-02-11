@@ -12,10 +12,9 @@ from openatlas.display.tab import Tab
 from openatlas.display.table import entity_table
 from openatlas.display.util import (
     bookmark_toggle, button, button_bar, description, format_entity_date,
-    get_appearance, get_chart_data, get_file_path, get_system_data, link,
-    reference_systems)
+    get_appearance, get_chart_data, get_system_data, link, reference_systems)
 from openatlas.display.util2 import (
-    display_bool, is_authorized, manual, sanitize, uc_first)
+    display_bool, get_file_path, is_authorized, manual, sanitize, uc_first)
 from openatlas.forms.util import deletion_possible
 from openatlas.models.annotation import AnnotationText
 from openatlas.models.dates import format_date
@@ -53,7 +52,7 @@ class Display:
             if self.entity.standard_type \
                     and type_.id == self.entity.standard_type.id:
                 continue  # Standard type is already included
-            title = " > ".join([g.types[i].name for i in type_.root])
+            title = ' > '.join([g.types[i].name for i in type_.root])
             html = f'<span title="{title}">{link(type_)}</span>'
             if type_.category == 'value':
                 html += f' {float(value):g} {type_.description or ''}'
@@ -140,7 +139,9 @@ class Display:
             columns = relation.tab['columns']
             if self.entity.category == 'value' and relation.name == 'entities':
                 columns = ['name', 'value', 'class', 'description']
-            if self.entity.root and g.types[self.entity.root[0]].name \
+            if name == 'entities' \
+                    and self.entity.root \
+                    and g.types[self.entity.root[0]].name \
                     in app.config['PROPERTY_TYPES']:
                 columns = ['domain', 'range']
                 items = [

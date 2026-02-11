@@ -1,5 +1,3 @@
-from typing import Any
-
 import requests
 from flask import g
 
@@ -7,7 +5,7 @@ from openatlas import app
 from openatlas.display.util import link
 
 
-def fetch_gnd(id_: str) -> dict[str, Any]:
+def fetch_gnd(id_: str) -> dict[str, str]:
     info: dict[str, str] = {}
     try:
         data = requests.get(

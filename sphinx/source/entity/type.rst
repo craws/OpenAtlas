@@ -60,6 +60,18 @@ types
 * Values can be entered as decimals in forms
 * A unit such as centimetre, gram, or percentage can be specified
 
+Place hierarchies
+-----------------
+Place hierarchies can be used to add information about e.g.
+administrative units or historical places. Unlike custom types they will only
+be available for place entities. Entries here are classified as places in
+the model but be aware that it isn't possible to add geolocations to these
+entries.
+
+System types
+------------
+Types listed here can't be modified but we still thought it useful to provide
+information about them.
 
 Form fields
 -----------
@@ -84,5 +96,5 @@ Please keep in mind that not all users can add new types when making a type
 required. This might lead to situations where a user is unable to choose a
 fitting type for an entity and might therefore reduce data quality.
 
-Existing entries that were entered before a typ was set to required and have
+Existing entries that were entered before a type was set to required and have
 no set values for this specific type can not be updated anymore afterwards.

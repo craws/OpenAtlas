@@ -4,7 +4,6 @@ from typing import Any, Optional
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import format_number, gettext as _
-from flask_login import current_user
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -13,16 +12,15 @@ from openatlas import app
 from openatlas.display.display import Display
 from openatlas.display.table import entity_table
 from openatlas.display.util import (
-    button, check_iiif_file_exist, get_chart_data, get_file_path,
-    get_iiif_file_path, hierarchy_crumbs, link, reference_systems,
-    required_group)
-from openatlas.display.util2 import is_authorized, manual, sanitize
+    button, check_iiif_file_exist, get_chart_data, get_iiif_file_path,
+    hierarchy_crumbs, link, reference_systems, required_group)
+from openatlas.display.util2 import (
+    get_file_path, is_authorized, manual, sanitize)
 from openatlas.forms.entity_form import get_entity_form, process_form
 from openatlas.forms.util import deletion_possible
 from openatlas.models.entity import Entity
 from openatlas.models.gis import InvalidGeomException, get_gis_all
 from openatlas.models.openatlas_class import Relation
-from openatlas.models.overlay import Overlay
 
 
 @app.route('/entity/<int:id_>')
@@ -98,7 +96,7 @@ def insert(
         class_=entity.class_,
         gis_data=gis_data,
         writable=os.access(app.config['UPLOAD_PATH'], os.W_OK),
-        overlays=get_overlays(origin) if origin else None,
+        overlays=origin.get_overlays() if origin else None,
         title=_(entity.class_.group['name']),
         geonames_module=entity.class_.name in g.geonames.classes,
         crumbs=crumbs_for_insert(entity, origin, structure))
@@ -116,13 +114,6 @@ def crumbs_for_insert(
                 if i.class_.name == entity.class_.name]):
             crumbs.append(f' ({count} {_("exists")})')
     return crumbs
-
-
-def get_overlays(entity: Entity) -> dict[int, Overlay]:
-    if entity.class_.group['name'] == 'place' \
-            and current_user.settings['module_map_overlay']:
-        return Overlay.get_by_object(entity)
-    return {}
 
 
 @app.route('/update/<int:id_>', methods=['GET', 'POST'])
@@ -149,7 +140,7 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         form=form,
         entity=entity,
         gis_data=gis_data,
-        overlays=get_overlays(entity),
+        overlays=entity.get_overlays(),
         title=entity.name,
         geonames_module=entity.class_.name in g.geonames.classes,
         crumbs=hierarchy_crumbs(entity) +
@@ -325,8 +316,8 @@ def index(group: str) -> str | Response:
         types: dict[str, dict[Entity, str]] = {
             'standard': {},
             'custom': {},
-            'place': {},
             'value': {},
+            'place': {},
             'system': {}}
         for type_ in [type_ for type_ in g.types.values() if not type_.root]:
             if type_.category in types:

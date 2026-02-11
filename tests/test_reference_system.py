@@ -1,5 +1,3 @@
-from typing import Any
-
 from flask import g, url_for
 
 from tests.base import TestBaseCase
@@ -17,10 +15,16 @@ class ReferenceSystemTest(TestBaseCase):
         rv = c.post(url_for('ajax_gnd_info'), data={'id_': '118584596'})
         assert b'Mozart' in rv.data
 
+        rv = c.post(url_for('ajax_cadaster_info'), data={'id_': '01004/784/1'})
+        assert b'784/1' in rv.data
+
+        rv = c.post(url_for('ajax_cadaster_info'), data={'id_': '01004/78/99'})
+        assert b'nicht vorhanden' in rv.data
+
         rv = c.get(url_for('insert', class_='reference_system'))
         assert b'resolver URL' in rv.data
 
-        data: Any = {
+        data: dict[str, str | list[str]] = {
             'name': 'Wikipedia',
             'website_url': 'https://wikipedia.org',
             'resolver_url': 'https://wikipedia.org'}

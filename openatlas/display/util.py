@@ -20,7 +20,8 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.display.image_processing import check_processed_image
-from openatlas.display.util2 import convert_size, is_authorized, uc_first
+from openatlas.display.util2 import (
+    convert_size, get_file_path, is_authorized, uc_first)
 from openatlas.models.cidoc import CidocClass, CidocProperty
 from openatlas.models.content import get_translation
 from openatlas.models.dates import Dates, format_date
@@ -66,7 +67,7 @@ def reference_systems(entity: Entity) -> str:
                 class="circle bg-gray fw-bold text-black-50"
                 style="height: 16px; font-size: 12px;">{system.name.upper()[0]}
             </div>"""
-        if system.name in ['GeoNames', 'GND', 'Wikidata']:
+        if system.name in ['GeoNames', 'GND', 'Wikidata', 'Cadaster']:
             name = system.name.lower()
             show = f'<span id="show">{uc_first(_('show info'))}</span>'
             hide = '<span id="hide" class="d-none">' + \
@@ -187,7 +188,7 @@ def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
     label = _('bookmark remove') \
         if current_user.bookmarks and entity_id in current_user.bookmarks \
         else _('bookmark')
-    onclick = f'ajaxBookmark("{entity_id}");'
+    onclick = f"ajaxBookmark('{entity_id}');"  # Don't change the quotes!
     if for_table:
         return \
             f'<a href="#" id="bookmark{entity_id}" onclick="{onclick}">' \
@@ -425,18 +426,6 @@ def tooltip(text: str) -> str:
         </span>"""
 
 
-def get_file_path(id_: int, size: Optional[str] = None) -> Optional[Path]:
-    if not hasattr(g, 'files') or id_ not in g.files:
-        return None
-    ext = g.files[id_].suffix
-    path = app.config['UPLOAD_PATH'] / f'{id_}{ext}'
-    if size:
-        if ext in app.config['PROCESSABLE_EXT']:
-            ext = app.config['PROCESSED_EXT']  # pragma: no cover
-        path = app.config['RESIZED_IMAGES'] / size / f'{id_}{ext}'
-    return path if os.path.exists(path) else None
-
-
 @pass_context  # Prevent Jinja2 context caching
 @app.template_filter()
 def get_logo_url(_context: str, _unneeded_var: str) -> str:
@@ -587,8 +576,9 @@ def get_entities_linked_to_type_recursive(
 
 def check_iiif_activation() -> bool:
     return bool(
-        g.settings['iiif'] and
-        os.access(Path(g.settings['iiif_path']), os.W_OK))
+        g.settings['iiif'] and os.access(
+            Path(g.settings['iiif_path']),
+            os.W_OK))
 
 
 def check_iiif_file_exist(id_: int) -> bool:
@@ -607,8 +597,8 @@ def delete_iiif_image(id_: int) -> None:
 
 
 def convert_image_to_iiif(id_: int, path: Optional[Path] = None) -> bool:
-    command: list[Any] = ["vips" if os.name == 'posix' else "vips.exe"]
-    command.extend([
+    command = [
+        'vips',
         'tiffsave',
         path or get_file_path(id_),
         get_iiif_file_path(id_),
@@ -619,7 +609,7 @@ def convert_image_to_iiif(id_: int, path: Optional[Path] = None) -> bool:
         '--tile-width',
         '128',
         '--tile-height',
-        '128'])
+        '128']
     try:
         with subprocess.Popen(command) as sub_process:
             sub_process.wait()

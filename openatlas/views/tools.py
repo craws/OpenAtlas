@@ -1,5 +1,3 @@
-from typing import Any
-
 from flask import flash, g, json, render_template, request, url_for
 from flask_babel import gettext as _
 from flask_wtf import FlaskForm
@@ -34,8 +32,8 @@ def name_result(result: float) -> str:
     return ''  # pragma: no cover
 
 
-def start_crumbs(entity: Entity) -> list[Any]:
-    crumbs: list[Any] = [link(entity, index=True)]
+def start_crumbs(entity: Entity) -> list[object]:
+    crumbs: list[object] = [link(entity, index=True)]
     for super_ in entity.get_structure()['supers']:
         crumbs.append(link(super_))
     crumbs.append(entity)

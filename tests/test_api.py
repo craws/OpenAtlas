@@ -136,7 +136,7 @@ class Api(ApiTestCase):
                 'api_04.network_visualisation',
                 exclude_system_classes='type'))
         rv = rv.get_json()
-        assert len(rv['results']) == 71
+        assert len(rv['results']) == 61
         rv = c.get(
             url_for(
                 'api_04.network_visualisation',
@@ -145,7 +145,7 @@ class Api(ApiTestCase):
         assert len(rv['results']) == 15
         rv = c.get(url_for('api_04.network_visualisation', download=True))
         rv = rv.get_json()
-        assert len(rv['results']) == 166
+        assert len(rv['results']) == 157
 
         rv = c.get(
             url_for(
@@ -514,6 +514,23 @@ class Api(ApiTestCase):
             assert rv['properties']['@id']
             assert rv['properties']['systemClass']
 
+        # Test entities with gpkg Format
+        for rv in [
+            c.get(
+                url_for(
+                    'api_04.query',
+                    entities=place.id,
+                    format='gpkg')),
+            c.get(
+                url_for(
+                    'api_04.query',
+                    entities=location.id,
+                    cidoc_classes='E18',
+                    view_classes='artifact',
+                    system_classes='person',
+                    format='gpkg'))]:
+            assert b'SQLite format' in rv.data
+
         for rv in [
                 c.get(
                     url_for(
@@ -701,12 +718,12 @@ class Api(ApiTestCase):
                 "relationToID": [{
                     "operator": "equal",
                     "values": [place.id]}]}]),
-            (171, [{
+            (162, [{
                 "typeIDWithSubs": [{
                     "operator": "notEqual",
                     "values": [boundary_mark.id],
                     "logicalOperator": "and"}]}]),
-            (173, [{
+            (164, [{
                 "typeName": [{
                     "operator": "notEqual",
                     "values": ["Boundary Mark", "Height"],

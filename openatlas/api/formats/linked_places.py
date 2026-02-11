@@ -10,7 +10,7 @@ from openatlas.api.resources.util import (
     date_to_str, get_crm_relation, get_crm_relation_label_x,
     get_crm_relation_x, get_iiif_manifest_and_path, get_license_name,
     to_camel_case)
-from openatlas.display.util import get_file_path
+from openatlas.display.util2 import get_file_path
 from openatlas.models.entity import Entity, Link
 
 
@@ -78,12 +78,15 @@ def get_lp_time(entity: Entity | Link) -> Optional[dict[str, Any]]:
             'comment': entity.dates.end_comment}}
 
 
-def get_lp_file(file: Entity) -> dict[str, Any]:
+def get_lp_file(
+        file: Entity,
+        entity: Optional[Entity] = None) -> dict[str, Any]:
     url = 'N/A'
     mime_type = None
     if path := get_file_path(file.id):
         url = url_for('api.display', filename=path.stem, _external=True)
         mime_type, _ = mimetypes.guess_type(path)
+    main_image = entity.get_profile_image_id() == file.id if entity else False
     data = {
         '@id': url_for('api.entity', id_=file.id, _external=True),
         'title': file.name,
@@ -92,6 +95,7 @@ def get_lp_file(file: Entity) -> dict[str, Any]:
         'licenseHolder': file.license_holder,
         'publicShareable': file.public,
         'mimetype': mime_type,
+        'mainImage': main_image,
         'url': url}
     data.update(get_iiif_manifest_and_path(file.id))
     return data

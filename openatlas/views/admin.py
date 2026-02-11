@@ -400,7 +400,7 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
     def upload_ident_with_iiif() -> bool:
         if not iiif_path:
             return False  # pragma: no cover
-        return app.config['UPLOAD_PATH'].resolve() == iiif_path.resolve()
+        return bool(app.config['UPLOAD_PATH'].resolve() == iiif_path.resolve())
 
     paths = {
         'export': {
@@ -416,28 +416,23 @@ def get_disk_space_info() -> Optional[dict[str, Any]]:
         iiif_path = Path(g.settings['iiif_path'])
         if not upload_ident_with_iiif():
             paths['iiif'] = {'path': iiif_path, 'size': 0, 'mounted': False}
-    files_size = 40999999999
-    if os.name == 'posix':
-        keys = []
-        for key, path in paths.items():
-            if not os.access(path['path'], os.W_OK):
-                continue
+    keys = []
+    for key, path in paths.items():
+        if os.access(path['path'], os.W_OK):
             size = run(
-                    ['du', '-sb', path['path']],
-                    capture_output=True,
-                    text=True,
-                    check=True)
+                ['du', '-sb', path['path']],
+                capture_output=True,
+                text=True,
+                check=True)
             path['size'] = int(size.stdout.split()[0])
             mounted = run(
                 ['df', path['path']],
                 capture_output=True,
                 text=True,
                 check=True)
-            tmp = mounted.stdout.split()
-            if '/mnt/' in tmp[-1]:
-                path['mounted'] = True  # pragma: no cover
+            path['mounted'] = '/mnt/' in mounted.stdout.split()[-1]
             keys.append(key)
-        files_size = sum(paths[key]['size'] for key in keys)
+    files_size: Any = sum(paths[key]['size'] for key in keys) or 0.1
     stats = shutil.disk_usage(app.config['UPLOAD_PATH'])
     percent: dict[str, int | Any] = {
         'free': 100 - math.ceil(stats.free / (stats.total / 100)),

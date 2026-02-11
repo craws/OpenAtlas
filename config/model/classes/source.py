@@ -37,7 +37,7 @@ source = {
                 'tooltip': _('mentioned in the source')}},
         'information_carrier': {
             'label': _('information carrier'),
-            'classes': ['artifact'],
+            'classes': class_groups['artifact']['classes'],
             'property': 'P128',
             'inverse': True,
             'multiple': True,

@@ -15,11 +15,25 @@ def index_changelog() -> str:
 
 
 versions = {
-    '9.1.0': ['TBA', {
+    '9.2.0': ['TBA', {
         'feature': {
+            '2722': 'API: Download geometries as .gpkg'}}],
+    '9.1.1': ['2026-02-11', {
+        'fix': {
+            '2729': 'Installation and other minor issues'}}],
+    '9.1.0': ['2026-02-06', {
+        'feature': {
+            '2505': 'Custom place hierarchies',
+            '2290': 'Cadaster API (kataster.bev.gv.at)',
+            '2713': 'Improved information carrier functionality',
             '2700': 'Restructured data integrity check',
-            '2695': 'Refactor and minor improvements'
-        }}],
+            '2703': 'Removed overlay option',
+            '2720': 'Updated Catalan and Spanish translations',
+            '2698': 'Update NPM libraries',
+            '2706': 'API 0.4.12',
+            '2695': 'Refactor and minor improvements'},
+        'fix': {
+            '2714': 'View jumping at table select fields'}}],
     '9.0.0': ['2026-01-01', {
         'feature': {
             '2464': 'OpenAtlas major version 9.0.0',

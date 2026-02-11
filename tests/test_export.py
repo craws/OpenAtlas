@@ -1,4 +1,3 @@
-import os
 import shutil
 from pathlib import Path
 from typing import Any
@@ -47,8 +46,7 @@ class ImportTest(ImportTestCase):
                 view='sql',
                 filename=f'{date_}_export.sql.7z'),
             follow_redirects=True)
-        if os.name == 'posix':
-            assert b'File deleted' in rv.data
+        assert b'File deleted' in rv.data
 
         rv = c.get(
             url_for(
@@ -56,8 +54,7 @@ class ImportTest(ImportTestCase):
                 view='sql',
                 filename=f'{date_}_export.dump.7z'),
             follow_redirects=True)
-        if os.name == 'posix':
-            assert b'File deleted' in rv.data
+        assert b'File deleted' in rv.data
 
         rv = c.get(
             url_for('delete_export', view='sql', filename='non_existing'),
@@ -127,17 +124,13 @@ class ImportTest(ImportTestCase):
         shutil.copy(openatlas_logo_path, file_with_license_path)
         shutil.copy(logo_path / '422.jpg', file_not_public_path)
 
-        rv = c.get(
-            url_for('arche_execute'),
-            follow_redirects=True)
+        rv = c.get(url_for('arche_execute'), follow_redirects=True)
         assert b'Data was exported' in rv.data
 
         # Run ARCHE export again with typeIds and without GeoNames
         app.config['ARCHE_METADATA']['typeIds'] = [case_study.id]
         app.config['ARCHE_METADATA']['excludeReferenceSystems'] = ['GeoNames']
-        rv = c.get(
-            url_for('arche_execute'),
-            follow_redirects=True)
+        rv = c.get(url_for('arche_execute'), follow_redirects=True)
         assert b'Data was exported' in rv.data
 
         date_ = current_date_for_filename()
@@ -149,29 +142,25 @@ class ImportTest(ImportTestCase):
         with c.get(
                 url_for('delete_export', view='arche', filename=filename),
                 follow_redirects=True) as rv_:
-            if os.name == 'posix':
-                assert b'File deleted' in rv_.data
+            assert b'File deleted' in rv_.data
 
         with c.get(
                 url_for('check_files', arche='arche'),
-                follow_redirects=True) as rv:
-            assert b'No license' in rv.data
+                follow_redirects=True) as rv_:
+            assert b'No license' in rv_.data
 
         assert b'Export RDF/NT' in c.get(url_for('export_rdf')).data
 
-        rv = c.get(
-            url_for('rdf_execute'),
-            follow_redirects=True)
-        assert b'Data was exported' in rv.data
+        with c.get(url_for('rdf_execute'), follow_redirects=True) as rv_:
+            assert b'Data was exported' in rv_.data
 
-        rv = c.get(
-            url_for(
-                'delete_export',
-                view='rdf',
-                filename=f'{date_}_export.nt'),
-            follow_redirects=True)
-        if os.name == 'posix':
-            assert b'File deleted' in rv.data
+        with c.get(
+                url_for(
+                    'delete_export',
+                    view='rdf',
+                    filename=f'{date_}_export.nt'),
+                follow_redirects=True) as rv_:
+            assert b'File deleted' in rv_.data
 
         openatlas_logo_path.unlink()
         file_without_license_path.unlink()

@@ -16,9 +16,9 @@ from openatlas.display.image_processing import delete_orphaned_resized
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table, entity_table
 from openatlas.display.util import (
-    button, check_iiif_activation, get_file_path, link, required_group)
+    button, check_iiif_activation, link, required_group)
 from openatlas.display.util2 import (
-    convert_size, is_authorized, manual, uc_first)
+    convert_size, get_file_path, is_authorized, manual, uc_first)
 from openatlas.forms.display import display_form
 from openatlas.forms.setting import SimilarForm
 from openatlas.models import checks

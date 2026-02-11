@@ -1,13 +1,12 @@
 tinymce.init({
+  license_key: 'gpl',
+  selector: 'textarea.tinymce',
   menubar: false,
   relative_urls: false,
-  mode: 'specific_textareas',
-  editor_selector: 'tinymce',
   resize: 'both',
-  toolbar_items_size: 'small',
-  plugins: 'link code textcolor colorpicker',
+  plugins: 'link code',
   toolbar: 'bold italic underline strikethrough alignleft aligncenter alignright alignjustify ' +
-      ' undo redo link unlink fontselect fontsizeselect forecolor code',
+      ' undo redo link unlink fontfamily fontsize forecolor code',
 });
 
 $(document).ready(function () {
@@ -276,6 +275,14 @@ async function ajaxGndInfo(data) {
   }, "gnd");
 }
 
+async function ajaxCadasterInfo(data) {
+  ajaxAPICall({
+    type: 'post',
+    url: '/ajax/info/cadaster',
+    data: 'id_=' + data
+  }, "cadaster");
+}
+
 async function ajaxAddType(data, fieldId, typeId, multiple=false) {
   const newTypeId = await $.ajax({
     type: 'post',
@@ -371,8 +378,8 @@ function selectFromTreeMulti(name, value_type = false) {
 }
 
 function deselectNode(fieldId,nodeId){
- $(`#${fieldId}-tree`).jstree('deselect_node', nodeId);
- selectFromTreeMulti(fieldId)
+  $(`#${fieldId}-tree`).jstree('deselect_node', nodeId);
+  selectFromTreeMulti(fieldId)
 }
 
 function selectFromTable(element, table, id, label=undefined) {

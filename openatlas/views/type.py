@@ -29,9 +29,8 @@ def type_delete_recursive(id_: int) -> str | Response:
 
     type_ = g.types[id_]
     root = g.types[type_.root[0]] if type_.root else None
-    root_name = root.name if root else type_.name
-    if type_.category == 'system' or \
-            type_.category in ('standard', 'place') and not root:
+    if type_.category == 'system' or (
+            type_.category == 'standard' and not root):
         abort(403)
     form = DeleteRecursiveTypesForm()
     if form.validate_on_submit() and form.confirm_delete.data:
@@ -51,21 +50,30 @@ def type_delete_recursive(id_: int) -> str | Response:
                 '(see tabs). Please check if you want to delete these subs '
                 'and links too.'),
             form=form),
-        'subs': Tab('subs', entity=type_),
+        'subs': Tab(
+            'subs',
+            table=Table(columns=['name', 'description']),
+            entity=type_),
         'entities': Tab('entities', entity=type_)}
     for sub_id in type_.get_sub_ids_recursive():
         sub = g.types[sub_id]
-        tabs['subs'].table.rows.append([link(sub), sub.count, sub.description])
-    if root_name in app.config['PROPERTY_TYPES']:
+        tabs['subs'].table.rows.append([link(sub), sub.description])
+    if root and root.name in app.config['PROPERTY_TYPES']:
+        tabs['entities'].table = Table([_('domain'), _('range')])
         for row in Link.get_links_by_type_recursive(type_, []):
-            tabs['entities'].table.columns = [_('domain'), _('range')]
             tabs['entities'].table.rows.append([
                 link(Entity.get_by_id(row['domain_id'])),
                 link(Entity.get_by_id(row['range_id']))])
     else:
+        entities = []
         for item in get_entities_linked_to_type_recursive(type_.id, []):
-            data = [link(item), item.class_.label, item.description]
-            tabs['entities'].table.rows.append(data)
+            if item.class_.name != 'administrative_unit':
+                item = item.get_linked_entity_safe('P53', inverse=True) \
+                    if item.class_.name == 'object_location' else item
+                entities.append(item)
+        tabs['entities'].table = entity_table(entities)
+
+
     crumbs = [[_('type'), url_for('index', group='type')]]
     if root:
         crumbs += [g.types[type_id] for type_id in type_.root]

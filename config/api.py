@@ -66,7 +66,10 @@ JSON_FORMATS = {
     'table_row': 'application/json',
     'presentation': 'application/json'}
 
-API_FORMATS = RDF_FORMATS | JSON_FORMATS
+OTHER = {
+    'gpkg': 'application/geopackage+sqlite3'}
+
+API_FORMATS = RDF_FORMATS | JSON_FORMATS | OTHER
 
 # ---------------------------------------------------------------------
 # Search and Filter Configuration

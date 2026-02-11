@@ -1,9 +1,7 @@
-from typing import Any
-
 from flask import g
 
 
-def get_sex_types(entity_id: int) -> list[dict[str, Any]]:
+def get_sex_types(entity_id: int) -> list[dict[str, object]]:
     g.cursor.execute(
         """
         SELECT e.id, l.id AS link_id, l.description

@@ -1,4 +1,3 @@
-import os
 from typing import Any
 
 import pandas as pd
@@ -24,8 +23,6 @@ class ImportTest(ImportTestCase):
                         austria = entity
                     case 'Height':
                         height = entity
-                    case 'Carantania':
-                        carantania = entity
                     case 'Place':
                         place_type = entity
                     case 'https://lotr.fandom.com/':
@@ -245,8 +242,6 @@ class ImportTest(ImportTestCase):
         data_frame.at[0, 'id'] = 'new_place_1'
         data_frame.at[1, 'id'] = 'new_place_2'
         data_frame.at[2, 'id'] = 'new_place_3'
-        data_frame.at[0, 'administrative_unit_id'] = austria.id
-        data_frame.at[0, 'historical_place_id'] = carantania.id
         data_frame.at[0, 'wkt'] = "POLYGON((16.1203 BLA, 16.606275))"
         data_frame.at[0, 'reference_ids'] = \
             f'{reference.id};IV {height.id};IV lit_1;55'
@@ -269,8 +264,6 @@ class ImportTest(ImportTestCase):
         data_frame.at[0, 'id'] = 'new_place_11'
         data_frame.at[1, 'id'] = 'new_place_22'
         data_frame.at[2, 'id'] = 'new_place_33'
-        data_frame.at[0, 'administrative_unit_id'] = austria.id
-        data_frame.at[0, 'historical_place_id'] = carantania.id
         type_ids = [
             boundary_mark.id,
             infrastructure.id,
@@ -347,8 +340,7 @@ class ImportTest(ImportTestCase):
                 view='sql',
                 filename=f'{date_}_export.sql.7z'),
             follow_redirects=True)
-        if os.name == 'posix':
-            assert b'File deleted' in rv.data
+        assert b'File deleted' in rv.data
 
         rv = c.get(
             url_for(
@@ -356,8 +348,7 @@ class ImportTest(ImportTestCase):
                 view='sql',
                 filename=f'{date_}_export.dump.7z'),
             follow_redirects=True)
-        if os.name == 'posix':
-            assert b'File deleted' in rv.data
+        assert b'File deleted' in rv.data
 
         rv = c.get(
             url_for(

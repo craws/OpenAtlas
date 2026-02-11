@@ -9,8 +9,8 @@ from werkzeug.wrappers import Response
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
-from openatlas.display.util import get_file_path, link, required_group
-from openatlas.display.util2 import is_authorized, manual
+from openatlas.display.util import link, required_group
+from openatlas.display.util2 import get_file_path, is_authorized, manual
 from openatlas.forms.form import annotate_image_form
 from openatlas.models.annotation import AnnotationImage, AnnotationText
 from openatlas.models.dates import format_date

@@ -4,6 +4,7 @@ from flask import Response, g, jsonify, request
 from flask_babel import gettext as _
 
 from openatlas import app
+from openatlas.api.external.cadaster import fetch_cadaster
 from openatlas.api.external.geonames import fetch_geonames
 from openatlas.api.external.gnd import fetch_gnd
 from openatlas.api.external.wikidata import fetch_wikidata
@@ -72,3 +73,9 @@ def ajax_geonames_info() -> str:
 @required_group('readonly')
 def ajax_gnd_info() -> str:
     return display_info(fetch_gnd(request.form['id_']))
+
+
+@app.route('/ajax/info/cadaster', methods=['POST'])
+@required_group('readonly')
+def ajax_cadaster_info() -> str:
+    return display_info(fetch_cadaster(request.form['id_']))

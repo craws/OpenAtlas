@@ -49,11 +49,6 @@ class TestBaseCase(unittest.TestCase):
                     Path(app.root_path).parent / 'install' /
                     f'{file_name}.sql', encoding='utf8') as sql_file:
                 self.cursor.execute(sql_file.read())
-        if app.config['LOAD_WINDOWS_TEST_SQL']:  # pragma: no cover
-            with open(
-                    Path(app.root_path).parent / 'install' /
-                    'data_test_windows.sql', encoding='utf8') as sql_file:
-                self.cursor.execute(sql_file.read())
 
 
 class ApiTestCase(TestBaseCase):
@@ -67,20 +62,22 @@ class ApiTestCase(TestBaseCase):
 
     @staticmethod
     def get_classes(data: list[dict[str, Any]]) -> bool:
-        return (data[0]['systemClass']
-                and data[0]['crmClass']
-                and data[0]['view']
-                and data[0]['icon']
-                and data[0]['en'])
+        return bool(
+            data[0]['systemClass']
+            and data[0]['crmClass']
+            and data[0]['view']
+            and data[0]['icon']
+            and data[0]['en'])
 
     @staticmethod
     def get_class_mapping(data: dict[str, Any], locale: str) -> bool:
-        return (data['locale'] == locale
-                and data['results'][0]['systemClass']
-                and data['results'][0]['crmClass']
-                and data['results'][0]['view']
-                and data['results'][0]['icon']
-                and data['results'][0]['label'])
+        return bool(
+            data['locale'] == locale
+            and data['results'][0]['systemClass']
+            and data['results'][0]['crmClass']
+            and data['results'][0]['view']
+            and data['results'][0]['icon']
+            and data['results'][0]['label'])
 
 
 class ImportTestCase(TestBaseCase):

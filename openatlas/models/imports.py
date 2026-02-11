@@ -138,8 +138,6 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
             if entity.class_ != 'type':
                 link_types(entity, row, class_, project)
             link_references(entity, row, class_, project)
-            if entity.location:
-                link_admin_units(entity.location, row)
             entities[row.get('id')] = {
                 'entity': entity,
                 'parent_id': row.get('parent_id'),
@@ -252,19 +250,6 @@ def link_references(
                         entity,
                         values[0],
                         type_id=match_types[values[1]].id)
-
-
-def link_admin_units(location: Entity, row: dict[str, Any]) -> None:
-    if data := row.get('administrative_unit_id'):
-        if ((str(data).isdigit() and int(data) in g.types) and
-                g.types[g.types[int(data)].root[0]].name in [
-                    'Administrative unit']):
-            location.link('P89', g.types[int(data)])
-    if data := row.get('historical_place_id'):
-        if ((str(data).isdigit() and int(data) in g.types) and
-                g.types[g.types[int(data)].root[0]].name in [
-                    'Historical place']):
-            location.link('P89', g.types[int(data)])
 
 
 def get_coordinates_from_wkt(coordinates: str) -> dict[str, Any]:

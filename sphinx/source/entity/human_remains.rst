@@ -19,6 +19,7 @@ Form fields
 * :doc:`type`
 * :doc:`/ui/date`
 * :doc:`/ui/description`
+* **Carrier of source** - if a :doc:`source` is depicted on the remains
 * :doc:`/tools/map`
 * :doc:`reference_system`
 * **Super** - a :doc:`place`, :doc:`feature`, :doc:`stratigraphic_unit`, or

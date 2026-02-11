@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.11j",
+    "version": "0.4.13a",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -4466,8 +4466,10 @@
           "enum": [
             "lp",
             "lpx",
+            "loud",
             "geojson",
             "geojson-v2",
+            "gpkg",
             "table_row",
             "pretty-xml",
             "n3",
@@ -5398,6 +5400,9 @@
                       },
                       "IIIFManifest": {
                         "type": "string"
+                      },
+                      "mainImage": {
+                        "type": "boolean"
                       }
                     }
                   }

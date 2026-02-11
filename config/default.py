@@ -5,7 +5,7 @@ from rdflib import Namespace
 
 from config.database_versions import DATABASE_VERSIONS
 
-VERSION = '9.1.0'
+VERSION = '9.2.0'
 DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 DEBUG = False
@@ -71,16 +71,15 @@ CSS = {
         'secondary': 'btn btn-outline-secondary btn-sm',
         'danger': 'btn btn-outline-danger btn-sm'}}
 
-# Tests
-LOAD_WINDOWS_TEST_SQL = False
-
 # External APIs
 API_WIKIDATA = 'https://www.wikidata.org/w/api.php'
 API_GEONAMES = 'http://api.geonames.org/get'
+API_CADASTER = 'https://kataster.bev.gv.at/api/'
+
 USER_AGENT = {
-    "User-Agent":
-        f"OpenAtlas/{VERSION} (https://github.com/craws/OpenAtlas; "
-        "openatlas@oeaw.ac.at)"}
+    'User-Agent':
+        f'OpenAtlas/{VERSION} (https://github.com/craws/OpenAtlas; '
+        'openatlas@oeaw.ac.at)'}
 
 CSP_HEADER = "frame-ancestors 'self'"
 

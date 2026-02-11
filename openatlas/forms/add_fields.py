@@ -200,17 +200,18 @@ def add_relations(
                         'name_inverse',
                         StringField(_('inverse')))
             else:  # It's a root type (hierarchy)
-                if entity.category == 'custom':
+                if entity.category in ('custom', 'place'):
                     form.multiple = BooleanField(
                         _('multiple'),
                         description=_('tooltip hierarchy multiple'))
-                # noinspection PyTypeChecker
-                form.classes = SelectMultipleField(
-                    _('classes'),
-                    description=_('tooltip hierarchy forms'),
-                    choices=Entity.get_class_choices(entity),
-                    option_widget=widgets.CheckboxInput(),
-                    widget=widgets.ListWidget(prefix_label=False))
+                if entity.category in ('custom', 'value'):
+                    # noinspection PyTypeChecker
+                    form.classes = SelectMultipleField(
+                        _('classes'),
+                        description=_('tooltip hierarchy forms'),
+                        choices=Entity.get_class_choices(entity),
+                        option_widget=widgets.CheckboxInput(),
+                        widget=widgets.ListWidget(prefix_label=False))
         elif relation.multiple:
             selection: Any = []
             if entity.id:
@@ -288,11 +289,9 @@ def selection_available(
 def add_date_fields(
         form_class: Any,
         item: Optional[Entity | Link] = None) -> None:
-    if item \
-            and isinstance(item, Entity) \
-            and item.class_.group['name'] == 'type' \
-            and not item.root:
-        return
+    if isinstance(item, Entity) and item.class_.group['name'] == 'type' and (
+            (item.id and not item.root) or (not item.id and item.category)):
+        return  # No dates because it's a type hierarchy
     validator_second = [OptionalValidator(), NumberRange(min=0, max=59)]
     validator_minute = [OptionalValidator(), NumberRange(min=0, max=59)]
     validator_hour = [OptionalValidator(), NumberRange(min=0, max=23)]
