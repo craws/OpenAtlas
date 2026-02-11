@@ -107,11 +107,11 @@ def crumbs_for_insert(
         origin: Entity | None,
         structure: dict[str, Any] | None) -> list[Any]:
     crumbs = hierarchy_crumbs(origin or entity) + \
-        [origin, f'+ {entity.class_.label}']
+             [origin, f'+ {entity.class_.label}']
     if entity.class_.group['name'] == 'artifact' and origin and structure:
         if count := len([
             i for i in structure['siblings']
-                if i.class_.name == entity.class_.name]):
+            if i.class_.name == entity.class_.name]):
             crumbs.append(f' ({count} {_("exists")})')
     return crumbs
 
@@ -133,7 +133,7 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
     entity.image_id = entity.get_profile_image_id()
     if entity.class_.attributes.get('location'):
         entity.location = entity.location \
-            or entity.get_linked_entity_safe('P53')
+                          or entity.get_linked_entity_safe('P53')
         gis_data = get_gis_all([entity], entity.get_structure())
     return render_template(
         'entity/update.html',
@@ -144,7 +144,7 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         title=entity.name,
         geonames_module=entity.class_.name in g.geonames.classes,
         crumbs=hierarchy_crumbs(entity) +
-        [entity, _('copy') if copy else _('edit')])
+               [entity, _('copy') if copy else _('edit')])
 
 
 @app.route('/delete/<int:id_>')
@@ -241,7 +241,7 @@ def redirect_url_insert(
                 selection_id=entity.id)
         elif not hasattr(form, 'continue_') or form.continue_.data != 'yes':
             url = url_for('view', id_=origin.id) \
-                + f'#tab-{relation_name.replace('_', '-')}'
+                  + f'#tab-{relation_name.replace('_', '-')}'
     if hasattr(form, 'continue_') \
             and form.continue_.data in ['sub', 'human_remains']:
         class_ = form.continue_.data
@@ -367,11 +367,18 @@ def walk_tree(types: list[int]) -> list[dict[str, Any]]:
     items = []
     for id_ in types:
         item = g.types[id_]
-        count_subs = f' ({format_number(item.count_subs)})' \
-            if item.count_subs else ''
+        count_subs = ''
+        if item.count_subs:
+            count_subs = f'''<span 
+                class="badge rounded-pill bg-light small ms-2 fw-normal 
+                text-muted">({format_number(item.count_subs)})</span>'''
         name = item.name.replace("'", "&apos;")
         if item.selectable:
-            text = f'{name} {format_number(item.count)}{count_subs}'
+            count = f'''<span 
+                class="badge rounded-pill bg-primary 
+                bg-opacity-10 text-primary ms-3">
+                {format_number(item.count)}</span>'''
+            text = f'{name}{count}{count_subs}'
         else:
             text = f'<span class="text-muted">{name}{count_subs}</span>'
         items.append({
