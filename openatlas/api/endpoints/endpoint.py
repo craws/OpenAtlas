@@ -460,7 +460,7 @@ class Endpoint:
                         isinstance(types, list) and \
                         isinstance(types[0], dict):
                     main_type_value = types[0].get('typeName')
-                for key, expected_type in schema_properties.items():
+                for key in schema_properties:
                     if key == 'main_type':
                         sanitized_props[key] = main_type_value
                         continue
