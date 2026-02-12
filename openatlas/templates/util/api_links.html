@@ -11,6 +11,7 @@
     {% if entity.class_.name == 'place' %}
       <li>{{ "THANADOS"|link(url_for('api.subunits', id_=entity.id), external=True)|safe }}</li>
       <li>{{ "ARIADNEplus"|link(url_for('api.subunits', id_=entity.id, format='xml'), external=True)|safe }}</li>
+      <li>{{ "GeoPackage"|link(url_for('api.entity', id_=entity.id, format='gpkg'), external=True)|safe }}</li>
     {% endif %}
     <li class="dropdown-divider"></li>
     <h6 class="dropdown-header px-0 py-1"><small>RDF</small></h6>
