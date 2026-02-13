@@ -3,7 +3,7 @@ import json
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Final
+from typing import Any, Final
 
 from shapely import Point
 from shapely.geometry import mapping
@@ -26,9 +26,9 @@ class Entry:
     description: str
     point: Point
     established: str
-    first_source: str
-    last_source: str
-    citation: dict[str, dict[str, str]]
+    first_source: str | None
+    last_source: str | None
+    citation: Any # dict[str, dict[str, str]]
 
 
 def process_citation(citation_strings: list[str]) -> dict[str, str]:
@@ -48,7 +48,8 @@ def process_citation(citation_strings: list[str]) -> dict[str, str]:
                 succeeding_name = name
             try:
                 citation_output[name] = splitted_citation[1]
-            except:  # todo: there are many failed citations, handle them
+            # todo: there are many failed citations, handle them
+            except Exception:
                 continue
     return citation_output
 
@@ -103,7 +104,7 @@ with app.test_request_context():
     replico = Entity.get_by_id(198155)
     zbiva = Entity.get_by_id(239450)
     church_type = Entity.get_by_id(285)
-    zbiva_project = 6
+    ZBIVA_PROJECT = 6
 
     for entry in entries:
         place = insert({
@@ -136,5 +137,9 @@ with app.test_request_context():
             'begin_to': entry.last_source})
         modification.link('P31', place)
 
-        import_data(zbiva_project, place.id, 23, f'{entry.id}_church')
-        import_data(zbiva_project, modification.id, 23, f'{entry.id}_modification')
+        import_data(ZBIVA_PROJECT, place.id, 23, f'{entry.id}_church')
+        import_data(
+            ZBIVA_PROJECT,
+            modification.id,
+            23,
+            f'{entry.id}_modification')
