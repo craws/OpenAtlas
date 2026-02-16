@@ -14,6 +14,7 @@ model: dict[str, Any] = {
     'appellation': {'attributes': {}},
     'artifact': artifact.artifact,
     'bibliography': reference.bibliography,
+    'creation': event.creation,
     'edition': reference.edition,
     'external_reference': reference.external_reference,
     'feature': place.feature,

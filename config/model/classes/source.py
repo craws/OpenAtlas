@@ -61,7 +61,14 @@ source = {
                 'buttons': ['link', 'insert'],
                 'tooltip': _('mentioned in the source')}},
         'reference': standard_relations['reference'],
-        'file': standard_relations['file']},
+        'file': standard_relations['file'],
+        'source_creation': {
+            'label': _('creation event'),
+            'classes': ['creation'],
+            'property': 'P94',
+            'inverse': True,
+            'mode': 'direct',
+            'tooltip': _('Links the creation event of the source')}},
     'display': {
         'buttons': ['copy'],
         'form_buttons': ['insert_and_continue'],

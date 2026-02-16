@@ -111,6 +111,17 @@ acquisition['relations'] = acquisition['relations'] | {
         'mode': 'direct',
         'multiple': True}}
 
+creation: dict[str, Any] = copy.deepcopy(class_)
+creation['label'] = _('creation')
+creation['display']['tooltip'] = _('creation of conceptual items')
+creation['relations'] = creation['relations'] | {
+    'created_source': {
+        'label': _('created source'),
+        'classes': ['source'],
+        'property': 'P94',
+        'multiple': True,
+        'mode': 'direct'}}
+
 modification: dict[str, Any] = copy.deepcopy(class_)
 modification['label'] = _('modification')
 modification['display']['tooltip'] = _('modification of artifacts')
