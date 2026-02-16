@@ -55,7 +55,7 @@ def get_file_dict(
     url = 'N/A'
     mime_type = None
     if path := get_file_path(link.domain.id):
-        url_for('api.display', filename=path.stem, _external=True)
+        url = url_for('api.display', filename=path.stem, _external=True)
         mime_type, _ = mimetypes.guess_type(path)
     data = {
         'id': link.domain.id,

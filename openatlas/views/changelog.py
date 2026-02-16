@@ -17,7 +17,9 @@ def index_changelog() -> str:
 versions = {
     '9.2.0': ['TBA', {
         'feature': {
-            '2722': 'API: Download geometries as .gpkg'}}],
+            '2722': 'API: Download geometries as .gpkg'},
+        'fix': {
+            '2740': 'Error at network view'}}],
     '9.1.1': ['2026-02-11', {
         'fix': {
             '2729': 'Installation and other minor issues'}}],
