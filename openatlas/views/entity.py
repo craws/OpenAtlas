@@ -110,8 +110,8 @@ def crumbs_for_insert(
              [origin, f'+ {entity.class_.label}']
     if entity.class_.group['name'] == 'artifact' and origin and structure:
         if count := len([
-            i for i in structure['siblings']
-            if i.class_.name == entity.class_.name]):
+                i for i in structure['siblings']
+                if i.class_.name == entity.class_.name]):
             crumbs.append(f' ({count} {_("exists")})')
     return crumbs
 
@@ -144,7 +144,7 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         title=entity.name,
         geonames_module=entity.class_.name in g.geonames.classes,
         crumbs=hierarchy_crumbs(entity) +
-               [entity, _('copy') if copy else _('edit')])
+        [entity, _('copy') if copy else _('edit')])
 
 
 @app.route('/delete/<int:id_>')
@@ -379,7 +379,7 @@ def walk_tree(types: list[int]) -> list[dict[str, Any]]:
             count_subs = f'''<span 
                 class="badge rounded-pill bg-primary 
                 bg-opacity-10 text-primary ms-3">
-                {format_number(item.count_subs + count_number) }</span>'''
+                {format_number(item.count_subs + count_number)}</span>'''
             text = f'{name}{count_subs}{count}'
         else:
             text = f'<span class="text-muted">{name}{count_subs}</span>'
