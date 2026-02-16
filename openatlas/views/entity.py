@@ -368,17 +368,19 @@ def walk_tree(types: list[int]) -> list[dict[str, Any]]:
     for id_ in types:
         item = g.types[id_]
         count_subs = ''
-        if item.count_subs:
-            count_subs = f'''<span 
-                class="badge rounded-pill bg-light small ms-2 fw-normal 
-                text-muted">({format_number(item.count_subs)})</span>'''
+        count = ''
         name = item.name.replace("'", "&apos;")
         if item.selectable:
-            count = f'''<span 
+            if count_number := item.count:
+                count = f'''<span 
+                    class="badge rounded-pill bg-light small ms-2 fw-normal 
+                    text-muted">(
+                    {_('directly')} {format_number(count_number)})</span>'''
+            count_subs = f'''<span 
                 class="badge rounded-pill bg-primary 
                 bg-opacity-10 text-primary ms-3">
-                {format_number(item.count)}</span>'''
-            text = f'{name}{count}{count_subs}'
+                {format_number(item.count_subs + count_number) }</span>'''
+            text = f'{name}{count_subs}{count}'
         else:
             text = f'<span class="text-muted">{name}{count_subs}</span>'
         items.append({
