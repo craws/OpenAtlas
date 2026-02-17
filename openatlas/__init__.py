@@ -32,7 +32,7 @@ from openatlas.api import api
 from openatlas.views import (
     admin, ajax, annotation, changelog, checks, entity, error, export, file,
     hierarchy, index, imports, link, login, model, note, overlay, profile,
-    search, token, tools, type as type_, user, vocabs)
+    rights_holder, search, token, tools, type as type_, user, vocabs)
 
 
 def get_locale() -> str:

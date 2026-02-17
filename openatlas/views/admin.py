@@ -37,6 +37,7 @@ from openatlas.models.content import get_content, update_content
 from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Project
+from openatlas.models.rights_holder import RightsHolder
 from openatlas.models.settings import update_settings
 from openatlas.models.user import User
 
@@ -66,7 +67,17 @@ def admin_index() -> str:
                 button(_('activity'), url_for('user_activity')),
                 get_newsletter_button(users),
                 button(_('user'), url_for('user_insert'))
-                if is_authorized('manager') else ''])}
+                if is_authorized('manager') else '']),
+        'rights_holder': Tab(
+            'rights_holder',
+            _('rights holder'),
+            table=get_rights_holder_table(),
+            buttons=[
+                manual('admin/user'),  # Todo: manual
+                button(
+                    f'+ {_('rights holder')}',
+                    url_for('rights_holder_insert'))
+                if is_authorized('contributor') else ''])}
     if is_authorized('admin'):
         tabs['general'] = Tab(
             'general',
@@ -162,11 +173,11 @@ def get_test_mail_form() -> str:
         body = (_(
             'This test mail was sent by %(username)s',
             username=current_user.username) +
-            f' {_('at')} {request.headers['Host']}')
+                f' {_('at')} {request.headers['Host']}')
         if send_mail(subject, body, form.receiver.data):  # type: ignore
             flash(
                 _('A test mail was sent to %(email)s.',
-                    email=form.receiver.data),
+                  email=form.receiver.data),
                 'info')
     elif request.method == 'GET':
         form.receiver.data = current_user.email
@@ -179,6 +190,21 @@ def get_newsletter_button(users: list[User]) -> str:
             if user.settings['newsletter']:
                 return button(_('newsletter'), url_for('newsletter'))
     return ''
+
+
+def get_rights_holder_table() -> Table:
+    table = Table(['name', 'class'])
+    rights_holders = RightsHolder.get_rights_holder()
+    for holder in rights_holders:
+        row = [
+            holder['name'],
+            holder['class'],
+            link(
+                _('edit'),
+                 #url_for('rights_holder_update')
+                 )]
+        table.rows.append(row)
+    return table
 
 
 def get_user_table(users: list[User]) -> Table:
@@ -198,7 +224,7 @@ def get_user_table(users: list[User]) -> Table:
             user.real_name,
             user.group,
             user.email if is_authorized('manager')
-            or user.settings['show_email'] else '',
+                          or user.settings['show_email'] else '',
             display_bool(user.settings['newsletter'], False),
             format_date(user.created),
             format_date(user.login_last_success),
@@ -271,7 +297,7 @@ def settings(category: str) -> str | Response:
         content=display_form(
             form,
             manual_page='admin/' +
-            category.replace('frontend', 'presentation_site')),
+                        category.replace('frontend', 'presentation_site')),
         title=_('admin'),
         crumbs=[
             [_('admin'), f'{url_for('admin_index')}#tab-{tab}'],
