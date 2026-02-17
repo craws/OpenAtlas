@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from flask import g
 
 from openatlas import app
@@ -88,6 +90,22 @@ def get_entity_ids_by_type_ids(type_ids: list[int]) -> list[int]:
         """,
         {'type_ids': tuple(type_ids)})
     return [row[0] for row in list(g.cursor)]
+
+
+def get_type_ids_by_entity_ids(entity_ids: list[int]) -> dict[int, list[int]]:
+    g.cursor.execute(
+        """
+        SELECT domain_id, range_id
+        FROM model.link
+        WHERE domain_id IN %(entity_ids)s
+          AND property_code IN ('P2', 'P89');
+        """,
+        {'entity_ids': tuple(entity_ids)})
+
+    result = defaultdict(list)
+    for domain_id, range_id in g.cursor:
+        result[domain_id].append(range_id)
+    return dict(result)
 
 
 def delete_(id_: int) -> None:
