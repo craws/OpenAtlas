@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.13a",
+    "version": "0.4.13b",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -4146,8 +4146,7 @@
         "description": "Download results",
         "in": "query",
         "schema": {
-          "type": "boolean",
-          "example": false
+          "type": "boolean"
         }
       },
       "place_hierarchy": {
@@ -4155,8 +4154,7 @@
         "description": "Will include the whole place hierarchy. This means that instead of only getting entities linked to the requested entity, all entities, which are connected with the property *P46* are included in the result set. This can significantly increase the load time.",
         "in": "query",
         "schema": {
-          "type": "boolean",
-          "example": false
+          "type": "boolean"
         }
       },
       "map_overlay": {
@@ -4164,8 +4162,7 @@
         "description": "Will add the map overlay information for images if available.",
         "in": "query",
         "schema": {
-          "type": "boolean",
-          "example": false
+          "type": "boolean"
         }
       },
       "remove_empty_values": {
@@ -4173,8 +4170,7 @@
         "description": "This will remove any keys which are empty or have no values assigned, e.g. []. This can reduce the load time.",
         "in": "query",
         "schema": {
-          "type": "boolean",
-          "example": false
+          "type": "boolean"
         }
       },
       "count": {
@@ -4182,8 +4178,7 @@
         "description": "Show integer count of how many entities would the result give back",
         "in": "query",
         "schema": {
-          "type": "boolean",
-          "example": false
+          "type": "boolean"
         }
       },
       "centroid": {
@@ -4191,8 +4186,7 @@
         "description": "Will calculate the centerpoint for all polygons and linestring and *add* them to geometries",
         "in": "query",
         "schema": {
-          "type": "boolean",
-          "example": false
+          "type": "boolean"
         }
       },
       "locale": {
@@ -4232,12 +4226,7 @@
               "description",
               "none"
             ]
-          },
-          "example": [
-            "when",
-            "description",
-            "links"
-          ]
+          }
         }
       },
       "sort": {
@@ -4404,8 +4393,7 @@
         "description": "Limits the number of entities returned in the response. A lower value may improve performance. The default is 20. Set to 0 to return all available entities.",
         "in": "query",
         "schema": {
-          "type": "integer",
-          "example": 50
+          "type": "integer"
         }
       },
       "depth": {
@@ -4413,8 +4401,7 @@
         "description": "Specifies the number of connection hops to include in the query. Higher values may significantly increase processing time. Default is 1.",
         "in": "query",
         "schema": {
-          "type": "integer",
-          "example": 3
+          "type": "integer"
         }
       },
       "first": {
@@ -4422,8 +4409,7 @@
         "description": "Starts the result set at the specified entity ID.",
         "in": "query",
         "schema": {
-          "type": "integer",
-          "example": 50505
+          "type": "integer"
         }
       },
       "last": {
@@ -4431,8 +4417,7 @@
         "description": "Starts the result set after the specified entity ID.",
         "in": "query",
         "schema": {
-          "type": "integer",
-          "example": 50505
+          "type": "integer"
         }
       },
       "page": {
@@ -4488,8 +4473,7 @@
           "type": "array",
           "items": {
             "type": "integer"
-          },
-          "example": 50505
+          }
         },
         "explode": true
       },
@@ -4501,8 +4485,7 @@
           "type": "array",
           "items": {
             "type": "integer"
-          },
-          "example": 50505
+          }
         },
         "explode": true
       },
@@ -4665,8 +4648,7 @@
               "P196",
               "P197",
               "P198"
-            ],
-            "example": "P2"
+            ]
           }
         },
         "explode": true
@@ -4831,8 +4813,7 @@
               "P196",
               "P197",
               "P198"
-            ],
-            "example": "P2"
+            ]
           }
         },
         "explode": true
@@ -4866,8 +4847,7 @@
           "type": "array",
           "items": {
             "type": "integer"
-          },
-          "example": 50505
+          }
         },
         "explode": true
       },
@@ -4879,8 +4859,7 @@
           "type": "array",
           "items": {
             "type": "integer"
-          },
-          "example": 50505
+          }
         },
         "explode": true
       },
@@ -4910,8 +4889,7 @@
               "E54",
               "E55",
               "E74"
-            ],
-            "example": "E18"
+            ]
           }
         },
         "explode": true
@@ -4935,8 +4913,7 @@
               "source",
               "source_translation",
               "type"
-            ],
-            "example": "actor"
+            ]
           }
         },
         "explode": true
@@ -4974,8 +4951,7 @@
               "stratigraphic_unit",
               "type",
               "tools"
-            ],
-            "example": "artifact"
+            ]
           }
         }
       },
@@ -5013,8 +4989,7 @@
               "stratigraphic_unit",
               "type",
               "type_tools"
-            ],
-            "example": "place"
+            ]
           }
         }
       },
@@ -5027,8 +5002,7 @@
           "type": "array",
           "items": {
             "type": "integer"
-          },
-          "example": 50505
+          }
         }
       },
       "image_size": {
@@ -5040,8 +5014,7 @@
           "enum": [
             "thumbnail",
             "table"
-          ],
-          "example": "table"
+          ]
         }
       }
     },
@@ -6137,6 +6110,7 @@
               "required": [
                 "id",
                 "label",
+                "typeIds",
                 "relations",
                 "systemClass"
               ],
@@ -6149,6 +6123,12 @@
                 },
                 "systemClass": {
                   "type": "string"
+                },
+                "typeIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
                 },
                 "relations": {
                   "type": "array",

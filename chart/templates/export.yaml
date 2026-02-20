@@ -6,7 +6,7 @@ metadata:
   name: {{ print ( include "fullname" . ) "-export"| quote }}
 spec:
   accessModes:
-    - ReadWriteOnce
+    - {{ .Values.storage.accessMode | default "ReadWriteOnce" }}
   resources:
     requests:
       storage: {{ .Values.storage.export.size }}

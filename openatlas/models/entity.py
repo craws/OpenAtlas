@@ -794,8 +794,8 @@ def insert(data: dict[str, Any]) -> Entity:
         data['description'] = result['text']
         annotation_data = result['data']
     for item in [
-            'begin_from', 'begin_to', 'begin_comment',
-            'end_from', 'end_to', 'end_comment', 'description']:
+        'begin_from', 'begin_to', 'begin_comment',
+        'end_from', 'end_to', 'end_comment', 'description']:
         data[item] = data.get(item)
     for item in ['name', 'description']:
         data[item] = sanitize(data[item])
@@ -876,6 +876,11 @@ class Link:
     @staticmethod
     def get_entity_ids_by_type_ids(types_: list[int]) -> list[int]:
         return db_link.get_entity_ids_by_type_ids(types_)
+
+    @staticmethod
+    def get_type_ids_by_entity_ids(
+            entity_ids: list[int]) -> dict[int, list[int]]:
+        return db_link.get_type_ids_by_entity_ids(entity_ids)
 
     @staticmethod
     def delete_(id_: int) -> None:

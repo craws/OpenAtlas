@@ -1,12 +1,11 @@
-<link rel="stylesheet" href="/static/node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css">
-<link rel="stylesheet" href="/static/css/map.css">
-<link rel="stylesheet" href="/static/vendor/Geonames-0.4.7/L.Control.Geonames.css">
-<link rel="stylesheet" href="/static/node_modules/leaflet/dist/leaflet.css">
-<link rel="stylesheet" href="/static/node_modules/leaflet.markercluster/dist/MarkerCluster.css">
-<link rel="stylesheet" href="/static/node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css">
-<link rel="stylesheet" href="/static/node_modules/leaflet-groupedlayercontrol/dist/leaflet.groupedlayercontrol.min.css">
-<link rel="stylesheet" href="/static/node_modules/leaflet.fullscreen/Control.FullScreen.css">
-
+<link rel="stylesheet" href="{{ url_for('static', filename='node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css', v=config.VERSION) }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/map.css', v=config.VERSION) }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/Geonames-0.4.7/L.Control.Geonames.css', v=config.VERSION) }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='node_modules/leaflet/dist/leaflet.css', v=config.VERSION) }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='node_modules/leaflet.markercluster/dist/MarkerCluster.css', v=config.VERSION) }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css', v=config.VERSION) }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='node_modules/leaflet-groupedlayercontrol/dist/leaflet.groupedlayercontrol.min.css', v=config.VERSION) }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='node_modules/leaflet.fullscreen/Control.FullScreen.css', v=config.VERSION) }}">
 <script>
   const geoNamesModule =     {{ 'true' if geonames_module else 'false' }};
   const geoNamesUsername =  '{{ g.settings.geonames_username }}';
@@ -40,12 +39,12 @@
     ];
   {% endif %}
 </script>
-<script src="/static/node_modules/@fortawesome/fontawesome-free/js/all.min.js"></script>
-<script src="/static/node_modules/leaflet/dist/leaflet.js"></script>
-<script src="/static/node_modules/leaflet.markercluster/dist/leaflet.markercluster.js" ></script>
-<script src="/static/node_modules/leaflet-groupedlayercontrol/dist/leaflet.groupedlayercontrol.min.js" ></script>
-<script src="/static/vendor/Geonames-0.4.7/L.Control.Geonames.js"></script>
-<script src="/static/node_modules/leaflet.fullscreen/Control.FullScreen.js"></script>
-<script src="/static/node_modules/leaflet-imageoverlay-rotated/Leaflet.ImageOverlay.Rotated.js"></script>
-<script src="/static/node_modules/@mapbox/leaflet-pip/leaflet-pip.js"></script>
-<script src="/static/node_modules/wellknown/wellknown.js"></script>
+<script src="{{ url_for('static', filename='node_modules/@fortawesome/fontawesome-free/js/all.min.js', v=config.VERSION) }}"></script>
+<script src="{{ url_for('static', filename='node_modules/leaflet/dist/leaflet.js', v=config.VERSION) }}"></script>
+<script src="{{ url_for('static', filename='node_modules/leaflet.markercluster/dist/leaflet.markercluster.js', v=config.VERSION) }}"></script>
+<script src="{{ url_for('static', filename='node_modules/leaflet-groupedlayercontrol/dist/leaflet.groupedlayercontrol.min.js', v=config.VERSION) }}"></script>
+<script src="{{ url_for('static', filename='vendor/Geonames-0.4.7/L.Control.Geonames.js', v=config.VERSION) }}"></script>
+<script src="{{ url_for('static', filename='node_modules/leaflet.fullscreen/Control.FullScreen.js', v=config.VERSION) }}"></script>
+<script src="{{ url_for('static', filename='node_modules/leaflet-imageoverlay-rotated/Leaflet.ImageOverlay.Rotated.js', v=config.VERSION) }}"></script>
+<script src="{{ url_for('static', filename='node_modules/@mapbox/leaflet-pip/leaflet-pip.js', v=config.VERSION) }}"></script>
+<script src="{{ url_for('static', filename='node_modules/wellknown/wellknown.js', v=config.VERSION) }}"></script>

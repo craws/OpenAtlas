@@ -44,6 +44,7 @@ readinessProbe:
   probeType: "httpGet"
 
 storage:
+  accessMode: ReadWriteMany
   export:
     size: 1Gi
   processedImages:

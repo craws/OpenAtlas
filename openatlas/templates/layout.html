@@ -3,28 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="theme-color" content="#ffffff">
-  <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
-  <link rel="icon" type="image/png" href="/static/favicon-32x32.png" sizes="32x32">
-  <link rel="icon" type="image/png" href="/static/favicon-16x16.png" sizes="16x16">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png', v=config.VERSION) }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-32x32.png', v=config.VERSION) }}" sizes="32x32">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon-16x16.png', v=config.VERSION) }}" sizes="16x16">
   {% if '127.0.0' not in request.url %}
-    <link rel="manifest" href="/static/manifest.json">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json', v=config.VERSION) }}">
   {% endif %}
-  <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="/static/node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css">
-  <link rel="stylesheet" href="/static/node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css">
-  <link rel="stylesheet" href="/static/node_modules/jstree/dist/themes/default/style.min.css">
-  <link rel="mask-icon" href="/static/safari-pinned-tab.svg">
-  <link rel="stylesheet" href="/static/css/style.css?v={{ config.VERSION }}">
-  <script src="/static/node_modules/jquery/dist/jquery.min.js"></script>
-  <script src="/static/node_modules/datatables.net/js/jquery.dataTables.min.js"></script>
-  <script src="/static/node_modules/jquery-validation/dist/jquery.validate.min.js"></script>
-  <script src="/static/node_modules/jstree/dist/jstree.min.js"></script>
-  <script src="/static/node_modules/tinymce/tinymce.js"></script>
-  <script src="/static/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="/static/node_modules/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
-  <script src="/static/node_modules/jquery-ui-dist/jquery-ui.min.js"></script>
-  <script src="/static/node_modules/@fortawesome/fontawesome-free/js/all.min.js"></script>
-  <script src="/static/node_modules/bootstrap-autocomplete/dist/latest/bootstrap-autocomplete.min.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/bootstrap/dist/css/bootstrap.min.css', v=config.VERSION) }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css', v=config.VERSION) }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css', v=config.VERSION) }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/jstree/dist/themes/default/style.min.css', v=config.VERSION) }}">
+  <link rel="mask-icon" href="{{ url_for('static', filename='safari-pinned-tab.svg', v=config.VERSION) }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css', v=config.VERSION) }}">
+
+  <script src="{{ url_for('static', filename='node_modules/jquery/dist/jquery.min.js', v=config.VERSION) }}"></script>
+  <script src="{{ url_for('static', filename='node_modules/datatables.net/js/jquery.dataTables.min.js', v=config.VERSION) }}"></script>
+  <script src="{{ url_for('static', filename='node_modules/jquery-validation/dist/jquery.validate.min.js', v=config.VERSION) }}"></script>
+  <script src="{{ url_for('static', filename='node_modules/jstree/dist/jstree.min.js', v=config.VERSION) }}"></script>
+  <script src="{{ url_for('static', filename='node_modules/tinymce/tinymce.js', v=config.VERSION) }}"></script>
+  <script src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.bundle.min.js', v=config.VERSION) }}"></script>
+  <script src="{{ url_for('static', filename='node_modules/datatables.net-bs4/js/dataTables.bootstrap4.min.js', v=config.VERSION) }}"></script>
+  <script src="{{ url_for('static', filename='node_modules/jquery-ui-dist/jquery-ui.min.js', v=config.VERSION) }}"></script>
+  <script src="{{ url_for('static', filename='node_modules/@fortawesome/fontawesome-free/js/all.min.js', v=config.VERSION) }}"></script>
+  <script src="{{ url_for('static', filename='node_modules/bootstrap-autocomplete/dist/latest/bootstrap-autocomplete.min.js', v=config.VERSION) }}"></script>
   {% include "util/translations.html" %}
   {% if gis_data %}
     {% include "map.html" %}
@@ -42,8 +43,8 @@
           }
       }
   </script>
-  <script src="/static/js/functions.js"></script>
-  <script src="/static/js/forms.js"></script>
+  <script src="{{ url_for('static', filename='js/functions.js', v=config.VERSION) }}"></script>
+  <script src="{{ url_for('static', filename='js/forms.js', v=config.VERSION) }}"></script>
   {{ session.language|get_js_messages|safe }}
   <title>
     {{ g.settings.site_name }}

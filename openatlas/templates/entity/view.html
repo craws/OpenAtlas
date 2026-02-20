@@ -26,7 +26,7 @@
   {% if gis_data %}
     <div class="col-lg-6">
       <div id="map" class="map"></div>
-      <script src="/static/js/map/map.js"></script>
+      <script src="{{ url_for('static', filename='js/map/map.js', v=config.VERSION) }}"></script>
     </div>
   {% endif %}
   {% if chart_data %}
@@ -35,8 +35,8 @@
         <canvas id="type-chart"></canvas>
       </div>
     </div>
-    <script src="/static/node_modules/chart.js/dist/chart.umd.js"></script>
-    <script src="/static/node_modules/chartjs-plugin-autocolors/dist/chartjs-plugin-autocolors.min.js"></script>
+    <script src="{{ url_for('static', filename='node_modules/chart.js/dist/chart.umd.js', v=config.VERSION) }}"></script>
+    <script src="{{ url_for('static', filename='node_modules/chartjs-plugin-autocolors/dist/chartjs-plugin-autocolors.min.js', v=config.VERSION) }}"></script>
     <script>
       const ctx = document.getElementById('type-chart');
       const autocolors = window['chartjs-plugin-autocolors'];

@@ -1,6 +1,8 @@
 <div class="btn-group">
-  <button type="button" class="{{ config.CSS.button.primary }} dropdown-toggle text-capitalize" data-bs-toggle="dropdown" aria-expanded="false">
-    {{ _('download')}}
+  <button type="button"
+          class="{{ config.CSS.button.primary }} dropdown-toggle text-capitalize"
+          data-bs-toggle="dropdown" aria-expanded="false">
+    {{ _('download') }}
   </button>
   <ul class="dropdown-menu p-2">
     <h6 class="dropdown-header px-0 py-1"><small>JSON</small></h6>
@@ -11,6 +13,9 @@
     {% if entity.class_.name == 'place' %}
       <li>{{ "THANADOS"|link(url_for('api.subunits', id_=entity.id), external=True)|safe }}</li>
       <li>{{ "ARIADNEplus"|link(url_for('api.subunits', id_=entity.id, format='xml'), external=True)|safe }}</li>
+    {% endif %}
+    {% if entity.class_.name in ['place', 'feature', 'stratigraphic_unit', 'artifact'] %}
+      <li>{{ "GeoPackage"|link(url_for('api.entity', id_=entity.id, format='gpkg'), external=True)|safe }}</li>
     {% endif %}
     <li class="dropdown-divider"></li>
     <h6 class="dropdown-header px-0 py-1"><small>RDF</small></h6>
