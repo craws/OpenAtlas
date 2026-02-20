@@ -1,31 +1,42 @@
 """
 This script is for restructuring place hierarchies from the Welterbe project.
 Basically:
-* Places -> Custom hierarchy kataster
+* Places -> Custom hierarchy cadaster
 * Feature and artifacts -> Places
 
-Steps:
-* Add custom place hierarchy "Kataster"
-* Link system cadaster ext ref system to admininstrative units
-* Make non selectable top level Kataster entries e.g. 42005 for 42005_F407G8
-* Change existing places to hierarchically place hierarchy entities
-** Take care of different spellings, e.g. spaces, F and N characters, ...
-** Add external reference link with correct spelling e.g. 42005/.407/8
-* Change existing features and artifacts to places
+To do:
+* Link system cadaster ext ref system to administrative units (valid URLs?)
+* Add infos from former places to new cadaster (to be discussed in meeting)
+* Connect new places to cadaster
 * Delete place types
 * Change feature and artifact types to place types
 * Test everything and once looking ok upload online to be tested by others too
 
 """
 import time
+from typing import Any
 
+import psycopg2
 from flask import g
+from psycopg2 import extras
 
 from openatlas import app
 from openatlas.models.entity import Entity, insert
 from tests.base import get_hierarchy
 
+
+def connect() -> Any:
+    return psycopg2.connect(
+        database='openatlas_welterbe',
+        user=app.config['DATABASE_USER'],
+        password=app.config['DATABASE_PASS'],
+        port=app.config['DATABASE_PORT'],
+        host=app.config['DATABASE_HOST'])
+
+
 start = time.time()
+connection = connect()
+cursor = connection.cursor(cursor_factory=extras.DictCursor)
 
 
 def prepare_cadasters() -> None:
@@ -59,7 +70,18 @@ def insert_cadasters() -> None:
             'name': name,
             'openatlas_class_name': 'administrative_unit',
             'description': place.description})
-        entity.link('P89', cadaster_mapping[place.cadaster_name])
+        entity.link(
+            'P89',
+            cadaster_mapping[place.cadaster_name])  # type: ignore
+
+
+def link_cadasters() -> None:
+    g.types = Entity.get_all_types(False)
+    for node in cadaster_mapping.values():
+        parent = g.types[node.id]
+        for id_ in parent.subs:
+            entity = g.types[id_]
+            system.link('P67', entity, f'{parent.name}-{entity.name}')
 
 
 def clean_up():
@@ -76,14 +98,24 @@ def clean_up():
     print(f'{count} former cadaster place types deleted')
 
 
+def feature_and_artifact_to_place():
+    g.cursor.execute(
+        """
+        UPDATE model.entity SET openatlas_class_name = 'place'
+        WHERE openatlas_class_name IN ('artifact', 'feature');
+        """)
+
+
 with app.test_request_context():
     app.preprocess_request()
-    # system = Entity.get_by_id(11611)
+    system = Entity.get_by_id(11611)
     clean_up()
     places = Entity.get_by_class('place')
     cadaster_supers = set()
     cadaster_mapping = {}
     prepare_cadasters()
     insert_cadasters()
+    link_cadasters()
+    # feature_and_artifact_to_place()
 
 print(f'Execution time: {int(time.time() - start)} seconds')
