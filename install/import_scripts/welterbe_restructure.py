@@ -11,6 +11,7 @@ To do:
 * Delete place types
 * Change feature and artifact types to place types
 * Test everything and once looking ok upload online to be tested by others too
+* Test kadaster.gv.at URLs?
 
 """
 import time
@@ -81,7 +82,7 @@ def link_cadasters() -> None:
         parent = g.types[node.id]
         for id_ in parent.subs:
             entity = g.types[id_]
-            system.link('P67', entity, f'{parent.name}-{entity.name}')
+            system.link('P67', entity, f'{parent.name}/{entity.name}')
 
 
 def clean_up():
