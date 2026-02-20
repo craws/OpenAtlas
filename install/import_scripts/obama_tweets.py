@@ -75,13 +75,6 @@ def get_account_types(entries_: list[Entry]) -> dict[str, Entity]:
 
 with app.test_request_context():
     app.preprocess_request()
-    sources = Entity.get_by_class('source')
-    type_ = Entity.get_by_id(1314)
-    for source in sources:
-        source.link('P2', type_)
-
-
-    1/0
     entries = import_csv_data(FILE_PATH)
     source_type = Entity.get_by_id(129)
     link_type = Entity.get_by_id(10)
@@ -91,6 +84,7 @@ with app.test_request_context():
     hashtag_types = get_hashtag_types(entries)
     account_types = get_account_types(entries)
 
+    my_type = Entity.get_by_id(1315)
     for entry in entries:
         tweet_name = f'{entry.timestamp.strftime('%Y-%m-%d')} Tweet'
         tweet = insert({
@@ -98,6 +92,7 @@ with app.test_request_context():
             'description': entry.text,
             'openatlas_class_name': 'source'})
         tweet.link('P2', source_type)
+        tweet.link('P2', my_type)
 
         if entry.hashtags:
             for hashtag in entry.hashtags:
