@@ -197,12 +197,12 @@ def get_rights_holder_table() -> Table:
     rights_holders = RightsHolder.get_rights_holder()
     for holder in rights_holders:
         row = [
-            holder['name'],
-            holder['class'],
+            holder.name,
+            holder.class_,
             link(
                 _('edit'),
-                 #url_for('rights_holder_update')
-                 )]
+                url_for('rights_holder_update', id_=holder.id_)
+                )]
         table.rows.append(row)
     return table
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from flask import flash, redirect, render_template, url_for
+from flask import flash, redirect, render_template, request, url_for, abort
 from flask_babel import gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.wrappers import Response
@@ -24,7 +24,7 @@ class RightsHolderForm(FlaskForm):
         _('name'),
         [InputRequired()],
         render_kw={'autofocus': True})
-    role: Any = SelectField(_('role'), choices=['person', 'group'])
+    role: Any = SelectField(_('role'), choices=('person', 'group'))
     description = TextAreaField(_('info'))
     save = SubmitField(_('save'))
 
@@ -32,6 +32,7 @@ class RightsHolderForm(FlaskForm):
 @app.route('/rights_holder_insert', methods=['GET', 'POST'])
 @required_group('manager')
 def rights_holder_insert() -> str | Response:  # Todo: move to other file
+    # Todo: move to other file
     form: Any = RightsHolderForm()
 
     if form.validate_on_submit():
@@ -41,17 +42,52 @@ def rights_holder_insert() -> str | Response:  # Todo: move to other file
             'description': sanitize(form.description.data)})
         flash(_('created'))  # todo: change name
         print(rights_holder)
-        return redirect(f'{url_for('admin_index')}#tab-rights-holder')
+        return redirect(f'{url_for("admin_index")}#tab-rights-holder')
     return render_template(
         'tabs.html',
         tabs={
             'rights_holder': Tab(
-                'user',
+                'rights_holder',
                 content=display_form(
                     form,
                     'rights-holder-form',
-                    manual_page='admin/user'))},
+                    manual_page='admin/rights_holder'))},
         title=_('rights holder'),
         crumbs=[
-            [_('admin'), f'{url_for('admin_index')}#tab-rights-holder'],
-            f'+ {uc_first(_('rights holder'))}'])
+            [_('admin'), f'{url_for("admin_index")}#tab-rights-holder'],
+            f'+ {uc_first(_("rights holder"))}'])
+
+
+@app.route('/rights_holder_update/<int:id_>', methods=['GET', 'POST'])
+@required_group('manager')
+def rights_holder_update(
+        id_: int) -> str | Response:  # Todo: move to other file
+    rights_holder = RightsHolder.get(id_)
+    if not rights_holder:
+        abort(404)
+
+    form: Any = RightsHolderForm(obj=rights_holder)
+    if request.method == 'GET':
+        form.role.data = rights_holder.class_
+
+    if form.validate_on_submit():
+        RightsHolder.update(id_, {
+            'name': sanitize(form.name.data),
+            'role': sanitize(form.role.data),
+            'description': sanitize(form.description.data)})
+        flash(_('updated'))
+        return redirect(f'{url_for("admin_index")}#tab-rights-holder')
+
+    return render_template(
+        'tabs.html',
+        tabs={
+            'rights_holder': Tab(
+                'rights_holder',
+                content=display_form(
+                    form,
+                    'rights-holder-form',
+                    manual_page='admin/rights_holder'))},
+        title=_('rights holder'),
+        crumbs=[
+            [_('admin'), f'{url_for("admin_index")}#tab-rights-holder'],
+            f'{uc_first(_("rights holder"))}: {rights_holder.name}'])
