@@ -74,6 +74,8 @@ def insert_cadasters() -> None:
         entity.link(
             'P89',
             cadaster_mapping[place.cadaster_name])  # type: ignore
+        for sub in place.get_linked_entities('P46'):
+            entity.link('P89', sub.get_linked_entity_safe('P53'), inverse=True)
 
 
 def link_cadasters() -> None:
@@ -101,6 +103,11 @@ def clean_up():
 
 def feature_and_artifact_to_place():
     g.cursor.execute(
+        # Todo: what about locations?
+        """
+        DELETE FROM model.entity WHERE openatlas_class_name = 'place';
+        """)
+    g.cursor.execute(
         """
         UPDATE model.entity SET openatlas_class_name = 'place'
         WHERE openatlas_class_name IN ('artifact', 'feature');
@@ -117,6 +124,6 @@ with app.test_request_context():
     prepare_cadasters()
     insert_cadasters()
     link_cadasters()
-    # feature_and_artifact_to_place()
+    feature_and_artifact_to_place()
 
 print(f'Execution time: {int(time.time() - start)} seconds')
