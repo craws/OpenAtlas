@@ -7,6 +7,7 @@ from flask_babel import Babel
 from flask_jwt_extended import JWTManager, verify_jwt_in_request
 from flask_login import current_user
 from flask_wtf.csrf import CSRFProtect
+from mypy.memprofile import defaultdict
 from psycopg2 import extras
 from werkzeug.wrappers import Response
 
@@ -99,6 +100,7 @@ def before_request() -> Response | None:
 
 def setup_files() -> None:
     from openatlas.models.entity import Entity
+    from openatlas.models.rights_holder import RightsHolder
     g.files = {}
     for file_ in app.config['UPLOAD_PATH'].iterdir():
         if file_.stem.isdigit():
@@ -110,7 +112,20 @@ def setup_files() -> None:
         g.display_file_ext += app.config['PROCESSABLE_EXT']
     if g.settings['iiif'] and g.settings['iiif_path']:
         g.writable_paths.append(g.settings['iiif_path'])
-    g.file_info = Entity.get_file_info()
+    rights_holder_ = {rh.id: rh for rh in RightsHolder.get_rights_holder()}
+    right_holder_links = RightsHolder.get_rights_holder_links()
+
+    # todo: start from here again, get the information
+    rh_dict = defaultdict(lambda: defaultdict(list))
+
+    file_info = Entity.get_file_info()
+    for link_ in right_holder_links:
+        file_info[link_['entity_id']][link_['role']].append(rights_holder_[link_['rights_holder_id']])
+
+
+
+
+    g.file_info = file_info
 
 
 def setup_api() -> None:

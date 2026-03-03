@@ -19,6 +19,7 @@ from openatlas.forms.field import SubmitField
 from openatlas.models.rights_holder import RightsHolder
 
 
+# todo: Select fields need to get openatlas class name from config model
 class RightsHolderForm(FlaskForm):
     name: Any = StringField(
         _('name'),
@@ -36,7 +37,7 @@ def rights_holder_insert() -> str | Response:  # Todo: move to other file
     form: Any = RightsHolderForm()
 
     if form.validate_on_submit():
-        rights_holder = RightsHolder.insert({
+        rights_holder = RightsHolder.insert_rights_holder({
             'name': sanitize(form.name.data),
             'role': sanitize(form.role.data),
             'description': sanitize(form.description.data)})
@@ -62,7 +63,7 @@ def rights_holder_insert() -> str | Response:  # Todo: move to other file
 @required_group('manager')
 def rights_holder_update(
         id_: int) -> str | Response:  # Todo: move to other file
-    rights_holder = RightsHolder.get(id_)
+    rights_holder = RightsHolder.get_rights_holder_by_id(id_)
     if not rights_holder:
         abort(404)
 
@@ -71,7 +72,7 @@ def rights_holder_update(
         form.role.data = rights_holder.class_
 
     if form.validate_on_submit():
-        RightsHolder.update(id_, {
+        RightsHolder.update_rights_holder(id_, {
             'name': sanitize(form.name.data),
             'role': sanitize(form.role.data),
             'description': sanitize(form.description.data)})

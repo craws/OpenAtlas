@@ -173,11 +173,11 @@ def get_test_mail_form() -> str:
         body = (_(
             'This test mail was sent by %(username)s',
             username=current_user.username) +
-                f' {_('at')} {request.headers['Host']}')
+            f' {_('at')} {request.headers['Host']}')
         if send_mail(subject, body, form.receiver.data):  # type: ignore
             flash(
                 _('A test mail was sent to %(email)s.',
-                  email=form.receiver.data),
+                    email=form.receiver.data),
                 'info')
     elif request.method == 'GET':
         form.receiver.data = current_user.email
@@ -198,11 +198,10 @@ def get_rights_holder_table() -> Table:
     for holder in rights_holders:
         row = [
             holder.name,
-            holder.class_,
+            holder.class_.name,
             link(
                 _('edit'),
-                url_for('rights_holder_update', id_=holder.id_)
-                )]
+                url_for('rights_holder_update', id_=holder.id))]
         table.rows.append(row)
     return table
 
@@ -224,7 +223,7 @@ def get_user_table(users: list[User]) -> Table:
             user.real_name,
             user.group,
             user.email if is_authorized('manager')
-                          or user.settings['show_email'] else '',
+            or user.settings['show_email'] else '',
             display_bool(user.settings['newsletter'], False),
             format_date(user.created),
             format_date(user.login_last_success),
@@ -297,7 +296,7 @@ def settings(category: str) -> str | Response:
         content=display_form(
             form,
             manual_page='admin/' +
-                        category.replace('frontend', 'presentation_site')),
+            category.replace('frontend', 'presentation_site')),
         title=_('admin'),
         crumbs=[
             [_('admin'), f'{url_for('admin_index')}#tab-{tab}'],

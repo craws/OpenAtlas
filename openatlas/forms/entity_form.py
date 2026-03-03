@@ -15,20 +15,20 @@ from openatlas.display.util import check_iiif_activation, convert_image_to_iiif
 from openatlas.forms.add_fields import (
     add_buttons, add_class_types, add_date_fields, add_description,
     add_name_fields, add_reference_systems, add_relations, get_validators)
-from openatlas.forms.field import DragNDropField
+from openatlas.forms.field import DragNDropField, TableMultiField
 from openatlas.forms.populate import populate_insert, populate_update
 from openatlas.forms.util import convert
 from openatlas.forms.validation import file, validate
 from openatlas.models.dates import Dates, form_to_datetime64
 from openatlas.models.entity import Entity, insert
 from openatlas.models.gis import InvalidGeomException
+from openatlas.models.rights_holder import RightsHolder
 
 
 def get_entity_form(
         entity: Entity,
         origin: Optional[Entity] = None,
         relation: Optional[str] = None) -> Any:
-
     class Form(FlaskForm):
         opened = HiddenField()
         validate = validate
@@ -39,8 +39,19 @@ def get_entity_form(
     add_reference_systems(Form, entity.class_)
     for key, value in entity.class_.attributes.items():
         match key:
-            case 'creator' | 'example_id' | 'license_holder' | \
-                 'resolver_url' | 'website_url':
+            case 'creator' | 'license_holder':
+                # Todo, second argument should be a selection (e.g. only which are linked)
+                setattr(
+                    Form,
+                    key,
+                    TableMultiField(
+                        RightsHolder.get_rights_holder(),
+                        RightsHolder.get_rights_holder(),
+                        # description=relation.tooltip,
+                        # label=relation.label
+                        ))
+
+            case 'example_id' | 'resolver_url' | 'website_url':
                 setattr(
                     Form,
                     key,

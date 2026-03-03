@@ -212,11 +212,24 @@ class Entity:
             inverse)
 
     def save_file_info(self, data: dict[str, Any]) -> None:
+        from openatlas.models.rights_holder import RightsHolder
         db.update_file_info({
             'entity_id': self.id,
             'creator': data.get('creator'),
             'license_holder': data.get('license_holder'),
             'public': data.get('public', False)})
+        # todo: as.literal_eval is only a prototype, better solution?
+        for creator_id in ast.literal_eval(data.get('creator', [])):
+            RightsHolder.insert_rights_holder_link(
+                self.id,
+                creator_id,
+                'creator')
+        for license_holder_id in ast.literal_eval(
+                data.get('license_holder', [])):
+            RightsHolder.insert_rights_holder_link(
+                self.id,
+                license_holder_id,
+                'license_holder')
 
     def update(self, data: dict[str, Any]) -> None:
         data['id'] = self.id
@@ -794,8 +807,8 @@ def insert(data: dict[str, Any]) -> Entity:
         data['description'] = result['text']
         annotation_data = result['data']
     for item in [
-        'begin_from', 'begin_to', 'begin_comment',
-        'end_from', 'end_to', 'end_comment', 'description']:
+            'begin_from', 'begin_to', 'begin_comment',
+            'end_from', 'end_to', 'end_comment', 'description']:
         data[item] = data.get(item)
     for item in ['name', 'description']:
         data[item] = sanitize(data[item])
