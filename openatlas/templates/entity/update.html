@@ -20,10 +20,10 @@
               class="fas fa-chevron-right"></i></div>
           <div id="map" class="map"></div>
         </div>
-        <link rel="stylesheet" href="/static/node_modules/leaflet-draw/dist/leaflet.draw.css">
-        <script src="/static/node_modules/leaflet-draw/dist/leaflet.draw.js"></script>
-        <script src="/static/js/map/map.js"></script>
-        <script src="/static/js/map/draw.js"></script>
+      <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/leaflet-draw/dist/leaflet.draw.css', v=config.VERSION) }}">
+      <script src="{{ url_for('static', filename='node_modules/leaflet-draw/dist/leaflet.draw.js', v=config.VERSION) }}"></script>
+      <script src="{{ url_for('static', filename='js/map/map.js', v=config.VERSION) }}"></script>
+      <script src="{{ url_for('static', filename='js/map/draw.js', v=config.VERSION) }}"></script>
       {% endif %}
     </div>
   </div>

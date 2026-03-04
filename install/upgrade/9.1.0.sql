@@ -18,7 +18,7 @@ VALUES (
     (SELECT id FROM model.entity WHERE name = 'Cadaster' AND cidoc_class_code = 'E32'),
     'https://kataster.bev.gv.at/api/gst/',
     'https://kataster.bev.gv.at/',
-    '01004/781/1');
+    '01004/784/1');
 
 INSERT INTO model.link (property_code, range_id, domain_id) VALUES
     ('P2', (SELECT id FROM model.entity WHERE name='exact match'), (SELECT id FROM model.entity WHERE name='Cadaster'));

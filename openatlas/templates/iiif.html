@@ -1,6 +1,7 @@
 <div class="row">
   <div id="viewer" style="width: 50%;"></div>
-  <script src="/static/node_modules/mirador/dist/mirador.min.js"></script>
+  <script src="{{ url_for('static', filename='node_modules/mirador/dist/mirador.min.js', v=config.VERSION) }}"></script>
+
   <script>
     var config = {
       "id": "viewer",

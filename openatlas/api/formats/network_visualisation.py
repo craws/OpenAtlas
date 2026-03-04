@@ -8,6 +8,7 @@ from openatlas.api.endpoints.parser import Parser
 from openatlas.api.resources.database_mapper import (
     get_all_links_for_network, get_links_by_id_network,
     get_place_linked_to_location_id, get_types_linked_to_network_ids)
+from openatlas.models.entity import Link
 
 
 def overwrite_object_locations_with_place(
@@ -41,6 +42,10 @@ def overwrite_object_locations_with_place(
 
 
 def get_link_dictionary(links: list[dict[str, Any]]) -> dict[int, Any]:
+    ids = {l_['domain_id'] for l_ in links} | {l_['range_id'] for l_ in links}
+    types = {}
+    if ids:
+        types = Link.get_type_ids_by_entity_ids(list(ids))
     output: dict[int, Any] = defaultdict(set)
     for item in links:
         if output.get(item['domain_id']):
@@ -49,6 +54,7 @@ def get_link_dictionary(links: list[dict[str, Any]]) -> dict[int, Any]:
             output[item['domain_id']] = {
                 'label': item['domain_name'],
                 'systemClass': item['domain_system_class'],
+                'typeIds': types.get(item['domain_id']),
                 'relations': {item['range_id']}}
         if output.get(item['range_id']):
             output[item['range_id']]['relations'].add(item['domain_id'])
@@ -56,6 +62,7 @@ def get_link_dictionary(links: list[dict[str, Any]]) -> dict[int, Any]:
             output[item['range_id']] = {
                 'label': item['range_name'],
                 'systemClass': item['range_system_class'],
+                'typeIds': types.get(item['range_id']),
                 'relations': {item['domain_id']}}
     return output
 
