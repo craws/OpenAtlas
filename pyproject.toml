@@ -5,7 +5,7 @@ description = "An open source database system for handling complex historical an
 readme = "README.md"
 license = "GPL-2.0-only"
 authors = [
-    { name = "OpenAtlas Team", email = "info@openatlas.eu" }
+    { name = "OpenAtlas Team", email = "openatlas@oeaw.ac.at" }
 ]
 requires-python = ">=3.13"
 
