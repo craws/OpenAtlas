@@ -6,11 +6,16 @@ from pathlib import Path
 # Network and Security Configuration
 # ---------------------------------------------------------------------
 
-# CORS policy: allow all domains to access the API
-CORS_ALLOWANCE = '*'
+# CORS policy: Defines which domains can access the API from a browser.
+# The default is an empty string, which blocks all cross-origin requests.
+# To allow all domains (e.g., for a public, read-only API), set this to '*'
+# in your instance/production.py.
+# WARNING: Using '*' with endpoints that modify data (POST, PUT, DELETE)
+# and use cookie-based authentication creates a security risk (CSRF).
+CORS_ALLOWANCE = ''
 
 # List of allowed IPs to access API services
-ALLOWED_IPS = ['127.0.0.1']
+ALLOWED_IPS: list[str] = ['127.0.0.1']
 
 # ---------------------------------------------------------------------
 # External System Integration
