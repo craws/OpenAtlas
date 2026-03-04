@@ -107,10 +107,10 @@ def crumbs_for_insert(
         origin: Entity | None,
         structure: dict[str, Any] | None) -> list[Any]:
     crumbs = hierarchy_crumbs(origin or entity) + \
-             [origin, f'+ {entity.class_.label}']
+        [origin, f'+ {entity.class_.label}']
     if entity.class_.group['name'] == 'artifact' and origin and structure:
         if count := len([
-                i for i in structure['siblings']
+            i for i in structure['siblings']
                 if i.class_.name == entity.class_.name]):
             crumbs.append(f' ({count} {_("exists")})')
     return crumbs
@@ -133,7 +133,7 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
     entity.image_id = entity.get_profile_image_id()
     if entity.class_.attributes.get('location'):
         entity.location = entity.location \
-                          or entity.get_linked_entity_safe('P53')
+            or entity.get_linked_entity_safe('P53')
         gis_data = get_gis_all([entity], entity.get_structure())
     return render_template(
         'entity/update.html',
@@ -241,7 +241,7 @@ def redirect_url_insert(
                 selection_id=entity.id)
         elif not hasattr(form, 'continue_') or form.continue_.data != 'yes':
             url = url_for('view', id_=origin.id) \
-                  + f'#tab-{relation_name.replace('_', '-')}'
+                + f'#tab-{relation_name.replace('_', '-')}'
     if hasattr(form, 'continue_') \
             and form.continue_.data in ['sub', 'human_remains']:
         class_ = form.continue_.data
