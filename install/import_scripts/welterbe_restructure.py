@@ -5,11 +5,11 @@ Basically:
 * Feature and artifacts -> Places
 
 To do:
-* Link system cadaster ext ref system to administrative units (valid URLs?)
-* Add infos from former places to new cadaster (to be discussed in meeting)
-* Connect new places to cadaster
-* Delete place types
-* Change feature and artifact types to place types
+* Add infos from former places to new cadaster:
+** Type Grundstück Begrenzung -> add to (all) subs
+** Publication status -> to be removed but check if map colors still working
+* Remove former admin units
+* Re-map types of places, features and artifacts
 * Test everything and once looking ok upload online to be tested by others too
 * Test kadaster.gv.at URLs?
 
@@ -23,7 +23,6 @@ from psycopg2 import extras
 
 from openatlas import app
 from openatlas.models.entity import Entity, insert
-from tests.base import get_hierarchy
 
 
 def connect() -> Any:
@@ -67,10 +66,15 @@ def prepare_cadasters() -> None:
 def insert_cadasters() -> None:
     for place in places:
         name = place.name.replace('F', '.').replace('G', '/').replace('N', '')
+        description = ''
+        if place.aliases:
+            description = 'Adresse: ' + ', '.join(place.aliases.values()) + '\n'
+        if place.description:
+            description += place.description
         entity = insert({
             'name': name,
             'openatlas_class_name': 'administrative_unit',
-            'description': place.description})
+            'description': description})
         entity.link(
             'P89',
             cadaster_mapping[place.cadaster_name])  # type: ignore
@@ -85,20 +89,6 @@ def link_cadasters() -> None:
         for id_ in parent.subs:
             entity = g.types[id_]
             system.link('P67', entity, f'{parent.name}/{entity.name}')
-
-
-def clean_up():
-    count = 0
-    try:
-        hierarchy = get_hierarchy('Cadaster')
-        for sub_id in hierarchy.get_sub_ids_recursive():
-            g.types[sub_id].delete()
-            count += 1
-        hierarchy.delete()
-        count += 1
-    except:
-        pass
-    print(f'{count} former cadaster place types deleted')
 
 
 def feature_and_artifact_to_place():
@@ -117,8 +107,7 @@ def feature_and_artifact_to_place():
 with app.test_request_context():
     app.preprocess_request()
     system = Entity.get_by_id(11611)
-    clean_up()
-    places = Entity.get_by_class('place')
+    places = Entity.get_by_class('place', types=True, aliases=True)
     cadaster_supers = set()
     cadaster_mapping = {}
     prepare_cadasters()
