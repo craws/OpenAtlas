@@ -1,17 +1,17 @@
 ## Supported Versions
 
 As an open source product, we will only provide security patches for the
-latest version.
-Older versions will not receive retroactive security patches.
+latest version. Older versions will not receive retroactive security patches.
 
 ## Reporting Security Issues
 
 1. **Please do not create a public issue.** 
-Instead please email as at openatlas@craws.net. 
-2. Include as much detail as possible, including steps to reproduce the
-  vulnerability, potential impact, and any other relevant information.
-3. We will acknowledge your email within 3 business days and work with you to
-  understand the issue and address it promptly.
+  Instead please email us at openatlas@craws.net.
+2. Please describe the issue as detailed as possible, including steps to
+  reproduce the vulnerability, potential impact, and any other relevant
+  information.
+3. We will acknowledge your email and will contact you to understand the issue
+  and find a solution as quickly as possible.
 
 ## Handling Security Issues
 
