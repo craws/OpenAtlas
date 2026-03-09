@@ -119,8 +119,8 @@ def setup_files() -> None:
     rh_dict = defaultdict(lambda: defaultdict(list))
 
     file_info = Entity.get_file_info()
-    for link_ in right_holder_links:
-        file_info[link_['entity_id']][link_['role']].append(rights_holder_[link_['rights_holder_id']])
+    #for link_ in right_holder_links:
+    #    file_info[link_['entity_id']][link_['role']].append(rights_holder_[link_['rights_holder_id']])
 
 
 

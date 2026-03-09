@@ -218,6 +218,9 @@ class Entity:
             'creator': data.get('creator'),
             'license_holder': data.get('license_holder'),
             'public': data.get('public', False)})
+        # todo: this deletes all links. Better would be that we compare
+        #  and update the entries
+        RightsHolder.delete_rights_holder_links(self.id)
         # todo: as.literal_eval is only a prototype, better solution?
         for creator_id in ast.literal_eval(data.get('creator', [])):
             RightsHolder.insert_rights_holder_link(

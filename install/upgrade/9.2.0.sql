@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS model.rights_holder
     id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
     name text NOT NULL,
     class text NOT NULL,
-    description text NOT NULL,
+    description text,
     created timestamp without time zone NOT NULL DEFAULT now(),
     modified timestamp without time zone,
     CONSTRAINT rights_holder_pkey PRIMARY KEY (id)

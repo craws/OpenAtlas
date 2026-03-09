@@ -1,8 +1,9 @@
 from typing import Any
 
 from openatlas.database.rights_holder import (
-    get_rights_holder, get_rights_holder_by_id, get_rights_holder_links,
-    insert_rights_holder,
+    delete_rights_holder_links, get_rights_holder, get_rights_holder_by_id,
+    get_rights_holder_links,
+    get_rights_holders_by_entity_and_role, insert_rights_holder,
     insert_rights_holder_link, update_rights_holder)
 from openatlas.models.entity import Entity
 
@@ -12,6 +13,13 @@ class RightsHolder:
     @staticmethod
     def get_rights_holder() -> list[Entity]:
         return [Entity(item) for item in get_rights_holder()]
+
+    @staticmethod
+    def get_rights_holders_by_entity_and_role(
+            entity_id: int,
+            role: str) -> list[Entity]:
+        return [Entity(item) for item in
+                get_rights_holders_by_entity_and_role(entity_id, role)]
 
     @staticmethod
     def get_rights_holder_by_id(id_: int) -> Entity | None:
@@ -36,3 +44,7 @@ class RightsHolder:
             rights_holder_id: int,
             role: str) -> None:
         insert_rights_holder_link(entity_id, rights_holder_id, role)
+
+    @staticmethod
+    def delete_rights_holder_links(entity_id: int) -> None:
+        delete_rights_holder_links(entity_id)

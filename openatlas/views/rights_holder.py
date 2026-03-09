@@ -33,7 +33,6 @@ class RightsHolderForm(FlaskForm):
 @app.route('/rights_holder_insert', methods=['GET', 'POST'])
 @required_group('manager')
 def rights_holder_insert() -> str | Response:  # Todo: move to other file
-    # Todo: move to other file
     form: Any = RightsHolderForm()
 
     if form.validate_on_submit():
@@ -69,7 +68,7 @@ def rights_holder_update(
 
     form: Any = RightsHolderForm(obj=rights_holder)
     if request.method == 'GET':
-        form.role.data = rights_holder.class_
+        form.role.data = rights_holder.class_.name
 
     if form.validate_on_submit():
         RightsHolder.update_rights_holder(id_, {

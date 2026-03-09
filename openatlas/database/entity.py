@@ -379,12 +379,13 @@ def update_file_info(data: dict[str, Any]) -> None:
 def get_file_info() -> dict[int, dict[str, Any]]:
     g.cursor.execute(
         """
-        SELECT entity_id, public
+        SELECT entity_id, public, creator, license_holder
         FROM model.file_info;
         """)
-    # todo: if we stick to this function, return could be simpler
+    # todo: delete creator and license holder and simplify function
     return {
-        row["entity_id"]: {key: row[key] for key in ["public"]}
+        row["entity_id"]: {
+            key: row[key] for key in ['public', 'creator', 'license_holder']}
         for row in g.cursor}
 
 
