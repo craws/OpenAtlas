@@ -354,7 +354,7 @@ def link(data: dict[str, Any]) -> int:
         data)
     return g.cursor.fetchone()['id']
 
-
+# todo: remove creator and license_holder
 def update_file_info(data: dict[str, Any]) -> None:
     g.cursor.execute(
         """
@@ -379,13 +379,13 @@ def update_file_info(data: dict[str, Any]) -> None:
 def get_file_info() -> dict[int, dict[str, Any]]:
     g.cursor.execute(
         """
-        SELECT entity_id, public, creator, license_holder
+        SELECT entity_id, public
         FROM model.file_info;
         """)
     # todo: delete creator and license holder and simplify function
     return {
         row["entity_id"]: {
-            key: row[key] for key in ['public', 'creator', 'license_holder']}
+            key: row[key] for key in ['public']}
         for row in g.cursor}
 
 

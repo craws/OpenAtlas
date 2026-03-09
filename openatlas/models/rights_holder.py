@@ -35,8 +35,26 @@ class RightsHolder:
         update_rights_holder(id_, entry)
 
     @staticmethod
-    def get_rights_holder_links() -> list[dict[str, Any]]:
+    def get_rights_holder_links() -> dict[int, dict[str, list[int]]]:
         return get_rights_holder_links()
+
+    @staticmethod
+    def get_rights_holder_information() -> dict[int, dict[str, list[Entity]]]:
+        rights_holder_dict = {
+            rh.id: rh for rh in RightsHolder.get_rights_holder()}
+        rights_holder_links = RightsHolder.get_rights_holder_links()
+        result: dict[int, dict[str, list[Entity]]] = {}
+        for entity_id, links in rights_holder_links.items():
+            result[entity_id] = {
+                'creator': [
+                    rights_holder_dict[rh_id]
+                    for rh_id in links['creator']
+                    if rh_id in rights_holder_dict],
+                'license_holder': [
+                    rights_holder_dict[rh_id]
+                    for rh_id in links['license_holder']
+                    if rh_id in rights_holder_dict]}
+        return result
 
     @staticmethod
     def insert_rights_holder_link(

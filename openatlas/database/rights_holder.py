@@ -56,15 +56,22 @@ def update_rights_holder(id_: int, entry: dict[str, Any]) -> None:
         {'id': id_, **entry})
 
 
-def get_rights_holder_links() -> list[dict[str, Any]]:
+def get_rights_holder_links() -> dict[int, dict[str, list[int]]]:
     g.cursor.execute(
         """
-        SELECT entity_id,
-               rights_holder_id,
-               role
+        SELECT entity_id, 
+               role, 
+               array_agg(rights_holder_id) as ids
         FROM model.rights_holder_file
+        GROUP BY entity_id, role
         """)
-    return list(g.cursor)
+    result: dict[int, dict[str, list[int]]] = {}
+    for row in g.cursor:
+        eid = row['entity_id']
+        if eid not in result:
+            result[eid] = {'creator': [], 'license_holder': []}
+        result[eid][row['role']] = row['ids']
+    return result
 
 
 def get_rights_holders_by_entity_and_role(
