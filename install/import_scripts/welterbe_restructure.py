@@ -6,11 +6,9 @@ Basically:
 
 To do:
 * Add infos from former places to new cadaster:
-** Type Grundstück Begrenzung -> add to (all) subs
-** Publication status -> to be removed but check if map colors still working
 * Remove former admin units
 * Re-map types of places, features and artifacts
-* Test everything and once looking ok upload online to be tested by others too
+* Remove reference "Grundstücksnr."
 * Test kadaster.gv.at URLs?
 
 """
@@ -68,7 +66,7 @@ def insert_cadasters() -> None:
         name = place.name.replace('F', '.').replace('G', '/').replace('N', '')
         description = ''
         if place.aliases:
-            description = 'Adresse: ' + ', '.join(place.aliases.values()) + '\n'
+            description = f'Adresse: {', '.join(place.aliases.values())}\n'
         if place.description:
             description += place.description
         entity = insert({
@@ -80,6 +78,11 @@ def insert_cadasters() -> None:
             cadaster_mapping[place.cadaster_name])  # type: ignore
         for sub in place.get_linked_entities('P46'):
             entity.link('P89', sub.get_linked_entity_safe('P53'), inverse=True)
+            for type_ in place.types:
+                if type_.root[0] == 530:  # Grundstück Begrenzung
+                    sub.link('P2', type_)
+        for file_ in place.get_linked_entities('P67', ['file'], inverse=True):
+            file_.link('P67', entity)
 
 
 def link_cadasters() -> None:
@@ -104,6 +107,15 @@ def feature_and_artifact_to_place():
         """)
 
 
+def clean_up_hierarchies():
+    # Remove hierarchies that aren't needed anymore
+    for id_ in [29, 81, 186, 189, 228, 229]:
+        hierarchy = g.types[id_]
+        for sub_id in hierarchy.get_sub_ids_recursive():
+            g.types[sub_id].delete()
+        hierarchy.delete()
+
+
 with app.test_request_context():
     app.preprocess_request()
     system = Entity.get_by_id(11611)
@@ -114,5 +126,6 @@ with app.test_request_context():
     insert_cadasters()
     link_cadasters()
     feature_and_artifact_to_place()
+    clean_up_hierarchies()
 
 print(f'Execution time: {int(time.time() - start)} seconds')
