@@ -1,5 +1,5 @@
-<link rel="stylesheet" href="/static/vendor/text-annotation/style.css">
-<script src="/static/vendor/text-annotation/text-annotation.iife.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/text-annotation/style.css', v=config.VERSION) }}">
+<script src="{{ url_for('static', filename='vendor/text-annotation/text-annotation.iife.js', v=config.VERSION) }}"></script>
 <div id="app"></div>
 <script>
   const linkedEntities = {{ field.linked_entities | tojson | safe }};
