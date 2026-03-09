@@ -110,7 +110,7 @@ def crumbs_for_insert(
         [origin, f'+ {entity.class_.label}']
     if entity.class_.group['name'] == 'artifact' and origin and structure:
         if count := len([
-            i for i in structure['siblings']
+                i for i in structure['siblings']
                 if i.class_.name == entity.class_.name]):
             crumbs.append(f' ({count} {_("exists")})')
     return crumbs
@@ -241,7 +241,7 @@ def redirect_url_insert(
                 selection_id=entity.id)
         elif not hasattr(form, 'continue_') or form.continue_.data != 'yes':
             url = url_for('view', id_=origin.id) \
-                + f'#tab-{relation_name.replace('_', '-')}'
+                  + f'#tab-{relation_name.replace('_', '-')}'
     if hasattr(form, 'continue_') \
             and form.continue_.data in ['sub', 'human_remains']:
         class_ = form.continue_.data
@@ -367,13 +367,30 @@ def walk_tree(types: list[int]) -> list[dict[str, Any]]:
     items = []
     for id_ in types:
         item = g.types[id_]
-        count_subs = f' ({format_number(item.count_subs)})' \
-            if item.count_subs else ''
         name = item.name.replace("'", "&apos;")
+
+        count_subs_html = ''
+        if item.count_subs:
+            pill = 'rounded-start-0 rounded-end-pill' if item.selectable \
+                else 'rounded-pill ms-3'
+            classes = f'badge {pill} bg-light small fw-normal text-muted'
+            count_subs_html = (
+                f'<span class="{classes}">'
+                f'+ {format_number(item.count_subs)} subs</span>')
+
+        text: str
         if item.selectable:
-            text = f'{name} {format_number(item.count)}{count_subs}'
+            pill = 'rounded-start-pill rounded-end-0' if item.count_subs \
+                else 'rounded-pill'
+            count_classes = (
+                f'ms-2 badge {pill} bg-primary bg-opacity-10 text-primary')
+            count_html = (
+                f'<span class="{count_classes}">'
+                f'{format_number(item.count)}</span>')
+            text = f'{name} {count_html}{count_subs_html}'
         else:
-            text = f'<span class="text-muted">{name}{count_subs}</span>'
+            text = f'<span class="text-muted">{name}{count_subs_html}</span>'
+
         items.append({
             'id': item.id,
             'href': url_for('view', id_=item.id),
