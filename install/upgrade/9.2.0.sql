@@ -42,4 +42,47 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON model.rights_holder_file FOR EAC
 ALTER TABLE IF EXISTS model.rights_holder_file OWNER to openatlas;
 
 
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'uq_rights_holder_name') THEN
+        ALTER TABLE model.rights_holder ADD CONSTRAINT uq_rights_holder_name UNIQUE (name);
+    END IF;
+END $$;
+
+
+INSERT INTO model.rights_holder (name, class)
+SELECT DISTINCT TRIM(name), 'person'
+FROM (
+    SELECT creator AS name FROM model.file_info WHERE creator IS NOT NULL
+    UNION
+    SELECT license_holder AS name FROM model.file_info WHERE license_holder IS NOT NULL
+) AS all_names
+WHERE TRIM(name) <> ''
+ON CONFLICT (name) DO NOTHING;
+
+
+INSERT INTO model.rights_holder_file (entity_id, rights_holder_id, role)
+SELECT
+    f.entity_id,
+    r.id,
+    'creator'
+FROM model.file_info f
+JOIN model.rights_holder r ON TRIM(f.creator) = r.name
+WHERE f.creator IS NOT NULL AND TRIM(f.creator) <> '';
+
+
+INSERT INTO model.rights_holder_file (entity_id, rights_holder_id, role)
+SELECT
+    f.entity_id,
+    r.id,
+    'license_holder'
+FROM model.file_info f
+JOIN model.rights_holder r ON TRIM(f.license_holder) = r.name
+WHERE f.license_holder IS NOT NULL AND TRIM(f.license_holder) <> '';
+
+
+ALTER TABLE model.file_info
+    DROP COLUMN creator,
+    DROP COLUMN license_holder CASCADE;
+
 END;
