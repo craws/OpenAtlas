@@ -85,4 +85,8 @@ ALTER TABLE model.file_info
     DROP COLUMN creator,
     DROP COLUMN license_holder CASCADE;
 
+
+ALTER TABLE model.rights_holder
+    DROP CONSTRAINT IF EXISTS uq_rights_holder_name;
+
 END;

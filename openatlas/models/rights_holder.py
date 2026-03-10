@@ -1,5 +1,7 @@
 from typing import Any
 
+from flask import g
+
 from openatlas.database.rights_holder import (
     delete_rights_holder_links, get_rights_holder, get_rights_holder_by_id,
     get_rights_holder_links,
@@ -40,8 +42,7 @@ class RightsHolder:
 
     @staticmethod
     def get_rights_holder_information() -> dict[int, dict[str, list[Entity]]]:
-        rights_holder_dict = {
-            rh.id: rh for rh in RightsHolder.get_rights_holder()}
+        rights_holder_dict = {rh.id: rh for rh in g.rights_holder}
         rights_holder_links = RightsHolder.get_rights_holder_links()
         result: dict[int, dict[str, list[Entity]]] = {}
         for entity_id, links in rights_holder_links.items():

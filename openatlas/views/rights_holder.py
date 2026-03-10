@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from typing import Any
 
-from flask import flash, redirect, render_template, request, url_for, abort
+from flask import flash, g, redirect, render_template, request, url_for, abort
 from flask_babel import gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.wrappers import Response
-from wtforms import SelectField, StringField, TextAreaField
+from wtforms import HiddenField, SelectField, StringField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app
@@ -25,8 +25,11 @@ class RightsHolderForm(FlaskForm):
         _('name'),
         [InputRequired()],
         render_kw={'autofocus': True})
-    role: Any = SelectField(_('role'), choices=('person', 'group'))
+    role: Any = SelectField(
+        _('role'),
+        choices=[('person', _('person')), ('group', _('group'))])
     description = TextAreaField(_('info'))
+    confirm_duplicate = HiddenField(default='false')
     save = SubmitField(_('save'))
 
 
@@ -36,13 +39,28 @@ def rights_holder_insert() -> str | Response:  # Todo: move to other file
     form: Any = RightsHolderForm()
 
     if form.validate_on_submit():
-        rights_holder = RightsHolder.insert_rights_holder({
-            'name': sanitize(form.name.data),
-            'role': sanitize(form.role.data),
-            'description': sanitize(form.description.data)})
-        flash(_('created'))  # todo: change name
-        print(rights_holder)
-        return redirect(f'{url_for("admin_index")}#tab-rights-holder')
+        rights_holder_name = sanitize(form.name.data)
+        rights_holder_role = sanitize(form.role.data)
+
+        already_confirmed = form.confirm_duplicate.data == 'true'
+        duplicate = any(
+            rh.name == rights_holder_name
+            and rh.class_.name == rights_holder_role
+            for rh in g.rights_holder)
+
+        if duplicate and not already_confirmed:
+            form.name.errors.append(
+                _('This Name-Role combination already exists. '
+                  'If this is a different person, click "Save" to confirm.'))
+            form.confirm_duplicate.data = 'true'
+        else:
+            RightsHolder.insert_rights_holder({
+                'name': rights_holder_name,
+                'role': rights_holder_role,
+                'description': sanitize(form.description.data)})
+            flash(_('entity created'))
+            return redirect(f'{url_for("admin_index")}#tab-rights-holder')
+
     return render_template(
         'tabs.html',
         tabs={

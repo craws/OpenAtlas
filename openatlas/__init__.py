@@ -112,7 +112,7 @@ def setup_files() -> None:
     if g.settings['iiif'] and g.settings['iiif_path']:
         g.writable_paths.append(g.settings['iiif_path'])
     file_info = Entity.get_file_info()
-
+    g.rights_holder = RightsHolder.get_rights_holder()
     rights_holder_info = RightsHolder.get_rights_holder_information()
     for file_id, info in file_info.items():
         rights = rights_holder_info.get(file_id, {})
