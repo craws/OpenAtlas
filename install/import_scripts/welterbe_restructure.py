@@ -5,7 +5,7 @@ Basically:
 * Feature and artifacts -> Places
 
 To do:
-* Check reference systems
+* re-map UNESCO Welterbe Objekt ID
 * Re-map types of places, features and artifacts
 * Test kadaster.gv.at URLs?
 
