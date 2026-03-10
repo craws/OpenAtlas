@@ -416,8 +416,13 @@ class Display:
             if name in ['creator', 'license_holder']:
                 if value := getattr(self.entity, name):
                     names = [rh.name for rh in value]
+                    # todo: start again from here
+                    # todo: make a button
+                    link_ = link(f'+ {name}', url_for('rights_holder_insert'))
                     # todo: if RH gets an own view, then make a link
-                    self.data[attribute['label']] = str('<br>'.join(names))
+                    html = f'{link_}<br>{str('<br>'.join(names))}'
+
+                    self.data[attribute['label']] = html
             if name in ['example_id', 'public', 'resolver_url', 'website_url']:
                 if value := getattr(self.entity, name):
                     if isinstance(value, bool):
