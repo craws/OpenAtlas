@@ -109,3 +109,11 @@ def rights_holder_update(
         crumbs=[
             [_('admin'), f'{url_for("admin_index")}#tab-rights-holder'],
             f'{uc_first(_("rights holder"))}: {rights_holder.name}'])
+
+
+@app.route('/rights_holder_delete/<int:id_>', methods=['GET', 'POST'])
+@required_group('manager')
+def rights_holder_delete(id_: int) -> str | Response:
+    RightsHolder.rights_holder_delete(id_)
+    flash(_('entity deleted'))
+    return redirect(f'{url_for("admin_index")}#tab-rights-holder')

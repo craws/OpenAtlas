@@ -201,7 +201,10 @@ def get_rights_holder_table() -> Table:
             holder.class_.name,
             link(
                 _('edit'),
-                url_for('rights_holder_update', id_=holder.id))]
+                url_for('rights_holder_update', id_=holder.id)),
+            link(
+                _('delete'),
+                url_for('rights_holder_delete', id_=holder.id))]
         table.rows.append(row)
     return table
 

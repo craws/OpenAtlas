@@ -44,6 +44,15 @@ def insert_rights_holder(entry: dict[str, Any]) -> int:
     return g.cursor.fetchone()['id']
 
 
+def rights_holder_delete(id_: int) -> None:
+    g.cursor.execute(
+        """
+        DELETE FROM model.rights_holder
+        WHERE id = %(id)s
+        """,
+        {'id': id_})
+
+
 def update_rights_holder(id_: int, entry: dict[str, Any]) -> None:
     g.cursor.execute(
         """

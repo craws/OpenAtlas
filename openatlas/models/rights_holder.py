@@ -6,7 +6,7 @@ from openatlas.database.rights_holder import (
     delete_rights_holder_links, get_rights_holder, get_rights_holder_by_id,
     get_rights_holder_links,
     get_rights_holders_by_entity_and_role, insert_rights_holder,
-    insert_rights_holder_link, update_rights_holder)
+    insert_rights_holder_link, rights_holder_delete, update_rights_holder)
 from openatlas.models.entity import Entity
 
 
@@ -35,6 +35,10 @@ class RightsHolder:
     @staticmethod
     def update_rights_holder(id_: int, entry: dict[str, Any]) -> None:
         update_rights_holder(id_, entry)
+
+    @staticmethod
+    def rights_holder_delete(id_: int) -> None:
+        rights_holder_delete(id_)
 
     @staticmethod
     def get_rights_holder_links() -> dict[int, dict[str, list[int]]]:
