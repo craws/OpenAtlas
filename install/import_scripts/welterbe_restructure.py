@@ -5,10 +5,8 @@ Basically:
 * Feature and artifacts -> Places
 
 To do:
-* Add infos from former places to new cadaster:
-* Remove former admin units
+* Check reference systems
 * Re-map types of places, features and artifacts
-* Remove reference "Grundstücksnr."
 * Test kadaster.gv.at URLs?
 
 """
@@ -114,6 +112,7 @@ def clean_up_hierarchies():
         for sub_id in hierarchy.get_sub_ids_recursive():
             g.types[sub_id].delete()
         hierarchy.delete()
+    Entity.get_by_id(969).delete()  # Remove reference "Grundstücksnr."
 
 
 with app.test_request_context():
