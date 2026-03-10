@@ -69,8 +69,8 @@ class Entity:
                     setattr(self, name, value)
         if self.class_.name == 'file':
             self.public = False
-            self.creator = None
-            self.license_holder = None
+            self.creator = []
+            self.license_holder = []
             if self.id in g.file_info:
                 self.public = g.file_info[self.id]['public']
                 self.creator = g.file_info[self.id]['creator']

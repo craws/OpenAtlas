@@ -413,9 +413,12 @@ class Display:
                 f'<span title="{var}">{link(self.entity.standard_type)}</span>'
         self.data.update(self.get_type_data())
         for name, attribute in self.entity.class_.attributes.items():
-            if name in [
-                    'creator', 'example_id', 'license_holder', 'public',
-                    'resolver_url', 'website_url']:
+            if name in ['creator', 'license_holder']:
+                if value := getattr(self.entity, name):
+                    names = [rh.name for rh in value]
+                    # todo: if RH gets an own view, then make a link
+                    self.data[attribute['label']] = str('<br>'.join(names))
+            if name in ['example_id', 'public', 'resolver_url', 'website_url']:
                 if value := getattr(self.entity, name):
                     if isinstance(value, bool):
                         value = display_bool(value)
