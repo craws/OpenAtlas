@@ -376,7 +376,7 @@ def walk_tree(types: list[int]) -> list[dict[str, Any]]:
             classes = f'badge {pill} bg-light small fw-normal text-muted'
             count_subs_html = (
                 f'<span class="{classes}">'
-                f'+ {format_number(item.count_subs)} subs</span>')
+                f'+ {format_number(item.count_subs)} {_('in subs')}</span>')
 
         text: str
         if item.selectable:
