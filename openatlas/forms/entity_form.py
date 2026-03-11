@@ -40,18 +40,15 @@ def get_entity_form(
     for key, value in entity.class_.attributes.items():
         match key:
             case 'creator' | 'license_holder':
-                # Todo, second argument should be a selection (e.g. only which are linked)
+                selection = RightsHolder.get_rights_holders_by_entity_and_role(
+                    entity.id,
+                    key)
                 setattr(
                     Form,
                     key,
                     TableMultiField(
                         RightsHolder.get_rights_holder(),
-                        RightsHolder.get_rights_holders_by_entity_and_role(entity.id, key),
-                        # description=relation.tooltip,
-                        # label=relation.label
-                        ))
-                print(RightsHolder.get_rights_holders_by_entity_and_role(entity.id, key))
-
+                        selection))
             case 'example_id' | 'resolver_url' | 'website_url':
                 setattr(
                     Form,

@@ -118,8 +118,6 @@ def setup_files() -> None:
         rights = rights_holder_info.get(file_id, {})
         info['creator'] = rights.get('creator', [])
         info['license_holder'] = rights.get('license_holder', [])
-
-    # todo: start here again. Dict is merged, next step is to change Entity and the display.
     g.file_info = file_info
 
 def setup_api() -> None:

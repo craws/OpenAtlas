@@ -246,7 +246,7 @@ class IIIFManifest(Resource):
             raise DisplayFileNotFoundError
         license_ = get_license_name(entity)
         if entity.license_holder:
-            license_ = f'{license_}, {entity.license_holder}'
+            license_ = f'{license_}, {', '.join(entity.license_holder)}'
         metadata = []
         if references := entity.get_links('P67', inverse=True):
             for reference in references:

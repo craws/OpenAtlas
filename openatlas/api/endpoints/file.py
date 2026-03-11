@@ -84,8 +84,8 @@ class LicensedFileOverview(Resource):
                     filename=path.stem,
                     _external=True),
                 'license': license_,
-                'creator': entity.creator,
-                'licenseHolder': entity.license_holder,
+                'creator': ', '.join(entity.creator),
+                'licenseHolder': ', '.join(entity.license_holder),
                 'publicShareable': entity.public,
                 'IIIFManifest': iiif_manifest}
         if parser['download']:
@@ -128,8 +128,8 @@ class EntityFiles(Resource):
             'id': entity.id,
             'title': entity.name,
             'license': get_license_name(entity),
-            'creator': entity.creator,
-            'licenseHolder': entity.license_holder,
+            'creator': ', '.join(entity.creator),
+            'licenseHolder': ', '.join(entity.license_holder),
             'publicShareable': entity.public,
             'mimetype': mime_type,
             'url': url}

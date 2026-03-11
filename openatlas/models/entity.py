@@ -73,8 +73,10 @@ class Entity:
             self.license_holder = []
             if self.id in g.file_info:
                 self.public = g.file_info[self.id]['public']
-                self.creator = g.file_info[self.id]['creator']
-                self.license_holder = g.file_info[self.id]['license_holder']
+                self.creator = [
+                    c.name for c in g.file_info[self.id]['creator']]
+                self.license_holder = [
+                    lh.name for lh in g.file_info[self.id]['license_holder']]
         if self.class_.name == 'reference_system' and 'website_url' in data:
             self.website_url = data['website_url']
             self.resolver_url = data['resolver_url']
@@ -215,24 +217,21 @@ class Entity:
         from openatlas.models.rights_holder import RightsHolder
         db.update_file_info({
             'entity_id': self.id,
-            'creator': data.get('creator'),
-            'license_holder': data.get('license_holder'),
             'public': data.get('public', False)})
-        # todo: this deletes all links. Better would be that we compare
-        #  and update the entries
         RightsHolder.delete_rights_holder_links(self.id)
-        # todo: as.literal_eval is only a prototype, better solution?
-        for creator_id in ast.literal_eval(data.get('creator', [])):
-            RightsHolder.insert_rights_holder_link(
-                self.id,
-                creator_id,
-                'creator')
-        for license_holder_id in ast.literal_eval(
-                data.get('license_holder', [])):
-            RightsHolder.insert_rights_holder_link(
-                self.id,
-                license_holder_id,
-                'license_holder')
+        if data.get('creator'):
+            for creator_id in ast.literal_eval(data.get('creator')):
+                RightsHolder.insert_rights_holder_link(
+                    self.id,
+                    creator_id,
+                    'creator')
+        if data.get('license_holder'):
+            for license_holder_id in ast.literal_eval(
+                    data.get('license_holder')):
+                RightsHolder.insert_rights_holder_link(
+                    self.id,
+                    license_holder_id,
+                    'license_holder')
 
     def update(self, data: dict[str, Any]) -> None:
         data['id'] = self.id

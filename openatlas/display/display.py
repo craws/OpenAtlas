@@ -415,13 +415,13 @@ class Display:
         for name, attribute in self.entity.class_.attributes.items():
             if name in ['creator', 'license_holder']:
                 if value := getattr(self.entity, name):
-                    names = [rh.name for rh in value]
-                    # todo: start again from here
-                    # todo: make a button
-                    link_ = link(f'+ {name}', url_for('rights_holder_insert', origin_id=self.entity.id, relation=name))
-                    # todo: if RH gets an own view, then make a link
-                    html = f'{link_}<br>{str('<br>'.join(names))}'
-
+                    link_ = link(
+                        f'+ {name}',
+                        url_for(
+                            'rights_holder_insert',
+                            origin_id=self.entity.id,
+                            relation=name))
+                    html = f'{link_}<br>{str('<br>'.join(value))}'
                     self.data[attribute['label']] = html
             if name in ['example_id', 'public', 'resolver_url', 'website_url']:
                 if value := getattr(self.entity, name):

@@ -55,17 +55,19 @@ def get_digital_object_details(
                 _external=True),
             "type": "DigitalObject"}]})
     if entity.license_holder:
-        digital_object.update({
-            'right_held_by': [{
-                '_label': entity.license_holder,
-                'type': 'Actor'}]})
+        for license_holder in entity.license_holder:
+            digital_object.update({
+                'right_held_by': [{
+                    '_label': license_holder,
+                    'type': 'Actor'}]})
     if entity.creator:
-        digital_object.update({'created_by': [{
-            '_label': f'Creation of {entity.name}',
-            'type': 'Creation',
-            'carried_out_by': [{
-                '_label': entity.creator,
-                'type': 'Actor'}]}]})
+        for creator in entity.creator:
+            digital_object.update({'created_by': [{
+                '_label': f'Creation of {entity.name}',
+                'type': 'Creation',
+                'carried_out_by': [{
+                    '_label': creator,
+                    'type': 'Actor'}]}]})
     if license_ := get_license_type(entity):
         subject_to: dict[str, Any] = {
             'type': "Right",

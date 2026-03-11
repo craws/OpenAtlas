@@ -22,8 +22,7 @@ CREATE TABLE IF NOT EXISTS model.rights_holder_file
     id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),
     entity_id integer NOT NULL,
     rights_holder_id integer NOT NULL,
-    role text NOT NULL,
-    description text,
+    description text NOT NULL,
     CONSTRAINT rights_holder_file_pkey PRIMARY KEY (id),
     CONSTRAINT fk_entity FOREIGN KEY (entity_id)
         REFERENCES model.entity (id) MATCH SIMPLE
@@ -61,7 +60,7 @@ WHERE TRIM(name) <> ''
 ON CONFLICT (name) DO NOTHING;
 
 
-INSERT INTO model.rights_holder_file (entity_id, rights_holder_id, role)
+INSERT INTO model.rights_holder_file (entity_id, rights_holder_id, description)
 SELECT
     f.entity_id,
     r.id,
@@ -71,7 +70,7 @@ JOIN model.rights_holder r ON TRIM(f.creator) = r.name
 WHERE f.creator IS NOT NULL AND TRIM(f.creator) <> '';
 
 
-INSERT INTO model.rights_holder_file (entity_id, rights_holder_id, role)
+INSERT INTO model.rights_holder_file (entity_id, rights_holder_id, description)
 SELECT
     f.entity_id,
     r.id,

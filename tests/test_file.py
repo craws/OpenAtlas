@@ -50,13 +50,15 @@ class FileTest(TestBaseCase):
                     str(license_type.id): license_type.subs[0]},
                 follow_redirects=True)
         assert b'An entry has been created' in rv.data
-
+        with app.test_request_context():
+            app.preprocess_request()
+            rights_holder_ids = [rh.id for rh in g.rights_holder]
         with open(logo, 'rb') as img:
             data = {
                 'name': 'IIIF File',
                 'file': img,
-                'creator': 'Max',
-                'license_holder': 'Moritz',
+                'creator': f'{rights_holder_ids}',
+                'license_holder': f'{rights_holder_ids}',
                 'public': True}
             rv = c.post(url_for('insert', class_='file'), data=data)
             iiif_id = rv.location.split('/')[-1]

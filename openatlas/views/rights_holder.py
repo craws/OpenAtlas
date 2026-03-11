@@ -20,7 +20,6 @@ from openatlas.models.entity import Entity
 from openatlas.models.rights_holder import RightsHolder
 
 
-# todo: Select fields need to get openatlas class name from config model
 class RightsHolderForm(FlaskForm):
     name: Any = StringField(
         _('name'),
@@ -41,7 +40,7 @@ class RightsHolderForm(FlaskForm):
 @required_group('contributor')
 def rights_holder_insert(
         origin_id: int | None = None,
-        relation: str | None = None) -> str | Response:  # Todo: move to other file
+        relation: str | None = None) -> str | Response:
     form: Any = RightsHolderForm()
 
     if form.validate_on_submit():
@@ -53,7 +52,7 @@ def rights_holder_insert(
             rh.name == rights_holder_name
             and rh.class_.name == rights_holder_role
             for rh in g.rights_holder)
-        url =f'{url_for("admin_index")}#tab-rights-holder'
+        url = f'{url_for("admin_index")}#tab-rights-holder'
         if duplicate and not already_confirmed:
             form.name.errors.append(
                 _('This Name-Role combination already exists. '
@@ -93,7 +92,7 @@ def rights_holder_insert(
 @app.route('/rights_holder_update/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def rights_holder_update(
-        id_: int) -> str | Response:  # Todo: move to other file
+        id_: int) -> str | Response:
     rights_holder = RightsHolder.get_rights_holder_by_id(id_)
     if not rights_holder:
         abort(404)

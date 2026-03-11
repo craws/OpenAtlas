@@ -354,24 +354,18 @@ def link(data: dict[str, Any]) -> int:
         data)
     return g.cursor.fetchone()['id']
 
-# todo: remove creator and license_holder
+
 def update_file_info(data: dict[str, Any]) -> None:
     g.cursor.execute(
         """
         INSERT INTO model.file_info (
             entity_id,
-            public,
-            creator,
-            license_holder
+            public
         ) VALUES (
             %(entity_id)s,
-            %(public)s,
-            %(creator)s,
-            %(license_holder)s
+            %(public)s
         ) ON CONFLICT (entity_id) DO UPDATE SET
-            public = %(public)s,
-            creator = %(creator)s,
-            license_holder = %(license_holder)s;
+            public = %(public)s
         """,
         data)
 
@@ -382,11 +376,7 @@ def get_file_info() -> dict[int, dict[str, Any]]:
         SELECT entity_id, public
         FROM model.file_info;
         """)
-    # todo: delete creator and license holder and simplify function
-    return {
-        row["entity_id"]: {
-            key: row[key] for key in ['public']}
-        for row in g.cursor}
+    return {row['entity_id']: {'public': row['public']} for row in g.cursor}
 
 
 def get_entity_ids_with_links(

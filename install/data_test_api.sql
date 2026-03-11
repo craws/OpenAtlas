@@ -188,12 +188,26 @@ ON CONFLICT (entity_id) DO UPDATE SET image_id=(SELECT id FROM model.entity WHER
 INSERT INTO web.map_overlay (image_id, bounding_box)
         VALUES ((SELECT id FROM model.entity WHERE name='Picture with a License'), '[[48.58653,15.64356],[48.58709,15.64294]]');
 
-INSERT INTO model.file_info (entity_id, public, creator, license_holder)
+INSERT INTO model.file_info (entity_id, public)
 VALUES
-    ((SELECT id FROM model.entity WHERE name='File without license'), TRUE, 'https://viaf.org/viaf/95218067', NULL ),
-    ((SELECT id FROM model.entity WHERE name='File without file'), TRUE, NULL, 'Sam' ),
-    ((SELECT id FROM model.entity WHERE name='Picture with a License'), TRUE, 'https://viaf.org/viaf/95218067', 'Sauron' ),
-    ((SELECT id FROM model.entity WHERE name='File not public'), FALSE, 'Sauron', NULL );
+    ((SELECT id FROM model.entity WHERE name='File without license'), TRUE),
+    ((SELECT id FROM model.entity WHERE name='File without file'), TRUE),
+    ((SELECT id FROM model.entity WHERE name='Picture with a License'), TRUE),
+    ((SELECT id FROM model.entity WHERE name='File not public'), FALSE);
+
+INSERT INTO model.rights_holder (name, class, description)
+VALUES
+    ( 'https://viaf.org/viaf/95218067', 'person', 'John Ronald Reuel Tolkien' ),
+    ( 'Sam', 'person', 'This is Sam' ),
+    ('Sauron', 'person', 'This is Sauron');
+
+INSERT INTO model.rights_holder_file (entity_id, rights_holder_id, description)
+VALUES
+    ((SELECT id FROM model.entity WHERE name='File without license'), (SELECT id FROM model.rights_holder WHERE name='https://viaf.org/viaf/95218067'), 'creator'),
+    ((SELECT id FROM model.entity WHERE name='File without file'), (SELECT id FROM model.rights_holder WHERE name='Sam'), 'license_holder'),
+    ((SELECT id FROM model.entity WHERE name='Picture with a License'), (SELECT id FROM model.rights_holder WHERE name='https://viaf.org/viaf/95218067'), 'creator'),
+    ((SELECT id FROM model.entity WHERE name='Picture with a License'), (SELECT id FROM model.rights_holder WHERE name='Sauron'), 'license_holder'),
+    ((SELECT id FROM model.entity WHERE name='File not public'), (SELECT id FROM model.rights_holder WHERE name='Sauron'), 'creator');
 
 UPDATE model.entity
 SET begin_from = CURRENT_DATE

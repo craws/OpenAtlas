@@ -2,12 +2,13 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 15.14 (Debian 15.14-0+deb12u1)
--- Dumped by pg_dump version 15.14 (Debian 15.14-0+deb12u1)
+-- Dumped from database version 17.8 (Debian 17.8-0+deb13u1)
+-- Dumped by pg_dump version 17.8 (Debian 17.8-0+deb13u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -47,6 +48,8 @@ ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_range_id_fk
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_property_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_domain_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.gis DROP CONSTRAINT IF EXISTS gis_entity_id_fkey;
+ALTER TABLE IF EXISTS ONLY model.rights_holder_file DROP CONSTRAINT IF EXISTS fk_rights_holder;
+ALTER TABLE IF EXISTS ONLY model.rights_holder_file DROP CONSTRAINT IF EXISTS fk_entity;
 ALTER TABLE IF EXISTS ONLY model.file_info DROP CONSTRAINT IF EXISTS file_info_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_openatlas_class_name_fkey;
 ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_class_code_fkey;
@@ -70,6 +73,8 @@ DROP TRIGGER IF EXISTS update_modified ON web.i18n;
 DROP TRIGGER IF EXISTS update_modified ON web.hierarchy_openatlas_class;
 DROP TRIGGER IF EXISTS update_modified ON web.hierarchy;
 DROP TRIGGER IF EXISTS update_modified ON web."group";
+DROP TRIGGER IF EXISTS update_modified ON model.rights_holder_file;
+DROP TRIGGER IF EXISTS update_modified ON model.rights_holder;
 DROP TRIGGER IF EXISTS update_modified ON model.link;
 DROP TRIGGER IF EXISTS update_modified ON model.gis;
 DROP TRIGGER IF EXISTS update_modified ON model.file_info;
@@ -110,6 +115,8 @@ ALTER TABLE IF EXISTS ONLY web."group" DROP CONSTRAINT IF EXISTS group_name_key;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_pkey;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_entity_id_key;
 ALTER TABLE IF EXISTS ONLY web.type_none_selectable DROP CONSTRAINT IF EXISTS entity_id_key;
+ALTER TABLE IF EXISTS ONLY model.rights_holder DROP CONSTRAINT IF EXISTS rights_holder_pkey;
+ALTER TABLE IF EXISTS ONLY model.rights_holder_file DROP CONSTRAINT IF EXISTS rights_holder_file_pkey;
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_pkey;
 ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_pkey;
 ALTER TABLE IF EXISTS ONLY model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_property_code_language_code_key;
@@ -197,6 +204,8 @@ DROP SEQUENCE IF EXISTS web.group_id_seq;
 DROP TABLE IF EXISTS web."group";
 DROP SEQUENCE IF EXISTS web.entity_profile_image_id_seq;
 DROP TABLE IF EXISTS web.entity_profile_image;
+DROP TABLE IF EXISTS model.rights_holder_file;
+DROP TABLE IF EXISTS model.rights_holder;
 DROP SEQUENCE IF EXISTS model.property_inheritance_id_seq;
 DROP TABLE IF EXISTS model.property_inheritance;
 DROP SEQUENCE IF EXISTS model.property_id_seq;
@@ -363,7 +372,7 @@ CREATE SEQUENCE import.entity_id_seq
     CACHE 1;
 
 
-ALTER TABLE import.entity_id_seq OWNER TO openatlas;
+ALTER SEQUENCE import.entity_id_seq OWNER TO openatlas;
 
 --
 -- Name: entity_id_seq; Type: SEQUENCE OWNED BY; Schema: import; Owner: openatlas
@@ -399,7 +408,7 @@ CREATE SEQUENCE import.project_id_seq
     CACHE 1;
 
 
-ALTER TABLE import.project_id_seq OWNER TO openatlas;
+ALTER SEQUENCE import.project_id_seq OWNER TO openatlas;
 
 --
 -- Name: project_id_seq; Type: SEQUENCE OWNED BY; Schema: import; Owner: openatlas
@@ -437,7 +446,7 @@ CREATE SEQUENCE model.annotation_image_id_seq
     CACHE 1;
 
 
-ALTER TABLE model.annotation_image_id_seq OWNER TO openatlas;
+ALTER SEQUENCE model.annotation_image_id_seq OWNER TO openatlas;
 
 --
 -- Name: annotation_image_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
@@ -458,7 +467,7 @@ CREATE SEQUENCE model.annotation_text_id_seq
     CACHE 1;
 
 
-ALTER TABLE model.annotation_text_id_seq OWNER TO openatlas;
+ALTER SEQUENCE model.annotation_text_id_seq OWNER TO openatlas;
 
 --
 -- Name: annotation_text; Type: TABLE; Schema: model; Owner: openatlas
@@ -532,7 +541,7 @@ CREATE SEQUENCE model.cidoc_class_i18n_id_seq
     CACHE 1;
 
 
-ALTER TABLE model.cidoc_class_i18n_id_seq OWNER TO openatlas;
+ALTER SEQUENCE model.cidoc_class_i18n_id_seq OWNER TO openatlas;
 
 --
 -- Name: cidoc_class_i18n_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
@@ -553,7 +562,7 @@ CREATE SEQUENCE model.cidoc_class_id_seq
     CACHE 1;
 
 
-ALTER TABLE model.cidoc_class_id_seq OWNER TO openatlas;
+ALTER SEQUENCE model.cidoc_class_id_seq OWNER TO openatlas;
 
 --
 -- Name: cidoc_class_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
@@ -587,7 +596,7 @@ CREATE SEQUENCE model.cidoc_class_inheritance_id_seq
     CACHE 1;
 
 
-ALTER TABLE model.cidoc_class_inheritance_id_seq OWNER TO openatlas;
+ALTER SEQUENCE model.cidoc_class_inheritance_id_seq OWNER TO openatlas;
 
 --
 -- Name: cidoc_class_inheritance_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
@@ -632,7 +641,7 @@ CREATE SEQUENCE model.entity_id_seq
     CACHE 1;
 
 
-ALTER TABLE model.entity_id_seq OWNER TO openatlas;
+ALTER SEQUENCE model.entity_id_seq OWNER TO openatlas;
 
 --
 -- Name: entity_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
@@ -653,7 +662,7 @@ CREATE SEQUENCE model.file_info_id_seq
     CACHE 1;
 
 
-ALTER TABLE model.file_info_id_seq OWNER TO openatlas;
+ALTER SEQUENCE model.file_info_id_seq OWNER TO openatlas;
 
 --
 -- Name: file_info; Type: TABLE; Schema: model; Owner: openatlas
@@ -663,8 +672,6 @@ CREATE TABLE model.file_info (
     id integer DEFAULT nextval('model.file_info_id_seq'::regclass) NOT NULL,
     entity_id integer,
     public boolean DEFAULT false,
-    creator text,
-    license_holder text,
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone
 );
@@ -713,7 +720,7 @@ CREATE SEQUENCE model.gis_id_seq
     CACHE 1;
 
 
-ALTER TABLE model.gis_id_seq OWNER TO openatlas;
+ALTER SEQUENCE model.gis_id_seq OWNER TO openatlas;
 
 --
 -- Name: gis_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
@@ -758,7 +765,7 @@ CREATE SEQUENCE model.link_id_seq
     CACHE 1;
 
 
-ALTER TABLE model.link_id_seq OWNER TO openatlas;
+ALTER SEQUENCE model.link_id_seq OWNER TO openatlas;
 
 --
 -- Name: link_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
@@ -803,7 +810,7 @@ CREATE SEQUENCE model.openatlas_class_id_seq
     CACHE 1;
 
 
-ALTER TABLE model.openatlas_class_id_seq OWNER TO openatlas;
+ALTER SEQUENCE model.openatlas_class_id_seq OWNER TO openatlas;
 
 --
 -- Name: openatlas_class_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
@@ -856,7 +863,7 @@ CREATE SEQUENCE model.property_i18n_id_seq
     CACHE 1;
 
 
-ALTER TABLE model.property_i18n_id_seq OWNER TO openatlas;
+ALTER SEQUENCE model.property_i18n_id_seq OWNER TO openatlas;
 
 --
 -- Name: property_i18n_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
@@ -877,7 +884,7 @@ CREATE SEQUENCE model.property_id_seq
     CACHE 1;
 
 
-ALTER TABLE model.property_id_seq OWNER TO openatlas;
+ALTER SEQUENCE model.property_id_seq OWNER TO openatlas;
 
 --
 -- Name: property_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
@@ -911,13 +918,73 @@ CREATE SEQUENCE model.property_inheritance_id_seq
     CACHE 1;
 
 
-ALTER TABLE model.property_inheritance_id_seq OWNER TO openatlas;
+ALTER SEQUENCE model.property_inheritance_id_seq OWNER TO openatlas;
 
 --
 -- Name: property_inheritance_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
 --
 
 ALTER SEQUENCE model.property_inheritance_id_seq OWNED BY model.property_inheritance.id;
+
+
+--
+-- Name: rights_holder; Type: TABLE; Schema: model; Owner: openatlas
+--
+
+CREATE TABLE model.rights_holder (
+    id integer NOT NULL,
+    name text NOT NULL,
+    class text NOT NULL,
+    description text,
+    created timestamp without time zone DEFAULT now() NOT NULL,
+    modified timestamp without time zone
+);
+
+
+ALTER TABLE model.rights_holder OWNER TO openatlas;
+
+--
+-- Name: rights_holder_file; Type: TABLE; Schema: model; Owner: openatlas
+--
+
+CREATE TABLE model.rights_holder_file (
+    id integer NOT NULL,
+    entity_id integer NOT NULL,
+    rights_holder_id integer NOT NULL,
+    description text NOT NULL,
+    created timestamp without time zone DEFAULT now() NOT NULL,
+    modified timestamp without time zone
+);
+
+
+ALTER TABLE model.rights_holder_file OWNER TO openatlas;
+
+--
+-- Name: rights_holder_file_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE model.rights_holder_file ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME model.rights_holder_file_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
+-- Name: rights_holder_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE model.rights_holder ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME model.rights_holder_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
 
 
 --
@@ -946,7 +1013,7 @@ CREATE SEQUENCE web.entity_profile_image_id_seq
     CACHE 1;
 
 
-ALTER TABLE web.entity_profile_image_id_seq OWNER TO openatlas;
+ALTER SEQUENCE web.entity_profile_image_id_seq OWNER TO openatlas;
 
 --
 -- Name: entity_profile_image_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
@@ -981,7 +1048,7 @@ CREATE SEQUENCE web.group_id_seq
     CACHE 1;
 
 
-ALTER TABLE web.group_id_seq OWNER TO openatlas;
+ALTER SEQUENCE web.group_id_seq OWNER TO openatlas;
 
 --
 -- Name: group_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
@@ -1050,7 +1117,7 @@ CREATE SEQUENCE web.hierarchy_form_id_seq
     CACHE 1;
 
 
-ALTER TABLE web.hierarchy_form_id_seq OWNER TO openatlas;
+ALTER SEQUENCE web.hierarchy_form_id_seq OWNER TO openatlas;
 
 --
 -- Name: hierarchy_form_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
@@ -1071,7 +1138,7 @@ CREATE SEQUENCE web.hierarchy_id_seq
     CACHE 1;
 
 
-ALTER TABLE web.hierarchy_id_seq OWNER TO openatlas;
+ALTER SEQUENCE web.hierarchy_id_seq OWNER TO openatlas;
 
 --
 -- Name: hierarchy_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
@@ -1108,7 +1175,7 @@ CREATE SEQUENCE web.i18n_id_seq
     CACHE 1;
 
 
-ALTER TABLE web.i18n_id_seq OWNER TO openatlas;
+ALTER SEQUENCE web.i18n_id_seq OWNER TO openatlas;
 
 --
 -- Name: i18n_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
@@ -1146,7 +1213,7 @@ CREATE SEQUENCE web.log_id_seq
     CACHE 1;
 
 
-ALTER TABLE web.log_id_seq OWNER TO openatlas;
+ALTER SEQUENCE web.log_id_seq OWNER TO openatlas;
 
 --
 -- Name: log_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
@@ -1182,7 +1249,7 @@ CREATE SEQUENCE web.map_overlay_id_seq
     CACHE 1;
 
 
-ALTER TABLE web.map_overlay_id_seq OWNER TO openatlas;
+ALTER SEQUENCE web.map_overlay_id_seq OWNER TO openatlas;
 
 --
 -- Name: map_overlay_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
@@ -1242,7 +1309,7 @@ CREATE SEQUENCE web.reference_system_form_id_seq
     CACHE 1;
 
 
-ALTER TABLE web.reference_system_form_id_seq OWNER TO openatlas;
+ALTER SEQUENCE web.reference_system_form_id_seq OWNER TO openatlas;
 
 --
 -- Name: reference_system_form_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
@@ -1276,7 +1343,7 @@ CREATE SEQUENCE web.settings_id_seq
     CACHE 1;
 
 
-ALTER TABLE web.settings_id_seq OWNER TO openatlas;
+ALTER SEQUENCE web.settings_id_seq OWNER TO openatlas;
 
 --
 -- Name: settings_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
@@ -1318,7 +1385,7 @@ CREATE SEQUENCE web.type_none_selectable_id_seq
     CACHE 1;
 
 
-ALTER TABLE web.type_none_selectable_id_seq OWNER TO openatlas;
+ALTER SEQUENCE web.type_none_selectable_id_seq OWNER TO openatlas;
 
 --
 -- Name: type_none_selectable_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
@@ -1380,7 +1447,7 @@ CREATE SEQUENCE web.user_bookmarks_id_seq
     CACHE 1;
 
 
-ALTER TABLE web.user_bookmarks_id_seq OWNER TO openatlas;
+ALTER SEQUENCE web.user_bookmarks_id_seq OWNER TO openatlas;
 
 --
 -- Name: user_bookmarks_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
@@ -1401,7 +1468,7 @@ CREATE SEQUENCE web.user_id_seq
     CACHE 1;
 
 
-ALTER TABLE web.user_id_seq OWNER TO openatlas;
+ALTER SEQUENCE web.user_id_seq OWNER TO openatlas;
 
 --
 -- Name: user_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
@@ -1437,7 +1504,7 @@ CREATE SEQUENCE web.user_log_id_seq
     CACHE 1;
 
 
-ALTER TABLE web.user_log_id_seq OWNER TO openatlas;
+ALTER SEQUENCE web.user_log_id_seq OWNER TO openatlas;
 
 --
 -- Name: user_log_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
@@ -1475,7 +1542,7 @@ CREATE SEQUENCE web.user_notes_id_seq
     CACHE 1;
 
 
-ALTER TABLE web.user_notes_id_seq OWNER TO openatlas;
+ALTER SEQUENCE web.user_notes_id_seq OWNER TO openatlas;
 
 --
 -- Name: user_notes_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
@@ -1512,7 +1579,7 @@ CREATE SEQUENCE web.user_settings_id_seq
     CACHE 1;
 
 
-ALTER TABLE web.user_settings_id_seq OWNER TO openatlas;
+ALTER SEQUENCE web.user_settings_id_seq OWNER TO openatlas;
 
 --
 -- Name: user_settings_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
@@ -1553,7 +1620,7 @@ CREATE SEQUENCE web.user_tokens_id_seq
     CACHE 1;
 
 
-ALTER TABLE web.user_tokens_id_seq OWNER TO openatlas;
+ALTER SEQUENCE web.user_tokens_id_seq OWNER TO openatlas;
 
 --
 -- Name: user_tokens_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
@@ -1966,6 +2033,22 @@ ALTER TABLE ONLY model.property
 
 
 --
+-- Name: rights_holder_file rights_holder_file_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.rights_holder_file
+    ADD CONSTRAINT rights_holder_file_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: rights_holder rights_holder_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.rights_holder
+    ADD CONSTRAINT rights_holder_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: type_none_selectable entity_id_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
@@ -2278,6 +2361,20 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON model.link FOR EACH ROW EXECUTE 
 
 
 --
+-- Name: rights_holder update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+--
+
+CREATE TRIGGER update_modified BEFORE UPDATE ON model.rights_holder FOR EACH ROW EXECUTE FUNCTION model.update_modified();
+
+
+--
+-- Name: rights_holder_file update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+--
+
+CREATE TRIGGER update_modified BEFORE UPDATE ON model.rights_holder_file FOR EACH ROW EXECUTE FUNCTION model.update_modified();
+
+
+--
 -- Name: group update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
@@ -2449,6 +2546,22 @@ ALTER TABLE ONLY model.entity
 
 ALTER TABLE ONLY model.file_info
     ADD CONSTRAINT file_info_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: rights_holder_file fk_entity; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.rights_holder_file
+    ADD CONSTRAINT fk_entity FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON DELETE CASCADE;
+
+
+--
+-- Name: rights_holder_file fk_rights_holder; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.rights_holder_file
+    ADD CONSTRAINT fk_rights_holder FOREIGN KEY (rights_holder_id) REFERENCES model.rights_holder(id) ON DELETE CASCADE;
 
 
 --

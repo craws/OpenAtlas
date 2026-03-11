@@ -69,17 +69,17 @@ def get_rights_holder_links() -> dict[int, dict[str, list[int]]]:
     g.cursor.execute(
         """
         SELECT entity_id, 
-               role, 
+               description, 
                array_agg(rights_holder_id) as ids
         FROM model.rights_holder_file
-        GROUP BY entity_id, role
+        GROUP BY entity_id, description
         """)
     result: dict[int, dict[str, list[int]]] = {}
     for row in g.cursor:
         eid = row['entity_id']
         if eid not in result:
             result[eid] = {'creator': [], 'license_holder': []}
-        result[eid][row['role']] = row['ids']
+        result[eid][row['description']] = row['ids']
     return result
 
 
@@ -96,11 +96,11 @@ def get_rights_holders_by_entity_and_role(
                rh.modified
         FROM model.rights_holder_file rhl
         LEFT JOIN model.rights_holder rh ON rhl.rights_holder_id = rh.id
-        WHERE entity_id = %(entity_id)s
-          AND role = %(role)s;
+        WHERE rhl.entity_id = %(entity_id)s
+          AND rhl.description = %(description)s;
         """, {
             'entity_id': entity_id,
-            'role': role})
+            'description': role})
     return list(g.cursor)
 
 
@@ -110,14 +110,14 @@ def insert_rights_holder_link(
         """
         INSERT INTO model.rights_holder_file (entity_id,
                                               rights_holder_id,
-                                              role)
+                                              description)
         VALUES (%(entity_id)s,
                 %(rights_holder_id)s,
-                %(role)s)
+                %(description)s)
         """, {
             'entity_id': entity_id,
             'rights_holder_id': rights_holder_id,
-            'role': role})
+            'description': role})
 
 
 def delete_rights_holder_links(entity_id: int) -> None:
