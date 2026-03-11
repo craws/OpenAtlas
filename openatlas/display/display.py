@@ -418,7 +418,7 @@ class Display:
                     names = [rh.name for rh in value]
                     # todo: start again from here
                     # todo: make a button
-                    link_ = link(f'+ {name}', url_for('rights_holder_insert'))
+                    link_ = link(f'+ {name}', url_for('rights_holder_insert', origin_id=self.entity.id, relation=name))
                     # todo: if RH gets an own view, then make a link
                     html = f'{link_}<br>{str('<br>'.join(names))}'
 

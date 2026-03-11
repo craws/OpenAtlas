@@ -16,6 +16,7 @@ from openatlas.display.util import (
 from openatlas.display.util2 import sanitize, uc_first
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
+from openatlas.models.entity import Entity
 from openatlas.models.rights_holder import RightsHolder
 
 
@@ -34,8 +35,13 @@ class RightsHolderForm(FlaskForm):
 
 
 @app.route('/rights_holder_insert', methods=['GET', 'POST'])
-@required_group('manager')
-def rights_holder_insert() -> str | Response:  # Todo: move to other file
+@app.route(
+    '/rights_holder_insert/<int:origin_id>/<relation>',
+    methods=['GET', 'POST'])
+@required_group('contributor')
+def rights_holder_insert(
+        origin_id: int | None = None,
+        relation: str | None = None) -> str | Response:  # Todo: move to other file
     form: Any = RightsHolderForm()
 
     if form.validate_on_submit():
@@ -47,19 +53,27 @@ def rights_holder_insert() -> str | Response:  # Todo: move to other file
             rh.name == rights_holder_name
             and rh.class_.name == rights_holder_role
             for rh in g.rights_holder)
-
+        url =f'{url_for("admin_index")}#tab-rights-holder'
         if duplicate and not already_confirmed:
             form.name.errors.append(
                 _('This Name-Role combination already exists. '
                   'If this is a different person, click "Save" to confirm.'))
             form.confirm_duplicate.data = 'true'
         else:
-            RightsHolder.insert_rights_holder({
+            rights_holder = RightsHolder.insert_rights_holder({
                 'name': rights_holder_name,
                 'role': rights_holder_role,
                 'description': sanitize(form.description.data)})
+            if origin_id:
+                if relation in {'creator', 'license_holder'} \
+                        and Entity.get_by_id(origin_id):
+                    RightsHolder.insert_rights_holder_link(
+                        origin_id,
+                        rights_holder,
+                        relation)
+                    url = url_for('view', id_=origin_id)
             flash(_('entity created'))
-            return redirect(f'{url_for("admin_index")}#tab-rights-holder')
+            return redirect(url)
 
     return render_template(
         'tabs.html',
@@ -77,7 +91,7 @@ def rights_holder_insert() -> str | Response:  # Todo: move to other file
 
 
 @app.route('/rights_holder_update/<int:id_>', methods=['GET', 'POST'])
-@required_group('manager')
+@required_group('contributor')
 def rights_holder_update(
         id_: int) -> str | Response:  # Todo: move to other file
     rights_holder = RightsHolder.get_rights_holder_by_id(id_)
@@ -112,7 +126,7 @@ def rights_holder_update(
 
 
 @app.route('/rights_holder_delete/<int:id_>', methods=['GET', 'POST'])
-@required_group('manager')
+@required_group('editor')
 def rights_holder_delete(id_: int) -> str | Response:
     RightsHolder.rights_holder_delete(id_)
     flash(_('entity deleted'))
