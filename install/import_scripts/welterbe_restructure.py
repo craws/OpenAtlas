@@ -1,14 +1,6 @@
 """
-This script is for restructuring place hierarchies from the Welterbe project.
-Basically:
-* Places -> Custom hierarchy cadaster
-* Feature and artifacts -> Places
-
-To do:
-* re-map UNESCO Welterbe Objekt ID
-* Re-map types of places, features and artifacts
-* Test kadaster.gv.at URLs?
-
+This script is for restructuring place hierarchies for the Welterbe project.
+Basically: Places -> Custom hierarchy cadaster, Feature and Artifacts -> Places
 """
 import time
 from typing import Any
@@ -19,6 +11,7 @@ from psycopg2 import extras
 
 from openatlas import app
 from openatlas.models.entity import Entity, insert
+from openatlas.database import entity as db
 
 
 def connect() -> Any:
@@ -105,14 +98,30 @@ def feature_and_artifact_to_place():
         """)
 
 
-def clean_up_hierarchies():
+def clean_up():
     # Remove hierarchies that aren't needed anymore
-    for id_ in [29, 81, 186, 189, 228, 229]:
+    for id_ in [29, 81, 186, 189, 228, 229, 972]:
         hierarchy = g.types[id_]
         for sub_id in hierarchy.get_sub_ids_recursive():
             g.types[sub_id].delete()
         hierarchy.delete()
-    Entity.get_by_id(969).delete()  # Remove reference "Grundstücksnr."
+
+    # Remove reference "Grundstücksnr."
+    Entity.get_by_id(969).delete()
+
+    # Remap custom types
+    for id_ in [
+            956, 278, 289, 6611, 6614, 11330, 285, 327, 11329, 414, 299, 6624,
+            318, 313, 362, 334, 4465, 152, 335, 336, 539, 552, 565, 576, 587,
+            598, 387, 420, 434, 425, 443, 453, 1593, 499, 463, 1863, 1903, 508,
+            481, 472, 2967, 1663, 2957, 490, 1910, 518, 233, 238, 273, 4450,
+            306, 11328]:
+        if 'artifact' in g.types[id_].classes:
+            g.types[id_].remove_class('artifact')
+        if 'feature' in g.types[id_].classes:
+            g.types[id_].remove_class('feature')
+        if 'place' not in g.types[id_].classes:
+            db.add_classes_to_hierarchy(id_, ['place'])
 
 
 with app.test_request_context():
@@ -125,6 +134,6 @@ with app.test_request_context():
     insert_cadasters()
     link_cadasters()
     feature_and_artifact_to_place()
-    clean_up_hierarchies()
+    clean_up()
 
 print(f'Execution time: {int(time.time() - start)} seconds')
