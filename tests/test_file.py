@@ -122,6 +122,7 @@ class FileTest(TestBaseCase):
                 url_for('insert', class_='file', origin_id=place.id),
                 data={'name': 'Invalid file', 'file': invalid_file},
                 follow_redirects=True)
+
         assert b'File type not allowed' in rv.data
 
         rv = c.post(

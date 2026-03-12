@@ -145,8 +145,7 @@ def process_form_data(
                     inverse = form.name_inverse.data \
                         .replace('(', '').replace(')', '').strip()
                     data[attr] += f' ({inverse})'
-            case _ if hasattr(form, attr) and (
-                    getattr(form, attr).data or getattr(form, attr).data == 0):
+            case _ if hasattr(form, attr):
                 value = getattr(form, attr).data
                 data[attr] = value.strip() if isinstance(value, str) else value
             case _:
