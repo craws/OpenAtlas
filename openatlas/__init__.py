@@ -120,6 +120,7 @@ def setup_files() -> None:
         info['license_holder'] = rights.get('license_holder', [])
     g.file_info = file_info
 
+
 def setup_api() -> None:
     from openatlas.api.resources.openapi_util import write_openapi_instance
     if request.path.startswith('/swagger'):

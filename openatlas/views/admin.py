@@ -197,7 +197,7 @@ def get_rights_holder_table() -> Table:
     rights_holders = RightsHolder.get_rights_holder()
     for holder in rights_holders:
         row = [
-            holder.name,
+            link(holder, url_for('rights_holder_view', id_=holder.id)),
             holder.class_.name,
             link(
                 _('edit'),

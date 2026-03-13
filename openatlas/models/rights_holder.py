@@ -3,7 +3,8 @@ from typing import Any
 from flask import g
 
 from openatlas.database.rights_holder import (
-    delete_rights_holder_links, get_rights_holder, get_rights_holder_by_id,
+    delete_rights_holder_links, get_entity_ids_by_rights_holder,
+    get_rights_holder, get_rights_holder_by_id,
     get_rights_holder_links,
     get_rights_holders_by_entity_and_role, insert_rights_holder,
     insert_rights_holder_link, rights_holder_delete, update_rights_holder)
@@ -71,3 +72,8 @@ class RightsHolder:
     @staticmethod
     def delete_rights_holder_links(entity_id: int) -> None:
         delete_rights_holder_links(entity_id)
+
+    @staticmethod
+    def get_files_by_rights_holder_id(rights_holder_id: int) -> list[Entity]:
+        return Entity.get_by_ids(
+            get_entity_ids_by_rights_holder(rights_holder_id))

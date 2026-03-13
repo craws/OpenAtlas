@@ -124,3 +124,14 @@ def delete_rights_holder_links(entity_id: int) -> None:
     g.cursor.execute(
         'DELETE FROM model.rights_holder_file WHERE entity_id = %(id)s;',
         {'id': entity_id})
+
+
+def get_entity_ids_by_rights_holder(rights_holder_id: int) -> list[int]:
+    g.cursor.execute(
+        """
+        SELECT entity_id
+        FROM model.rights_holder_file
+        WHERE rights_holder_id = %(id)s
+        """,
+        {'id': rights_holder_id})
+    return [row['entity_id'] for row in g.cursor]

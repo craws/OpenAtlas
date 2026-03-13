@@ -463,29 +463,29 @@ def link(
     elif isinstance(object_, Entity):
         html = link(
             object_.name,
-            url_for('view', id_=object_.id),
+            url or url_for('view', id_=object_.id),
             uc_first_=False,
             external=external)
     elif isinstance(object_, CidocClass):
         html = link(
             object_.code,
-            url_for('cidoc_class_view', code=object_.code),
+            url or url_for('cidoc_class_view', code=object_.code),
             external=external)
     elif isinstance(object_, CidocProperty):
         html = link(
             object_.code,
-            url_for('property_view', code=object_.code),
+            url or url_for('property_view', code=object_.code),
             external=external)
     elif isinstance(object_, Project):
         html = link(
             object_.name,
-            url_for('import_project_view', id_=object_.id),
+            url or url_for('import_project_view', id_=object_.id),
             uc_first_=False,
             external=external)
     elif isinstance(object_, User):
         html = link(
             object_.username,
-            url_for('user_view', id_=object_.id),
+            url or url_for('user_view', id_=object_.id),
             class_='' if object_.active else 'text-muted',
             uc_first_=False,
             external=external)

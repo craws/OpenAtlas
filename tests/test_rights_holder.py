@@ -39,7 +39,15 @@ class RightsHolderTests(TestBaseCase):
             app.preprocess_request()
             rights_holders = RightsHolder.get_rights_holder()
             rh_id = rights_holders[-1].id
+            rh_name = rights_holders[-1].name
             person = insert('person', 'Nice person')
+
+        rv = c.get(url_for('rights_holder_view', id_=rh_id))
+        assert rh_name.encode() in rv.data
+
+        rv = c.get(url_for('rights_holder_view', id_=9999))
+        assert rv.status_code == 418
+        assert b'418' in rv.data
 
         rv = c.post(
             url_for(

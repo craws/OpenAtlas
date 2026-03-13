@@ -220,14 +220,14 @@ class Entity:
             'public': data.get('public', False)})
         RightsHolder.delete_rights_holder_links(self.id)
         if data.get('creator'):
-            for creator_id in ast.literal_eval(data.get('creator')):
+            for creator_id in ast.literal_eval(data['creator']):
                 RightsHolder.insert_rights_holder_link(
                     self.id,
                     creator_id,
                     'creator')
         if data.get('license_holder'):
             for license_holder_id in ast.literal_eval(
-                    data.get('license_holder')):
+                    data['license_holder']):
                 RightsHolder.insert_rights_holder_link(
                     self.id,
                     license_holder_id,

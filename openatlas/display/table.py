@@ -161,9 +161,10 @@ def get_table_cell_content(
         case 'created':
             html = format_date(e.created)
         case 'creator':
-            # todo: if RH gets an own view, then make a link
             creators = g.file_info.get(e.id, {}).get('creator', [])
-            html = str('<br>'.join([rh.name for rh in creators]))
+            html = '<br>'.join([
+                link(rh, url_for('rights_holder_view', id_=rh.id))
+                for rh in creators])
         case 'content' | 'description':
             html = e.description
             if relation and name in relation.additional_fields:
@@ -192,8 +193,10 @@ def get_table_cell_content(
                 f'<a href="{url_for("view", id_=e.id)}">' \
                 f'{file_preview(e.id)}</a>'
         case 'license_holder':
-            lh = g.file_info.get(e.id, {}).get('license_holder', [])
-            html = str('<br>'.join([rh.name for rh in lh]))
+            lh = g.file_info.get(e.id, {}).get('creator', [])
+            html = '<br>'.join([
+                link(rh, url_for('rights_holder_view', id_=rh.id))
+                for rh in lh])
         case 'main_image' if origin:
             html = profile_image_table_link(origin, e)
         case 'page':
