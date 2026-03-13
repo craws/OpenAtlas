@@ -230,7 +230,7 @@ class Display:
                                 _('move entities'),
                                 url_for('change_type', id_=self.entity.id)))
                 case 'remove_reference_system_class' \
-                        if not items and is_authorized('manager'):
+                    if not items and is_authorized('manager'):
                     buttons.append(
                         button(
                             _('remove'),
@@ -414,15 +414,19 @@ class Display:
         self.data.update(self.get_type_data())
         for name, attribute in self.entity.class_.attributes.items():
             if name in ['creator', 'license_holder']:
+                link_ = link(
+                    f'+ {name}',
+                    url_for(
+                        'rights_holder_insert',
+                        origin_id=self.entity.id,
+                        relation=name))
+                html = f'{link_}'
                 if value := getattr(self.entity, name):
-                    link_ = link(
-                        f'+ {name}',
-                        url_for(
-                            'rights_holder_insert',
-                            origin_id=self.entity.id,
-                            relation=name))
-                    html = f'{link_}<br>{str('<br>'.join(value))}'
-                    self.data[attribute['label']] = html
+                    entries = [
+                        link(rh, url_for('rights_holder_view', id_=rh.id))
+                        for rh in value]
+                    html += f'<br>{str('<br>'.join(entries))}'
+                self.data[attribute['label']] = html
             if name in ['example_id', 'public', 'resolver_url', 'website_url']:
                 if value := getattr(self.entity, name):
                     if isinstance(value, bool):

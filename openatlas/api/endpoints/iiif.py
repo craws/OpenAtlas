@@ -11,8 +11,8 @@ from flask_restful import Resource
 
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.resources.api_entity import ApiEntity
-from openatlas.api.resources.error import DisplayFileNotFoundError, \
-    IIIFMetadataNotFound
+from openatlas.api.resources.error import (DisplayFileNotFoundError,
+                                           IIIFMetadataNotFound)
 from openatlas.api.resources.parser import iiif
 from openatlas.api.resources.util import get_license_name, get_license_url
 from openatlas.display.util import check_iiif_file_exist
@@ -167,7 +167,7 @@ class IIIFAnnotation(Resource):
                 "@type": "dctypes:Text",
                 "chars": annotation.text,
                 "format": "text/plain"}
-            ],
+                ],
             "on": {
                 "@type": "oa:SpecificResource",
                 "full": url_for(
@@ -246,7 +246,8 @@ class IIIFManifest(Resource):
             raise DisplayFileNotFoundError
         license_ = get_license_name(entity)
         if entity.license_holder:
-            license_ = f'{license_}, {', '.join(entity.license_holder)}'
+            license_ = f'{license_}, {', '.join([
+                lh.name for lh in entity.license_holder])}'
         metadata = []
         if references := entity.get_links('P67', inverse=True):
             for reference in references:
@@ -259,9 +260,10 @@ class IIIFManifest(Resource):
                     "label": _('source').capitalize(),
                     "value": f"<a href={url} target=_blank>{text}</a>"})
         if entity.creator:
-            metadata.append({
-                "label": _('creator').capitalize(),
-                "value": entity.creator})
+            for c in entity.creator:
+                metadata.append({
+                    "label": _('creator').capitalize(),
+                    "value": c.name})
         see_also = []
         if related_entities := entity.get_links('P67'):
             for related_entity in related_entities:

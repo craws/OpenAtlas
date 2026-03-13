@@ -142,15 +142,25 @@ def add_arche_file_metadata_to_graph(
     if metadata.license:
         graph.add((subject_uri, ACDH.hasLicense, URIRef(metadata.license)))
 
+    # todo: add role, person or organization
     if metadata.licensors:
-        ensure_person_exist(graph, metadata.licensors)
-        for uri in create_uri(metadata.licensors):
+        names = [e.name for e in metadata.licensors]
+        ensure_person_exist(graph, names)
+        for uri in create_uri(names):
             graph.add((subject_uri, ACDH.hasLicensor, uri))
 
     if metadata.rights_holders:
-        ensure_person_exist(graph, metadata.rights_holders)
-        for uri in create_uri(metadata.rights_holders):
+        names = [e.name for e in metadata.rights_holders]
+        ensure_person_exist(graph, names)
+        for uri in create_uri(names):
             graph.add((subject_uri, ACDH.hasRightsHolder, uri))
+
+    if metadata.creators:
+        names = [e.name for e in metadata.creators]
+        ensure_person_exist(graph, names)
+        for uri in create_uri(names):
+            graph.add((subject_uri, ACDH.hasCreator, uri))
+
 
     if metadata.is_part_of:
         graph.add((subject_uri, ACDH.isPartOf, URIRef(metadata.is_part_of)))
@@ -199,11 +209,6 @@ def add_arche_file_metadata_to_graph(
             subject_uri,
             ACDH.hasBinarySize,
             Literal(metadata.binary_size, datatype=XSD.integer)))
-
-    if metadata.creators:
-        ensure_person_exist(graph, metadata.creators)
-        for uri in create_uri(metadata.creators):
-            graph.add((subject_uri, ACDH.hasCreator, uri))
 
     if metadata.metadata_creators:
         ensure_person_exist(graph, metadata.metadata_creators)

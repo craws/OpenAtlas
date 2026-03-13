@@ -61,8 +61,9 @@ def get_file_dict(
         'id': link.domain.id,
         'title': link.domain.name,
         'license': get_license_name(link.domain),
-        'creator': ', '.join(link.domain.creator),
-        'licenseHolder': ', '.join(link.domain.license_holder),
+        'creator': ', '.join([rh.name for rh in link.domain.creator]),
+        'licenseHolder': ', '.join([
+            rh.name for rh in link.domain.license_holder]),
         'publicShareable': link.domain.public,
         'mimetype': mime_type,
         'fromSuperEntity': root,
