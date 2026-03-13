@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from flask import flash, g, redirect, render_template, request, url_for, abort
+from flask import abort, flash, g, redirect, render_template, request, url_for
 from flask_babel import gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.wrappers import Response
@@ -12,8 +12,7 @@ from wtforms.validators import InputRequired
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import entity_table
-from openatlas.display.util import (
-    hierarchy_crumbs, required_group)
+from openatlas.display.util import required_group
 from openatlas.display.util2 import sanitize, uc_first
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
@@ -140,14 +139,15 @@ def rights_holder_view(id_: int) -> str | Response:
     if not rights_holder:
         abort(418)
     linked_files = RightsHolder.get_files_by_rights_holder_id(id_)
-
     columns = [
         'created', 'icon', 'name', 'license', 'public', 'creator',
         'license_holder', 'size', 'extension', 'description']
     files_table = entity_table(linked_files, columns=columns)
-
     return render_template(
         'rights_holder.html',
         rights_holder=rights_holder,
         files_table=files_table,
-        crumbs=hierarchy_crumbs(rights_holder) + [rights_holder.name])
+        crumbs=[
+            [_('rights holder'),
+             f'{url_for("admin_index")}#tab-rights-holder'],
+            rights_holder.name])

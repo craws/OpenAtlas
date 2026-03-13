@@ -88,8 +88,7 @@ def get_csv_geom_entry(entity: Entity) -> str:
     shapes = [shape(geom) for geom in geom_data]
     if len(shapes) == 1:
         return shapes[0].wkt
-    else:
-        return GeometryCollection(shapes).wkt
+    return GeometryCollection(shapes).wkt
 
 
 def get_grouped_entities(entities: list[dict[str, Any]]) -> dict[str, Any]:

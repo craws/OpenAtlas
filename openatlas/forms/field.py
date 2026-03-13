@@ -180,6 +180,7 @@ class TableMultiField(HiddenField):
         self.entities = entities
         self.selection = selection or []
         self.description = description
+        self.data = None
 
     def process_data(self, value: Any) -> None:
         self.data = str([e.id for e in self.selection])

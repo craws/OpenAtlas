@@ -213,6 +213,7 @@ class Entity:
             classes,
             inverse)
 
+    # pylint: disable=import-outside-toplevel
     def save_file_info(self, data: dict[str, Any]) -> None:
         from openatlas.models.rights_holder import RightsHolder
         db.update_file_info({
@@ -809,8 +810,8 @@ def insert(data: dict[str, Any]) -> Entity:
         data['description'] = result['text']
         annotation_data = result['data']
     for item in [
-            'begin_from', 'begin_to', 'begin_comment',
-            'end_from', 'end_to', 'end_comment', 'description']:
+        'begin_from', 'begin_to', 'begin_comment',
+        'end_from', 'end_to', 'end_comment', 'description']:
         data[item] = data.get(item)
     for item in ['name', 'description']:
         data[item] = sanitize(data[item])
