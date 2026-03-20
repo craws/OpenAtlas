@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from flask import flash, g, render_template, url_for
 from flask_babel import gettext as _
@@ -265,7 +265,7 @@ def orphans() -> str:
 @app.route('/check_files')
 @app.route('/check_files/<arche>')
 @required_group('contributor')
-def check_files(arche: Optional[str] = None) -> str:
+def check_files(arche: str | None = None) -> str:
     entities: list[Entity] = Entity.get_by_class('file', types=True)
     result: dict[str, list[Entity]] = {
         'missing_files': [],

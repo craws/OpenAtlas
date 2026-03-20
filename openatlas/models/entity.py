@@ -69,8 +69,8 @@ class Entity:
                     setattr(self, name, value)
         if self.class_.name == 'file':
             self.public = False
-            self.creator = None
-            self.license_holder = None
+            self.creator = []
+            self.license_holder = []
             if self.id in g.file_info:
                 self.public = g.file_info[self.id]['public']
                 self.creator = g.file_info[self.id]['creator']
@@ -211,12 +211,26 @@ class Entity:
             classes,
             inverse)
 
+    # pylint: disable=import-outside-toplevel
     def save_file_info(self, data: dict[str, Any]) -> None:
+        from openatlas.models.rights_holder import RightsHolder
         db.update_file_info({
             'entity_id': self.id,
-            'creator': data.get('creator'),
-            'license_holder': data.get('license_holder'),
             'public': data.get('public', False)})
+        RightsHolder.delete_rights_holder_links(self.id)
+        if data.get('creator'):
+            for creator_id in ast.literal_eval(data['creator']):
+                RightsHolder.insert_rights_holder_link(
+                    self.id,
+                    creator_id,
+                    'creator')
+        if data.get('license_holder'):
+            for license_holder_id in ast.literal_eval(
+                    data['license_holder']):
+                RightsHolder.insert_rights_holder_link(
+                    self.id,
+                    license_holder_id,
+                    'license_holder')
 
     def update(self, data: dict[str, Any]) -> None:
         data['id'] = self.id

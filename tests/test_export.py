@@ -2,7 +2,7 @@ import shutil
 from pathlib import Path
 from typing import Any
 
-from flask import url_for
+from flask import g, url_for
 
 from openatlas import app
 from openatlas.api.resources.api_entity import ApiEntity
@@ -63,6 +63,9 @@ class ImportTest(ImportTestCase):
 
         assert b'Export ARCHE' in c.get(url_for('export_arche')).data
 
+        with app.test_request_context():
+            app.preprocess_request()
+            rights_holder_ids = [rh.id for rh in g.rights_holder]
         logo_path = Path(app.root_path) / 'static' / 'images' / 'layout'
         with open(logo_path / 'logo.png', 'rb') as img:
             c.post(
@@ -70,8 +73,8 @@ class ImportTest(ImportTestCase):
                 data={
                     'name': 'OpenAtlas logo',
                     'file': img,
-                    'creator': 'Max',
-                    'license_holder': 'Moritz',
+                    'creator': f'{rights_holder_ids}',
+                    'license_holder': f'{rights_holder_ids}',
                     'public': True},
                 follow_redirects=True)
 

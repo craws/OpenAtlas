@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from flask import url_for
+from flask import g, url_for
 
 from openatlas import app
 from openatlas.api.resources.api_entity import ApiEntity
@@ -12,22 +12,26 @@ from tests.base import ApiTestCase
 class Api(ApiTestCase):
     def test_api(self) -> None:
         c = self.client
-        logo_path = Path(app.root_path) / 'static' / 'images' / 'layout'
+        with app.test_request_context():
+            app.preprocess_request()
+            rights_holder_ids = [rh.id for rh in g.rights_holder]
 
+        logo_path = Path(app.root_path) / 'static' / 'images' / 'layout'
         with open(logo_path / 'logo.png', 'rb') as img:
             c.post(
                 url_for('insert', class_='file'),
                 data={
                     'name': 'OpenAtlas logo',
                     'file': img,
-                    'creator': 'Max',
-                    'license_holder': 'Moritz',
+                    'creator': f'{rights_holder_ids}',
+                    'license_holder': f'{rights_holder_ids}',
                     'public': True},
                 follow_redirects=True)
 
         c.get(url_for('logout'))
         with app.test_request_context():
             app.preprocess_request()
+
             for entity in ApiEntity.get_by_cidoc_classes(['all']):
                 match entity.name:
                     case 'Location of Shire':

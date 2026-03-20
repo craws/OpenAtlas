@@ -24,6 +24,7 @@ files/
 .idea
 .ftpconfig
 venv
+.venv
 
 # npm libs
 openatlas/static/.eggs/
@@ -42,3 +43,4 @@ env.sh
 
 .vscode
 /.env
+/.venv/

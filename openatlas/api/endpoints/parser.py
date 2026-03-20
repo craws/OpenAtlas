@@ -189,7 +189,8 @@ class Parser:
             case "creator":
                 tag = "creator"
                 if e.class_.name == "file" and g.file_info.get(e.id):
-                    value = g.file_info[e.id]["creator"]
+                    creators = g.file_info[e.id]["creator"]
+                    value = ', '.join([c.name for c in creators])
             case "content" | "description":
                 tag = "description"
                 value = (e.description or "").lower()
@@ -210,7 +211,8 @@ class Parser:
             case "license_holder":
                 tag = "license_holder"
                 if e.class_.name == "file" and g.file_info.get(e.id):
-                    value = g.file_info[e.id]["license_holder"]
+                    lhs = g.file_info[e.id]["license_holder"]
+                    value = ', '.join([lh.name for lh in lhs])
             case "name":
                 tag = "name"
                 value = e.name.lower()

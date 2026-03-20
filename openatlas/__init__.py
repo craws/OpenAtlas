@@ -32,7 +32,7 @@ from openatlas.api import api
 from openatlas.views import (
     admin, ajax, annotation, changelog, checks, entity, error, export, file,
     hierarchy, index, imports, link, login, model, note, overlay, profile,
-    search, token, tools, type as type_, user, vocabs)
+    rights_holder, search, token, tools, type as type_, user, vocabs)
 
 
 def get_locale() -> str:
@@ -99,6 +99,7 @@ def before_request() -> Response | None:
 
 def setup_files() -> None:
     from openatlas.models.entity import Entity
+    from openatlas.models.rights_holder import RightsHolder
     g.files = {}
     for file_ in app.config['UPLOAD_PATH'].iterdir():
         if file_.stem.isdigit():
@@ -110,7 +111,14 @@ def setup_files() -> None:
         g.display_file_ext += app.config['PROCESSABLE_EXT']
     if g.settings['iiif'] and g.settings['iiif_path']:
         g.writable_paths.append(g.settings['iiif_path'])
-    g.file_info = Entity.get_file_info()
+    file_info = Entity.get_file_info()
+    g.rights_holder = RightsHolder.get_rights_holder()
+    rights_holder_info = RightsHolder.get_rights_holder_information()
+    for file_id, info in file_info.items():
+        rights = rights_holder_info.get(file_id, {})
+        info['creator'] = rights.get('creator', [])
+        info['license_holder'] = rights.get('license_holder', [])
+    g.file_info = file_info
 
 
 def setup_api() -> None:

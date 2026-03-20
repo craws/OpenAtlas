@@ -58,3 +58,6 @@ INSERT INTO web.hierarchy (id, name, category, multiple, directional) VALUES
 INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) VALUES
   ((SELECT id FROM web.hierarchy WHERE name='Administrative unit'), 'place');
 
+INSERT INTO model.rights_holder (name, class, description) VALUES
+  ('OpenAtlas Logo creator', 'person', 'Good friend of OpenAtlas')
+

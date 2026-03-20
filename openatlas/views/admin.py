@@ -37,6 +37,7 @@ from openatlas.models.content import get_content, update_content
 from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Project
+from openatlas.models.rights_holder import RightsHolder
 from openatlas.models.settings import update_settings
 from openatlas.models.user import User
 
@@ -66,7 +67,17 @@ def admin_index() -> str:
                 button(_('activity'), url_for('user_activity')),
                 get_newsletter_button(users),
                 button(_('user'), url_for('user_insert'))
-                if is_authorized('manager') else ''])}
+                if is_authorized('manager') else '']),
+        'rights_holder': Tab(
+            'rights_holder',
+            _('rights holder'),
+            table=get_rights_holder_table(),
+            buttons=[
+                manual('admin/rights_holder'),
+                button(
+                    f'+ {uc_first(_('rights holder'))}',
+                    url_for('rights_holder_insert'))
+                if is_authorized('contributor') else ''])}
     if is_authorized('admin'):
         tabs['general'] = Tab(
             'general',
@@ -179,6 +190,22 @@ def get_newsletter_button(users: list[User]) -> str:
             if user.settings['newsletter']:
                 return button(_('newsletter'), url_for('newsletter'))
     return ''
+
+
+def get_rights_holder_table() -> Table:
+    table = Table(['name', 'class'])
+    for holder in RightsHolder.get_rights_holder():
+        row = [
+            link(holder, url_for('rights_holder_view', id_=holder.id)),
+            uc_first(f'{_(holder.class_.name)}'),
+            link(
+                _('edit'),
+                url_for('rights_holder_update', id_=holder.id)),
+            link(
+                _('delete'),
+                url_for('rights_holder_delete', id_=holder.id))]
+        table.rows.append(row)
+    return table
 
 
 def get_user_table(users: list[User]) -> Table:
