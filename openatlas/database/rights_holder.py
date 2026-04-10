@@ -6,13 +6,9 @@ from flask import g
 def get_rights_holder() -> list[dict[str, Any]]:
     g.cursor.execute(
         """
-        SELECT id,
-               name,
-               class as openatlas_class_name,
-               description,
-               created,
-               modified
+        SELECT id, name, class as class_, description, created, modified
         FROM model.rights_holder
+        ORDER BY name;
         """)
     return list(g.cursor)
 
@@ -20,14 +16,10 @@ def get_rights_holder() -> list[dict[str, Any]]:
 def get_rights_holder_by_id(id_: int) -> dict[str, Any] | None:
     g.cursor.execute(
         """
-        SELECT id,
-               name,
-               class as openatlas_class_name,
-               description,
-               created,
-               modified
+        SELECT id, name, class as class_, description, created, modified
         FROM model.rights_holder
         WHERE id = %(id)s
+        ORDER BY name;
         """,
         {'id': id_})
     return g.cursor.fetchone()
@@ -68,9 +60,10 @@ def update_rights_holder(id_: int, entry: dict[str, Any]) -> None:
 def get_rights_holder_links() -> dict[int, dict[str, list[int]]]:
     g.cursor.execute(
         """
-        SELECT entity_id, 
-               description, 
-               array_agg(rights_holder_id) as ids
+        SELECT
+            entity_id,
+            description,
+            array_agg(rights_holder_id) as ids
         FROM model.rights_holder_file
         GROUP BY entity_id, description
         """)
@@ -88,16 +81,17 @@ def get_rights_holders_by_entity_and_role(
         role: str) -> list[dict[str, Any]]:
     g.cursor.execute(
         """
-        SELECT rh.id,
-               rh.name,
-               rh.class as openatlas_class_name,
-               rh.description,
-               rh.created,
-               rh.modified
+        SELECT
+            rh.id,
+            rh.name,
+            rh.class as class_,
+            rh.description,
+            rh.created,
+            rh.modified
         FROM model.rights_holder_file rhl
         LEFT JOIN model.rights_holder rh ON rhl.rights_holder_id = rh.id
         WHERE rhl.entity_id = %(entity_id)s
-          AND rhl.description = %(description)s;
+            AND rhl.description = %(description)s;
         """, {
             'entity_id': entity_id,
             'description': role})
@@ -108,12 +102,14 @@ def insert_rights_holder_link(
         entity_id: int, rights_holder_id: int, role: str) -> None:
     g.cursor.execute(
         """
-        INSERT INTO model.rights_holder_file (entity_id,
-                                              rights_holder_id,
-                                              description)
-        VALUES (%(entity_id)s,
-                %(rights_holder_id)s,
-                %(description)s)
+        INSERT INTO model.rights_holder_file (
+            entity_id,
+            rights_holder_id,
+            description)
+        VALUES (
+            %(entity_id)s,
+            %(rights_holder_id)s,
+            %(description)s)
         """, {
             'entity_id': entity_id,
             'rights_holder_id': rights_holder_id,
@@ -135,3 +131,17 @@ def get_entity_ids_by_rights_holder(rights_holder_id: int) -> list[int]:
         """,
         {'id': rights_holder_id})
     return [row['entity_id'] for row in g.cursor]
+
+
+def get_rights_holder_file_count() -> dict[int, int]:
+    g.cursor.execute("""
+        SELECT 
+            rights_holder_id, 
+            COUNT(DISTINCT entity_id) AS count
+        FROM 
+            model.rights_holder_file
+        GROUP BY 
+            rights_holder_id;
+    """)
+    return {
+        row['rights_holder_id']: row['count'] for row in g.cursor.fetchall()}

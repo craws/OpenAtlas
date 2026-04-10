@@ -165,12 +165,12 @@ these example files based on the historical Abbey of Saint Gall.
    These examples use specific OpenAtlas IDs for type hierarchies that are only valid
    on the **demo-dev** instance (`https://demo-dev.openatlas.eu/ <https://demo-dev.openatlas.eu/>`_).
 
-* :download:`Places (Place hierarchy)<../../../openatlas/static/st_gallen_places.csv>`
-* :download:`Persons <../../../openatlas/static/st_gallen_persons.csv>`
-* :download:`Modifications (Events) <../../../openatlas/static/st_gallen_modifications.csv>`
-* :download:`Sources <../../../openatlas/static/st_gallen_sources.csv>`
-* :download:`Bibliography <../../../openatlas/static/st_gallen_bibliography.csv>`
-* :download:`Types <../../../openatlas/static/st_gallen_types.csv>`
+* :download:`Types <../../../openatlas/static/examples/example_types.csv>`
+* :download:`Bibliography <../../../openatlas/static/examples/example_bibliography.csv>`
+* :download:`Places (Place hierarchy)<../../../openatlas/static/examples/example_places.csv>`
+* :download:`Persons <../../../openatlas/static/examples/example_persons.csv>`
+* :download:`Modifications (Events) <../../../openatlas/static/examples/example_modifications.csv>`
+* :download:`Sources <../../../openatlas/static/examples/example_sources.csv>`
 
 Import Options
 --------------

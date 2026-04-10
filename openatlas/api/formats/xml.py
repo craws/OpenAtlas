@@ -8,15 +8,12 @@ from lxml import etree
 def subunit_xml(result: dict[str, Any]) -> bytes:
     new_dict = {}
     for key, value in result.items():
-        item_list = [{item['openatlasClassName']: item} for item in value]
-        new_dict[key] = item_list
-    root = dict_to_xml('root', new_dict)
-    xml_bytes = etree.tostring(
-        root,
+        new_dict[key] = [{item['openatlasClassName']: item} for item in value]
+    return etree.tostring(
+        dict_to_xml('root', new_dict),
         pretty_print=True,
         xml_declaration=True,
         encoding="utf-8")
-    return xml_bytes
 
 
 def dict_to_xml(tag: str, data: Any) -> etree.Element:

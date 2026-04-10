@@ -25,9 +25,11 @@ class RightsHolderForm(FlaskForm):
         _('name'),
         [InputRequired()],
         render_kw={'autofocus': True})
-    role: Any = SelectField(
-        _('type'),
+    class_: Any = SelectField(
+        _('class'),
+        validators=[InputRequired()],
         choices=[
+            ('', ''),
             ('person', uc_first(_('person'))),
             ('group', uc_first(_('group')))])
     description = TextAreaField(_('info'))
@@ -47,7 +49,7 @@ def rights_holder_view(id_: int) -> str | Response:
         buttons.append(
             button(_('edit'), url_for('rights_holder_update', id_=id_)))
 
-    linked_files = RightsHolder.get_files_by_rights_holder_id(id_)
+    linked_files = Entity.get_files_by_rights_holder_id(id_)
     columns = [
         'created', 'icon', 'name', 'license', 'public', 'creator',
         'license_holder', 'size', 'extension', 'description']
@@ -69,18 +71,18 @@ def rights_holder_view(id_: int) -> str | Response:
     methods=['GET', 'POST'])
 @required_group('contributor')
 def rights_holder_insert(
-        origin_id: int | None = None,
+        origin_id: int = 0,
         relation: str | None = None) -> str | Response:
     form: Any = RightsHolderForm()
     origin = Entity.get_by_id(origin_id) if origin_id else None
     if form.validate_on_submit():
         rights_holder_name = sanitize(form.name.data.strip())
-        rights_holder_role = sanitize(form.role.data)
+        rights_holder_role = sanitize(form.class_.data)
 
         already_confirmed = form.confirm_duplicate.data == 'true'
         duplicate = any(
             rh.name == rights_holder_name
-            and rh.class_.name == rights_holder_role
+            and rh.class_ == rights_holder_role
             for rh in g.rights_holder)
         url = f'{url_for("admin_index")}#tab-rights-holder'
         if duplicate and not already_confirmed:
@@ -115,7 +117,8 @@ def rights_holder_insert(
                     manual_page='admin/rights_holder'))},
         title=_('rights holder'),
         crumbs=[
-            [_('admin'), f'{url_for("admin_index")}#tab-rights-holder'],
+            [_('rights holder'),
+             f'{url_for("admin_index")}#tab-rights-holder'],
             link(origin) if origin else None,
             f'+ {uc_first(_("rights holder"))}'])
 
@@ -130,12 +133,12 @@ def rights_holder_update(
 
     form: Any = RightsHolderForm(obj=rights_holder)
     if request.method == 'GET':
-        form.role.data = rights_holder.class_.name
+        form.class_.data = rights_holder.class_
 
     if form.validate_on_submit():
         RightsHolder.update_rights_holder(id_, {
             'name': sanitize(form.name.data.strip()),
-            'role': sanitize(form.role.data),
+            'role': sanitize(form.class_.data),
             'description': sanitize(form.description.data.strip())})
         flash(_('info update'))
         return redirect(f'{url_for("admin_index")}#tab-rights-holder')
@@ -151,7 +154,8 @@ def rights_holder_update(
                     manual_page='admin/rights_holder'))},
         title=_('rights holder'),
         crumbs=[
-            [_('admin'), f'{url_for("admin_index")}#tab-rights-holder'],
+            [_('rights holder'),
+             f'{url_for("admin_index")}#tab-rights-holder'],
             link(
                 rights_holder,
                 url_for('rights_holder_view', id_=rights_holder.id)),

@@ -1,4 +1,5 @@
-from subprocess import call
+import subprocess
+from pathlib import Path
 from typing import Any, Optional
 
 from flask import g, request
@@ -11,7 +12,8 @@ from wtforms import (
 from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.image_processing import resize_image
-from openatlas.display.util import check_iiif_activation, convert_image_to_iiif
+from openatlas.display.util import check_iiif_activation, \
+    convert_image_to_iiif, get_binary_path
 from openatlas.forms.add_fields import (
     add_buttons, add_class_types, add_date_fields, add_description,
     add_name_fields, add_reference_systems, add_relations, get_validators)
@@ -197,7 +199,7 @@ def process_types(entity: Entity, form: Any) -> None:
         if data := convert(getattr(form, str(type_.id)).data):
             if type_.class_.name == 'administrative_unit':
                 location = entity.location \
-                    or entity.get_linked_entity_safe('P53')
+                           or entity.get_linked_entity_safe('P53')
                 location.link('P89', [g.types[id_] for id_ in data])
             else:
                 entity.link('P2', [g.types[id_] for id_ in data])
@@ -319,7 +321,7 @@ def process_form(
             path = app.config['UPLOAD_PATH'] / name
             file_.save(str(path))
             if f'.{ext}' in g.display_file_ext:
-                call(f'exiftran -ai {path}', shell=True)  # Fix rotation
+                rotate_file(name, path)
             filenames.append(name)
             if g.settings['image_processing']:
                 resize_image(name)
@@ -331,3 +333,25 @@ def process_form(
         g.logger.log('error', 'database', 'file upload failed', e)
         raise e from None
     return entity
+
+
+def rotate_file(name: str, path: Path) -> None:
+    exiftran_path = get_binary_path('exiftran', required=False)
+    if exiftran_path:
+        try:
+            subprocess.run(
+                [exiftran_path, '-ai', str(path)],
+                check=True,
+                capture_output=True,
+                text=True)
+        except subprocess.CalledProcessError as e:  # pragma: no cover
+            g.logger.log(
+                'warn',
+                'image_processing',
+                f'exiftran failed for {name} ({e.returncode}): '
+                f'{e.stderr.strip()}')
+        except Exception as e:  # pragma: no cover
+            g.logger.log(
+                'error',
+                'image_processing',
+                f'Unexpected error during exiftran: {str(e)}')

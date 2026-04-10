@@ -230,7 +230,7 @@ class Display:
                                 _('move entities'),
                                 url_for('change_type', id_=self.entity.id)))
                 case 'remove_reference_system_class' \
-                    if not items and is_authorized('manager'):
+                        if not items and is_authorized('manager'):
                     buttons.append(
                         button(
                             _('remove'),

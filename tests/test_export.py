@@ -61,7 +61,8 @@ class ImportTest(ImportTestCase):
             follow_redirects=True)
         assert b'An error occurred when trying to delete the f' in rv.data
 
-        assert b'Export ARCHE' in c.get(url_for('export_arche')).data
+        with c.get(url_for('export_arche')) as rv:
+            assert b'Export ARCHE' in rv.data
 
         with app.test_request_context():
             app.preprocess_request()
@@ -127,20 +128,24 @@ class ImportTest(ImportTestCase):
         shutil.copy(openatlas_logo_path, file_with_license_path)
         shutil.copy(logo_path / '422.jpg', file_not_public_path)
 
-        rv = c.get(url_for('arche_execute'), follow_redirects=True)
-        assert b'Data was exported' in rv.data
+        with c.get(url_for('arche_execute'), follow_redirects=True) as rv:
+            assert b'Data was exported' in rv.data
 
         # Run ARCHE export again with typeIds and without GeoNames
         app.config['ARCHE_METADATA']['typeIds'] = [case_study.id]
         app.config['ARCHE_METADATA']['excludeReferenceSystems'] = ['GeoNames']
-        rv = c.get(url_for('arche_execute'), follow_redirects=True)
-        assert b'Data was exported' in rv.data
+        with c.get(url_for('arche_execute'), follow_redirects=True) as rv:
+            assert b'Data was exported' in rv.data
 
         date_ = current_date_for_filename()
         collection_name = app.config["ARCHE_METADATA"]["topCollection"]
         filename = f'{date_}_{collection_name.replace(" ", "_")}.zip'
-        rv = c.get(url_for('download_export', view='arche', filename=filename))
-        assert b'PK' in rv.data
+        with c.get(
+                url_for(
+                    'download_export',
+                    view='arche',
+                    filename=filename)) as rv:
+            assert b'PK' in rv.data
 
         with c.get(
                 url_for('delete_export', view='arche', filename=filename),

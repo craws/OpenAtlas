@@ -17,7 +17,16 @@ def index_changelog() -> str:
 versions = {
     '9.2.0': ['TBA', {
         'feature': {
-            '2722': 'API: Download geometries as .gpkg'},
+            '2716': 'Improved count view at type trees',
+            '2730': 'Force browser to reload npm libs',
+            '2767': 'Improved data check performance',
+            '2602': 'Manual: types import via CSV and examples',
+            '2726': 'Manual: improved API and import sections',
+            '2742': 'API: 0.4.13',
+            '2722': 'API: Download geometries as .gpkg',
+            '2723': 'API: CSV export geometries',
+            '2744': 'API: Add typeIDS to network',
+            '2759': 'Refactor and minor improvements'},
         'fix': {
             '2740': 'Error at network view'}}],
     '9.1.1': ['2026-02-11', {

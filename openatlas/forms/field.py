@@ -21,6 +21,7 @@ from openatlas.display.util import link
 from openatlas.display.util2 import is_authorized, uc_first
 from openatlas.forms.util import convert
 from openatlas.models.entity import Entity
+from openatlas.models.rights_holder import RightsHolder
 
 
 class RemovableListInput(HiddenInput):
@@ -172,8 +173,8 @@ class TableMultiField(HiddenField):
 
     def __init__(
             self,
-            entities: list[Entity],
-            selection: Optional[list[Entity]] = None,
+            entities: list[Entity] | list[RightsHolder],
+            selection: Optional[list[Entity] | list[RightsHolder]] = None,
             description: Optional[str] = None,
             **kwargs: Any) -> None:
         super().__init__(**kwargs)

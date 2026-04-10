@@ -11,8 +11,8 @@ from flask_restful import Resource
 
 from openatlas.api.endpoints.parser import Parser
 from openatlas.api.resources.api_entity import ApiEntity
-from openatlas.api.resources.error import (DisplayFileNotFoundError,
-                                           IIIFMetadataNotFound)
+from openatlas.api.resources.error import (
+    DisplayFileNotFoundError, IIIFMetadataNotFound)
 from openatlas.api.resources.parser import iiif
 from openatlas.api.resources.util import get_license_name, get_license_url
 from openatlas.display.util import check_iiif_file_exist

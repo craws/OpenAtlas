@@ -1,12 +1,10 @@
 from __future__ import annotations
 
 import importlib
-import math
 import os
 import shutil
 from pathlib import Path
-from subprocess import run
-from typing import Any, Optional
+from typing import Any
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import format_number, gettext as _
@@ -173,11 +171,11 @@ def get_test_mail_form() -> str:
         body = (_(
             'This test mail was sent by %(username)s',
             username=current_user.username) +
-            f' {_('at')} {request.headers['Host']}')
+                f' {_('at')} {request.headers['Host']}')
         if send_mail(subject, body, form.receiver.data):  # type: ignore
             flash(
                 _('A test mail was sent to %(email)s.',
-                    email=form.receiver.data),
+                  email=form.receiver.data),
                 'info')
     elif request.method == 'GET':
         form.receiver.data = current_user.email
@@ -194,16 +192,26 @@ def get_newsletter_button(users: list[User]) -> str:
 
 def get_rights_holder_table() -> Table:
     table = Table(['name', 'class'])
+    file_count = RightsHolder.get_rights_holder_file_count()
     for holder in RightsHolder.get_rights_holder():
         row = [
             link(holder, url_for('rights_holder_view', id_=holder.id)),
-            uc_first(f'{_(holder.class_.name)}'),
+            uc_first(f'{_(holder.class_) if holder.class_ else ''}'),
             link(
                 _('edit'),
                 url_for('rights_holder_update', id_=holder.id)),
             link(
                 _('delete'),
-                url_for('rights_holder_delete', id_=holder.id))]
+                url_for('rights_holder_delete', id_=holder.id),
+                js=f"return confirm('{uc_first(
+                    _('delete %(name)s?',
+                      name=holder.name.replace("'", "")))}?')"),
+            link(
+                str(file_count.get(holder.id, '')),
+                url_for(
+                    'rights_holder_view',
+                    id_=holder.id,
+                    _anchor='tab-files'))]
         table.rows.append(row)
     return table
 
@@ -298,7 +306,7 @@ def settings(category: str) -> str | Response:
         content=display_form(
             form,
             manual_page='admin/' +
-            category.replace('frontend', 'presentation_site')),
+                        category.replace('frontend', 'presentation_site')),
         title=_('admin'),
         crumbs=[
             [_('admin'), f'{url_for('admin_index')}#tab-{tab}'],
@@ -423,69 +431,61 @@ def resize_images() -> Response:
     return redirect(url_for('admin_index') + '#tab-data')
 
 
-def get_disk_space_info() -> Optional[dict[str, Any]]:
-    def upload_ident_with_iiif() -> bool:
-        if not iiif_path:
-            return False  # pragma: no cover
-        return bool(app.config['UPLOAD_PATH'].resolve() == iiif_path.resolve())
+def get_disk_space_info() -> dict[str, Any] | None:
+    def get_dir_size(path: str) -> int:
+        total_size = 0
+        try:
+            for entry in os.scandir(path):
+                if entry.is_dir(follow_symlinks=False):
+                    total_size += get_dir_size(entry.path)
+                elif entry.is_file(follow_symlinks=False):
+                    total_size += entry.stat().st_size
+        except (OSError, FileNotFoundError):
+            return 0
+        return total_size
 
     paths = {
-        'export': {
-            'path': app.config['EXPORT_PATH'], 'size': 0, 'mounted': False},
-        'upload': {
-            'path': app.config['UPLOAD_PATH'], 'size': 0, 'mounted': False},
-        'processed': {
-            'path': app.config['PROCESSED_IMAGE_PATH'],
-            'size': 0,
-            'mounted': False}}
-    iiif_path = None
-    if g.settings['iiif_path']:
-        iiif_path = Path(g.settings['iiif_path'])
-        if not upload_ident_with_iiif():
-            paths['iiif'] = {'path': iiif_path, 'size': 0, 'mounted': False}
-    keys = []
-    for key, path in paths.items():
-        if os.access(path['path'], os.W_OK):
-            size = run(
-                ['du', '-sb', path['path']],
-                capture_output=True,
-                text=True,
-                check=True)
-            path['size'] = int(size.stdout.split()[0])
-            mounted = run(
-                ['df', path['path']],
-                capture_output=True,
-                text=True,
-                check=True)
-            path['mounted'] = '/mnt/' in mounted.stdout.split()[-1]
-            keys.append(key)
-    files_size: Any = sum(paths[key]['size'] for key in keys) or 0.1
-    stats = shutil.disk_usage(app.config['UPLOAD_PATH'])
-    percent: dict[str, int | Any] = {
-        'free': 100 - math.ceil(stats.free / (stats.total / 100)),
-        'project': math.ceil(files_size / (stats.total / 100)),
-        'export': math.ceil(paths['export']['size'] / (files_size / 100)),
-        'upload': math.ceil(paths['upload']['size'] / (files_size / 100)),
-        'iiif': 0}
-    if iiif_path and not upload_ident_with_iiif():
-        percent['iiif'] = math.ceil(paths['iiif']['size'] / (files_size / 100))
-    percent['processed'] = math.ceil(
-        paths['processed']['size'] / (files_size / 100))
-    other_files = stats.total - stats.free - files_size
-    percent['other'] = 100 - (percent['project'] + percent['free'])
+        'export': {'path': app.config['EXPORT_PATH']},
+        'upload': {'path': app.config['UPLOAD_PATH']},
+        'processed': {'path': app.config['PROCESSED_IMAGE_PATH']}}
+    iiif_path = Path(g.settings['iiif_path']) \
+        if g.settings['iiif_path'] else None
+    if iiif_path and iiif_path.resolve() != paths['upload']['path'].resolve():
+        paths['iiif'] = {'path': iiif_path}
+
+    for key, info in paths.items():
+        info['size'] = get_dir_size(str(info['path']))
+        info['mounted'] = info['path'].is_mount()
+
+    project_size = sum(info['size'] for info in paths.values())
+    try:
+        disk = shutil.disk_usage(app.config['UPLOAD_PATH'])
+    except (FileNotFoundError, PermissionError, OSError):  #pragma: no cover
+        return None
+    other_size = max(0, disk.used - project_size)
+
+    dist = {'project': 0, 'other': 0, 'free': 0}
+    if disk.total > 0:
+        dist['project'] = round((project_size / disk.total) * 100)
+        dist['other'] = round((other_size / disk.total) * 100)
+        dist['free'] = 100 - dist['project'] - dist['other']
+
+    breakdown = {key: 0 for key in paths}
+    if project_size > 0:
+        for key, info in paths.items():
+            breakdown[key] = round((info['size'] / project_size) * 100)
+
     return {
-        'total': convert_size(stats.total),
-        'project': convert_size(files_size),
-        'export': convert_size(paths['export']['size']),
-        'upload': convert_size(paths['upload']['size']),
-        'processed': convert_size(paths['processed']['size']),
-        'iiif': convert_size(
-            paths['iiif']['size'] if iiif_path and not upload_ident_with_iiif()
-            else 0),
-        'other_files': convert_size(other_files),
-        'free': convert_size(stats.free),
-        'percent': percent,
-        'mounted': [k for k, v in paths.items() if v['mounted']]}
+        'total': convert_size(disk.total),
+        'project': convert_size(project_size),
+        'other_files': convert_size(other_size),
+        'free': convert_size(disk.free),
+        'export': convert_size(paths.get('export', {}).get('size', 0)),
+        'upload': convert_size(paths.get('upload', {}).get('size', 0)),
+        'processed': convert_size(paths.get('processed', {}).get('size', 0)),
+        'iiif': convert_size(paths.get('iiif', {}).get('size', 0)),
+        'percent': {**dist, **breakdown},
+        'mounted': [k for k, v in paths.items() if v.get('mounted')]}
 
 
 def count_files_to_convert() -> int:

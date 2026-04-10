@@ -66,9 +66,9 @@ def ensure_person_exist(
             continue  # pragma: no cover
         uri = create_single_uri(name)
         if str(uri) not in ENTITIES_EMITTED:
-            if entity and entity.class_.name == 'group':
+            if entity and entity.class_ == 'group':
                 graph.add((uri, RDF.type, ACDH.Organisation))
-            elif entity and entity.class_.name == 'person':
+            elif entity and entity.class_ == 'person':
                 graph.add((uri, RDF.type, ACDH.Person))
             else:
                 graph.add((uri, RDF.type, ACDH.Agent))

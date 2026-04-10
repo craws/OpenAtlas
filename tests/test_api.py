@@ -519,39 +519,37 @@ class Api(ApiTestCase):
             assert rv['properties']['systemClass']
 
         # Test entities with gpkg Format
-        for rv in [
-            c.get(
-                url_for(
-                    'api_04.query',
-                    entities=place.id,
-                    format='gpkg')),
-            c.get(
-                url_for(
-                    'api_04.query',
-                    entities=location.id,
-                    cidoc_classes='E18',
-                    view_classes='artifact',
-                    system_classes='person',
-                    format='gpkg'))]:
-            assert b'SQLite format' in rv.data
+        for url in [
+            url_for(
+                'api_04.query',
+                entities=place.id,
+                format='gpkg'),
+            url_for(
+                'api_04.query',
+                entities=location.id,
+                cidoc_classes='E18',
+                view_classes='artifact',
+                system_classes='person',
+                format='gpkg')]:
+            with c.get(url) as rv:
+                assert b'SQLite format' in rv.data
 
-        for rv in [
-                c.get(
+        for url in [
                     url_for(
                         'api_04.query',
                         cidoc_classes='E18',
                         view_classes='artifact',
                         system_classes='person',
-                        format='table_row')),
-                c.get(
+                        format='table_row'),
                     url_for(
                         'api_04.table_rows',
                         cidoc_classes='E18',
                         view_classes='artifact',
-                        system_classes='person'))]:
-            rv = rv.get_json()['results']
-            assert 'Bar' in rv[0][0]
-            assert 'The One Ring' in rv[-1][0]
+                        system_classes='person')]:
+            with c.get(url) as rv:
+                rv = rv.get_json()['results']
+                assert 'Bar' in rv[0][0]
+                assert 'The One Ring' in rv[-1][0]
 
         # Just test if not filter not crashes. Can be more detailed.
         columns = [

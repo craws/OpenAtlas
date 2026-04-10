@@ -16,7 +16,7 @@ class RightsHolderTests(TestBaseCase):
         # Insert
         data = {
             'name': 'Test Creator',
-            'role': 'person',
+            'class_': 'person',
             'description': 'A test creator'}
         rv = c.post(
             url_for('rights_holder_insert'),
@@ -56,7 +56,7 @@ class RightsHolderTests(TestBaseCase):
                 relation='creator'),
             data={
                 'name': 'Test Creator 2',
-                'role': 'person',
+                'class_': 'person',
                 'description': 'A second creator'},
             follow_redirects=True)
         assert b'An entry has been created' in rv.data
@@ -68,7 +68,7 @@ class RightsHolderTests(TestBaseCase):
 
         update_data = {
             'name': 'Updated Creator',
-            'role': 'group',
+            'class_': 'group',
             'description': 'An updated description'}
         rv = c.post(
             url_for('rights_holder_update', id_=rh_id),

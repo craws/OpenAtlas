@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 import smtplib
 import subprocess
 from datetime import datetime, timedelta
@@ -27,6 +28,7 @@ from openatlas.models.content import get_translation
 from openatlas.models.dates import Dates, format_date
 from openatlas.models.entity import Entity, Link
 from openatlas.models.imports import Project
+from openatlas.models.rights_holder import RightsHolder
 from openatlas.models.user import User
 
 
@@ -466,6 +468,12 @@ def link(
             url or url_for('view', id_=object_.id),
             uc_first_=False,
             external=external)
+    elif isinstance(object_, RightsHolder):
+        html = link(
+            object_.name,
+            url or url_for('view', id_=object_.id),
+            uc_first_=False,
+            external=external)
     elif isinstance(object_, CidocClass):
         html = link(
             object_.code,
@@ -596,26 +604,45 @@ def delete_iiif_image(id_: int) -> None:
 
 
 def convert_image_to_iiif(id_: int, path: Optional[Path] = None) -> bool:
+    vips_path = get_binary_path('vips', required=True)
+    if not vips_path:  # pragma: no cover
+        return False
+    source = str(path or get_file_path(id_))
+    target = str(get_iiif_file_path(id_))
     command = [
-        'vips',
+        vips_path,
         'tiffsave',
-        path or get_file_path(id_),
-        get_iiif_file_path(id_),
+        source,
+        target,
         '--tile',
         '--pyramid',
-        '--compression',
-        g.settings['iiif_conversion'],
-        '--tile-width',
-        '128',
-        '--tile-height',
-        '128']
+        '--compression', g.settings['iiif_conversion'],
+        '--tile-width', '128',
+        '--tile-height', '128']
     try:
-        with subprocess.Popen(command) as sub_process:
-            sub_process.wait()
-    except Exception:  # pragma: no cover
+        subprocess.run(command, check=True, capture_output=True, text=True)
+    except subprocess.CalledProcessError as e:  # pragma: no cover
+        error_msg = e.stderr.strip() if e.stderr else "Unknown vips error"
+        g.logger.log(
+            'error',
+            'iiif_conversion',
+            f'Vips failed for ID {id_} ({e.returncode}): {error_msg}')
+        return False
+    except Exception as e:  # pragma: no cover
+        g.logger.log(
+            'error',
+            'iiif_conversion',
+            f'Unexpected error during Vips conversion for ID {id_}: {str(e)}')
         return False
     return True
 
+def get_binary_path(name: str, required: bool = False) -> str | None:
+    binary_path = shutil.which(name)
+    if not binary_path:  # pragma: no cover
+        msg = f"{_("system tool not found")}: {name}"
+        flash(msg, 'error' if required else 'warning')
+        return None
+    return binary_path
 
 def hierarchy_crumbs(entity: Entity) -> list[str]:
     crumbs: list[Any] = [link(entity, index=True)]
