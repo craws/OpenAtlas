@@ -28,6 +28,7 @@ class AdministrativeUnit:
 
 def parse_admin_units() -> list[AdministrativeUnit]:
     df = pd.read_csv(ADMIN_PATH, delimiter=',', encoding='utf-8', dtype=str)
+    df = df.where(pd.notnull(df), None)
     df = df.rename(columns=lambda x: x.strip().lower())
     return [AdministrativeUnit(**row) for row in
             df[['region', 'district', 'cadastre']].to_dict(orient='records')]
@@ -37,10 +38,9 @@ def parse_admin_units() -> list[AdministrativeUnit]:
 # Code for Administrative units #
 #################################
 
-def normalize_name(name: str) -> str:
-    """
-    Normalize name for internal comparison only (case + accent insensitive).
-    """
+def normalize_name(name):
+    if not isinstance(name, str):
+        return ""
     return unidecode(name.strip().lower())
 
 
@@ -94,7 +94,7 @@ def import_and_get_administrative_units() -> dict[str, dict[str, Any]]:
 def import_places() -> None:
     data = pd.read_csv(PLACE_PATH, delimiter=',', encoding='utf-8', dtype=str)
     data = data.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
-    data = data.fillna('')
+    data = data.replace(['', 'nan', 'NaN'], None).where(pd.notnull(data), None)
     places_result: list[dict[str, Any]] = []
     for _, row in data.iterrows():
         places_result.append(row.to_dict())
@@ -108,6 +108,13 @@ def import_places() -> None:
         if region_norm and district_norm and cadastre_norm:
             cadastre_id = cadastres_.get(cadastre_key, 0)
             row['administrative_unit_id'] = cadastre_id
+            if cadastre_id:
+                type_ids = row.get('type_ids')
+                if type_ids:
+                    row['type_ids'] = f"{type_ids} {cadastre_id}"
+                    print(cadastre_id)
+                else:
+                    row['type_ids'] = str(cadastre_id)
     import_data_(project, 'place', places_result)
 
 
