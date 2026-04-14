@@ -609,6 +609,8 @@ def convert_image_to_iiif(id_: int, path: Optional[Path] = None) -> bool:
         return False
     source = str(path or get_file_path(id_))
     target = str(get_iiif_file_path(id_))
+    env = os.environ.copy()
+    env["VIPS_WARNING"] = "0"
     command = [
         vips_path,
         'tiffsave',
@@ -620,7 +622,13 @@ def convert_image_to_iiif(id_: int, path: Optional[Path] = None) -> bool:
         '--tile-width', '128',
         '--tile-height', '128']
     try:
-        subprocess.run(command, check=True, capture_output=True, text=True)
+        subprocess.run(
+            command,
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            env=env,
+            text=True)
     except subprocess.CalledProcessError as e:  # pragma: no cover
         error_msg = e.stderr.strip() if e.stderr else "Unknown vips error"
         g.logger.log(
@@ -636,6 +644,7 @@ def convert_image_to_iiif(id_: int, path: Optional[Path] = None) -> bool:
         return False
     return True
 
+
 def get_binary_path(name: str, required: bool = False) -> str | None:
     binary_path = shutil.which(name)
     if not binary_path:  # pragma: no cover
@@ -643,6 +652,7 @@ def get_binary_path(name: str, required: bool = False) -> str | None:
         flash(msg, 'error' if required else 'warning')
         return None
     return binary_path
+
 
 def hierarchy_crumbs(entity: Entity) -> list[str]:
     crumbs: list[Any] = [link(entity, index=True)]

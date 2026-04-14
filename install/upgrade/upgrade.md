@@ -18,7 +18,8 @@ then run the database upgrade script, then restart Apache:
     sudo service apache2 restart
 
 ### 9.1.x to 9.2.0
-No database update is required but an additional Python package is needed:
+9.2.0.sql is needed but will be taken care of by the database upgrade script.
+An additional Python package is needed:
 
     sudo apt install python3-fiona
 

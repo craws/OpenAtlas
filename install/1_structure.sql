@@ -7,8 +7,8 @@
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET transaction_timeout = 0;
+-- SET idle_in_transaction_session_timeout = 0;
+-- SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -2442,6 +2442,13 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON web.user_notes FOR EACH ROW EXEC
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON web.user_settings FOR EACH ROW EXECUTE FUNCTION model.update_modified();
+
+
+--
+-- Name: user_tokens update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
+--
+
+CREATE TRIGGER update_modified BEFORE UPDATE ON web.user_tokens FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 
 
 --
