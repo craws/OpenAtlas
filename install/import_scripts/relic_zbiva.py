@@ -6,6 +6,7 @@ from typing import Any
 import pandas as pd
 from flask_login import login_user
 from unidecode import unidecode
+from tqdm import tqdm
 
 from openatlas import app
 from openatlas.models.entity import Entity, insert
@@ -38,7 +39,7 @@ def parse_admin_units() -> list[AdministrativeUnit]:
 # Code for Administrative units #
 #################################
 
-def normalize_name(name):
+def normalize_name(name: str) -> str:
     if not isinstance(name, str):
         return ""
     return unidecode(name.strip().lower())
@@ -52,7 +53,7 @@ def import_and_get_administrative_units() -> dict[str, dict[str, Any]]:
     districts_ = {}
     cadastres_ = {}
 
-    for entry in entries:
+    for entry in tqdm(entries, desc='Importing administrative units'):
         region_norm = normalize_name(entry.region)
         district_norm = normalize_name(entry.district)
         cadastre_norm = normalize_name(entry.cadastre)
@@ -96,10 +97,11 @@ def import_places() -> None:
     data = data.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
     data = data.replace(['', 'nan', 'NaN'], None).where(pd.notnull(data), None)
     places_result: list[dict[str, Any]] = []
-    for _, row in data.iterrows():
+    for _, row in tqdm(
+            data.iterrows(), total=len(data), desc='Processing places'):
         places_result.append(row.to_dict())
     cadastres_ = admin_units['cadastres']
-    for row in places_result:
+    for row in tqdm(places_result, desc='Importing places'):
         region_norm = normalize_name(row.get('region', ''))
         district_norm = normalize_name(row.get('district', ''))
         cadastre_norm = normalize_name(row.get('cadastre', ''))
@@ -112,7 +114,6 @@ def import_places() -> None:
                 type_ids = row.get('type_ids')
                 if type_ids:
                     row['type_ids'] = f"{type_ids} {cadastre_id}"
-                    print(cadastre_id)
                 else:
                     row['type_ids'] = str(cadastre_id)
     import_data_(project, 'place', places_result)
@@ -124,7 +125,8 @@ def import_bibliography() -> None:
     data = data.apply(lambda x: x.str.strip() if x.dtype == "object" else x)
     data = data.fillna('')
     bib_result: list[dict[str, Any]] = []
-    for _, row in data.iterrows():
+    for _, row in tqdm(
+            data.iterrows(), total=len(data), desc='Processing bibliography'):
         bib_result.append(row.to_dict())
     import_data_(project, 'bibliography', bib_result)
 

@@ -73,6 +73,22 @@ def check_duplicates(class_: str, names: list[str]) -> list[str]:
     return db.check_duplicates(class_, names)
 
 
+def sort_types(
+        type_ids: list[tuple[str, str | None]]) \
+        -> dict[str, list[tuple[str, str | None]]]:
+    sorted_types: dict[str, list[tuple[str, str | None]]] = {
+        'types': [],
+        'administrative_units': []}
+    for item in type_ids:
+        type_id, _ = item
+        root = g.types[g.types[int(type_id)].root[0]]
+        if root.name in ['Administrative unit', 'Historical place']:
+            sorted_types['administrative_units'].append(item)
+        else:
+            sorted_types['types'].append(item)
+    return sorted_types
+
+
 def check_type_id(type_id: str, class_: str) -> bool:
     if not type_id.isdigit() or int(type_id) not in g.types:
         return False
@@ -80,8 +96,6 @@ def check_type_id(type_id: str, class_: str) -> bool:
         return False
     root_type = g.types[g.types[int(type_id)].root[0]]
     if class_ not in root_type.classes:
-        return False
-    if root_type.name in ['Administrative unit', 'Historical place']:
         return False
     return True
 
@@ -207,8 +221,15 @@ def link_types(
     checked_type_ids = [
         type_tuple for type_tuple in type_ids
         if check_type_id(type_tuple[0], class_)]
-    for type_tuple in checked_type_ids:
+    sorted_type_ids = sort_types(checked_type_ids)
+    for type_tuple in sorted_type_ids['types']:
         entity.link('P2', g.types[int(type_tuple[0])], type_tuple[1])
+    for type_tuple in sorted_type_ids['administrative_units']:
+        if entity.location:
+            entity.location.link(
+                'P89',
+                g.types[int(type_tuple[0])],
+                type_tuple[1])
 
 
 def link_references(

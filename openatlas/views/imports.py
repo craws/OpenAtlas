@@ -1,6 +1,6 @@
 from collections import Counter, defaultdict
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Optional, cast
 
 import pandas as pd
 from flask import flash, g, render_template, request, url_for
@@ -34,8 +34,9 @@ from openatlas.models.dates import (
     datetime64_to_timestamp, form_to_datetime64, format_date)
 from openatlas.models.entity import Entity
 from openatlas.models.imports import (
-    Project, check_duplicates, check_single_type_duplicates, check_type_id,
-    clean_reference_pages, get_id_from_origin_id, get_origin_ids, import_data_)
+    Project, check_duplicates, check_single_type_duplicates,
+    check_type_id, clean_reference_pages, get_id_from_origin_id,
+    get_origin_ids, import_data_)
 
 _('invalid columns')
 _('possible duplicates')
@@ -329,14 +330,17 @@ def check_data_for_table_representation(
         checked_data: list[Any],
         project: Project) -> Table:
     file_ = request.files['file']
-    file_path = app.config['TMP_PATH'] / secure_filename(str(file_.filename))
+    file_path: Path = (
+            app.config['TMP_PATH'] / secure_filename(str(file_.filename)))
     file_.save(str(file_path))
-    data_frame: Any = pd.read_csv(
-        file_path,
-        dtype=str,
-        skipinitialspace=True,
-        keep_default_na=True,
-        na_values=['']).where(pd.notna, None)
+    data_frame: DataFrame = cast(
+        DataFrame,
+        pd.read_csv(  # type: ignore[call-overload]
+            str(file_path),
+            dtype=str,
+            skipinitialspace=True,
+            keep_default_na=True,
+            na_values=[''])).where(pd.notna, None)
     columns = get_clean_header(data_frame, class_, checks)
     table_data = []
     origin_ids = []
@@ -579,10 +583,10 @@ def check_cell_value(
                     value[1],
                     value[2],
                     to_date=item in ['begin_to', 'end_to']))
-                row[item] = value if all(value) else ''
+                row[item] = value or ''
             except ValueError:
                 row[item] = ''
-                value = '' if str(value) == 'NaT' else error_span(value)
+                value = '' if str(value) == 'NaT' else error_span(str(value))
                 checks.set_warning('invalid_dates', id_)
         case 'administrative_unit_id' | 'historical_place_id' if value:
             if ((not str(value).isdigit() or int(value) not in g.types) or
