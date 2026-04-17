@@ -10,6 +10,7 @@
   <title>Admin &mdash; OpenAtlas 9.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
 
   
@@ -18,6 +19,7 @@
       <script src="../_static/documentation_options.js?v=92dab87b"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="User" href="user.html" />
@@ -52,6 +54,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Admin</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="user.html">User</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rights_holder.html">Rights holder</a></li>
 <li class="toctree-l2"><a class="reference internal" href="general.html">General</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mail.html">Mail</a></li>
 <li class="toctree-l2"><a class="reference internal" href="modules.html">Modules</a></li>
@@ -113,6 +116,12 @@
 <li class="toctree-l2"><a class="reference internal" href="user.html#groups">Groups</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="rights_holder.html">Rights holder</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rights_holder.html#form-fields">Form fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rights_holder.html#creator">Creator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rights_holder.html#license-holder">License Holder</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="general.html">General</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="general.html#authentication">Authentication</a></li>
 </ul>
@@ -168,24 +177,27 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="import.html">Import</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="import.html#preparation">Preparation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="import.html#project">Project</a></li>
-<li class="toctree-l2"><a class="reference internal" href="import.html#import-class">Import class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="import.html#possible-import-fields">Possible import fields</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="import.html#alias">Alias</a></li>
-<li class="toctree-l3"><a class="reference internal" href="import.html#dates">Dates</a></li>
-<li class="toctree-l3"><a class="reference internal" href="import.html#types">Types</a></li>
-<li class="toctree-l3"><a class="reference internal" href="import.html#origin-types">Origin types</a></li>
-<li class="toctree-l3"><a class="reference internal" href="import.html#value-types">Value types</a></li>
-<li class="toctree-l3"><a class="reference internal" href="import.html#origin-value-types">Origin value types</a></li>
-<li class="toctree-l3"><a class="reference internal" href="import.html#references">References</a></li>
-<li class="toctree-l3"><a class="reference internal" href="import.html#origin-references">Origin references</a></li>
-<li class="toctree-l3"><a class="reference internal" href="import.html#wkt-coordinates">WKT coordinates</a></li>
-<li class="toctree-l3"><a class="reference internal" href="import.html#external-reference-systems">External reference systems</a></li>
-<li class="toctree-l3"><a class="reference internal" href="import.html#place-hierarchy">Place hierarchy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="import.html#general-concepts">General Concepts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="import.html#import-workflow">Import Workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="import.html#identifiers-id-vs-openatlas-id">Identifiers (ID vs. OpenAtlas ID)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="import.html#linking-limitations">Linking Limitations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="import.html#import-project">Import Project</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="import.html#import-options">Import options</a></li>
-<li class="toctree-l2"><a class="reference internal" href="import.html#after-the-import">After the import</a></li>
+<li class="toctree-l2"><a class="reference internal" href="import.html#supported-fields">Supported Fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="import.html#class-specific-descriptions">Class Specific Descriptions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="import.html#id">ID</a></li>
+<li class="toctree-l3"><a class="reference internal" href="import.html#names">Names</a></li>
+<li class="toctree-l3"><a class="reference internal" href="import.html#dates">Dates</a></li>
+<li class="toctree-l3"><a class="reference internal" href="import.html#types-value-types">Types &amp; Value Types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="import.html#references">References</a></li>
+<li class="toctree-l3"><a class="reference internal" href="import.html#external-reference-systems">External Reference Systems</a></li>
+<li class="toctree-l3"><a class="reference internal" href="import.html#geometries-hierarchies-places-artifacts">Geometries &amp; Hierarchies (Places &amp; Artifacts)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="import.html#example-datasets-st-gallen">Example Datasets (St. Gallen)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="import.html#import-options">Import Options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="import.html#after-the-import">After the Import</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="export.html">Export</a><ul>
@@ -208,7 +220,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api.html#public-default-off"><strong>Public</strong> (default=off)</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html#api-token"><strong>API token</strong></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#api-token-jwt"><strong>API token (JWT)</strong></a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api.html#valid-token"><strong>Valid token</strong></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api.html#generate"><strong>Generate</strong></a></li>
 </ul>

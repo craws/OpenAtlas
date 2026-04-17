@@ -90,7 +90,7 @@ class ImportTest(ImportTestCase):
                 follow_redirects=True)
         assert b'OpenAtlas 2024' in rv.data
 
-        with open(self.static_path / 'example.csv', 'rb') as file:
+        with open(self.static_path / 'examples' / 'example.csv', 'rb') as file:
             rv = c.post(
                 url_for('import_data', class_='place', project_id=p_id),
                 data={'file': file, 'duplicate': True},
@@ -115,7 +115,8 @@ class ImportTest(ImportTestCase):
         assert b'Dam' in rv.data
         (self.test_path / 'example_type.csv').unlink()
 
-        with open(self.static_path / 'example.csv', 'rb') as file:
+        with open(self.static_path / 'examples' /  'example.csv', 'rb') \
+              as file:
             rv = c.post(
                 url_for('import_data', class_='place', project_id=p_id),
                 data={'file': file, 'duplicate': True},
@@ -237,7 +238,7 @@ class ImportTest(ImportTestCase):
         (self.test_path / 'invalid_3_modified.csv').unlink()
 
         data_frame = pd.read_csv(
-            self.static_path / 'example.csv',
+            self.static_path / 'examples' / 'example.csv',
             keep_default_na=False)
         data_frame.at[0, 'id'] = 'new_place_1'
         data_frame.at[1, 'id'] = 'new_place_2'
@@ -302,7 +303,7 @@ class ImportTest(ImportTestCase):
         (self.test_path / 'example.csv').unlink()
 
         data_frame = pd.read_csv(
-            self.static_path / 'example_place_hierarchy.csv',
+            self.static_path / 'examples' /  'example_place_hierarchy.csv',
             keep_default_na=False)
         data_frame.at[7, 'openatlas_parent_id'] = place.id
         data_frame.at[7, 'origin_value_types'] = 'type_7;38'

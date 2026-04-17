@@ -1,4 +1,5 @@
-from subprocess import call
+import subprocess
+from pathlib import Path
 from typing import Any, Optional
 
 from flask import g, request
@@ -11,24 +12,25 @@ from wtforms import (
 from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.image_processing import resize_image
-from openatlas.display.util import check_iiif_activation, convert_image_to_iiif
+from openatlas.display.util import (
+    check_iiif_activation, convert_image_to_iiif, get_binary_path)
 from openatlas.forms.add_fields import (
     add_buttons, add_class_types, add_date_fields, add_description,
     add_name_fields, add_reference_systems, add_relations, get_validators)
-from openatlas.forms.field import DragNDropField
+from openatlas.forms.field import DragNDropField, TableMultiField
 from openatlas.forms.populate import populate_insert, populate_update
 from openatlas.forms.util import convert
 from openatlas.forms.validation import file, validate
 from openatlas.models.dates import Dates, form_to_datetime64
 from openatlas.models.entity import Entity, insert
 from openatlas.models.gis import InvalidGeomException
+from openatlas.models.rights_holder import RightsHolder
 
 
 def get_entity_form(
         entity: Entity,
         origin: Optional[Entity] = None,
         relation: Optional[str] = None) -> Any:
-
     class Form(FlaskForm):
         opened = HiddenField()
         validate = validate
@@ -39,8 +41,17 @@ def get_entity_form(
     add_reference_systems(Form, entity.class_)
     for key, value in entity.class_.attributes.items():
         match key:
-            case 'creator' | 'example_id' | 'license_holder' | \
-                 'resolver_url' | 'website_url':
+            case 'creator' | 'license_holder':
+                selection = RightsHolder.get_rights_holders_by_entity_and_role(
+                    entity.id,
+                    key)
+                setattr(
+                    Form,
+                    key,
+                    TableMultiField(
+                        RightsHolder.get_rights_holder(),
+                        selection))
+            case 'example_id' | 'resolver_url' | 'website_url':
                 setattr(
                     Form,
                     key,
@@ -136,8 +147,7 @@ def process_form_data(
                     inverse = form.name_inverse.data \
                         .replace('(', '').replace(')', '').strip()
                     data[attr] += f' ({inverse})'
-            case _ if hasattr(form, attr) and (
-                    getattr(form, attr).data or getattr(form, attr).data == 0):
+            case _ if hasattr(form, attr):
                 value = getattr(form, attr).data
                 data[attr] = value.strip() if isinstance(value, str) else value
             case _:
@@ -147,8 +157,10 @@ def process_form_data(
         if entity.id:
             delete_links(entity)
             entity.update(data)
+            g.logger.log_user(entity.id, 'update')
         else:
             entity = insert(data)
+            g.logger.log_user(entity.id, 'insert')
         if entity.class_.hierarchies:
             process_types(entity, form)
         process_relations(entity, form, origin, relation)
@@ -189,7 +201,7 @@ def process_types(entity: Entity, form: Any) -> None:
         if data := convert(getattr(form, str(type_.id)).data):
             if type_.class_.name == 'administrative_unit':
                 location = entity.location \
-                    or entity.get_linked_entity_safe('P53')
+                           or entity.get_linked_entity_safe('P53')
                 location.link('P89', [g.types[id_] for id_ in data])
             else:
                 entity.link('P2', [g.types[id_] for id_ in data])
@@ -311,7 +323,7 @@ def process_form(
             path = app.config['UPLOAD_PATH'] / name
             file_.save(str(path))
             if f'.{ext}' in g.display_file_ext:
-                call(f'exiftran -ai {path}', shell=True)  # Fix rotation
+                rotate_file(name, path)
             filenames.append(name)
             if g.settings['image_processing']:
                 resize_image(name)
@@ -323,3 +335,25 @@ def process_form(
         g.logger.log('error', 'database', 'file upload failed', e)
         raise e from None
     return entity
+
+
+def rotate_file(name: str, path: Path) -> None:
+    exiftran_path = get_binary_path('exiftran', required=False)
+    if exiftran_path:
+        try:
+            subprocess.run(
+                [exiftran_path, '-ai', str(path)],
+                check=True,
+                capture_output=True,
+                text=True)
+        except subprocess.CalledProcessError as e:  # pragma: no cover
+            g.logger.log(
+                'warn',
+                'image_processing',
+                f'exiftran failed for {name} ({e.returncode}): '
+                f'{e.stderr.strip()}')
+        except Exception as e:  # pragma: no cover
+            g.logger.log(
+                'error',
+                'image_processing',
+                f'Unexpected error during exiftran: {str(e)}')

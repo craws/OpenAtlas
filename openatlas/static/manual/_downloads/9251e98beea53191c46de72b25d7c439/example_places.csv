@@ -1,0 +1,10 @@
+id,name,alias,description,wkt,type_ids,origin_type_ids,parent_id,openatlas_class
+st_gallen_abbey,Abbey of Saint Gall,Kloster St. Gallen,A Benedictine religious complex in the city of St. Gallen.,POINT(9.3766 47.4239),80,,,place
+st_gallen_church,Abbey Church of Saint Gall,,The main church of the abbey.,POINT(9.3770 47.4230),26197,,st_gallen_abbey,feature
+st_gallen_library,Abbey Library of Saint Gall,Stiftsbibliothek,One of the richest medieval libraries in the world.,POINT(9.3760 47.4245),26197,,st_gallen_abbey,feature
+st_gallen_scriptorium,Scriptorium,,The room where manuscripts were written.,,26513,,st_gallen_library,stratigraphic_unit
+st_gallen_altar_main,Main Altar,,The central altar in the abbey church.,,26513,,st_gallen_church,stratigraphic_unit
+codex_sangallensis_1395,Codex Sangallensis 1395,"",The oldest surviving manuscript containing the Irish version of the Gospels.,"","",st_gallen_parchment,st_gallen_library,artifact
+codex_abrogans,Codex Abrogans,"",Considered the oldest book in the German language.,"","",st_gallen_parchment,st_gallen_library,artifact
+st_gallen_plan,Plan of Saint Gall,"",Famous medieval architectural drawing of a monastery complex.,"","",st_gallen_parchment,st_gallen_library,artifact
+st_gallen_bell,Abbey Bell,"",Historical bell of the abbey.,"",26443,,st_gallen_church,artifact

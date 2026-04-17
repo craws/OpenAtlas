@@ -1,0 +1,3 @@
+id,name,description,begin_from,end_to,type_ids,origin_type_ids
+construction_abbey_church,Construction of the Abbey Church,Major building phase under Abbot Gozbert.,0830,0837,209005,""
+foundation_st_gallen,Foundation of the Abbey,The monastery was established by Saint Gall and later Otmar.,0719,0719,"",st_gallen_foundation

@@ -22,6 +22,7 @@ from openatlas.api.external.arche_class import ArcheFileMetadata
 from openatlas.api.formats.rdf import rdf_export_to_file
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.util import filter_by_type, get_reference_systems
+from openatlas.display.util import get_binary_path
 from openatlas.models.entity import Entity
 
 
@@ -33,33 +34,49 @@ def current_date_for_filename() -> str:
 
 
 def sql_export(format_: str, postfix: Optional[str] = '') -> bool:
-    file = app.config['SQL_PATH'] \
-           / f'{current_date_for_filename()}_export{postfix}.{format_}'
-    command: list[Any] = ['pg_dump']
-    if format_ == 'dump':
-        command.append('-Fc')
-    command.extend([
+    dump_file = app.config['SQL_PATH'] \
+        / f'{current_date_for_filename()}_export{postfix}.{format_}'
+    pg_dump_path = get_binary_path('pg_dump', required=True)
+    if not pg_dump_path:  # pragma: no cover
+        return False
+    command = [
+        pg_dump_path,
         '-h', app.config['DATABASE_HOST'],
         '-d', app.config['DATABASE_NAME'],
         '-U', app.config['DATABASE_USER'],
         '-p', str(app.config['DATABASE_PORT']),
-        '-f', file])
+        '-f', str(dump_file)]
+    if format_ == 'dump':
+        command.insert(1, '-Fc')
     try:
-        with subprocess.Popen(
-                command,
-                stdin=subprocess.PIPE,
-                env={
-                    'PGPASSWORD': app.config['DATABASE_PASS'],
-                    'SYSTEMROOT': os.environ.get('SYSTEMROOT', '')}) \
-                as sub_process:
-            sub_process.wait()
-        with open(os.devnull, 'w', encoding='utf8') as null:
-            with subprocess.Popen(
-                    ['7z', 'a', f'{file}.7z', file],
-                    stdout=null) as sub_process:
-                sub_process.wait()
-        file.unlink()
-    except Exception:  # pragma: no cover
+        subprocess.run(
+            command,
+            env={
+                'PGPASSWORD': app.config['DATABASE_PASS'],
+                'SYSTEMROOT': os.environ.get('SYSTEMROOT', '')},
+            check=True,
+            capture_output=True,
+            text=True)
+        seven_zip_path = get_binary_path('7z', required=False)
+        if seven_zip_path:
+            archive_file = f'{dump_file}.7z'
+            try:
+                with open(os.devnull, 'w', encoding='utf8') as null:
+                    subprocess.run(
+                        [seven_zip_path, 'a', archive_file, str(dump_file)],
+                        stdout=null,
+                        check=True                )
+                dump_file.unlink()
+            except subprocess.CalledProcessError as e:  # pragma: no cover
+                g.logger.log(
+                    'warn',
+                    'database',
+                    f'7zip compression failed: {e.stderr}')
+    except subprocess.CalledProcessError as e:  # pragma: no cover
+        g.logger.log('error', 'database', f'pg_dump failed: {e.stderr}')
+        return False
+    except Exception as e:  # pragma: no cover
+        g.logger.log('error', 'database', f'Unexpected backup error: {str(e)}')
         return False
     return True
 
@@ -366,12 +383,15 @@ def find_duplicates(entity_ids: set[int]) -> set[tuple[int, int]]:
 
 
 def open_tmp_sql_file() -> str:
+    pg_dump_bin = get_binary_path('pg_dump', required=True)
+    if not pg_dump_bin:  # pragma: no cover
+        raise FileNotFoundError("pg_dump binary not found")
     with tempfile.NamedTemporaryFile(
             mode='w+',
             suffix='.sql',
             delete=False) as tmp_sql:
         command = [
-            'pg_dump',
+            pg_dump_bin,
             '-h', app.config['DATABASE_HOST'],
             '-d', app.config['DATABASE_NAME'],
             '-U', app.config['DATABASE_USER'],
@@ -379,15 +399,26 @@ def open_tmp_sql_file() -> str:
             '--schema=model',
             '--schema=public',
             '--schema=import']
-        subprocess.run(
-            command,
-            stdout=tmp_sql,
-            env={
-                'PGPASSWORD': app.config['DATABASE_PASS'],
-                'SYSTEMROOT': os.environ.get('SYSTEMROOT', '')},
-            check=True)
-        return tmp_sql.name
+        try:
+            subprocess.run(
+                command,
+                stdout=tmp_sql,
+                env={
+                    'PGPASSWORD': app.config['DATABASE_PASS'],
+                    'SYSTEMROOT': os.environ.get('SYSTEMROOT', '')},
+                check=True,
+                capture_output=False,
+                text=True)
+        except subprocess.CalledProcessError as e:  # pragma: no cover
+            g.logger.log(
+                'error',
+                'database',
+                f'pg_dump for temporary SQL file failed ({e.returncode})')
+            if os.path.exists(tmp_sql.name):
+                os.unlink(tmp_sql.name)
+            raise e
 
+        return tmp_sql.name
 
 def rdf_export() -> str:
     return rdf_export_to_file(

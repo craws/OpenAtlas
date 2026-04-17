@@ -14,9 +14,10 @@ class ArcheFileMetadata:
     titles: list[tuple[str, str]]
     depositors: str | list[str] | None = None
     license: str | None = None
-    licensors: str | list[str] | None = None
+    licensors: list[Entity] | None = None
+    rights_holders: list[Entity] | None = None
+    creators: list[Entity] | None = None
     metadata_creators: str | list[str] | None = None
-    rights_holders: str | list[str] | None = None
     is_part_of: str | None = None
     accepted_date: str | None = None
     curators: str | list[str] | None = None
@@ -26,7 +27,6 @@ class ArcheFileMetadata:
     related_disciplines: str | list[str] | None = None
     transfer_date: str | None = None
     binary_size: int | None = None
-    creators: str | list[str] | None = None
     actors: list[dict[str, str | list[str]]] | None = None
     spatial_coverages: list[dict[str, str | list[str]]] | None = None
     has_publications: list[tuple[Entity, str]] | None = None

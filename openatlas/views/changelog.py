@@ -15,9 +15,23 @@ def index_changelog() -> str:
 
 
 versions = {
-    '9.2.0': ['TBA', {
+    '9.3.0': ['TBA', {}],
+    '9.2.0': ['2026-04-15', {
         'feature': {
-            '2722': 'API: Download geometries as .gpkg'}}],
+            '2570': 'Improved tracking of file creator and license holder',
+            '2716': 'Improved count view at type trees',
+            '2730': 'Force browser to reload npm libs',
+            '2767': 'Improved data check performance',
+            '2602': 'Manual: types import via CSV and examples',
+            '2726': 'Manual: improved API and import sections',
+            '2742': 'API: 0.4.13',
+            '2722': 'API: Download geometries as .gpkg',
+            '2723': 'API: CSV export geometries',
+            '2744': 'API: Add typeIDS to network',
+            '2759': 'Refactor and minor improvements'},
+        'fix': {
+            '2770': 'Binaries called without absolute paths, silent failures',
+            '2740': 'Error at network view'}}],
     '9.1.1': ['2026-02-11', {
         'fix': {
             '2729': 'Installation and other minor issues'}}],
@@ -46,7 +60,7 @@ versions = {
             '2442': 'Text annotation: show orphans',
             '2693': 'Updated Catalan and Spanish translations',
             '2510': 'Manual: document dates and type_id at links',
-            '2657': 'API: 4.11.0',
+            '2657': 'API: 0.14.11',
             '2478': 'API: Format for tables',
             '2681': 'API: Additional columns for sorting'}}],
     '8.15.1': ['2025-11-17', {
@@ -60,7 +74,7 @@ versions = {
             '2568': 'Admin interface for generating ARCHE dumps',
             '2580': 'Report generation for ARCHE import issues',
             '2590': 'Bigger info button',
-            '2626': 'API: 4.10.0',
+            '2626': 'API: 0.4.10',
             '2466': 'API: Export files with ARCHE RDF metadata',
             '2619': 'API: Presentation view get root references',
             '2660': 'API: Presentation view adaption',
@@ -84,7 +98,7 @@ versions = {
             '2592': 'Polish UI translations',
             '2571': 'Update Catalan and Spanish translations',
             '2574': 'Update French translations',
-            '2562': 'API: 4.9.0',
+            '2562': 'API: 0.4.9',
             '2434': 'API: Text annotation for presentation view',
             '2563': 'API: Presentation view improvements',
             '2595': 'Security improvements',

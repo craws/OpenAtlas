@@ -172,7 +172,7 @@ def user_view(id_: int) -> str:
                     _('delete'),
                     f'{url_for('user_delete', id_=user.id)}#tab-user',
                     onclick=""
-                    f"return confirm('{_('Delete %(name)s?', name=name)}')"))
+                    f"return confirm('{_('delete %(name)s?', name=name)}')"))
     return render_template(
         'tabs.html',
         tabs={
@@ -325,7 +325,7 @@ def first_admin() -> str | Response:
             'username': sanitize(form.username.data),
             'real_name': sanitize(form.real_name.data) or '',
             'info': sanitize(form.description.data) or '',
-            'email': None,
+            'email': sanitize(form.email.data) or '',
             'active': True,
             'group_name': 'admin',
             'password': bcrypt.hashpw(

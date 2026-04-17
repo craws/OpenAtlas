@@ -35,7 +35,7 @@ def html_form(
         if field.type in ['CustomField']:
             html += add_row(field, value=field.content)
             continue
-        if field.id.startswith("reference_system") \
+        if field.id.startswith('reference_system') \
                 and len(reference_systems_fields) > 3 \
                 and not reference_systems_fields_errors:
             if not reference_systems_added:

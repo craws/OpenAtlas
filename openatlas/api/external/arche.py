@@ -56,14 +56,22 @@ def create_uri(value: str | list[str]) -> list[URIRef]:
     return [create_single_uri(value)]
 
 
-def ensure_person_exist(graph: Graph, names: str | list[str]) -> None:
+def ensure_person_exist(
+        graph: Graph,
+        names: str | list[str],
+        entity: Entity | None = None) -> None:
     names = names if isinstance(names, list) else [names]
     for name in names:
         if not name or is_valid_url(name):
             continue  # pragma: no cover
         uri = create_single_uri(name)
         if str(uri) not in ENTITIES_EMITTED:
-            graph.add((uri, RDF.type, ACDH.Person))
+            if entity and entity.class_ == 'group':
+                graph.add((uri, RDF.type, ACDH.Organisation))
+            elif entity and entity.class_ == 'person':
+                graph.add((uri, RDF.type, ACDH.Person))
+            else:
+                graph.add((uri, RDF.type, ACDH.Agent))
             graph.add((uri, ACDH.hasTitle, Literal(name, lang="und")))
             graph.add((uri, ACDH.hasIdentifier, uri))
             ENTITIES_EMITTED.add(str(uri))
@@ -143,14 +151,22 @@ def add_arche_file_metadata_to_graph(
         graph.add((subject_uri, ACDH.hasLicense, URIRef(metadata.license)))
 
     if metadata.licensors:
-        ensure_person_exist(graph, metadata.licensors)
-        for uri in create_uri(metadata.licensors):
+        for e in metadata.licensors:
+            ensure_person_exist(graph, e.name, e)
+        for uri in create_uri([e.name for e in metadata.licensors]):
             graph.add((subject_uri, ACDH.hasLicensor, uri))
 
     if metadata.rights_holders:
-        ensure_person_exist(graph, metadata.rights_holders)
-        for uri in create_uri(metadata.rights_holders):
+        for e in metadata.rights_holders:
+            ensure_person_exist(graph, e.name, e)
+        for uri in create_uri([e.name for e in metadata.rights_holders]):
             graph.add((subject_uri, ACDH.hasRightsHolder, uri))
+
+    if metadata.creators:
+        for e in metadata.creators:
+            ensure_person_exist(graph, e.name, e)
+        for uri in create_uri([e.name for e in metadata.creators]):
+            graph.add((subject_uri, ACDH.hasCreator, uri))
 
     if metadata.is_part_of:
         graph.add((subject_uri, ACDH.isPartOf, URIRef(metadata.is_part_of)))
@@ -199,11 +215,6 @@ def add_arche_file_metadata_to_graph(
             subject_uri,
             ACDH.hasBinarySize,
             Literal(metadata.binary_size, datatype=XSD.integer)))
-
-    if metadata.creators:
-        ensure_person_exist(graph, metadata.creators)
-        for uri in create_uri(metadata.creators):
-            graph.add((subject_uri, ACDH.hasCreator, uri))
 
     if metadata.metadata_creators:
         ensure_person_exist(graph, metadata.metadata_creators)

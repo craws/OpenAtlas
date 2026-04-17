@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from flask import flash, g, render_template, url_for
 from flask_babel import gettext as _
@@ -265,7 +265,7 @@ def orphans() -> str:
 @app.route('/check_files')
 @app.route('/check_files/<arche>')
 @required_group('contributor')
-def check_files(arche: Optional[str] = None) -> str:
+def check_files(arche: str | None = None) -> str:
     entities: list[Entity] = Entity.get_by_class('file', types=True)
     result: dict[str, list[Entity]] = {
         'missing_files': [],
@@ -369,7 +369,7 @@ def get_files_without_entity(entity_file_ids: list[int]) -> list[Any]:
                 and os.path.isfile(file) \
                 and file.stem.isdigit() \
                 and int(file.stem) not in entity_file_ids:
-            confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
+            confirm = _('delete %(name)s?', name=file.name.replace("'", ''))
             rows.append([
                 file.stem,
                 convert_size(file.stat().st_size),
@@ -387,7 +387,7 @@ def get_files_without_entity(entity_file_ids: list[int]) -> list[Any]:
 def get_iiif_files_without_entity(entity_file_ids: list[int]) -> list[Any]:
     rows = []
     for file in Path(g.settings['iiif_path']).iterdir():
-        confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
+        confirm = _('delete %(name)s?', name=file.name.replace("'", ''))
         if file.name != '.gitignore' \
                 and os.path.isfile(file) \
                 and file.stem.isdigit() \

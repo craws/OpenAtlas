@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: "postgis/postgis:15-3.4"
+    image: "postgis/postgis:17-3.4"
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
@@ -15,7 +15,7 @@ services:
 #      - ./install/2_data_model.sql:/docker-entrypoint-initdb.d/2_data_model.sql
 #      - ./install/3_data_web.sql:/docker-entrypoint-initdb.d/3_data_web.sql
 #      - ./install/4_data_type.sql:/docker-entrypoint-initdb.d/4_data_type.sql
-#      Import dump (comment install section above)
+# Import dump (comment install section above)
 #      - ./files/export/dump.sql:/docker-entrypoint-initdb.d/dump.sql
     healthcheck:
       test: ["CMD-SHELL", "sh -c 'PGPASSWORD=${POSTGRES_PASSWORD} psql -h localhost -U openatlas -d ${POSTGRES_DB} -c \\\\q'"]

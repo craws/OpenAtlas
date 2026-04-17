@@ -3,8 +3,8 @@
 from typing import List
 
 # pylint: disable=invalid-name
-version = '9.1.0'
-release = '9.1.0'
+version = '9.2.0'
+release = '9.2.0'
 templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
@@ -12,7 +12,10 @@ project = 'OpenAtlas'
 author = 'The OpenAtlas team'
 language = 'en'
 pygments_style = 'sphinx'
-extensions: List[str] = ['sphinx.ext.extlinks']
+extensions: List[str] = [
+    'sphinx.ext.extlinks',
+    'sphinxcontrib.openapi',
+    'sphinx_design']
 extlinks = {
     'cidoc_entity': (
         'https://www.cidoc-crm.org/Entity/%s/version-7.1',

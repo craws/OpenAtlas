@@ -18,6 +18,7 @@ from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity, Link
 from openatlas.models.openatlas_class import Relation
 from openatlas.models.overlay import Overlay
+from openatlas.models.rights_holder import RightsHolder
 
 # For table translations
 _('previous')
@@ -93,6 +94,8 @@ def entity_table(
             default_columns = item.domain.class_.group['table_columns']
         else:
             default_columns = item.range.class_.group['table_columns']
+    elif isinstance(item, RightsHolder):
+        default_columns = ['name', 'class', 'description']
     else:
         default_columns = item.class_.group['table_columns']
     forms = forms or {}
@@ -157,11 +160,17 @@ def get_table_cell_content(
                     {"checked" if e.id in forms.get('selection_ids', [])
                      else ""}>"""
         case 'class':
-            html = e.class_.label
+            if isinstance(e, RightsHolder):
+                html = uc_first(_(e.class_))
+            else:
+                html = e.class_.label
         case 'created':
             html = format_date(e.created)
         case 'creator':
-            html = g.file_info.get(e.id, {}).get('creator')
+            creators = g.file_info.get(e.id, {}).get('creator', [])
+            html = '<br>'.join([
+                link(rh, url_for('rights_holder_view', id_=rh.id))
+                for rh in creators])
         case 'content' | 'description':
             html = e.description
             if relation and name in relation.additional_fields:
@@ -190,7 +199,10 @@ def get_table_cell_content(
                 f'<a href="{url_for("view", id_=e.id)}">' \
                 f'{file_preview(e.id)}</a>'
         case 'license_holder':
-            html = g.file_info.get(e.id, {}).get('license_holder')
+            lh = g.file_info.get(e.id, {}).get('license_holder', [])
+            html = '<br>'.join([
+                link(rh, url_for('rights_holder_view', id_=rh.id))
+                for rh in lh])
         case 'main_image' if origin:
             html = profile_image_table_link(origin, e)
         case 'page':

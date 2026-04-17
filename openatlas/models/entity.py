@@ -8,13 +8,17 @@ from flask import g, request
 from werkzeug.exceptions import abort
 
 from openatlas import app
-from openatlas.database import entity as db, link as db_link
+from openatlas.database import (
+    entity as db,
+    link as db_link,
+    rights_holder as db_rights_holder)
 from openatlas.database.connect import Transaction
 from openatlas.display.util2 import convert_size, sanitize
 from openatlas.models.annotation import AnnotationText
 from openatlas.models.dates import Dates
 from openatlas.models.gis import delete_gis_by_entity, insert_gis
 from openatlas.models.overlay import Overlay
+from openatlas.models.rights_holder import RightsHolder
 
 
 class Entity:
@@ -69,8 +73,8 @@ class Entity:
                     setattr(self, name, value)
         if self.class_.name == 'file':
             self.public = False
-            self.creator = None
-            self.license_holder = None
+            self.creator = []
+            self.license_holder = []
             if self.id in g.file_info:
                 self.public = g.file_info[self.id]['public']
                 self.creator = g.file_info[self.id]['creator']
@@ -139,7 +143,6 @@ class Entity:
             inverse: bool = False,
             type_id: Optional[int] = None,
             dates: Optional[dict[str, Any]] = None) -> list[int]:
-        property_ = g.properties[code]
         entities = range_ if isinstance(range_, list) else [range_]
         new_link_ids = []
         for linked_entity in entities:
@@ -147,11 +150,11 @@ class Entity:
             range_ = self if inverse else linked_entity
             domain_error = True
             range_error = True
-            if property_.find_object(
+            if g.properties[code].find_object(
                     'domain_class_code',
                     domain.class_.cidoc_class.code):
                 domain_error = False
-            if property_.find_object(
+            if g.properties[code].find_object(
                     'range_class_code',
                     range_.class_.cidoc_class.code):
                 range_error = False
@@ -176,8 +179,7 @@ class Entity:
                     'end_from': None,
                     'end_to': None,
                     'end_comment': None})
-            id_ = db.link(data)
-            new_link_ids.append(id_)
+            new_link_ids.append(db.link(data))
         return new_link_ids
 
     def link_string(
@@ -214,9 +216,21 @@ class Entity:
     def save_file_info(self, data: dict[str, Any]) -> None:
         db.update_file_info({
             'entity_id': self.id,
-            'creator': data.get('creator'),
-            'license_holder': data.get('license_holder'),
             'public': data.get('public', False)})
+        RightsHolder.delete_rights_holder_links(self.id)
+        if data.get('creator'):
+            for creator_id in ast.literal_eval(data['creator']):
+                RightsHolder.insert_rights_holder_link(
+                    self.id,
+                    creator_id,
+                    'creator')
+        if data.get('license_holder'):
+            for license_holder_id in ast.literal_eval(
+                    data['license_holder']):
+                RightsHolder.insert_rights_holder_link(
+                    self.id,
+                    license_holder_id,
+                    'license_holder')
 
     def update(self, data: dict[str, Any]) -> None:
         data['id'] = self.id
@@ -398,7 +412,7 @@ class Entity:
         for entity in Entity.get_by_class(self.classes, types=True):
             linked = False
             to_check = entity
-            if self.name in ('Administrative unit', 'Historical place'):
+            if self.class_.name == 'administrative_unit':
                 to_check = entity.get_linked_entity_safe('P53', types=True)
             for type_ in to_check.types:
                 if type_.root[0] == self.id:
@@ -675,6 +689,7 @@ class Entity:
                     type_.root[-1],
                     type_.root)
                 type_.category = hierarchies[type_.root[0]]['category']
+                type_.multiple = hierarchies[type_.root[0]]['multiple']
                 continue
             type_.category = hierarchies[type_.id]['category']
             type_.multiple = hierarchies[type_.id]['multiple']
@@ -784,6 +799,12 @@ class Entity:
                 setattr(g, system.name.lower(), system)
         return systems
 
+    @staticmethod
+    def get_files_by_rights_holder_id(
+            rights_holder_id: int) -> list[Entity]:
+        return Entity.get_by_ids(
+            db_rights_holder.get_entity_ids_by_rights_holder(rights_holder_id))
+
 
 def insert(data: dict[str, Any]) -> Entity:
     annotation_data = []
@@ -876,6 +897,11 @@ class Link:
     @staticmethod
     def get_entity_ids_by_type_ids(types_: list[int]) -> list[int]:
         return db_link.get_entity_ids_by_type_ids(types_)
+
+    @staticmethod
+    def get_type_ids_by_entity_ids(
+            entity_ids: list[int]) -> dict[int, list[int]]:
+        return db_link.get_type_ids_by_entity_ids(entity_ids)
 
     @staticmethod
     def delete_(id_: int) -> None:

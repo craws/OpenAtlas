@@ -4,6 +4,7 @@ Admin
 .. toctree::
 
    user
+   rights_holder
    general
    mail
    modules

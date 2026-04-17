@@ -73,7 +73,6 @@ def type_delete_recursive(id_: int) -> str | Response:
                 entities.append(item)
         tabs['entities'].table = entity_table(entities)
 
-
     crumbs = [[_('type'), url_for('index', group='type')]]
     if root:
         crumbs += [g.types[type_id] for type_id in type_.root]
@@ -158,7 +157,7 @@ def show_multiple_linked_entities(id_: int) -> str:
         multiple_linked_entities,
         columns=['name', 'class', 'begin', 'end', 'description'])
     tabs = {
-        'untyped': Tab(
+        'multiple_linked': Tab(
             'multiple_linked',
             _('multiple linked entities'),
             table=table,

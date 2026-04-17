@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.13a",
+    "version": "0.4.13c",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -3674,8 +3674,7 @@
         ],
         "description": "Retrieves a json with the entity IDs as keys and a list of file information for all images.",
         "operationId": "FilesOfEntities",
-        "parameters": [
-        ],
+        "parameters": [],
         "security": [
           {},
           {
@@ -3823,6 +3822,7 @@
             "name": "version",
             "required": true,
             "schema": {
+              "type": "integer",
               "enum": [
                 2
               ]
@@ -4058,6 +4058,7 @@
         "required": true,
         "in": "path",
         "schema": {
+          "type": "string",
           "enum": [
             "all",
             "E5",
@@ -4088,6 +4089,7 @@
         "required": true,
         "in": "path",
         "schema": {
+          "type": "string",
           "enum": [
             "all",
             "actor",
@@ -4110,6 +4112,7 @@
         "required": true,
         "in": "path",
         "schema": {
+          "type": "string",
           "enum": [
             "all",
             "acquisition",
@@ -4146,8 +4149,7 @@
         "description": "Download results",
         "in": "query",
         "schema": {
-          "type": "boolean",
-          "example": false
+          "type": "boolean"
         }
       },
       "place_hierarchy": {
@@ -4155,8 +4157,7 @@
         "description": "Will include the whole place hierarchy. This means that instead of only getting entities linked to the requested entity, all entities, which are connected with the property *P46* are included in the result set. This can significantly increase the load time.",
         "in": "query",
         "schema": {
-          "type": "boolean",
-          "example": false
+          "type": "boolean"
         }
       },
       "map_overlay": {
@@ -4164,8 +4165,7 @@
         "description": "Will add the map overlay information for images if available.",
         "in": "query",
         "schema": {
-          "type": "boolean",
-          "example": false
+          "type": "boolean"
         }
       },
       "remove_empty_values": {
@@ -4173,8 +4173,7 @@
         "description": "This will remove any keys which are empty or have no values assigned, e.g. []. This can reduce the load time.",
         "in": "query",
         "schema": {
-          "type": "boolean",
-          "example": false
+          "type": "boolean"
         }
       },
       "count": {
@@ -4182,8 +4181,7 @@
         "description": "Show integer count of how many entities would the result give back",
         "in": "query",
         "schema": {
-          "type": "boolean",
-          "example": false
+          "type": "boolean"
         }
       },
       "centroid": {
@@ -4191,8 +4189,7 @@
         "description": "Will calculate the centerpoint for all polygons and linestring and *add* them to geometries",
         "in": "query",
         "schema": {
-          "type": "boolean",
-          "example": false
+          "type": "boolean"
         }
       },
       "locale": {
@@ -4232,12 +4229,7 @@
               "description",
               "none"
             ]
-          },
-          "example": [
-            "when",
-            "description",
-            "links"
-          ]
+          }
         }
       },
       "sort": {
@@ -4321,71 +4313,67 @@
       },
       "search": {
         "name": "search",
-        "description": "Search query for specific results.\n\n **Filterable categories**\n\n entityName, entityDescription, entityAliases, entityCidocClass, entitySystemClass, entityID, typeID, valueTypeID, typeIDWithSubs, typeName, beginFrom, beginTo, endFrom, endTo, relationToID\n\n **Values** \n\n Values has to be a list of items. The items can be either a string, an integer or a tuple (see Notes). Strings need to be marked with \u201c\u201d or \u2018\u2019, while integers does not allow this. \n \n *Notes*: \n The category valueTypeID can search for values of a type ID. But it takes one or more two valued Tuple as list entry: (x,y). x is the type id and y is the searched value. This can be an int or a float, e.g: `{\"operator\":\"lesserThan\",\"values\":[(3142,543.3)],\"logicalOperator\":\"and\"}`\n The date categories (beginFrom, beginTo, endFrom, endTo) only allow *one* value in the **values** field and it has to be formated the following way: YYYY-MM-DD. Month and day values need to filled up with 0, e.g. 800-01-01 \n\n **Compare operators** \n\n equal, notEqual, like (1), greaterThan (2), greaterThanEqual (2), lesserThan (2)\n\nThe compare operators work like the mathematical operators. equal x=y, notEqual x!=y, greaterThan x>y , greaterThanEqual x>=y, lesserThan x<y, lesserThanEqual x<=y. The like operator searches for occurrence of the string, so a match can also occur in the middle of a word.\n\n(1)Only for string based categories\n\n(2)Only for beginFrom, beginTo, endFrom, endTo, valueTypeID\n\n**Logical operators**\n\nNot mandatory, OR is the default value. Logical operators handles, if the values are treated as OR or AND. \n \n The following table outlines the supported operations for each field:\n\n|                  | equal     | notEqual  | like      | greaterThan | greaterThanEqual | lesserThan | lesserThanEqual |\n|------------------|-----------|-----------|-----------|-------------|------------------|------------|-----------------|\n| entityName       |     x      |     x      |    x       |             |                  |            |                 |\n| entityDescription|      x     |      x     |      x     |             |                  |            |                 |\n| entityAliases    |      x     |      x     |     x      |             |                  |            |                 |\n| entityCidocClass |      x     |      x     |      x     |             |                  |            |                 |\n| entitySystemClass|      x     |      x     |     x      |             |                  |            |                 |\n| typeName         |       x    |      x     |     x      |             |                  |            |                 |\n| entityID         |       x    |      x     |           |             |                  |            |                 |\n| typeID           |      x     |       x    |           |             |                  |            |                 |\n| valueTypeID      |      x     |      x     |           |      x       |    x              |    x        |      x           |\n| typeIDWithSubs   |      x     |       x    |           |             |                  |            |                 |\n| relationToID     |      x     |      x     |           |             |                  |            |                 |\n| beginFrom        |      x     |      x     |           |      x       |        x          |     x       |      x           |\n| beginTo          |      x     |      x     |           |      x       |          x        |      x      |       x          |\n| endFrom          |      x     |      x     |           |       x      |         x         |       x     |       x          |\n| endTo            |      x     |      x     |           |       x      |       x           |       x     |      x           |\n\n",
+        "description": "Search query for specific results.\n\n **Filterable categories**\n\n entityName, entityDescription, entityAliases, entityCidocClass, entitySystemClass, entityID, typeID, valueTypeID, typeIDWithSubs, typeName, beginFrom, beginTo, endFrom, endTo, relationToID\n\n **Values** \n\n Values has to be a list of items. The items can be either a string, an integer or a tuple (see Notes). Strings need to be marked with “” or ‘’, while integers does not allow this. \n \n *Notes*: \n The category valueTypeID can search for values of a type ID. But it takes one or more two valued Tuple as list entry: (x,y). x is the type id and y is the searched value. This can be an int or a float, e.g: `{\"operator\":\"lesserThan\",\"values\":[(3142,543.3)],\"logicalOperator\":\"and\"}`\n The date categories (beginFrom, beginTo, endFrom, endTo) only allow *one* value in the **values** field and it has to be formated the following way: YYYY-MM-DD. Month and day values need to filled up with 0, e.g. 800-01-01 \n\n **Compare operators** \n\n equal, notEqual, like (1), greaterThan (2), greaterThanEqual (2), lesserThan (2)\n\nThe compare operators work like the mathematical operators. equal x=y, notEqual x!=y, greaterThan x>y , greaterThanEqual x>=y, lesserThan x<y, lesserThanEqual x<=y. The like operator searches for occurrence of the string, so a match can also occur in the middle of a word.\n\n(1)Only for string based categories\n\n(2)Only for beginFrom, beginTo, endFrom, endTo, valueTypeID\n\n**Logical operators**\n\nNot mandatory, OR is the default value. Logical operators handles, if the values are treated as OR or AND. \n \n The following table outlines the supported operations for each field:\n\n::\n\n    |                  | equal\n         | notEqual  | like      | greaterThan | greaterThanEqual | lesserThan | lesserThanEqual |\n    |------------------|-----------|-----------|-----------|-------------|------------------|------------|-----------------|\n    | entityName       |     x      |     x      |    x       |             |                  |            |                 |\n    | entityDescription|      x     |      x     |      x     |             |                  |            |                 |\n    | entityAliases    |      x     |      x     |     x      |             |                  |            |                 |\n    | entityCidocClass |      x     |      x     |      x     |             |                  |            |                 |\n    | entitySystemClass|      x     |      x     |     x      |             |                  |            |                 |\n    | typeName         |       x    |      x     |     x      |             |                  |            |                 |\n    | entityID         |       x    |      x     |           |             |                  |            |                 |\n    | typeID           |      x     |       x    |           |             |                  |            |                 |\n    | valueTypeID      |      x     |      x     |           |      x       |    x              |    x        |      x           |\n    | typeIDWithSubs   |      x     |       x    |           |             |                  |            |                 |\n    | relationToID     |      x     |      x     |           |             |                  |            |                 |\n    | beginFrom        |      x     |      x     |           |      x       |        x          |     x       |      x           |\n    | beginTo          |      x     |      x     |           |      x       |          x        |      x      |       x          |\n    | endFrom          |      x     |      x     |           |       x      |         x         |       x     |       x          |\n    | endTo            |      x     |      x     |           |       x      |       x           |       x     |      x           |\n    \n\n",
         "in": "query",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "object",
-              "properties": {
-                "entityName": {
-                  "$ref": "#/components/schemas/searchCriteria"
-                },
-                "entityDescription": {
-                  "$ref": "#/components/schemas/searchCriteria"
-                },
-                "entityAliases": {
-                  "$ref": "#/components/schemas/searchCriteria"
-                },
-                "entityCidocClass": {
-                  "$ref": "#/components/schemas/searchCriteria"
-                },
-                "entitySystemClass": {
-                  "$ref": "#/components/schemas/searchCriteria"
-                },
-                "entityID": {
-                  "$ref": "#/components/schemas/searchCriteria"
-                },
-                "typeID": {
-                  "$ref": "#/components/schemas/searchCriteria"
-                },
-                "valueTypeID": {
-                  "$ref": "#/components/schemas/searchCriteria"
-                },
-                "typeIDWithSubs": {
-                  "$ref": "#/components/schemas/searchCriteria"
-                },
-                "typeName": {
-                  "$ref": "#/components/schemas/searchCriteria"
-                },
-                "beginFrom": {
-                  "$ref": "#/components/schemas/searchCriteria"
-                },
-                "beginTo": {
-                  "$ref": "#/components/schemas/searchCriteria"
-                },
-                "endFrom": {
-                  "$ref": "#/components/schemas/searchCriteria"
-                },
-                "endTo": {
-                  "$ref": "#/components/schemas/searchCriteria"
-                },
-                "relationToID": {
-                  "$ref": "#/components/schemas/searchCriteria"
-                }
-              },
-              "example": {
-                "entityName": [
-                  {
-                    "operator": "like",
-                    "values": [
-                      "A"
-                    ],
-                    "logicalOperator": "and"
-                  }
-                ]
-              }
+        "schema": {
+          "type": "object",
+          "properties": {
+            "entityName": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "entityDescription": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "entityAliases": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "entityCidocClass": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "entitySystemClass": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "entityID": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "typeID": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "valueTypeID": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "typeIDWithSubs": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "typeName": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "beginFrom": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "beginTo": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "endFrom": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "endTo": {
+              "$ref": "#/components/schemas/searchCriteria"
+            },
+            "relationToID": {
+              "$ref": "#/components/schemas/searchCriteria"
             }
+          },
+          "example": {
+            "entityName": [
+              {
+                "operator": "like",
+                "values": [
+                  "A"
+                ],
+                "logicalOperator": "and"
+              }
+            ]
           }
         }
       },
@@ -4404,8 +4392,7 @@
         "description": "Limits the number of entities returned in the response. A lower value may improve performance. The default is 20. Set to 0 to return all available entities.",
         "in": "query",
         "schema": {
-          "type": "integer",
-          "example": 50
+          "type": "integer"
         }
       },
       "depth": {
@@ -4413,8 +4400,7 @@
         "description": "Specifies the number of connection hops to include in the query. Higher values may significantly increase processing time. Default is 1.",
         "in": "query",
         "schema": {
-          "type": "integer",
-          "example": 3
+          "type": "integer"
         }
       },
       "first": {
@@ -4422,8 +4408,7 @@
         "description": "Starts the result set at the specified entity ID.",
         "in": "query",
         "schema": {
-          "type": "integer",
-          "example": 50505
+          "type": "integer"
         }
       },
       "last": {
@@ -4431,8 +4416,7 @@
         "description": "Starts the result set after the specified entity ID.",
         "in": "query",
         "schema": {
-          "type": "integer",
-          "example": 50505
+          "type": "integer"
         }
       },
       "page": {
@@ -4488,8 +4472,7 @@
           "type": "array",
           "items": {
             "type": "integer"
-          },
-          "example": 50505
+          }
         },
         "explode": true
       },
@@ -4501,8 +4484,7 @@
           "type": "array",
           "items": {
             "type": "integer"
-          },
-          "example": 50505
+          }
         },
         "explode": true
       },
@@ -4665,8 +4647,7 @@
               "P196",
               "P197",
               "P198"
-            ],
-            "example": "P2"
+            ]
           }
         },
         "explode": true
@@ -4831,8 +4812,7 @@
               "P196",
               "P197",
               "P198"
-            ],
-            "example": "P2"
+            ]
           }
         },
         "explode": true
@@ -4866,8 +4846,7 @@
           "type": "array",
           "items": {
             "type": "integer"
-          },
-          "example": 50505
+          }
         },
         "explode": true
       },
@@ -4879,8 +4858,7 @@
           "type": "array",
           "items": {
             "type": "integer"
-          },
-          "example": 50505
+          }
         },
         "explode": true
       },
@@ -4910,8 +4888,7 @@
               "E54",
               "E55",
               "E74"
-            ],
-            "example": "E18"
+            ]
           }
         },
         "explode": true
@@ -4935,8 +4912,7 @@
               "source",
               "source_translation",
               "type"
-            ],
-            "example": "actor"
+            ]
           }
         },
         "explode": true
@@ -4974,8 +4950,7 @@
               "stratigraphic_unit",
               "type",
               "tools"
-            ],
-            "example": "artifact"
+            ]
           }
         }
       },
@@ -5013,8 +4988,7 @@
               "stratigraphic_unit",
               "type",
               "type_tools"
-            ],
-            "example": "place"
+            ]
           }
         }
       },
@@ -5027,8 +5001,7 @@
           "type": "array",
           "items": {
             "type": "integer"
-          },
-          "example": 50505
+          }
         }
       },
       "image_size": {
@@ -5040,8 +5013,7 @@
           "enum": [
             "thumbnail",
             "table"
-          ],
-          "example": "table"
+          ]
         }
       }
     },
@@ -6137,6 +6109,7 @@
               "required": [
                 "id",
                 "label",
+                "typeIds",
                 "relations",
                 "systemClass"
               ],
@@ -6149,6 +6122,12 @@
                 },
                 "systemClass": {
                   "type": "string"
+                },
+                "typeIds": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
                 },
                 "relations": {
                   "type": "array",
@@ -7527,12 +7506,9 @@
             }
           },
           "geometries": {
-            "nullable": true,
-            "type": "object",
             "$ref": "#/components/schemas/Geometries"
           },
           "when": {
-            "nullable": true,
             "$ref": "#/components/schemas/TimeRangeModel"
           },
           "types": {
@@ -7795,6 +7771,7 @@
       },
       "TimeRangeModel": {
         "type": "object",
+        "nullable": true,
         "required": [
           "start",
           "end"
@@ -7969,9 +7946,7 @@
             }
           },
           "geometries": {
-            "type": "object",
-            "$ref": "#/components/schemas/Geometries",
-            "nullable": true
+            "$ref": "#/components/schemas/Geometries"
           },
           "when": {
             "$ref": "#/components/schemas/TimeRangeModel"
@@ -8199,21 +8174,9 @@
         },
         "description": "A GeoJSON Polygon geometry."
       },
-      "GeoJsonGeometry": {
-        "oneOf": [
-          {
-            "$ref": "#/components/schemas/Point"
-          },
-          {
-            "$ref": "#/components/schemas/LineString"
-          },
-          {
-            "$ref": "#/components/schemas/Polygon"
-          }
-        ]
-      },
       "FeatureProperties": {
         "type": "object",
+        "nullable": true,
         "properties": {
           "title": {
             "type": "string",
@@ -8264,7 +8227,6 @@
             ]
           },
           "properties": {
-            "nullable": true,
             "$ref": "#/components/schemas/FeatureProperties"
           }
         },
@@ -8503,4 +8465,3 @@
     }
   }
 }
-

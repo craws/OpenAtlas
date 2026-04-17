@@ -49,7 +49,7 @@ def delete_export(view: str, filename: str) -> Response:
             f'{view.upper()} file deletion failed',
             e)
         flash(_('error file delete'), 'error')
-    return redirect(url_for(f'export_{view}', _anchor='tab-export'))
+    return redirect(f'{url_for('export_'+view)}#tab-export')
 
 
 @app.route('/export/execute/<format_>')
@@ -62,7 +62,7 @@ def export_execute(format_: str) -> Response:
         else:  # pragma: no cover
             g.logger.log('error', 'database', 'SQL export failed')
             flash(_('export failed'), 'error')
-    return redirect(url_for('export_sql'))
+    return redirect(f"{url_for('export_sql')}#tab-export")
 
 
 @app.route('/export/sql')
@@ -146,7 +146,7 @@ def arche_execute() -> Response:
         else:  # pragma: no cover
             g.logger.log('error', 'database', 'ARCHE export failed')
             flash(_('export failed'), 'error')
-    return redirect(url_for('export_arche', _anchor='tab-export'))
+    return redirect(f"{url_for('export_arche')}#tab-export")
 
 
 @app.route('/export/rdf')
@@ -178,7 +178,7 @@ def rdf_execute() -> Response:
         else:  # pragma: no cover
             g.logger.log('error', 'database', 'RDF export failed')
             flash(_('export failed'), 'error')
-    return redirect(url_for('export_rdf', _anchor='tab-export'))
+    return redirect(f"{url_for('export_rdf')}#tab-export")
 
 
 def build_export_table(view: str) -> Table:
@@ -194,7 +194,7 @@ def build_export_table(view: str) -> Table:
                 _('download'),
                 url_for('download_export', view=view, filename=file.name))]
         if is_authorized('admin') and os.access(path, os.W_OK):
-            confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
+            confirm = _('delete %(name)s?', name=file.name.replace("'", ''))
             data.append(
                 link(
                     _('delete'),

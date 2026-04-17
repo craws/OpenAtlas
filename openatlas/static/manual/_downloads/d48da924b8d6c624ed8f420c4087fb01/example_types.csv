@@ -1,0 +1,7 @@
+id,name,description,openatlas_parent_id,reference_ids,origin_reference_ids,reference_system_wikidata
+st_gallen_abbot,Abbot,Rank of the head of the monastery.,213216,,,
+st_gallen_monk,Monk,Religious member of the monastic community.,213216,,,
+st_gallen_parchment,Parchment,Writing material used in medieval manuscripts.,157754,,,
+st_gallen_foundation,Foundation,The original establishment of the monastery.,26,,,
+st_gallen_parish,Parish Church,Ecclesiastical administrative unit.,73,,,
+st_gallen_charter,Charter,Document granting rights or property.,39,,,

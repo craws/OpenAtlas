@@ -60,6 +60,8 @@ types
 * Values can be entered as decimals in forms
 * A unit such as centimetre, gram, or percentage can be specified
 
+.. _place hierarchies:
+
 Place hierarchies
 -----------------
 Place hierarchies can be used to add information about e.g.

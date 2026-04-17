@@ -273,8 +273,8 @@ class Endpoint:
                     for item in self.entities_with_links.values()]
             case 'lp' | 'lpx':
                 self.formated_entities = [
-                    self.get_linked_places_entity(_id)
-                    for _id in self.entities_with_links]
+                    self.get_linked_places_entity(id_)
+                    for id_ in self.entities_with_links]
             case _ if self.parser.format in app.config['RDF_FORMATS']:
                 license_links = get_license_ids_with_links()
                 parsed_context = parse_loud_context()
@@ -357,11 +357,11 @@ class Endpoint:
         self.get_entities_formatted()
         return self.generator_entities
 
-    def get_linked_places_entity(self, _id: int) -> dict[str, Any]:
-        entity = self.entities_with_links[_id]['entity']
-        links = self.entities_with_links[_id]['links']
-        links_inverse = self.entities_with_links[_id]['links_inverse']
-        geometry = self.entities_with_links[_id]['geometry']
+    def get_linked_places_entity(self, id_: int) -> dict[str, Any]:
+        entity = self.entities_with_links[id_]['entity']
+        links = self.entities_with_links[id_]['links']
+        links_inverse = self.entities_with_links[id_]['links_inverse']
+        geometry = self.entities_with_links[id_]['geometry']
         crm = f'crm:{entity.cidoc_class.code} {entity.cidoc_class.i18n['en']}'
         feature = {
             '@id': url_for('api.entity', id_=entity.id, _external=True),

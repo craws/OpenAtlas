@@ -59,6 +59,27 @@ increasingly also by archives and museums.
 
 By default it is usable for **persons** in OpenAtlas.
 
+Cadaster
+********
+The `Austrian Cadaster <https://kataster.bev.gv.at/>`_ is the official
+directory of all properties in Austria, managed by the Federal Office of
+Metrology and Surveying (BEV). It is primarily used for
+:ref:`place hierarchies <place hierarchies>`
+(:ref:`administrative unit <place hierarchies>`).
+
+In OpenAtlas, you can link to two different types of entries:
+
+*   **Katastralgemeinde (Cadastral Community):** By entering a single number
+    (e.g., ``01004``), you can link to a specific cadastral community.
+    OpenAtlas will use the ``/kgnr/{kgnr}`` endpoint to retrieve the
+    information.
+*   **Grundstück (Plot of Land):** By entering an identifier with slashes
+    (e.g., ``01004/781/1``), you can link to a specific plot of land.
+    OpenAtlas will use the ``/gst/{kgnr}/{gnr}`` endpoint for this.
+
+By default it is usable for :ref:`administrative unit <place hierarchies>`
+in OpenAtlas.
+
 Usage
 -----
 Links consists of an identifier (ID) and a precision and can be entered when
@@ -97,8 +118,8 @@ Admins and manager can add, update, and delete external reference systems.
   `Wikidata <https://wikidata.org/>`_ for Wikidata)
 * **Resolver URL** - URL that - in combination with the ID - links to an
   entity in the reference system (e.g. the resolver URL
-  **https://www.wikidata.org/wiki/** in combination with the ID **Q123**
-  creates the external link: https://www.wikidata.org/wiki/Q123 (September)
+  **https://www.wikiwand.com/en/** in combination with the ID **Q123**
+  creates the external link: https://www.wikiwand.com/en/Q123 (September)
 * **Example ID** - an example id to show the desired format (e.g. Q123
   for Wikidata)
 * **Classes** - a checkbox list of available classes, for GeoNames only place

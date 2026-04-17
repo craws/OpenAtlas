@@ -478,4 +478,5 @@ def network_visualisation_template() -> dict[str, Any]:
         'id': fields.Integer,
         'label': fields.String,
         'systemClass': fields.String,
+        'typeIds': fields.List(fields.Integer),
         'relations': fields.List(fields.Integer)}))}

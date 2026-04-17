@@ -6,15 +6,6 @@
     </h1>
     <div class="progress">
       <div
-        class="progress-bar bg-primary"
-        role="progressbar"
-        style="width: {{ disk_space_info.percent.free - disk_space_info.percent.project }}%"
-        aria-valuenow="{{ disk_space_info.percent.free - disk_space_info.percent.project }}"
-        aria-valuemin="0"
-        aria-valuemax="100">
-        <b>{{ disk_space_info.percent.free - disk_space_info.percent.project }}%</b>
-      </div>
-      <div
         class="progress-bar bg-warning"
         role="progressbar"
         style="width: {{ disk_space_info.percent.project }}%"
@@ -24,13 +15,22 @@
         <b>{{ disk_space_info.percent.project }}%</b>
       </div>
       <div
-        class="progress-bar bg-gray"
+        class="progress-bar bg-primary"
         role="progressbar"
-        style="width: {{ 100 - disk_space_info.percent.free }}%"
-        aria-valuenow="{{ 100 - disk_space_info.percent.free }}"
+        style="width: {{ disk_space_info.percent.other }}%"
+        aria-valuenow="{{ disk_space_info.percent.other }}"
         aria-valuemin="0"
         aria-valuemax="100">
-        <b class="text-dark">{{ 100 - disk_space_info.percent.free }}%</b>
+        <b>{{ disk_space_info.percent.other }}%</b>
+      </div>
+      <div
+        class="progress-bar bg-gray"
+        role="progressbar"
+        style="width: {{ disk_space_info.percent.free }}%"
+        aria-valuenow="{{ disk_space_info.percent.free }}"
+        aria-valuemin="0"
+        aria-valuemax="100">
+        <b class="text-dark">{{ disk_space_info.percent.free }}%</b>
       </div>
     </div>
     <div>
@@ -39,19 +39,19 @@
         <strong>{{ disk_space_info.total }}</strong>
       </p>
       <p class="mb-1">
-        <span class="bg-gray d-inline-block ml-2 disk-space-legend"></span>
-        {{ _('free disk space')|uc_first }}
-        <strong>{{ disk_space_info.free }}</strong>
-      </p>
-      <p class="mb-1">
-        <span class="bg-primary d-inline-block ml-2 disk-space-legend"></span>
-        {{ _('non project files')|uc_first }}
-        <strong>{{ disk_space_info.other_files }}</strong>
-      </p>
-      <p class="mb-1">
         <span class="bg-warning d-inline-block ml-2 disk-space-legend"></span>
         {{ _('project files')|uc_first }}
         <strong>{{ disk_space_info.project }}</strong>
+      </p>
+      <p class="mb-1">
+        <span class="bg-primary d-inline-block ml-2 disk-space-legend"></span>
+        {{ _('other files')|uc_first }}
+        <strong>{{ disk_space_info.other_files }}</strong>
+      </p>
+      <p class="mb-1">
+        <span class="bg-gray d-inline-block ml-2 disk-space-legend"></span>
+        {{ _('free disk space')|uc_first }}
+        <strong>{{ disk_space_info.free }}</strong>
       </p>
     </div>
     <div class="ms-2">

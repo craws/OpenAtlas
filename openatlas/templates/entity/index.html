@@ -12,6 +12,6 @@
     {% endif %}
   </div>
   {% if class_ == 'place' %}
-    <script src="/static/js/map/map.js"></script>
+    <script src="{{ url_for('static', filename='js/map/map.js', v=config.VERSION) }}"></script>
   {% endif %}
 {% endblock %}

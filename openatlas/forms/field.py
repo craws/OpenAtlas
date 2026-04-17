@@ -21,6 +21,7 @@ from openatlas.display.util import link
 from openatlas.display.util2 import is_authorized, uc_first
 from openatlas.forms.util import convert
 from openatlas.models.entity import Entity
+from openatlas.models.rights_holder import RightsHolder
 
 
 class RemovableListInput(HiddenInput):
@@ -152,7 +153,7 @@ class TableMultiSelect(HiddenInput):
     def __call__(self: Any, field: TableMultiField, **kwargs: Any) -> str:
         if request and request.method == 'POST':  # If validation failed
             field.selection = []
-            if request.form[field.name]:
+            if request.form.get(field.name):
                 field.selection = \
                     Entity.get_by_ids(convert(request.form[field.name]))
         if field.selection:
@@ -172,14 +173,18 @@ class TableMultiField(HiddenField):
 
     def __init__(
             self,
-            entities: list[Entity],
-            selection: Optional[list[Entity]] = None,
+            entities: list[Entity] | list[RightsHolder],
+            selection: Optional[list[Entity] | list[RightsHolder]] = None,
             description: Optional[str] = None,
             **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.entities = entities
         self.selection = selection or []
         self.description = description
+        self.data = None
+
+    def process_data(self, value: Any) -> None:
+        self.data = str([e.id for e in self.selection])
 
 
 class LinkTableSelect(HiddenInput):
@@ -253,9 +258,8 @@ class TableSelect(HiddenInput):
         for class_name in field.add_dynamical:
             field.forms[class_name] = get_form(class_name)
         if request and request.method == 'POST':  # If validation failed
-            field.selection = \
-                Entity.get_by_id(int(request.form[field.name])) \
-                if request.form[field.name] else None
+            val = request.form.get(field.name)
+            field.selection = Entity.get_by_id(int(val)) if val else None
         field.data = field.selection.id if field.selection else ''
         field.data_string = field.selection.name if field.selection else ''
         field.table = entity_table(
@@ -314,7 +318,7 @@ def table_cidoc(table_id: str, items: list[Any]) -> Table:
     table_ = Table(['code', 'name'])
     for i in items:
         js = 'selectFromTable(' \
-            + f"this, '{table_id}', '{i.code}', '{i.code} {i.name}');"
+             + f"this, '{table_id}', '{i.code}', '{i.code} {i.name}');"
         table_.rows.append([link(i.code, '#', js=js), i.name])
     return table_
 

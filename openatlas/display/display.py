@@ -357,7 +357,7 @@ class Display:
         if not deletion_possible(self.entity):
             return
         msg = _(
-            'Delete %(name)s?',
+            'delete %(name)s?',
             name=escape(self.entity.name.replace('\'', '')))
         self.buttons.append(
             button(
@@ -413,9 +413,22 @@ class Display:
                 f'<span title="{var}">{link(self.entity.standard_type)}</span>'
         self.data.update(self.get_type_data())
         for name, attribute in self.entity.class_.attributes.items():
-            if name in [
-                    'creator', 'example_id', 'license_holder', 'public',
-                    'resolver_url', 'website_url']:
+            if name in ['creator', 'license_holder']:
+                html = ''
+                if value := getattr(self.entity, name):
+                    entries = [
+                        link(rh, url_for('rights_holder_view', id_=rh.id))
+                        for rh in value]
+                    html += f'{str('<br>'.join(entries))}<br>'
+                link_ = button(
+                    f'+ {uc_first(_(name.replace('_', ' ')))}',
+                    url_for(
+                        'rights_holder_insert',
+                        origin_id=self.entity.id,
+                        relation=name))
+                html += f'{link_}'
+                self.data[attribute['label']] = html
+            if name in ['example_id', 'public', 'resolver_url', 'website_url']:
                 if value := getattr(self.entity, name):
                     if isinstance(value, bool):
                         value = display_bool(value)

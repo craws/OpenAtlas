@@ -17,11 +17,12 @@ Description: :doc:`/technical/api`
     * If turned on the API and linked files with a license can be accessed without being logged in. This might be useful if you want to allow other systems to use your data without restrictions.
 
 
-**API token**
--------------
+**API token (JWT)**
+--------------------
 
-API Tokens can be created to query the API if it is turned off. Only Admins
-are allowed to create, revoke and delete tokens. Available options are:
+API Tokens (JSON Web Token) can be created to query the API if it is turned off.
+Only Admins are allowed to create, revoke and delete tokens.
+Available options are:
 
     * **Generate**: :ref:`generate` a new token
     * **Revoke all tokens**: Revoke all available tokens

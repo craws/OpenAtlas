@@ -1,6 +1,7 @@
 from flask import g, url_for
 
 from openatlas import app
+from openatlas.models.entity import Entity
 from tests.base import TestBaseCase, get_hierarchy, insert
 
 
@@ -14,6 +15,11 @@ class TypeTest(TestBaseCase):
             place = insert('place', 'Home')
             place.link('P2', g.types[dimension_type.subs[0]], '46')
             location = place.get_linked_entity_safe('P53')
+            new_type = insert('type', 'Some sub place type')
+            new_type.link(
+                'P127',
+                Entity.get_by_id(get_hierarchy('Place').subs[0]))
+            place.link('P2', new_type)
 
         rv = c.get(
             url_for(
