@@ -12,8 +12,8 @@ from wtforms import (
 from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.image_processing import resize_image
-from openatlas.display.util import check_iiif_activation, \
-    convert_image_to_iiif, get_binary_path
+from openatlas.display.util import (
+    check_iiif_activation, convert_image_to_iiif, get_binary_path)
 from openatlas.forms.add_fields import (
     add_buttons, add_class_types, add_date_fields, add_description,
     add_name_fields, add_reference_systems, add_relations, get_validators)
@@ -157,8 +157,10 @@ def process_form_data(
         if entity.id:
             delete_links(entity)
             entity.update(data)
+            g.logger.log_user(entity.id, 'update')
         else:
             entity = insert(data)
+            g.logger.log_user(entity.id, 'insert')
         if entity.class_.hierarchies:
             process_types(entity, form)
         process_relations(entity, form, origin, relation)

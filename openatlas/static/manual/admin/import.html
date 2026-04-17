@@ -10,6 +10,7 @@
   <title>Import &mdash; OpenAtlas 9.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
 
   
@@ -18,6 +19,7 @@
       <script src="../_static/documentation_options.js?v=92dab87b"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Export" href="export.html" />
@@ -52,6 +54,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Admin</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="user.html">User</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rights_holder.html">Rights holder</a></li>
 <li class="toctree-l2"><a class="reference internal" href="general.html">General</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mail.html">Mail</a></li>
 <li class="toctree-l2"><a class="reference internal" href="modules.html">Modules</a></li>
@@ -111,28 +114,10 @@
 </div>
 <p>Import settings are available for admins and managers and offer functionality
 to import data directly from
-<a class="reference external" href="https://en.wikipedia.org/wiki/Comma-separated_values">CSV</a> files.
-Lists containing the following fields can be imported currently:</p>
-<ul class="simple">
-<li><p>Origin IDs</p></li>
-<li><p>Name</p></li>
-<li><p>Alias</p></li>
-<li><p>Description</p></li>
-<li><p>Dates</p></li>
-<li><p>GIS data</p></li>
-<li><p>Types</p></li>
-<li><p>Origin types</p></li>
-<li><p>Value types</p></li>
-<li><p>Origin value types</p></li>
-<li><p>References</p></li>
-<li><p>Origin references</p></li>
-<li><p>Reference systems</p></li>
-<li><p>Place hierarchy</p></li>
-<li><p>Type hierarchy</p></li>
-</ul>
+<a class="reference external" href="https://en.wikipedia.org/wiki/Comma-separated_values">CSV</a> files.</p>
 <section id="preparation">
 <h2>Preparation<a class="headerlink" href="#preparation" title="Link to this heading"></a></h2>
-<p>Automatic imports cause problems regarding data integrity, so proceed with
+<p>Automatic imports can cause problems regarding data integrity, so proceed with
 caution. Fixing such problems can be time consuming, so we strongly advise
 you to:</p>
 <ul class="simple">
@@ -144,252 +129,463 @@ not older than a day is enforced</p></li>
 error in the script, nothing will be imported.</p>
 <p><strong>The file:</strong></p>
 <ul class="simple">
-<li><p>Take a look at the <a class="reference download internal" download="" href="../_downloads/c252be00e4e00a8d8fbe6ca68143f1c4/example.csv"><code class="xref download docutils literal notranslate"><span class="pre">example.csv</span></code></a> or
-<a class="reference download internal" download="" href="../_downloads/b05023d4f028f7f863c2384f2569e5f0/example_place_hierarchy.csv"><code class="xref download docutils literal notranslate"><span class="pre">example_place_hierarchy.csv</span></code></a></p></li>
+<li><p>Use UTF-8 encoding for your CSV files to ensure special characters (e.g. ä, ö, ü) are correctly imported.</p></li>
 <li><p>Make sure the file extension (.csv) is spelled correctly in lower case e.g.
 my_data.csv</p></li>
 <li><p>Header names are found in the first row of the table</p></li>
-<li><p>Each following row contains one data set; values are separated by commas</p></li>
+<li><p>Each following row contains one data set; values are separated by commas (<strong>,</strong>)</p></li>
 <li><p>Text should be enclosed in double quotes (<strong>”</strong>), especially if they contain
 commas</p></li>
 </ul>
 </section>
-<section id="project">
-<h2>Project<a class="headerlink" href="#project" title="Link to this heading"></a></h2>
+<section id="general-concepts">
+<h2>General Concepts<a class="headerlink" href="#general-concepts" title="Link to this heading"></a></h2>
+<section id="import-workflow">
+<h3>Import Workflow<a class="headerlink" href="#import-workflow" title="Link to this heading"></a></h3>
+<p>For complex datasets, it is highly recommended to follow a specific import order to ensure all links
+(e.g., to types or literature) are established correctly. Always import your data in this sequence:</p>
+<ol class="arabic simple">
+<li><p><strong>Types</strong>: Import your custom types first, as entities in other files will refer to them.</p></li>
+<li><p><strong>Bibliography / References</strong>: Import your literature next.</p></li>
+<li><p><strong>Entities</strong>: Finally, import your main entities (Places, Persons, Events, Artifacts).</p></li>
+</ol>
+</section>
+<section id="identifiers-id-vs-openatlas-id">
+<h3>Identifiers (ID vs. OpenAtlas ID)<a class="headerlink" href="#identifiers-id-vs-openatlas-id" title="Link to this heading"></a></h3>
+<p>One of the most important concepts to understand is how OpenAtlas links
+data during import:</p>
+<ul class="simple">
+<li><p><strong>id</strong> (in CSV): This is a <strong>temporary</strong> identifier you provide (e.g., <cite>person_1</cite>, <cite>abbey_01</cite>). It is only used <em>within the import project</em> to link entries together (e.g., to assign a parent place or a source). After the import, the system assigns its own internal IDs but keeps the ID as <em>Origin ID</em>.</p></li>
+<li><p><strong>OpenAtlas ID</strong>: This is the unique number an entity already has in the
+database (visible in the URL or the detail view). You use this when you want
+to link new data to <em>existing</em> records.</p></li>
+</ul>
+</section>
+<section id="linking-limitations">
+<h3>Linking Limitations<a class="headerlink" href="#linking-limitations" title="Link to this heading"></a></h3>
+<p>Currently, the CSV import only supports linking to <strong>References/Bibliography</strong> and <strong>Types</strong> during the
+import of an entity. It is <strong>not</strong> possible to link to other entity classes (e.g., linking an event to
+a person or a place) within the CSV file, with one exception:</p>
+<ul class="simple">
+<li><p><strong>Place Hierarchies</strong>: Within a single CSV file, places can be linked to each other using the
+<cite>parent_id</cite> field.</p></li>
+</ul>
+<p>For all other relationships (e.g., Person - Event), the links must be created manually in the
+OpenAtlas interface after the import.</p>
+</section>
+<section id="import-project">
+<h3>Import Project<a class="headerlink" href="#import-project" title="Link to this heading"></a></h3>
 <p>To find imported entities after the import, they have to be associated with a
 project. If no project is available (or not the right one) you have
 to create a new one. Name and description of said project can be updated
 later.</p>
 </section>
-<section id="import-class">
-<h2>Import class<a class="headerlink" href="#import-class" title="Link to this heading"></a></h2>
-<p>Only one class can be imported at a time, so you have to choose one of the
-available classes.</p>
 </section>
-<section id="possible-import-fields">
-<h2>Possible import fields<a class="headerlink" href="#possible-import-fields" title="Link to this heading"></a></h2>
-<p>Column headers can contain the following titles. Other titles won’t be
-imported and an error message will be displayed</p>
-<ul class="simple">
-<li><p><strong>id</strong> - this field has to be <strong>unique per project</strong>; if you have
-same IDs like a person and place with id = 1, you can prefix them in the
-document e.g. person_1, place_1 before importing. Please use only characters,
-numbers, underscore (_) or hyphen (-).</p></li>
-<li><p><strong>name</strong> - required, an error will be displayed if name; the data will not
-get imported if a name is missing</p></li>
-<li><p><strong>alias</strong> - only available for person, group and place, see
-<a class="reference internal" href="#alias-import"><span class="std std-ref">Alias</span></a></p></li>
-<li><p><strong>description</strong> - a description can be provided</p></li>
-<li><p><strong>begin_from</strong> - used for dates, see <a class="reference internal" href="#dates-import"><span class="std std-ref">Dates</span></a></p></li>
-<li><p><strong>begin_to</strong> - used for dates, see <a class="reference internal" href="#dates-import"><span class="std std-ref">Dates</span></a></p></li>
-<li><p><strong>end_from</strong> - used for dates, see <a class="reference internal" href="#dates-import"><span class="std std-ref">Dates</span></a></p></li>
-<li><p><strong>end_to</strong> - used for dates, see <a class="reference internal" href="#dates-import"><span class="std std-ref">Dates</span></a></p></li>
-<li><p><strong>type_ids</strong> - used for linking to a type, see <a class="reference internal" href="#types-import"><span class="std std-ref">Types</span></a></p></li>
-<li><p><strong>origin_type_ids</strong> - used for linking to a type within the same project,
-see <a class="reference internal" href="#origin-types-import"><span class="std std-ref">Origin types</span></a></p></li>
-<li><p><strong>value_types</strong> - used for linking to a value type,
-see <a class="reference internal" href="#value-types-import"><span class="std std-ref">Value types</span></a></p></li>
-<li><p><strong>origin_value_types</strong> - used for linking to a value type within the same
-project, see <a class="reference internal" href="#origin-value-types-import"><span class="std std-ref">Origin value types</span></a></p></li>
-<li><p><strong>reference_ids</strong> - used for linking data to already existing references in
-the database, see <a class="reference internal" href="#references-import"><span class="std std-ref">References</span></a></p></li>
-<li><p><strong>origin_reference_ids</strong> - used for linking data to already existing
-references in the database within the same project,
-see <a class="reference internal" href="#origin-references-import"><span class="std std-ref">Origin references</span></a></p></li>
-<li><p><strong>wkt</strong> - only available for places and artifacts, see <a class="reference internal" href="#wkt-import"><span class="std std-ref">WKT coordinates</span></a></p></li>
-<li><p><strong>reference_system_*</strong> - used for linking data to already existing external
-reference systems in the database, see <a class="reference internal" href="#reference-systems-import"><span class="std std-ref">External reference systems</span></a></p></li>
-<li><p><strong>parent_id</strong> - only available for place, ID of a super unit in a place
-hierarchy, see <a class="reference internal" href="#place-hierarchy-import"><span class="std std-ref">Place hierarchy</span></a></p></li>
-<li><p><strong>openatlas_parent_id</strong> - only available for place, ID of a super unit
-existing in OpenAtlas, see <a class="reference internal" href="#place-hierarchy-import"><span class="std std-ref">Place hierarchy</span></a></p></li>
-<li><p><strong>openatlas_class</strong> - only available for place and only used with
-<strong>parent_id</strong>, see <a class="reference internal" href="#place-hierarchy-import"><span class="std std-ref">Place hierarchy</span></a></p></li>
+<section id="supported-fields">
+<h2>Supported Fields<a class="headerlink" href="#supported-fields" title="Link to this heading"></a></h2>
+<p>Not every field is allowed for every class. The following table provides an
+overview of which column headers (attributes) are supported for which import class:</p>
+<table class="tight-table docutils align-default" id="id4">
+<caption><span class="caption-text">Supported Import Fields</span><a class="headerlink" href="#id4" title="Link to this table"></a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Source</p></th>
+<th class="head"><p>Activity</p></th>
+<th class="head"><p>Acquisition</p></th>
+<th class="head"><p>Modification</p></th>
+<th class="head"><p>Move</p></th>
+<th class="head"><p>Production</p></th>
+<th class="head"><p>Person</p></th>
+<th class="head"><p>Group</p></th>
+<th class="head"><p>Place</p></th>
+<th class="head"><p>Artifact</p></th>
+<th class="head"><p>Bibliography</p></th>
+<th class="head"><p>Edition</p></th>
+<th class="head"><p>Type</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>id</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+</tr>
+<tr class="row-odd"><td><p>name</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+</tr>
+<tr class="row-even"><td><p>alias</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>description</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+</tr>
+<tr class="row-even"><td><p>begin_from</p></td>
+<td></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>begin_to</p></td>
+<td></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>end_from</p></td>
+<td></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>end_to</p></td>
+<td></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>type_ids</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>origin_type_ids</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>value_types</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>origin_value_types</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>reference_ids</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td></td>
+<td></td>
+<td><p>x</p></td>
+</tr>
+<tr class="row-odd"><td><p>origin_reference_ids</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td></td>
+<td></td>
+<td><p>x</p></td>
+</tr>
+<tr class="row-even"><td><p>wkt</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>reference_system_*</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td></td>
+<td></td>
+<td><p>x</p></td>
+</tr>
+<tr class="row-even"><td><p>parent_id</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td></td>
+<td></td>
+<td><p>x</p></td>
+</tr>
+<tr class="row-odd"><td><p>openatlas_parent_id</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td></td>
+<td></td>
+<td><p>x</p></td>
+</tr>
+<tr class="row-even"><td><p>openatlas_class</p></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="class-specific-descriptions">
+<h2>Class Specific Descriptions<a class="headerlink" href="#class-specific-descriptions" title="Link to this heading"></a></h2>
+<p>The following sections describe the fields and their requirements for different entity classes.</p>
+<section id="id">
+<h3>ID<a class="headerlink" href="#id" title="Link to this heading"></a></h3>
+<ul class="simple" id="id-import">
+<li><p><strong>id</strong>: This field has to be <strong>unique per project</strong>. Please use only characters, numbers, underscore (_) or hyphen (-).
+It is a <strong>temporary</strong> identifier used <em>within the import project</em> to link entries together.</p></li>
 </ul>
-<section id="alias">
-<span id="alias-import"></span><h3>Alias<a class="headerlink" href="#alias" title="Link to this heading"></a></h3>
-<p><a class="reference internal" href="../ui/alias.html"><span class="doc">Alias</span></a> can be entered as string. Multiple aliases can be separated
-by semicolon (;). If an <a class="reference internal" href="../ui/alias.html"><span class="doc">Alias</span></a> contains a comma (,) please
-surround the whole string with double quotes(<strong>”</strong>).</p>
+</section>
+<section id="names">
+<span id="name-import"></span><h3>Names<a class="headerlink" href="#names" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>name</strong>: Required for every entry. The import will fail for rows without a name.</p></li>
+<li><p><strong>alias</strong>: Multiple names separated by semicolon (<strong>;</strong>), e.g., <cite>Notker Balbulus;Notker the Stammerer</cite>.</p></li>
+</ul>
 </section>
 <section id="dates">
 <span id="dates-import"></span><h3>Dates<a class="headerlink" href="#dates" title="Link to this heading"></a></h3>
-<p>Dates can be entered in the format <strong>YYYY-MM-DD</strong>, <strong>YYYY-MM</strong> or <strong>YYYY</strong>.
-Fill out the <strong>begin_from</strong> and <strong>end_from</strong> field for a known timeframe.
-For a timespan you can use <strong>begin_to</strong> and <strong>end_to</strong> in combination
-with <strong>begin_from</strong> and <strong>end_from</strong>. For more information see: <a class="reference internal" href="../ui/date.html"><span class="doc">Date</span></a>.</p>
-<p>Keep in mind:</p>
+<p>Dates can be entered in the format <strong>YYYY-MM-DD</strong>, <strong>YYYY-MM</strong> or <strong>YYYY</strong>.</p>
 <ul class="simple">
-<li><p>if the date format is incorrect, it will be displayed in red and won’t be
-imported</p></li>
-<li><p>if the required fields are missing data (<strong>begin_from</strong>
-and/or <strong>end_from</strong>), values entered in the other fields (<strong>begin_to</strong> and
-<strong>end_to</strong>) will be lost without further warning</p></li>
-<li><p>There are no advanced checks for dates, so end dates can start before
-begin dates. Check validity after the importing process; for more
-information see <a class="reference internal" href="data_integrity_checks.html"><span class="doc">Data integrity checks</span></a></p></li>
+<li><p><strong>begin_from / begin_to</strong>: Start of the event (as a point in time or timespan).</p></li>
+<li><p><strong>end_from / end_to</strong>: End of the event.</p></li>
 </ul>
+<p>See <a class="reference internal" href="../ui/date.html"><span class="doc">Date</span></a> for more details.</p>
 </section>
-<section id="types">
-<span id="types-import"></span><h3>Types<a class="headerlink" href="#types" title="Link to this heading"></a></h3>
-<p>It is possible to link entities to one or multiple <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>. This
-can be useful for example when you use a custom type <strong>Case studies</strong> you
-can link all of the imported data to this.</p>
+<section id="types-value-types">
+<span id="types-import"></span><h3>Types &amp; Value Types<a class="headerlink" href="#types-value-types" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p><a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> IDs can be entered in the column <strong>type_ids</strong></p></li>
-<li><p>you can enter multiple IDs, separated by a space</p></li>
-<li><p>the ID of a <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> can be found at the detail view of the
-specific <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> in your OpenAtlas instance</p></li>
-</ul>
-</section>
-<section id="origin-types">
-<span id="origin-types-import"></span><h3>Origin types<a class="headerlink" href="#origin-types" title="Link to this heading"></a></h3>
-<p>It is possible to link entities to one or multiple <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>, which
-were imported in the same project by their origin id.</p>
-<ul class="simple">
-<li><p>Origin type IDs can be entered in the column <strong>origin_type_ids</strong></p></li>
-<li><p>you can enter multiple IDs, separated by a space</p></li>
-<li><p>the origin ID of a <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> can be found at the detail view of the
-specific <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> in your OpenAtlas instance</p></li>
-</ul>
-</section>
-<section id="value-types">
-<span id="value-types-import"></span><h3>Value types<a class="headerlink" href="#value-types" title="Link to this heading"></a></h3>
-<p>It is possible to link entities to one or multiple value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>
-when importing.</p>
-<ul class="simple">
-<li><p>a Value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> can be entered via the <strong>value_types</strong> column</p></li>
-<li><p>type ID and corresponding value are separated by a semicolon (<strong>;</strong>), e.g.
-1234;-13.65</p></li>
-<li><p>for each value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> a value is required</p></li>
-<li><p>multiple value type-value pairs are separated by a space</p></li>
-<li><p>The ID of a value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> can be found at the detail view of a
-specific value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> in your OpenAtlas instance</p></li>
-</ul>
-</section>
-<section id="origin-value-types">
-<span id="origin-value-types-import"></span><h3>Origin value types<a class="headerlink" href="#origin-value-types" title="Link to this heading"></a></h3>
-<p>It is possible to link entities to one or multiple origin value
-<a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>, which were imported in the same project by their origin id.</p>
-<ul class="simple">
-<li><p>a Value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> can be entered via the <strong>origin_value_types</strong>
-column</p></li>
-<li><p>type ID and corresponding value are separated by a semicolon (<strong>;</strong>), e.g.
-value_type_1;-13.65</p></li>
-<li><p>for each value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> a value is required</p></li>
-<li><p>multiple value type-value pairs are separated by a space</p></li>
-<li><p>The ID of a value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> can be found at the detail view of a
-specific value <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> in your OpenAtlas instance</p></li>
+<li><p><strong>type_ids</strong>: Link to existing system types (e.g., <a class="reference external" href="https://demo.openatlas.eu/entity/765">765</a>). Enter one or more IDs, separated by space.</p></li>
+<li><p><strong>origin_type_ids</strong>: Link to types <em>imported within the same project</em>.</p></li>
+<li><p><strong>value_types</strong>: Pair of <cite>Type-ID;Value</cite>, e.g., <a class="reference external" href="https://demo-dev.openatlas.eu/entity/26188">26188;45.5</a>. Multiple pairs separated by space.</p></li>
+<li><p><strong>origin_…</strong>: Same as above, but using the temporary <cite>id</cite> from your CSV instead of system IDs.</p></li>
 </ul>
 </section>
 <section id="references">
 <span id="references-import"></span><h3>References<a class="headerlink" href="#references" title="Link to this heading"></a></h3>
-<p>The imported data can be linked to an already existing
-<a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a>.</p>
+<p>Format: <cite>Reference-ID;Pages</cite>.</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> ID and pages are separated by a semicolon
-(<strong>;</strong>), e.g. 1234;56-78</p></li>
-<li><p>to link a <a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> with multiple page numbers, wrap the
-whole cell in quotation marks, e.g. “1234;IV, 56-78 542;34-23 66;”</p></li>
-<li><p>to link a <a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> without page numbers, just add the ID
-and a semicolon (<strong>;</strong>) without further information</p></li>
-<li><p>enter multiple <a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> separated by a space, e.g. 1234;
-56-78 5678;</p></li>
-<li><p>the ID of each <a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> can be found at the detail view of
-said reference in your OpenAtlas instance</p></li>
+<li><p>Example: <a class="reference external" href="https://demo.openatlas.eu/entity/1603">1603;56-78</a></p></li>
+<li><p>Multiple references: <cite>1234;56-78 5678;</cite> (separated by space)</p></li>
+<li><p>If using commas in pages, wrap in quotes: <cite>“1234;IV, 56-78”</cite></p></li>
 </ul>
-</section>
-<section id="origin-references">
-<span id="origin-references-import"></span><h3>Origin references<a class="headerlink" href="#origin-references" title="Link to this heading"></a></h3>
-<p>The imported data can be linked to an already existing
-<a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> within the same import project and through the origin
-ID (the ID which was given in the import), e.g. “literature_1”.</p>
-<ul class="simple">
-<li><p><a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> origin ID and pages are separated by a semicolon
-(<strong>;</strong>), e.g. literature_1;56-78</p></li>
-<li><p>to link a <a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> with multiple page numbers, wrap the
-whole cell in quotation marks, e.g. “literature_1;IV, 56-78 book_2;34-23 66;”</p></li>
-<li><p>to link a <a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> without page numbers, just add the ID
-and a semicolon (<strong>;</strong>) without further information</p></li>
-<li><p>enter multiple <a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> separated by a space, e.g. literature_1;
-56-78 book_2;</p></li>
-<li><p>the <strong>origin ID</strong> of each <a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a> can be found at the detail view of
-said reference in your OpenAtlas instance if you have <strong>Show import information</strong>
-enabled in your <a class="reference internal" href="../tools/profile.html"><span class="doc">Profile</span></a>.</p></li>
-</ul>
-</section>
-<section id="wkt-coordinates">
-<span id="wkt-import"></span><h3>WKT coordinates<a class="headerlink" href="#wkt-coordinates" title="Link to this heading"></a></h3>
-<p>For places and artifact (multi)point, (multi)polygon, and (multi)linestring
-coordinates or GeometricCollection can be imported. Keep in mind to use
-the <a class="reference external" href="https://gisgeography.com/wgs84-world-geodetic-system/">WGS84</a>
-geodetic system (EPSG 4326).
-Coordinates will be imported as <a class="reference external" href="https://en.wikipedia.org/wiki/Well-known_text_representation_of_geometry">WKT</a>.
-It is only possible to import one geometry for each entry. Since the WKT
-format uses commas, surround tall coordinates with double quotes (“)</p>
-<dl class="simple">
-<dt>Example:</dt><dd><p>“LINESTRING (12.458533781141528 41.922205268362234, 12.53062334955289 41.917606998887024, 12.52169797441624 41.888476931243254)”</p>
-</dd>
-</dl>
 </section>
 <section id="external-reference-systems">
-<span id="reference-systems-import"></span><h3>External reference systems<a class="headerlink" href="#external-reference-systems" title="Link to this heading"></a></h3>
-<p>It is possible to link the imported entity to an existing
-<a class="reference internal" href="../entity/reference_system.html"><span class="doc">Reference System</span></a>. Named the column <strong>reference_system_*</strong> with
-the <em>name</em> of the external
-<a class="reference internal" href="../entity/reference_system.html"><span class="doc">Reference System</span></a> appended, e.g. <strong>reference_system_wikidata</strong>.
-If spaces occur in the name, please substitute them with underscore (_),
-e.g. <strong>reference_system_getty_aat</strong>.
-Each entry consist of two values, separated by a semicolon (;). The first
-value is the identifier, e.g. Q54123, the second value is the match type
-(<strong>close_match</strong> or <strong>exact_match</strong>)</p>
-<dl class="simple">
-<dt>Example:</dt><dd><p>Q54123;close_match</p>
-</dd>
-</dl>
+<span id="reference-systems-import"></span><h3>External Reference Systems<a class="headerlink" href="#external-reference-systems" title="Link to this heading"></a></h3>
+<p>Column name format: <cite>reference_system_&lt;name&gt;</cite>, e.g., <cite>reference_system_wikidata</cite>.
+Value format: <cite>Identifier;Match-Type</cite> (Match-Type: <cite>exact_match</cite> or <cite>close_match</cite>).</p>
+<ul class="simple">
+<li><p>Example: <cite>Q54123;exact_match</cite></p></li>
+</ul>
 </section>
-<section id="place-hierarchy">
-<span id="place-hierarchy-import"></span><h3>Place hierarchy<a class="headerlink" href="#place-hierarchy" title="Link to this heading"></a></h3>
-<p>Use the <strong>parent_id</strong> or <strong>openatlas_parent_id</strong> to generate a
-<a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a> hierarchy together
-with <a class="reference internal" href="../entity/feature.html"><span class="doc">Feature</span></a>, <a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>,
-<a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a>, and <a class="reference internal" href="../entity/human_remains.html"><span class="doc">Human remains</span></a>.
-The <strong>parent_id</strong> has to be an origin <strong>id</strong> of a row in the <strong>current</strong>
-import file.
-The <strong>openatlas_parent_id</strong> has to be an <strong>existing</strong> OpenAtlas entity ID
-with the correct class.
-To declare, which entry has a specific class, the <strong>openatlas_class</strong> column
-is used. Here the following classes can be entered: <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a>,
-<a class="reference internal" href="../entity/feature.html"><span class="doc">Feature</span></a>, <a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>,
-<a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a>, and <a class="reference internal" href="../entity/human_remains.html"><span class="doc">Human remains</span></a>. This is
-case-insensitive.
-For an example, please see: <a class="reference download internal" download="" href="../_downloads/b05023d4f028f7f863c2384f2569e5f0/example_place_hierarchy.csv"><code class="xref download docutils literal notranslate"><span class="pre">example_place_hierarchy.csv</span></code></a></p>
-<p>For questions about the correct place hierarchy structure, please have a
-look at <strong>archaeological sub units</strong> at the OpenAtlas <a class="reference internal" href="../model/index.html"><span class="doc">Model</span></a>.</p>
+<section id="geometries-hierarchies-places-artifacts">
+<span id="geometries-import"></span><h3>Geometries &amp; Hierarchies (Places &amp; Artifacts)<a class="headerlink" href="#geometries-hierarchies-places-artifacts" title="Link to this heading"></a></h3>
+<p>For geographical entities and physical objects:</p>
+<ul class="simple">
+<li><p><strong>wkt</strong>: Well-Known Text geometry (e.g., <cite>POINT(9.3 47.4)</cite>). Only one
+geometry per entry, but also GeometryCollection and Multi geometries are allowed.</p></li>
+<li><p><strong>parent_id</strong>: Links to the <cite>id</cite> of a super-unit <em>within the same file</em>.</p></li>
+<li><p><strong>openatlas_parent_id</strong>: Links to the <cite>ID</cite> of an <em>existing</em> OpenAtlas entity.</p></li>
+<li><p><strong>openatlas_class</strong>: Required when using <cite>parent_id</cite> to specify the target class (e.g., <cite>place</cite>, <cite>feature</cite>, <cite>artifact</cite>).</p></li>
+</ul>
 </section>
+</section>
+<section id="example-datasets-st-gallen">
+<h2>Example Datasets (St. Gallen)<a class="headerlink" href="#example-datasets-st-gallen" title="Link to this heading"></a></h2>
+<p>To better understand how these fields work together, you can download and inspect
+these example files based on the historical Abbey of Saint Gall.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>These examples use specific OpenAtlas IDs for type hierarchies that are only valid
+on the <strong>demo-dev</strong> instance (<a class="reference external" href="https://demo-dev.openatlas.eu/">https://demo-dev.openatlas.eu/</a>).</p>
+</div>
+<ul class="simple">
+<li><p><a class="reference download internal" download="" href="../_downloads/d48da924b8d6c624ed8f420c4087fb01/example_types.csv"><code class="xref download docutils literal notranslate"><span class="pre">Types</span></code></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/4b5382ce52575469b8daeab64b7939b7/example_bibliography.csv"><code class="xref download docutils literal notranslate"><span class="pre">Bibliography</span></code></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/9251e98beea53191c46de72b25d7c439/example_places.csv"><code class="xref download docutils literal notranslate"><span class="pre">Places</span> <span class="pre">(Place</span> <span class="pre">hierarchy)</span></code></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/2d355aca03ada930aaad25055bdf2f06/example_persons.csv"><code class="xref download docutils literal notranslate"><span class="pre">Persons</span></code></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/0cdf8111654f2080591bf5d1aaa05f74/example_modifications.csv"><code class="xref download docutils literal notranslate"><span class="pre">Modifications</span> <span class="pre">(Events)</span></code></a></p></li>
+<li><p><a class="reference download internal" download="" href="../_downloads/e62717c8ba2228e246e538da2f54d784/example_sources.csv"><code class="xref download docutils literal notranslate"><span class="pre">Sources</span></code></a></p></li>
+</ul>
 </section>
 <section id="import-options">
-<h2>Import options<a class="headerlink" href="#import-options" title="Link to this heading"></a></h2>
+<h2>Import Options<a class="headerlink" href="#import-options" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p><strong>File</strong> - select a file you’ll want to import</p></li>
-<li><p><strong>Preview</strong> - if this option is selected, nothing will be imported and you
-see a preview</p></li>
-<li><p><strong>Check for duplicates</strong> - if selected, the chosen class e.g. person will
-be searched for already existing names. The search is not case-sensitive
-e.g. “King Arthur” would be found even it is spelled “KiNg ArThUr”. If
-duplicates are found, a warning is printed but doesn’t stop the import</p></li>
+<li><p><strong>File</strong>: Select your CSV file.</p></li>
+<li><p><strong>Preview</strong>: (Enabled by default) Shows what would happen without actually changing the database.</p></li>
+<li><p><strong>Check for duplicates</strong>: Searches for existing names (case-insensitive) and provides warnings.</p></li>
 </ul>
 </section>
 <section id="after-the-import">
-<h2>After the import<a class="headerlink" href="#after-the-import" title="Link to this heading"></a></h2>
-<p>When the import went through, a summary which data was imported is shown.
-You can also browse the projects to see which imported entities are associated
-with them.
-If advanced layout is enabled, the detail view of an entity shows from which
-project the entity was imported, which user did the import and the
-origin ID value.</p>
-<p>It is always a good idea to run <a class="reference internal" href="data_integrity_checks.html"><span class="doc">Data integrity checks</span></a> after
-each import.</p>
+<h2>After the Import<a class="headerlink" href="#after-the-import" title="Link to this heading"></a></h2>
+<p>A summary of imported data is shown. It is highly recommended to run <a class="reference internal" href="data_integrity_checks.html"><span class="doc">Data integrity checks</span></a> to ensure everything is correct.</p>
 </section>
 </section>
 

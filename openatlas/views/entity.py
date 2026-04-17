@@ -195,7 +195,6 @@ def save(
     url = url_for('index', group=entity.class_.group['name'])
     try:
         entity = process_form(entity, form, origin, relation)
-        g.logger.log_user(entity.id, action)
         url = redirect_url_insert(entity, form, origin, relation)
         flash(_('entity created') if action == 'insert' else _('info update'))
     except InvalidGeomException:

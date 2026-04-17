@@ -15,8 +15,10 @@ def index_changelog() -> str:
 
 
 versions = {
-    '9.2.0': ['TBA', {
+    '9.3.0': ['TBA', {}],
+    '9.2.0': ['2026-04-15', {
         'feature': {
+            '2570': 'Improved tracking of file creator and license holder',
             '2716': 'Improved count view at type trees',
             '2730': 'Force browser to reload npm libs',
             '2767': 'Improved data check performance',
@@ -28,6 +30,7 @@ versions = {
             '2744': 'API: Add typeIDS to network',
             '2759': 'Refactor and minor improvements'},
         'fix': {
+            '2770': 'Binaries called without absolute paths, silent failures',
             '2740': 'Error at network view'}}],
     '9.1.1': ['2026-02-11', {
         'fix': {

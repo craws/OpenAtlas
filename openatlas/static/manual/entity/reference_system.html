@@ -10,6 +10,7 @@
   <title>Reference System &mdash; OpenAtlas 9.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
 
   
@@ -18,6 +19,7 @@
       <script src="../_static/documentation_options.js?v=92dab87b"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Tools" href="../tools/index.html" />
@@ -155,6 +157,26 @@ bodies from catalogues. It is used mainly for documentation in libraries and
 increasingly also by archives and museums.</p>
 <p>By default it is usable for <strong>persons</strong> in OpenAtlas.</p>
 </section>
+<section id="cadaster">
+<h3>Cadaster<a class="headerlink" href="#cadaster" title="Link to this heading"></a></h3>
+<p>The <a class="reference external" href="https://kataster.bev.gv.at/">Austrian Cadaster</a> is the official
+directory of all properties in Austria, managed by the Federal Office of
+Metrology and Surveying (BEV). It is primarily used for
+<a class="reference internal" href="type.html#place-hierarchies"><span class="std std-ref">place hierarchies</span></a>
+(<a class="reference internal" href="type.html#place-hierarchies"><span class="std std-ref">administrative unit</span></a>).</p>
+<p>In OpenAtlas, you can link to two different types of entries:</p>
+<ul class="simple">
+<li><p><strong>Katastralgemeinde (Cadastral Community):</strong> By entering a single number
+(e.g., <code class="docutils literal notranslate"><span class="pre">01004</span></code>), you can link to a specific cadastral community.
+OpenAtlas will use the <code class="docutils literal notranslate"><span class="pre">/kgnr/{kgnr}</span></code> endpoint to retrieve the
+information.</p></li>
+<li><p><strong>Grundstück (Plot of Land):</strong> By entering an identifier with slashes
+(e.g., <code class="docutils literal notranslate"><span class="pre">01004/781/1</span></code>), you can link to a specific plot of land.
+OpenAtlas will use the <code class="docutils literal notranslate"><span class="pre">/gst/{kgnr}/{gnr}</span></code> endpoint for this.</p></li>
+</ul>
+<p>By default it is usable for <a class="reference internal" href="type.html#place-hierarchies"><span class="std std-ref">administrative unit</span></a>
+in OpenAtlas.</p>
+</section>
 </section>
 <section id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h2>
@@ -194,8 +216,8 @@ pre-installed reference systems Wikidata and GeoNames</p></li>
 <a class="reference external" href="https://wikidata.org/">Wikidata</a> for Wikidata)</p></li>
 <li><p><strong>Resolver URL</strong> - URL that - in combination with the ID - links to an
 entity in the reference system (e.g. the resolver URL
-<strong>https://www.wikidata.org/wiki/</strong> in combination with the ID <strong>Q123</strong>
-creates the external link: <a class="reference external" href="https://www.wikidata.org/wiki/Q123">https://www.wikidata.org/wiki/Q123</a> (September)</p></li>
+<strong>https://www.wikiwand.com/en/</strong> in combination with the ID <strong>Q123</strong>
+creates the external link: <a class="reference external" href="https://www.wikiwand.com/en/Q123">https://www.wikiwand.com/en/Q123</a> (September)</p></li>
 <li><p><strong>Example ID</strong> - an example id to show the desired format (e.g. Q123
 for Wikidata)</p></li>
 <li><p><strong>Classes</strong> - a checkbox list of available classes, for GeoNames only place

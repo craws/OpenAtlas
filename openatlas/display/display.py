@@ -357,7 +357,7 @@ class Display:
         if not deletion_possible(self.entity):
             return
         msg = _(
-            'Delete %(name)s?',
+            'delete %(name)s?',
             name=escape(self.entity.name.replace('\'', '')))
         self.buttons.append(
             button(

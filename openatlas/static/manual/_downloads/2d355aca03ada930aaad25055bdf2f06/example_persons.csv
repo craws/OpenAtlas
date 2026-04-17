@@ -1,0 +1,5 @@
+id,name,alias,description,begin_from,end_to,type_ids,origin_type_ids
+gozbert_abbot,Gozbert of Saint Gall,,Abbot of Saint Gall from 816 to 837. Commissioned the Plan of Saint Gall.,0816,0837,25,st_gallen_abbot
+notker_balbulus,Notker the Stammerer,Notker Balbulus,A Benedictine monk at the Abbey of Saint Gall. Author and composer.,0840,0912,25,st_gallen_monk
+tuotilo,Tuotilo,,A medieval monk and composer at the Abbey of Saint Gall.,0850,0912,25,st_gallen_monk
+waldo_reichenau,Waldo of Reichenau,,Abbot of Reichenau and Saint Gall.,0782,0784,25,st_gallen_abbot

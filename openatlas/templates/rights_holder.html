@@ -25,8 +25,10 @@
         <div class="tab-pane fade show active" role="tabpanel" id="tab-info">
           <h2 class="fw-bold">{{ _('name')|uc_first }}</h2>
           <p>{{ rights_holder.name }}</p>
-          <h2 class="fw-bold">{{ _('class')|uc_first }}</h2>
-          <p>{{ rights_holder.class_.label }}</p>
+          {% if rights_holder.class_ %}
+            <h2 class="fw-bold">{{ _('class')|uc_first }}</h2>
+            <p>{{ rights_holder.class_|uc_first }}</p>
+          {% endif %}
           {{ rights_holder.description|description|safe }}
         </div>
         <div class="tab-pane fade" role="tabpanel" id="tab-files">

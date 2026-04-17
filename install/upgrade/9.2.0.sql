@@ -3,6 +3,7 @@ BEGIN;
 -- Raise database version
 UPDATE web.settings SET value = '9.2.0' WHERE name = 'database_version';
 
+-- Improved tracking of creators and license holders of files (#2570)
 CREATE TABLE IF NOT EXISTS model.rights_holder
 (
     id integer NOT NULL GENERATED ALWAYS AS IDENTITY ( INCREMENT 1 START 1 MINVALUE 1 MAXVALUE 2147483647 CACHE 1 ),

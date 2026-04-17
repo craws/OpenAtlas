@@ -172,7 +172,7 @@ def user_view(id_: int) -> str:
                     _('delete'),
                     f'{url_for('user_delete', id_=user.id)}#tab-user',
                     onclick=""
-                    f"return confirm('{_('Delete %(name)s?', name=name)}')"))
+                    f"return confirm('{_('delete %(name)s?', name=name)}')"))
     return render_template(
         'tabs.html',
         tabs={

@@ -194,7 +194,7 @@ def build_export_table(view: str) -> Table:
                 _('download'),
                 url_for('download_export', view=view, filename=file.name))]
         if is_authorized('admin') and os.access(path, os.W_OK):
-            confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
+            confirm = _('delete %(name)s?', name=file.name.replace("'", ''))
             data.append(
                 link(
                     _('delete'),

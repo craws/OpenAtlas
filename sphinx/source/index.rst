@@ -25,7 +25,6 @@ development specific documentation in our Redmine
 
    model/index
    technical/api
-   cookbook
    technical/database_structure
    technical/application_structure
 

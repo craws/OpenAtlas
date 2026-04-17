@@ -648,7 +648,7 @@ def convert_image_to_iiif(id_: int, path: Optional[Path] = None) -> bool:
 def get_binary_path(name: str, required: bool = False) -> str | None:
     binary_path = shutil.which(name)
     if not binary_path:  # pragma: no cover
-        msg = f"{_("system tool not found")}: {name}"
+        msg = f'{_('system tool not found')}: {name}'
         flash(msg, 'error' if required else 'warning')
         return None
     return binary_path
