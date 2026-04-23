@@ -2,7 +2,7 @@ import re
 import time
 from collections import defaultdict
 
-from tqdm import tqdm
+from tqdm import tqdm  # pylint: disable=import-error
 
 from openatlas import app
 from openatlas.models.entity import Entity, insert
@@ -33,7 +33,7 @@ with app.test_request_context():
         'name': 'Patients',
         'openatlas_class_name': 'group'})
     patientinnen_group.link('P2', cs_patients)
-    patientinnen_group.link('P74', elisabethinen_location)
+    patientinnen_group.link('P74', elisabethinen_location)  # type: ignore
     patients = cs_patients.get_linked_entities('P2', ['person'], inverse=True)
     for patient in tqdm(patients, desc='Processing patients'):
         patient.link('P107', patientinnen_group, inverse=True)
@@ -41,7 +41,7 @@ with app.test_request_context():
     patient_super_event = insert({
         'name': 'Patient visits',
         'openatlas_class_name': 'activity'})
-    patient_super_event.link('P7', elisabethinen_location)
+    patient_super_event.link('P7', elisabethinen_location)  # type: ignore
     patient_super_event.link('P2', cs_patients)
     visits = cs_patients.get_linked_entities('P2', ['activity'], inverse=True)
     for visit in tqdm(visits, desc='Processing patient visits'):
@@ -86,7 +86,9 @@ with app.test_request_context():
         'P127',
         inverse=True)
     positions = defaultdict(list)
-    for position_type in tqdm(all_position_types, desc='Processing position types'):
+    for position_type in tqdm(
+            all_position_types,
+            desc='Processing position types'):
         position_type_name = re.split(r'[;,|–/]', position_type.name.lower())
         for name in position_type_name:
             positions[name.strip()].append(
@@ -112,7 +114,9 @@ with app.test_request_context():
         'P127',
         inverse=True)
     dislocation = defaultdict(list)
-    for dislocation_type in tqdm(all_dislocation_types, desc='Processing dislocation types'):
+    for dislocation_type in tqdm(
+            all_dislocation_types,
+            desc='Processing dislocation types'):
         dislocation_type_name = re.split(
             r'[;,|–/]',
             dislocation_type.name.lower())
@@ -120,7 +124,9 @@ with app.test_request_context():
             dislocation[name.strip()].append(
                 dislocation_type.get_linked_entities('P2', inverse=True))
 
-    for name, entities in tqdm(dislocation.items(), desc='Linking dislocations'):
+    for name, entities in tqdm(
+            dislocation.items(),
+            desc='Linking dislocations'):
         if not name:
             continue
         new_type = insert({
@@ -132,4 +138,6 @@ with app.test_request_context():
     end_time = time.perf_counter()
     print(f'Dislocation section took: {end_time - start_time:.2f} seconds')
     total_end_time = time.perf_counter()
-    print(f'Total script execution took: {total_end_time - total_start_time:.2f} seconds')
+    print(
+        f'Total script execution took: {total_end_time - total_start_time:.2f}'
+        ' seconds')

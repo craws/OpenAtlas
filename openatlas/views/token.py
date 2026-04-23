@@ -6,7 +6,6 @@ from typing import Any
 from flask import (
     flash, make_response, redirect, render_template, request, url_for)
 from flask_babel import gettext as _
-from flask_login import login_required
 from flask_wtf import FlaskForm
 from werkzeug.wrappers import Response
 from wtforms import SelectField, StringField
@@ -176,7 +175,7 @@ def generate_token() -> str | Response:
 
 
 @app.route('/admin/api_token/revoke_token/<int:id_>')
-@login_required
+@required_group('admin')
 def revoke_token(id_: int) -> str | Response:
     Token.revoke_jwt_token(id_)
     flash(_('token revoked'))
@@ -184,7 +183,7 @@ def revoke_token(id_: int) -> str | Response:
 
 
 @app.route('/admin/api_token/authorize_token/<int:id_>')
-@login_required
+@required_group('admin')
 def authorize_token(id_: int) -> str | Response:
     Token.authorize_jwt_token(id_)
     flash(_('token authorized'))
@@ -192,7 +191,7 @@ def authorize_token(id_: int) -> str | Response:
 
 
 @app.route('/admin/api_token/delete_token/<int:id_>')
-@login_required
+@required_group('admin')
 def delete_token(id_: int) -> str | Response:
     Token.delete_token(id_)
     flash(_('token deleted'))
@@ -200,7 +199,7 @@ def delete_token(id_: int) -> str | Response:
 
 
 @app.route('/admin/api_token/delete_revoked_tokens/')
-@login_required
+@required_group('admin')
 def delete_revoked_tokens() -> str | Response:
     Token.delete_all_revoked_tokens()
     flash(_('tokens deleted'))
@@ -208,7 +207,7 @@ def delete_revoked_tokens() -> str | Response:
 
 
 @app.route('/admin/api_token/delete_invalid_tokens/')
-@login_required
+@required_group('admin')
 def delete_invalid_tokens() -> str | Response:
     Token.delete_invalid_tokens()
     flash(_('tokens deleted'))
@@ -216,7 +215,7 @@ def delete_invalid_tokens() -> str | Response:
 
 
 @app.route('/admin/api_token/revoke_all_tokens/')
-@login_required
+@required_group('admin')
 def revoke_all_tokens() -> str | Response:
     Token.revoke_all_tokens()
     flash(_('all tokens revoked'))
@@ -224,7 +223,7 @@ def revoke_all_tokens() -> str | Response:
 
 
 @app.route('/admin/api_token/authorize_all_tokens/')
-@login_required
+@required_group('admin')
 def authorize_all_tokens() -> str | Response:
     Token.authorize_all_tokens()
     flash(_('all tokens authorized'))
