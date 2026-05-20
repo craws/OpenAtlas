@@ -98,6 +98,8 @@ def check_type_id(type_id: str, class_: str) -> bool:
     root_type = g.types[g.types[int(type_id)].root[0]]
     if class_ not in root_type.classes:
         return False
+    if root_type.name in ['Administrative unit', 'Historical place']:
+        return False
     return True
 
 
