@@ -28,9 +28,9 @@ from openatlas.api.resources.templates import (
     geojson_collection_template, geojson_pagination, linked_place_pagination,
     linked_places_template, loud_pagination, loud_template)
 from openatlas.api.resources.util import (
-    date_to_str, geometry_to_geojson, get_license_ids_with_links,
+    date_to_str, geometry_to_geojson,
     get_location_link, get_reference_systems,
-    replace_empty_list_values_in_dict_with_none)
+    get_type_references, replace_empty_list_values_in_dict_with_none)
 from openatlas.display.table import entity_table
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import get_centroids_by_entities, get_gis_by_entities
@@ -130,9 +130,14 @@ class Endpoint:
             return self.export_csv_network()
         self.get_entities_formatted()
         if self.parser.format in app.config['RDF_FORMATS']:
-            return Response(
+            response = Response(
                 rdf_output(self.generator_entities, self.parser.format),
                 mimetype=app.config['RDF_FORMATS'][self.parser.format])
+            if self.parser.download == 'true':
+                filename = f'export.{self.parser.format}'
+                response.headers['Content-Disposition'] = (
+                    f'attachment; filename={filename}')
+            return response
         if self.parser.format == 'gpkg':
             return send_file(
                 self.write_gpkg(),
@@ -267,22 +272,22 @@ class Endpoint:
                 self.formated_entities = [self.get_geojson_v2()]
             case 'loud':
                 parsed_context = parse_loud_context()
-                license_links = get_license_ids_with_links()
+                type_references = get_type_references()
                 self.formated_entities = [
-                    get_loud_entities(item, parsed_context, license_links)
+                    get_loud_entities(item, parsed_context, type_references)
                     for item in self.entities_with_links.values()]
             case 'lp' | 'lpx':
                 self.formated_entities = [
                     self.get_linked_places_entity(id_)
                     for id_ in self.entities_with_links]
             case _ if self.parser.format in app.config['RDF_FORMATS']:
-                license_links = get_license_ids_with_links()
+                type_references = get_type_references()
                 parsed_context = parse_loud_context()
                 self.generator_entities = (
                     get_loud_entities(
                         item,
                         parsed_context,
-                        license_links)
+                        type_references)
                     for item in self.entities_with_links.values())
 
     def get_geojson(self) -> dict[str, Any]:

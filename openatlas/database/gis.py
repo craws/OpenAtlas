@@ -3,6 +3,7 @@ from collections import defaultdict
 from typing import Any
 
 from flask import g
+from shapely import GeometryCollection, from_wkt
 
 
 def get_by_id(id_: int) -> list[dict[str, Any]]:
@@ -120,7 +121,7 @@ def get_centroid_dict(row: dict[str, Any]) -> dict[str, Any]:
     return geometry
 
 
-def get_wkt_by_id(id_: int) -> list[dict[str, Any]]:
+def get_wkt_by_id(id_: int) -> str:
     g.cursor.execute(
         """
         SELECT
@@ -137,20 +138,18 @@ def get_wkt_by_id(id_: int) -> list[dict[str, Any]]:
         """,
         {'id_': id_})
     geometries = []
-    for row in list(g.cursor):
-        geometry = {}
+    for row in g.cursor:
         if row['point']:
-            geometry['defined_by'] = row['point']
-        elif row['linestring']:
-            geometry['defined_by'] = row['linestring']
-        else:
-            geometry['defined_by'] = row['polygon']
-        geometry['content'] = row['description'].replace('"', '\"') \
-            if row['description'] else ''
-        geometry['shape_type'] = row['type'].replace('"', '\"') \
-            if row['type'] else ''
-        geometries.append(geometry)
-    return geometries
+            geometries.append(from_wkt(row['point']))
+        if row['linestring']:
+            geometries.append(from_wkt(row['linestring']))
+        if row['polygon']:
+            geometries.append(from_wkt(row['polygon']))
+    if not geometries:
+        return ""
+    if len(geometries) == 1:
+        return geometries[0].wkt
+    return GeometryCollection(geometries).wkt
 
 
 def get_all(extra_ids: list[int]) -> list[dict[str, Any]]:

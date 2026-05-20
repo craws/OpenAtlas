@@ -304,7 +304,7 @@ network.add_argument(
         "acquisition",
         "activity",
         "administrative_unit",
-        "appellation",
+        "alias",
         "artifact",
         "bibliography",
         "creation",
@@ -322,8 +322,8 @@ network.add_argument(
         "production",
         "reference_system",
         "source",
-        "source_translation",
         "stratigraphic_unit",
+        "text",
         "type",
         "type_tools"))
 network.add_argument(

@@ -10,9 +10,9 @@ class SearchTest(TestBaseCase):
         with app.test_request_context():
             app.preprocess_request()
             person = insert('person', 'Waldo', begin_to='2018-01-01')
-            person.link('P1', insert('appellation', 'Waldo alias'))
+            person.link('P1', insert('alias', 'Waldo alias'))
             object_ = insert('place', 'Waldorf')
-            object_.link('P1', insert('appellation', 'Waldorf alias'))
+            object_.link('P1', insert('alias', 'Waldorf alias'))
             insert('person', 'Waldo without date')
 
         rv = c.post(url_for('search_index'), data={'global-term': ''})

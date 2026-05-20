@@ -33,7 +33,7 @@ file: dict[str, Any] = {
         'event': relation('event'),
         'actor': relation('actor'),
         'place': relation('place'),
-        'artifact': relation('artifact'),
+        'item': relation('item'),
         'reference': standard_relations['reference'],
         'type': relation('type')},
     'display': {

@@ -144,15 +144,10 @@ def type_unset_selectable(id_: int) -> Response:
 @required_group('editor')
 def show_multiple_linked_entities(id_: int) -> str:
     type_ = g.types[id_]
-    linked_entity_ids = set()
-    already_tracked_ids = set()
-    multiple_linked_entities = []
-    for entity in get_entities_linked_to_type_recursive(id_, []):
-        if entity.id in linked_entity_ids \
-                and entity.id not in already_tracked_ids:
-            multiple_linked_entities.append(entity)
-            already_tracked_ids.add(entity.id)
-        linked_entity_ids.add(entity.id)
+    multiple_linked_entities = [
+        e.get_linked_entity_safe('P53', inverse=True)
+        if e.class_.name == 'object_location' else e
+        for e in type_.get_multiple_typed_entities()]
     table = entity_table(
         multiple_linked_entities,
         columns=['name', 'class', 'begin', 'end', 'description'])

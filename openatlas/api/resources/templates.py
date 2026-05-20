@@ -353,10 +353,10 @@ def overview_template() -> dict[str, Type[String | Integer]]:
         'place': fields.Integer,
         'production': fields.Integer,
         'reference_system': fields.Integer,
-        'type': fields.Integer,
-        'source_translation': fields.Integer,
         'stratigraphic_unit': fields.Integer,
-        'source': fields.Integer}
+        'source': fields.Integer,
+        'text': fields.Integer,
+        'type': fields.Integer}
 
 
 def type_tree_template() -> dict[str, Any]:

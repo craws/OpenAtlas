@@ -14,7 +14,7 @@ source = {
     'relations': {
         'text': {
             'label': _('text'),
-            'classes': ['source_translation'],
+            'classes': ['text'],
             'property': 'P73',
             'multiple': True,
             'tab': {
@@ -27,9 +27,9 @@ source = {
             'tab': {
                 'buttons': ['link', 'insert'],
                 'tooltip': _('mentioned in the source')}},
-        'artifact': {
-            'label': class_groups['artifact']['label'],
-            'classes': class_groups['artifact']['classes'],
+        'item': {
+            'label': class_groups['item']['label'],
+            'classes': class_groups['item']['classes'],
             'property': 'P67',
             'multiple': True,
             'tab': {
@@ -37,13 +37,13 @@ source = {
                 'tooltip': _('mentioned in the source')}},
         'information_carrier': {
             'label': _('information carrier'),
-            'classes': class_groups['artifact']['classes'],
+            'classes': class_groups['item']['classes'],
             'property': 'P128',
             'inverse': True,
             'multiple': True,
             'mode': 'direct',
-            'tooltip': _(
-                'Link artifacts as the information carrier of the source')},
+            'tooltip':
+                _('Link items as the information carrier of the source')},
         'event': {
             'label': class_groups['event']['label'],
             'classes': class_groups['event']['classes'],
@@ -68,8 +68,8 @@ source = {
         'additional_tabs': {'note': {}},
         'network_color': '#FFA500'}}
 
-source_translation = {
-    'label': _('source translation'),
+text = {
+    'label': _('text'),
     'attributes': {
         'name': {
             'required': True},

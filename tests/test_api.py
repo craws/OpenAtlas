@@ -140,16 +140,16 @@ class Api(ApiTestCase):
                 'api_04.network_visualisation',
                 exclude_system_classes='type'))
         rv = rv.get_json()
-        assert len(rv['results']) == 61
+        assert len(rv['results']) == 66
         rv = c.get(
             url_for(
                 'api_04.network_visualisation',
                 linked_to_ids=boundary_mark.id))
         rv = rv.get_json()
-        assert len(rv['results']) == 15
+        assert len(rv['results']) == 16
         rv = c.get(url_for('api_04.network_visualisation', download=True))
         rv = rv.get_json()
-        assert len(rv['results']) == 157
+        assert len(rv['results']) == 161
 
         rv = c.get(
             url_for(
@@ -157,7 +157,7 @@ class Api(ApiTestCase):
                 id_=place.id,
                 exclude_system_classes='type'))
         rv = rv.get_json()
-        assert len(rv['results']) == 12
+        assert len(rv['results']) == 14
         rv = c.get(
             url_for(
                 'api_04.ego_network_visualisation',
@@ -179,11 +179,11 @@ class Api(ApiTestCase):
                 id_=place.id,
                 download=True))
         rv = rv.get_json()
-        assert len(rv['results']) == 16
+        assert len(rv['results']) == 18
 
         for rv in [
-                c.get(url_for('api_04.geometric_entities')),
-                c.get(url_for('api_04.geometric_entities', download=True))]:
+            c.get(url_for('api_04.geometric_entities')),
+            c.get(url_for('api_04.geometric_entities', download=True))]:
             rv = rv.get_json()
             assert rv['features'][0]['geometry']['coordinates']
             assert rv['features'][0]['properties']['id']
@@ -236,7 +236,7 @@ class Api(ApiTestCase):
                == [16.37069611, 48.208571233]
         assert rv['depictions'][0]['@id']
         assert rv['depictions'][0]['title'] == 'Picture with a License'
-        assert rv['depictions'][0]['license'] == 'Public domain'
+        assert rv['depictions'][0]['license'] == 'CC BY 4.0'
         assert rv['depictions'][0]['url']
 
         rv = c.get(
@@ -270,23 +270,31 @@ class Api(ApiTestCase):
         for key in geojson_checklist:
             assert rv['properties'][key]
 
+        # Test Skolem
+        rv = c.get(url_for('api_04.skolem_proxy', subpath='timespan/2513fcbc'))
+        assert 'Skolem URI for Linked.art.' in rv.get_json()['error']
+
         # Test entity in Linked Open Usable Data
         rv = c.get(url_for('api_04.entity', id_=place.id, format='loud'))
         assert 'application/json' in rv.headers.get('Content-Type')
         rv = rv.get_json()
-        assert rv['type'] == 'PhysicalThing'
+        assert rv['type'] == 'Site'
         assert rv['_label'] == 'Shire'
-        assert rv['content'] == 'The Shire was the homeland of the hobbits.'
-        assert rv['timespan']['begin_of_the_begin'] == '2018-01-31T00:00:00'
+        assert rv['timespan']['begin_of_the_begin'] == '2018-01-31'
         assert rv['identified_by'][0]['_label'] == 'Sûza'
         assert rv['classified_as'][0]['_label'] == 'Boundary Mark'
-        assert (rv['former_or_current_location'][0]['_label']
-                == 'Location of Shire')
-        assert (rv['former_or_current_location'][0]['defined_by']
-                == 'POLYGON((28.9389559878606 41.0290525580955,'
-                   '28.9409293485759 41.0273124142771,28.941969652866 '
-                   '41.0284940983463,28.9399641177912 41.0297647897435'
-                   ',28.9389559878606 41.0290525580955))')
+        assert (rv['former_or_current_location']['defined_by'] ==
+                'GEOMETRYCOLLECTION (POLYGON ((28.9389559878606 '
+                '41.0290525580955, 28.9409293485759 41.0273124142771, '
+                '28.941969652866 41.0284940983463, 28.9399641177912 '
+                '41.0297647897435, 28.9389559878606 41.0290525580955)),'
+                ' POINT (16.370696110389183 48.20857123273274))')
+
+        rv = c.get(url_for('api_04.entity_uuid', uuid=place.uuid))
+        assert 'application/json' in rv.headers.get('Content-Type')
+        rv = rv.get_json()
+        assert rv['type'] == 'Site'
+        assert rv['_label'] == 'Shire'
 
         # Test Entity export and RDFS
         for rv in [
@@ -414,8 +422,8 @@ class Api(ApiTestCase):
                 url_for(
                     'api_04.query',
                     entities=location.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     sort='desc',
                     column='cidoc_class',
                     system_classes='person',
@@ -425,8 +433,8 @@ class Api(ApiTestCase):
                 url_for(
                     'api_04.query',
                     entities=location.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     linked_entities=place.id,
                     sort='desc',
@@ -459,7 +467,7 @@ class Api(ApiTestCase):
                 system_classes='person',
                 limit=0,
                 first=actor2.id)).get_json()
-        assert rv['pagination']['entities'] == 9
+        assert rv['pagination']['entities'] == 10
 
         # Test page parameter
         rv = c.get(
@@ -472,7 +480,7 @@ class Api(ApiTestCase):
                 limit=1,
                 page=7)).get_json()
         properties = rv['results'][0]['features'][0]['properties']
-        assert properties['title'] == actor2.name
+        assert properties['title'] == 'Mordor'
         assert len(rv['results']) == 1
 
         rv = c.get(
@@ -491,7 +499,7 @@ class Api(ApiTestCase):
                 view_classes='artifact',
                 system_classes='person',
                 count=True))
-        assert rv.get_json() == 9
+        assert rv.get_json() == 10
 
         rv = c.get(url_for('api_04.geometric_entities', count=True))
         assert rv.get_json() == 6
@@ -535,17 +543,17 @@ class Api(ApiTestCase):
                 assert b'SQLite format' in rv.data
 
         for url in [
-                    url_for(
-                        'api_04.query',
-                        cidoc_classes='E18',
-                        view_classes='artifact',
-                        system_classes='person',
-                        format='table_row'),
-                    url_for(
-                        'api_04.table_rows',
-                        cidoc_classes='E18',
-                        view_classes='artifact',
-                        system_classes='person')]:
+            url_for(
+                'api_04.query',
+                cidoc_classes='E18',
+                view_classes='artifact',
+                system_classes='person',
+                format='table_row'),
+            url_for(
+                'api_04.table_rows',
+                cidoc_classes='E18',
+                view_classes='artifact',
+                system_classes='person')]:
             with c.get(url) as rv:
                 rv = rv.get_json()['results']
                 assert 'Bar' in rv[0][0]
@@ -590,6 +598,21 @@ class Api(ApiTestCase):
                 locale='en',
                 format='turtle'))
         assert b'Sam' in rv.data
+        for url in [
+            url_for(
+                'api_04.system_class',
+                class_='all',
+                limit=0,
+                locale='en',
+                format='turtle'),
+            url_for(
+                'api_04.system_class',
+                class_='all',
+                limit=0,
+                download='true',
+                format='turtle')]:
+            with c.get(url) as rv:
+                assert b'Sam' in rv.data
 
         rv = c.get(
             url_for(
@@ -602,13 +625,13 @@ class Api(ApiTestCase):
 
         # ---Type Endpoints---
         for rv in [
-                c.get(url_for('api_04.type_overview')),
-                c.get(url_for('api_04.type_overview', download=True))]:
+            c.get(url_for('api_04.type_overview')),
+            c.get(url_for('api_04.type_overview', download=True))]:
             assert 'Austria' in str(rv.get_json())
 
         for rv in [
-                c.get(url_for('api_04.type_by_view_class')),
-                c.get(url_for('api_04.type_by_view_class', download=True))]:
+            c.get(url_for('api_04.type_by_view_class')),
+            c.get(url_for('api_04.type_by_view_class', download=True))]:
             assert 'Boundary Mark' in str(rv.get_json())
         rv = c.get(url_for('api_04.type_tree'))
         assert rv.get_json()['typeTree']
@@ -651,7 +674,7 @@ class Api(ApiTestCase):
                     "operator": "lesserThan",
                     "values": ["2020-01-01"],
                     "logicalOperator": "and"}]}]),
-            (3, [{
+            (2, [{
                 "beginTo": [{
                     "operator": "lesserThanEqual",
                     "values": ["2018-03-01"],
@@ -708,7 +731,7 @@ class Api(ApiTestCase):
                     "operator": "equal",
                     "values": [boundary_mark.id, height.id]}]}]),
             (6, [{"entityName": [{"operator": "like", "values": ["Fr"]}]}]),
-            (7, [{
+            (8, [{
                 "typeIDWithSubs": [{
                     "operator": "equal",
                     "values": [boundary_mark.id, height.id,
@@ -716,16 +739,16 @@ class Api(ApiTestCase):
                 "entityDescription": [{
                     "operator": "like",
                     "values": ["FrOdO", "sam"]}]}]),
-            (14, [{
+            (15, [{
                 "relationToID": [{
                     "operator": "equal",
                     "values": [place.id]}]}]),
-            (162, [{
+            (166, [{
                 "typeIDWithSubs": [{
                     "operator": "notEqual",
                     "values": [boundary_mark.id],
                     "logicalOperator": "and"}]}]),
-            (164, [{
+            (168, [{
                 "typeName": [{
                     "operator": "notEqual",
                     "values": ["Boundary Mark", "Height"],
@@ -832,15 +855,18 @@ class Api(ApiTestCase):
         assert rv.get_json()['pagination']['entities'] == 2
 
         rv = c.get(url_for('api_04.search', class_='type', term='i'))
-        assert rv.get_json()['pagination']['entities'] == 50
+        assert rv.get_json()['pagination']['entities'] == 49
 
         rv = c.get(url_for('api_04.search', class_='person'))
         assert rv.get_json()['pagination']['entities'] == 3
 
         # Test Error Handling
         for rv in [
-                c.get(url_for('api_04.entity', id_=233423424)),
-                c.get(url_for('api_04.cidoc_class', class_='E18', last=1231))]:
+            c.get(url_for('api_04.entity', id_=233423424)),
+            c.get(url_for(
+                'api_04.entity_uuid',
+                uuid='7b9e1c4a-5f2d-4b8a-9e3c-2d1f0a9b8c7d')),
+            c.get(url_for('api_04.cidoc_class', class_='E18', last=1231))]:
             rv = rv.get_json()
         assert 'Entity does not exist' in rv['title']
 

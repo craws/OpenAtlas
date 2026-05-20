@@ -126,3 +126,13 @@ class GetChainedEvents(Resource):
                 root_id,
                 ['P134']),
             parser).get_chained_events(root_id)
+
+
+class GetSkolemProxy(Resource):
+    @staticmethod
+    def get(subpath: str | None = None) -> tuple[dict[str, str | None], int]:
+        return {
+            "path": subpath,
+            "error": "This is a deterministic Skolem URI for Linked.art. "
+                     "It is used for semantic mapping and has no persistent "
+                     "database entry."}, 200

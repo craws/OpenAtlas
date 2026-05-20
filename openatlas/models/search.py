@@ -12,7 +12,7 @@ def search(data: dict[str, Any]) -> list[Entity]:
         return []
     for class_ in data['classes']:
         if g.classes[class_].attributes.get('alias'):
-            data['classes'].append('appellation')
+            data['classes'].append('alias')
             break
     entities = []
     for row in db.search(
@@ -21,7 +21,7 @@ def search(data: dict[str, Any]) -> list[Entity]:
             data['desc'],
             data['own'],
             current_user.id):
-        if row['openatlas_class_name'] == 'appellation':
+        if row['openatlas_class_name'] == 'alias':
             entity = Entity.get_linked_entity_safe_static(
                 row['id'],
                 'P1',

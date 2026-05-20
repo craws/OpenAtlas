@@ -109,66 +109,6 @@ $(document).ready(function () {
     history.replaceState(null, null, newUrl);
   });
 
-  /**
-   * Wikidata autocomplete
-   * Documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
-   * Bootstrap version needs to be manually set d/t
-   */
-  $('input[data-reference-system=Wikidata]').autoComplete({
-    bootstrapVersion: '4',
-    resolver: 'custom',
-    formatResult: function (item) {
-      return {
-        value: item.id,
-        text: `${item.label} - ${item.description}<br><small>${item.id}</small>`
-      };
-    },
-    events: {
-      search: function (qry, callback) {
-        $.ajax(
-            `https://www.wikidata.org/w/api.php?action=wbsearchentities&language=en&format=json&origin=*&search=${qry}`,
-        ).done(function (res) {
-            callback(res.search)
-        });
-      }
-    }
-  }).on('autocomplete.select', function(evt,item) {
-      $('input[data-reference-system=Wikidata]').val(item.id);
-  });
-
-  /**
-   * GND autocomplete
-   * Documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
-   * Bootstrap version needs to be manually set d/t
-  */
-  $('input[data-reference-system=GND]').autoComplete({
-    bootstrapVersion: '4',
-    resolver: 'custom',
-    formatResult: function (item) {
-      return {
-         value: item.id,
-         text: `${item.label} - ${item.category}<br><small>${item.id.substring(item.id.lastIndexOf('/') + 1)}</small>`
-      };
-    },
-    events: {
-      search: function (qry, callback) {
-        $.ajax({
-          url: "https://lobid.org/gnd/search",
-          dataType: "jsonp",
-          data: {
-            q: qry,
-            format: "json:preferredName"
-          },
-          success: function(data) {
-            callback(data);
-          }
-        })
-      }
-    }
-  }).on('autocomplete.select', function(evt,item) {
-    $('input[data-reference-system=GND]').val(item.id.substring(item.id.lastIndexOf('/') + 1));
-  });
-
 });
 
 $.jstree.defaults.core.themes.dots = false;
@@ -229,17 +169,17 @@ async function ajaxAPICall(props, id){
    if ($(`#${id}-switch #hide`).hasClass("d-none")){
     if ($(`#${id}-info-div`).html().length > 0){
       $(`#${id}-info-div`).show();
-          $(`#${id}-switch #show`).addClass("d-none")
-          $(`#${id}-switch #hide`).removeClass("d-none")
+      $(`#${id}-switch #show`).addClass("d-none")
+      $(`#${id}-switch #hide`).removeClass("d-none")
     }
     else{
       $.ajax({
         ...props,
         success: function (info) {
-            $(`#${id}-info-div`).html(info);
-            $(`#${id}-info-div`).show();
-            $(`#${id}-switch #show`).addClass("d-none")
-            $(`#${id}-switch #hide`).removeClass("d-none")
+          $(`#${id}-info-div`).html(info);
+          $(`#${id}-info-div`).show();
+          $(`#${id}-switch #show`).addClass("d-none")
+          $(`#${id}-switch #hide`).removeClass("d-none")
         }
       });
     }
@@ -251,36 +191,12 @@ async function ajaxAPICall(props, id){
   }
 }
 
-async function ajaxWikidataInfo(data) {
+async function ajaxApiInfo(api, system_id, data) {
   ajaxAPICall({
-    type: 'post',
-    url: '/ajax/info/wikidata',
-    data: 'id_=' + data
-  }, "wikidata")
-}
-
-async function ajaxGeonamesInfo(data) {
-  ajaxAPICall({
-    type: 'post',
-    url: '/ajax/info/geonames',
-    data: 'id_=' + data,
-  }, "geonames")
-}
-
-async function ajaxGndInfo(data) {
-  ajaxAPICall({
-    type: 'post',
-    url: '/ajax/info/gnd',
-    data: 'id_=' + data
-  }, "gnd");
-}
-
-async function ajaxCadasterInfo(data) {
-  ajaxAPICall({
-    type: 'post',
-    url: '/ajax/info/cadaster',
-    data: 'id_=' + data
-  }, "cadaster");
+      type: 'post',
+      url: '/ajax/api/' + system_id,
+      data: 'id_=' + data},
+    system_id)
 }
 
 async function ajaxAddType(data, fieldId, typeId, multiple=false) {

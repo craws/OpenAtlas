@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 import os
-import shutil
 import smtplib
-import subprocess
 from datetime import datetime, timedelta
 from email.header import Header
 from email.mime.text import MIMEText
@@ -20,7 +18,9 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.display.image_processing import check_processed_image
+from openatlas.display.image_processing import (check_iiif_activation,
+                                                check_iiif_file_exist,
+                                                check_processed_image)
 from openatlas.display.util2 import (
     convert_size, get_file_path, is_authorized, uc_first)
 from openatlas.models.cidoc import CidocClass, CidocProperty
@@ -69,19 +69,22 @@ def reference_systems(entity: Entity) -> str:
                 class="circle bg-gray fw-bold text-black-50"
                 style="height: 16px; font-size: 12px;">{system.name.upper()[0]}
             </div>"""
-        if system.name in ['GeoNames', 'GND', 'Wikidata', 'Cadaster']:
-            name = system.name.lower()
+        if system.api:
             show = f'<span id="show">{uc_first(_('show info'))}</span>'
             hide = '<span id="hide" class="d-none">' + \
                 f'{uc_first(_('hide info'))}</span>'
             show_info_button += f"""
-                <button id="{name}-switch"
+                <button id="{system.id}-switch"
                   class="mt-1 me-1 {app.config["CSS"]["button"]["secondary"]}"
-                  onclick="ajax{uc_first(name)}Info('{link_.description}')"
+                  onclick="ajaxApiInfo(
+                        '{system.api}',
+                        '{system.id}',
+                        '{link_.description}')"
                     >{show}{hide}
                 </button>"""
-            info_div = f'<div id="{name}-info-div" class="mt-2"></div>'
-            logo = f"""<img src="/static/images/logos/{system.name}.svg" alt=""
+            info_div = f'<div id="{system.id}-info-div" class="mt-2"></div>'
+            logo = f"""
+                <img src="/static/images/logos/{system.api}.svg" alt=""
                 class="rounded-circle object-fit-cover my-1" width="16">"""
         entry = f"""
             <li class="list-group-item bg-transparent">
@@ -206,7 +209,8 @@ def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
 def format_entity_date(
         dates: Dates,
         mode: str,
-        object_: Optional[Entity] = None) -> str:
+        object_: Optional[Entity] = None,
+        with_comment: Optional[bool] = False) -> str:
     html = link(object_) if object_ else ''
     if getattr(dates, f'{mode}_from'):
         html += ', ' if html else ''
@@ -217,6 +221,8 @@ def format_entity_date(
                 end=format_date(getattr(dates, f'{mode}_to')))
         else:
             html += format_date(getattr(dates, f'{mode}_from'))
+        if with_comment and (comment := getattr(dates, f'{mode}_comment')):
+            html += f' ({comment})'
     return html
 
 
@@ -229,7 +235,7 @@ def menu(entity: Optional[Entity]) -> str:
             'event': _('event'),
             'actor': _('actor'),
             'place': _('place'),
-            'artifact': _('artifact'),
+            'item': _('item'),
             'reference': _('reference'),
             'type': _('type'),
             'file': _('file')}.items():
@@ -581,79 +587,6 @@ def get_entities_linked_to_type_recursive(
     return data
 
 
-def check_iiif_activation() -> bool:
-    return bool(
-        g.settings['iiif'] and os.access(
-            Path(g.settings['iiif_path']),
-            os.W_OK))
-
-
-def check_iiif_file_exist(id_: int) -> bool:
-    if g.settings['iiif_conversion']:
-        return get_iiif_file_path(id_).is_file()
-    return bool(get_file_path(id_))  # pragma: no cover
-
-
-def get_iiif_file_path(id_: int) -> Path:
-    ext = '.tiff' if g.settings['iiif_conversion'] else g.files[id_].suffix
-    return Path(g.settings['iiif_path']) / f'{id_}{ext}'
-
-
-def delete_iiif_image(id_: int) -> None:
-    get_iiif_file_path(id_).unlink(missing_ok=True)
-
-
-def convert_image_to_iiif(id_: int, path: Optional[Path] = None) -> bool:
-    vips_path = get_binary_path('vips', required=True)
-    if not vips_path:  # pragma: no cover
-        return False
-    source = str(path or get_file_path(id_))
-    target = str(get_iiif_file_path(id_))
-    env = os.environ.copy()
-    env["VIPS_WARNING"] = "0"
-    command = [
-        vips_path,
-        'tiffsave',
-        source,
-        target,
-        '--tile',
-        '--pyramid',
-        '--compression', g.settings['iiif_conversion'],
-        '--tile-width', '128',
-        '--tile-height', '128']
-    try:
-        subprocess.run(
-            command,
-            check=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.PIPE,
-            env=env,
-            text=True)
-    except subprocess.CalledProcessError as e:  # pragma: no cover
-        error_msg = e.stderr.strip() if e.stderr else "Unknown vips error"
-        g.logger.log(
-            'error',
-            'iiif_conversion',
-            f'Vips failed for ID {id_} ({e.returncode}): {error_msg}')
-        return False
-    except Exception as e:  # pragma: no cover
-        g.logger.log(
-            'error',
-            'iiif_conversion',
-            f'Unexpected error during Vips conversion for ID {id_}: {str(e)}')
-        return False
-    return True
-
-
-def get_binary_path(name: str, required: bool = False) -> str | None:
-    binary_path = shutil.which(name)
-    if not binary_path:  # pragma: no cover
-        msg = f'{_('system tool not found')}: {name}'
-        flash(msg, 'error' if required else 'warning')
-        return None
-    return binary_path
-
-
 def hierarchy_crumbs(entity: Entity) -> list[str]:
     crumbs: list[Any] = [link(entity, index=True)]
     if entity.class_.group['name'] == 'type':
@@ -661,8 +594,7 @@ def hierarchy_crumbs(entity: Entity) -> list[str]:
             g.types[id_] for id_ in entity.root] if entity.root else crumbs
     for relation in entity.class_.relations.values():
         if relation.name == 'super' or (
-                entity.class_.name == 'source_translation'
-                and relation.name == 'source'):
+                entity.class_.name == 'text' and relation.name == 'source'):
             crumbs += entity.get_linked_entities_recursive(
                 relation.property,
                 relation.inverse)

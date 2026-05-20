@@ -56,13 +56,13 @@ class SourceTest(TestBaseCase):
             follow_redirects=True)
         assert b'Source updated' in rv.data
 
-        rv = c.get(url_for('insert', class_='source_translation'))
-        assert b'+ Source translation' in rv.data
+        rv = c.get(url_for('insert', class_='text'))
+        assert b'+ Text' in rv.data
 
         rv = c.post(
             url_for(
                 'insert',
-                class_='source_translation',
+                class_='text',
                 origin_id=source_id,
                 relation='text'),
             data={'name': 'continue', 'source': source_id, 'continue_': 'yes'},
@@ -70,10 +70,7 @@ class SourceTest(TestBaseCase):
         assert b'+' in rv.data
 
         rv = c.post(
-            url_for(
-                'insert',
-                class_='source_translation',
-                relation='text'),
+            url_for('insert', class_='text', relation='text'),
             data={'name': 'Test translation', 'source': source_id})
         translation_id = rv.location.split('/')[-1]
 
@@ -102,7 +99,7 @@ class SourceTest(TestBaseCase):
             app.preprocess_request()
             source = Entity.get_by_id(int(source_id))
             translation_2 = insert(
-                'source_translation',
+                'text',
                 'new translation',
                 ('The <mark meta="{"annotationId":"c27",'
                  f'"entityId":{artifact.id},'

@@ -19,29 +19,31 @@ on:
         default: false
 jobs:
   setup_workflow_env:
-    runs-on: ubuntu-latest
-    outputs:
-      environment: ${{ steps.get_environment_from_git_ref.outputs.environment }}
-      environment_short: ${{ steps.get_environment_from_git_ref.outputs.environment_short }}
-      image_name: container-preview
-      registry_root: ghcr.io/${{ github.repository }}/
-      default_port: "5000"
-      APP_NAME: OpenAtlas
-      APP_ROOT: "/"
-    steps:
-      - name: Get environment from git ref
-        id: get_environment_from_git_ref
-        run: |
-          echo "Running on branch ${{ github.ref_name }}"
-          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            echo "environment=production"
-            echo "environment=production" >> $GITHUB_OUTPUT
-            echo "environment_short=prod" >> $GITHUB_OUTPUT
-          else
-            echo "environment=review/${{ github.ref_name }}"
-            echo "environment=review/${{ github.ref_name }}" >> $GITHUB_OUTPUT
-            echo "environment_short=$(echo -n ${{ github.ref_name }} | sed 's/feat\(ure\)\{0,1\}[_/]//' | tr '_' '-' | tr '[:upper:]' '[:lower:]' | cut -c -63 )" >> $GITHUB_OUTPUT
-          fi
+      runs-on: ubuntu-latest
+      outputs:
+        environment: ${{ steps.get_environment_from_git_ref.outputs.environment }}
+        environment_short: ${{ steps.get_environment_from_git_ref.outputs.environment_short }}
+        image_name: container-preview
+        registry_root: ghcr.io/${{ github.repository }}/
+        default_port: "5000"
+        APP_NAME: OpenAtlas
+        APP_ROOT: "/"
+      steps:
+        - name: Get environment from git ref
+          id: get_environment_from_git_ref
+          run: |
+            echo "Running on branch ${{ github.ref_name }}"
+            if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+              echo "environment=production"
+              echo "environment=production" >> $GITHUB_OUTPUT
+              echo "environment_short=prod" >> $GITHUB_OUTPUT
+            else
+              CLEAN_ENV=$(echo -n "review/${{ github.ref_name }}" | tr '/' '-')
+              echo "environment=$CLEAN_ENV" >> $GITHUB_OUTPUT
+              
+              CLEAN_REF=$(echo -n "${{ github.ref_name }}" | sed -E 's/^(feat(ure)?|fix)[_/]//' | tr '_' '-' | tr '/' '-' | tr '[:upper:]' '[:lower:]' | cut -c -63)
+              echo "environment_short=$CLEAN_REF" >> $GITHUB_OUTPUT
+            fi
   build_openatlas:
     needs: [setup_workflow_env]
     environment: ${{ needs.setup_workflow_env.outputs.environment }}

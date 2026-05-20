@@ -1,7 +1,7 @@
 from typing import Any
 
 from flask import g
-from fuzzywuzzy import fuzz
+from rapidfuzz import fuzz
 
 from openatlas.database import checks as db, date
 from openatlas.models.entity import Entity, Link

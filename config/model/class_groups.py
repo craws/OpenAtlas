@@ -7,9 +7,9 @@ class_groups = {
         'classes': ['person', 'group'],
         'table_columns': ['name', 'class', 'begin', 'end', 'description'],
         'icon': 'mdi-account'},
-    'artifact': {
-        'name': 'artifact',
-        'label': _('artifact'),
+    'item': {
+        'name': 'item',
+        'label': _('item'),
         'classes': ['artifact', 'human_remains'],
         'table_columns':
             ['name', 'class', 'type', 'begin', 'end', 'description'],
@@ -48,11 +48,11 @@ class_groups = {
         'classes': ['reference_system'],
         'table_columns': [
             'name', 'count', 'website_url', 'resolver_url', 'example_id',
-            'default_precision', 'description']},
+            'default_precision', 'api', 'description']},
     'source': {
         'name': 'source',
         'label': _('source'),
-        'classes': ['source', 'source_translation'],
+        'classes': ['source', 'text'],
         'table_columns': ['name', 'class', 'type', 'content'],
         'icon': 'mdi-text-box'},
     'type': {

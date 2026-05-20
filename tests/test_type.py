@@ -70,7 +70,7 @@ class TypeTest(TestBaseCase):
                 class_='type',
                 origin_id=type_id,
                 relation='subs'),
-            data={'name': 'My sub type', relation_type.id: type_id})
+            data={'name': 'My sub type', 'super': type_id, 'name_inverse': ''})
         sub_type_id = rv.location.split('/')[-1]
 
         rv = c.get(url_for('update', id_=sub_type_id))

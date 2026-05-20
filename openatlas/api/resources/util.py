@@ -1,9 +1,12 @@
+import re
+from collections import defaultdict
 from typing import Any, Optional
 
 from flask import g, json, url_for
 
 from openatlas.api.resources.api_entity import ApiEntity
-from openatlas.display.util import check_iiif_activation, check_iiif_file_exist
+from openatlas.display.image_processing import (check_iiif_activation,
+                                                check_iiif_file_exist)
 from openatlas.models.entity import Entity, Link
 from openatlas.models.gis import get_gis_all
 
@@ -37,14 +40,17 @@ def get_license_url(entity: Entity) -> Optional[str]:
     return url
 
 
-def get_license_ids_with_links() -> dict[int, str]:
-    type_ids = Entity.get_hierarchy('License').get_sub_ids_recursive()
-    license_links = Entity.get_links_of_entities(type_ids, 'P67', inverse=True)
-    url_dict = {}
-    for link_ in license_links:
-        if link_.domain.class_.name == "external_reference":
-            url_dict[link_.range.id] = link_.domain.name
-    return url_dict
+def get_type_references() -> dict[int, list[Link]]:
+    type_links = Entity.get_links_of_entities(
+        list(g.types.keys()),
+        'P67',
+        inverse=True)
+    out: dict[int, list[Link]] = defaultdict(list)
+    for link_ in type_links:
+        if link_.domain.class_.name in \
+                ['external_reference', 'reference_system']:
+            out[link_.range.id].append(link_)
+    return out
 
 
 def to_camel_case(i: str) -> str:
@@ -215,6 +221,27 @@ def date_to_str(date: Any) -> Optional[str]:
     return str(date) if date else None
 
 
+# Returns an xsd:date ('YYYY-MM-DD') for date-only values and an
+# xsd:dateTime ('YYYY-MM-DDTHH:MM:SSZ', UTC) when a real time is set.
+# Regex-based to preserve BC years (e.g. '-4712-12-31'), which
+# datetime.fromisoformat does not support.
+_DATE_PARTS_RE = re.compile(
+    r'^(-?\d{4,})-(\d{2})-(\d{2})'
+    r'(?:[T ](\d{2}):(\d{2}):(\d{2})(?:\.\d+)?)?Z?$')
+
+
+def date_to_utc_iso_str(date: Any) -> str | None:
+    if not date:
+        return None
+    match = _DATE_PARTS_RE.match(str(date))
+    if not match:  # pragma: no cover
+        return str(date)
+    year, month, day, hour, minute, second = match.groups()
+    if hour and (int(hour) or int(minute) or int(second)):  # pragma: no cover
+        return f'{year}-{month}-{day}T{hour}:{minute}:{second}Z'
+    return f'{year}-{month}-{day}'
+
+
 def get_crm_relation(link_: Link, inverse: bool = False) -> str:
     property_ = f' {link_.property.i18n['en']}'
     if inverse and link_.property.i18n_inverse['en']:
@@ -233,16 +260,6 @@ def get_crm_relation_x(link_: Link, inverse: bool = False) -> str:
     if inverse and link_.property.i18n_inverse['en']:
         property_ = f'i_{link_.property.i18n_inverse['en']}'
     return f'crm:{link_.property.code}{property_.replace(' ', '_')}'
-
-
-def get_crm_code(link_: Link, inverse: bool = False) -> str:
-    name = link_.range.cidoc_class.i18n['en']
-    if inverse:
-        name = link_.domain.cidoc_class.i18n['en']
-    code = link_.range.cidoc_class.code
-    if inverse:
-        code = link_.domain.cidoc_class.code
-    return f'crm:{code} {name}'
 
 
 def flatten_list_and_remove_duplicates(list_: list[Any]) -> list[Any]:
@@ -269,3 +286,11 @@ def filter_by_type(
                 for id_ in type_ids):
             result.append(entity)
     return result
+
+
+def is_float(value: str) -> bool:
+    try:
+        float(value)
+        return True
+    except ValueError:  # pragma: no cover
+        return False

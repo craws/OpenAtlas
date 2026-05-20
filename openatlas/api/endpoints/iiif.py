@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import mimetypes
 from typing import Any, Tuple
 
 import requests
@@ -15,7 +14,9 @@ from openatlas.api.resources.error import (
     DisplayFileNotFoundError, IIIFMetadataNotFound)
 from openatlas.api.resources.parser import iiif
 from openatlas.api.resources.util import get_license_name, get_license_url
-from openatlas.display.util import check_iiif_file_exist
+from openatlas.display.image_processing import (
+    check_iiif_file_exist, get_actual_mime)
+from openatlas.display.util2 import get_file_path
 from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
 
@@ -56,7 +57,7 @@ class IIIFCanvas(Resource):
             metadata: dict[str, Any],
             parser: Parser) -> dict[str, Any]:
         entity = metadata['entity']
-        mime_type, _ = mimetypes.guess_type(g.files[entity.id])
+        mime_type = get_actual_mime(get_file_path(entity.id))
         return {
             "@id": url_for('api.iiif_canvas', id_=entity.id, _external=True),
             "@type": "sc:Canvas",
@@ -94,7 +95,7 @@ class IIIFImage(Resource):
     @staticmethod
     def build_image(metadata: dict[str, Any]) -> dict[str, Any]:
         id_ = metadata['entity'].id
-        mime_type, _ = mimetypes.guess_type(g.files[id_])
+        mime_type = get_actual_mime(get_file_path(id_))
         return {
             "@id": url_for('api.iiif_image', id_=id_, _external=True),
             "@type": "oa:Annotation",

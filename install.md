@@ -27,10 +27,10 @@ that we are using to set up Debian servers for OpenAtlas installations.
     sudo apt install python3 python3-flask python3-psycopg2 python3-flask-babel python3-flask-login
     sudo apt install python3-jwt python3-python-flask-jwt-extended python3-flaskext.wtf python3-flask-cors
     sudo apt install python3-rdflib python3-shapely python3-flasgger python3-flask-restful python3-pandas
-    sudo apt install python3-validators python3-email-validator python3-wand python3-svgwrite python3-fuzzywuzzy 
-    sudo apt install python3-xmltodict python3-markdown exiftran python3-bcrypt python3-dateutil p7zip-full 
+    sudo apt install python3-validators python3-email-validator python3-wand python3-svgwrite
+    sudo apt install python3-xmltodict python3-markdown exiftran python3-bcrypt python3-dateutil p7zip-full
     sudo apt install python3-requests python3-bs4 python3-unidecode python3-lxml python3-unidecode python3-numpy
-    sudo apt install python3-fiona
+    sudo apt install python3-fiona python3-magic python3-flask-bcrypt python3-levenshtein
 
 ### Apache 2.4, gettext, npm
     sudo apt install apache2 libapache2-mod-wsgi-py3 gettext npm
@@ -174,5 +174,5 @@ Run tests with coverage
 
 # Installing OpenAtlas with Docker (Experimental)
 
-A Docker setup is available for local development. Please follow the 
+A Docker setup is available for local development. Please follow the
 [detailed Docker installation instructions here](install/docker/install.md).

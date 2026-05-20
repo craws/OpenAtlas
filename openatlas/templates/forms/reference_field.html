@@ -9,7 +9,7 @@
       placeholder="{{ field.placeholder }}"
       type="text"
       class="{{ config.CSS.string_field }}"
-      data-reference-system="{{ field.label.text.replace(' ','-') }}">
+      data-reference-system="{{ field.reference_system_id }}">
   </div>
   <div class="col-6">
     <input value="and" type="hidden">
@@ -23,5 +23,8 @@
         <option {{ 'selected' if field.data['precision'] == choice[0] }} value="{{ choice[0] }}">{{ choice[1]}}</option>
       {% endfor %}
     </select>
+    {% if field.reference_system_js %}
+      {{ field.reference_system_js }}
+    {% endif %}
   </div>
 </div>

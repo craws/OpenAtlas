@@ -4,9 +4,9 @@ from flask_babel import lazy_gettext as _
 
 from config.model.class_groups import class_groups, standard_relations
 
-artifact_relation = {
-    'label': _('artifact'),
-    'classes': class_groups['artifact']['classes'],
+item_relations = {
+    'label': _('item'),
+    'classes': class_groups['item']['classes'],
     'property': 'P46',
     'multiple': True,
     'tab': {
@@ -24,7 +24,7 @@ place: dict[str, Any] = {
     'extra': ['reference_system'],
     'relations': {
         'source': standard_relations['source'],
-        'artifact': artifact_relation,
+        'item': item_relations,
         'feature': {
             'classes': ['feature'],
             'property': 'P46',
@@ -115,7 +115,7 @@ feature: dict[str, Any] = {
             'inverse': True,
             'mode': 'direct'},
         'source': standard_relations['source'],
-        'artifact': artifact_relation,
+        'item': item_relations,
         'stratigraphic_unit': {
             'classes': ['stratigraphic_unit'],
             'property': 'P46',
@@ -147,7 +147,7 @@ stratigraphic_unit: dict[str, Any] = {
             'inverse': True,
             'mode': 'direct'},
         'source': standard_relations['source'],
-        'artifact': artifact_relation,
+        'item': item_relations,
         'reference': standard_relations['reference'],
         'file': standard_relations['file']},
     'display': {

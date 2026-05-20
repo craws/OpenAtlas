@@ -17,7 +17,7 @@ from wtforms import (
 
 from openatlas import app
 from openatlas.api.import_scripts.util import (
-    get_match_types, get_reference_system_by_name)
+    get_match_types)
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.error import EntityDoesNotExistError
 from openatlas.display.tab import Tab
@@ -32,7 +32,7 @@ from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
 from openatlas.models.dates import (
     datetime64_to_timestamp, form_to_datetime64, format_date)
-from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity, get_reference_system_by_name
 from openatlas.models.imports import (
     Project, check_duplicates, check_single_type_duplicates,
     check_type_id, clean_reference_pages, get_id_from_origin_id,
@@ -40,7 +40,6 @@ from openatlas.models.imports import (
 
 _('invalid columns')
 _('possible duplicates')
-_('invalid administrative units')
 _('invalid dates')
 _('invalid reference system class')
 _('invalid reference system')
@@ -451,12 +450,9 @@ def get_allowed_columns(class_: str) -> dict[str, list[str]]:
     if class_ in ['place', 'artifact']:
         columns.append('wkt')
     if class_ in ['place', 'artifact', 'type']:
-        columns.extend([
-            'parent_id', 'openatlas_parent_id'])
+        columns.extend(['parent_id', 'openatlas_parent_id'])
     if class_ in ['place', 'type']:
         columns.extend(['openatlas_class'])
-    if class_ in ['place']:
-        columns.extend(['administrative_unit_id', 'historical_place_id'])
     return {
         'allowed': columns,
         'valid': [],
@@ -588,16 +584,10 @@ def check_cell_value(
                 row[item] = ''
                 value = '' if str(value) == 'NaT' else error_span(str(value))
                 checks.set_warning('invalid_dates', id_)
-        case 'administrative_unit_id' | 'historical_place_id' if value:
-            if ((not str(value).isdigit() or int(value) not in g.types) or
-                    g.types[g.types[int(value)].root[0]].name not in [
-                        'Administrative unit', 'Historical place']):
-                value = error_span(value)
-                checks.set_warning('invalid_administrative_units', id_)
         case 'openatlas_class' if value:
             if (value.lower().replace(' ', '_') not in (
                     g.class_groups['place']['classes'] +
-                    g.class_groups['artifact']['classes'] +
+                    g.class_groups['item']['classes'] +
                     g.class_groups['type']['classes'])):
                 value = error_span(value)
                 checks.set_warning('invalid_openatlas_class', id_)

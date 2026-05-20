@@ -18,8 +18,8 @@ from openatlas.api.resources.templates import licensed_file_template
 from openatlas.api.resources.util import (
     get_iiif_manifest_and_path, get_license_name)
 from openatlas.database.overlay import get_by_object
-from openatlas.display.util import (
-    check_iiif_activation, check_iiif_file_exist)
+from openatlas.display.image_processing import (check_iiif_activation,
+                                                check_iiif_file_exist)
 from openatlas.display.util2 import get_file_path
 from openatlas.models.entity import Entity
 from openatlas.models.overlay import Overlay

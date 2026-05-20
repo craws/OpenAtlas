@@ -150,7 +150,6 @@ class ImportTest(ImportTestCase):
                 data={'file': file},
                 follow_redirects=True)
         assert b'invalid columns: not_existing_column' in rv.data
-        assert b'invalid administrative units' in rv.data
         assert b'invalid type ids' in rv.data
         assert b'invalid value type ids' in rv.data
         assert b'invalid value type values' in rv.data

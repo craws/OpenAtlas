@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.13c",
+    "version": "0.4.14",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -171,6 +171,101 @@
                 "schema": {
                   "type": "string",
                   "description": "CSV representation of the data"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BadRequestError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForbiddenError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConflictError"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalServerError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/uuid/{uuid}": {
+      "get": {
+        "tags": [
+          "Entity Endpoint"
+        ],
+        "description": "Retrieves information about a single entity thorugh the UUID in the linked.art format.",
+        "operationId": "GetEntityByUUID",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/uuid"
+          },
+          {
+            "$ref": "#/components/parameters/download"
+          }
+        ],
+        "security": [
+          {},
+          {
+            "bearerHttpAuthentication": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/ld+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkedArtModel"
                 }
               }
             }
@@ -4034,6 +4129,7 @@
         "required": true,
         "schema": {
           "type": "integer",
+          "description": "Internal database ID",
           "example": 50505
         },
         "x-examples": [
@@ -4041,6 +4137,17 @@
           179184,
           196290
         ]
+      },
+      "uuid": {
+        "name": "uuid",
+        "in": "path",
+        "description": "Specific entity UUID",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "description": "Universally Unique IDentifier",
+          "example": "281aebb0-edff-440d-9775-2732744d916e"
+        }
       },
       "fileId": {
         "name": "fileId",
@@ -4093,7 +4200,7 @@
           "enum": [
             "all",
             "actor",
-            "artifact",
+            "item",
             "event",
             "file",
             "place",
@@ -4903,7 +5010,7 @@
             "enum": [
               "all",
               "actor",
-              "artifact",
+              "item",
               "event",
               "file",
               "place",
@@ -5883,7 +5990,7 @@
           "place",
           "production",
           "source",
-          "source_translation",
+          "text",
           "stratigraphic_unit"
         ],
         "properties": {
@@ -5911,7 +6018,7 @@
               "$ref": "#/components/schemas/TypesByViewClassEntry"
             }
           },
-          "artifact": {
+          "item": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TypesByViewClassEntry"
@@ -6007,7 +6114,7 @@
               "$ref": "#/components/schemas/TypesByViewClassEntry"
             }
           },
-          "source_translation": {
+          "text": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TypesByViewClassEntry"
@@ -6903,7 +7010,7 @@
           "production",
           "reference_system",
           "type",
-          "source_translation",
+          "text",
           "stratigraphic_unit",
           "source"
         ],
@@ -6952,7 +7059,7 @@
             "type": "integer",
             "format": "int32"
           },
-          "source_translation": {
+          "text": {
             "type": "integer",
             "format": "int32"
           },
@@ -7645,12 +7752,6 @@
                   "$ref": "#/components/schemas/RelatedEntityModel"
                 }
               },
-              "appellation": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/RelatedEntityModel"
-                }
-              },
               "artifact": {
                 "type": "array",
                 "items": {
@@ -7753,7 +7854,7 @@
                   "$ref": "#/components/schemas/RelatedEntityModel"
                 }
               },
-              "source_translation": {
+              "text": {
                 "type": "array",
                 "items": {
                   "$ref": "#/components/schemas/RelatedEntityModel"

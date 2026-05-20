@@ -2,8 +2,10 @@ from typing import Any, Optional
 
 from flask import g
 
-from openatlas.api.import_scripts.util import get_exact_match, vocabs_requests
-from openatlas.models.entity import Entity, insert
+from openatlas.api.import_scripts.util import (
+    get_exact_match, get_match_types, vocabs_requests)
+from openatlas.models.entity import (
+    Entity, get_reference_system_by_name_safe, insert)
 
 
 def import_vocabs_data(
@@ -79,31 +81,48 @@ def fetch_top_level(
     req = vocabs_requests(id_, 'topConcepts', {'lang': form_data['language']})
     count = []
     duplicates = []
+    vocabulary = None
+    if form_data['vocabulary']:
+        if Entity.check_hierarchy_exists(details['title']):
+            return [], [details['title']]
+        vocabulary = insert({
+            'openatlas_class_name': 'type',
+            'name': details['title'],
+            'description':
+                f'Automatically imported from {details['title']}'})
+        Entity.insert_hierarchy(
+            vocabulary,
+            'custom', form_data['classes'],
+            form_data['multiple'])
     if ref := get_vocabs_reference_system(details):
         for entry in req['topconcepts']:
-            if entry['uri'] in form_data['top_concepts'] \
-                    and not Entity.check_hierarchy_exists(entry['label']):
-                hierarchy = insert({
+            if entry['uri'] in form_data['top_concepts']:
+                if not vocabulary and \
+                        Entity.check_hierarchy_exists(entry['label']):
+                    duplicates.append(entry['label'])
+                    continue
+                top_concept = insert({
                     'openatlas_class_name': 'type',
                     'name': entry['label'],
-                    'description':
+                    'description': '' if vocabulary else \
                         f'Automatically imported from {details["title"]}'})
-                Entity.insert_hierarchy(
-                    hierarchy,
-                    'custom', form_data['classes'],
-                    form_data['multiple'])
+                if vocabulary:
+                    top_concept.link('P127', vocabulary)
+                else:
+                    Entity.insert_hierarchy(
+                        top_concept,
+                        'custom', form_data['classes'],
+                        form_data['multiple'])
                 exact_match_id = get_exact_match().id
                 name = entry['uri'].rsplit('/', 1)[-1]
-                ref.link('P67', hierarchy, name, type_id=exact_match_id)
+                ref.link('P67', top_concept, name, type_id=exact_match_id)
                 entry['subs'] = import_children(
                     entry['uri'],
                     id_,
                     form_data['language'],
                     ref,
-                    hierarchy)
+                    top_concept)
                 count.append(entry)
-            if Entity.check_hierarchy_exists(entry['label']):
-                duplicates.append(entry['label'])
     return count, duplicates
 
 
@@ -128,22 +147,58 @@ def import_children(
         if super_:
             child = insert({
                 'openatlas_class_name': 'type',
-                'name': entry['prefLabel']})  # Switch if bug is solved
-            # get_pref_label(entry['prefLabel'], id_, entry['uri'])
+                'name': get_pref_label(entry['prefLabel'], id_, entry['uri'])})
             child.link('P127', super_)
             ref.link('P67', child, name, type_id=exact_match_id)
+            ext_ref_systems = get_external_references_from_mapping(
+                id_,
+                entry['uri'],
+                lang)
+            for link, system, type_ in ext_ref_systems:
+                child.link(
+                    'P67',
+                    system,
+                    description=link,
+                    type_id=type_.id,
+                    inverse=True)
         entry['subs'] = import_children(entry['uri'], id_, lang, ref, child)
         children.append(entry)
     return children
 
 
-# Skosmos API has a problem, this code will work if bug is closed
-#
-# def get_pref_label(label: str, id_: str, uri: str) -> str:
-#     if not label:
-#         req = vocabs_requests(id_, 'label', {'uri': uri})
-#         label = req['prefLabel']
-#     return label
+def get_external_references_from_mapping(
+        id_: str,
+        uri: str,
+        lang: str) -> list[tuple[str, Entity, Entity]]:
+    req = vocabs_requests(
+        id_,
+        'mappings',
+        {'uri': uri, 'lang': lang, 'external': 'true'})
+    out = []
+    for mapping in req.get('mappings', []):
+        type_ = mapping['type'][0]
+        if 'exactMatch' in type_:
+            type_ = 'exact_match'
+        else:
+            type_ = 'close_match'
+        match_type = get_match_types().get(type_)
+        if not match_type:
+            continue
+
+        # Add addtional reference systems if available
+        match mapping['vocabName']:
+            case 'www.wikidata.org':
+                link_name = str(mapping['hrefLink'].rsplit('/', 1)[-1])
+                if ref_system := get_reference_system_by_name_safe('Wikidata'):
+                    out.append((link_name, ref_system, match_type))
+    return out
+
+
+def get_pref_label(label: str, id_: str, uri: str) -> str:
+    if not label:
+        req = vocabs_requests(id_, 'label', {'uri': uri})
+        label = req['prefLabel']
+    return label
 
 
 def get_vocabs_reference_system(details: dict[str, Any], ) -> Entity:

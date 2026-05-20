@@ -92,8 +92,7 @@ def overview() -> str:
         if not g.classes[name].group:
             continue
         url = ''
-        if name not in [
-                'feature', 'stratigraphic_unit', 'source_translation']:
+        if name not in ['feature', 'stratigraphic_unit', 'text']:
             url = url_for('index', group=g.classes[name].group['name'])
         if name == 'administrative_unit':
             url = f'{url_for('index', group='type')}#menu-tab-place'

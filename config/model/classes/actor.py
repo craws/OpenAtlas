@@ -114,9 +114,9 @@ group: dict[str, Any] = {
                 'buttons': ['link', 'insert'],
                 'columns':
                     ['name', 'type_link', 'begin', 'end', 'description']}},
-        'artifact': {
-            'label': class_groups['artifact']['label'],
-            'classes': class_groups['artifact']['classes'],
+        'item': {
+            'label': class_groups['item']['label'],
+            'classes': class_groups['item']['classes'],
             'property': 'P52',
             'inverse': True,
             'tab': {

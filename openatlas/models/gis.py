@@ -32,10 +32,6 @@ def get_centroids_by_entities(
     return db.get_centroids_by_entities([e.id for e in entities])
 
 
-def get_wkt_by_id(id_: int) -> list[dict[str, Any]]:
-    return db.get_wkt_by_id(id_)
-
-
 def get_gis_all(
         objects: Optional[list[Entity]] = None,
         structure: Optional[dict[str, Any]] = None) -> dict[str, Any]:

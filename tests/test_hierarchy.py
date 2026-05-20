@@ -3,6 +3,7 @@ from typing import Any
 from flask import g, url_for
 
 from openatlas import app
+from openatlas.models.entity import get_reference_system_by_name_safe
 from tests.base import TestBaseCase, get_hierarchy, insert
 
 
@@ -29,7 +30,8 @@ class HierarchyTest(TestBaseCase):
         hierarchy = get_hierarchy('Geronimo')
         data['classes'] = ['acquisition']
         data['entity_id'] = hierarchy.id
-        data[f'reference_system_id_{g.wikidata.id}'] \
+        wikidata = get_reference_system_by_name_safe('wikidata')
+        data[f'reference_system_id_{wikidata.id}'] \
             = ['Q123', self.precision_type.subs[0]]
         rv = c.post(
             url_for('hierarchy_update', id_=hierarchy.id),

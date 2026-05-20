@@ -7,8 +7,8 @@
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
--- SET idle_in_transaction_session_timeout = 0;
--- SET transaction_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET transaction_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -16,6 +16,8 @@ SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 
 ALTER TABLE IF EXISTS ONLY web.user_tokens DROP CONSTRAINT IF EXISTS user_tokens_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_tokens DROP CONSTRAINT IF EXISTS user_tokens_creator_id_fkey;
@@ -63,6 +65,7 @@ ALTER TABLE IF EXISTS ONLY model.annotation_image DROP CONSTRAINT IF EXISTS anno
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_project_id_fkey;
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_entity_id_fkey;
+DROP TRIGGER IF EXISTS update_modified ON web.user_tokens;
 DROP TRIGGER IF EXISTS update_modified ON web.user_settings;
 DROP TRIGGER IF EXISTS update_modified ON web.user_notes;
 DROP TRIGGER IF EXISTS update_modified ON web.user_bookmarks;
@@ -623,6 +626,7 @@ CREATE TABLE model.entity (
     end_to timestamp without time zone,
     end_comment text,
     openatlas_class_name text NOT NULL,
+    uuid uuid DEFAULT public.gen_random_uuid() NOT NULL,
     CONSTRAINT no_empty_name CHECK ((name <> ''::text))
 );
 
@@ -1270,7 +1274,8 @@ CREATE TABLE web.reference_system (
     identifier_example text,
     system boolean DEFAULT false NOT NULL,
     created timestamp without time zone,
-    modified timestamp without time zone DEFAULT now() NOT NULL
+    modified timestamp without time zone DEFAULT now() NOT NULL,
+    api text
 );
 
 
@@ -1950,6 +1955,14 @@ ALTER TABLE ONLY model.file_info
 
 ALTER TABLE ONLY model.entity
     ADD CONSTRAINT entity_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: entity entity_uuid_unique; Type: CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.entity
+    ADD CONSTRAINT entity_uuid_unique UNIQUE (uuid);
 
 
 --

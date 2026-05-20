@@ -6,27 +6,28 @@
   </button>
   <ul class="dropdown-menu p-2">
     <h6 class="dropdown-header px-0 py-1"><small>JSON</small></h6>
-    <li>{{ "Linked Places"|link(url_for('api.entity', id_=entity.id, format='lp'), external=True)|safe }}</li>
-    <li>{{ "Linked Open Art"|link(url_for('api.entity', id_=entity.id, format='loud'), external=True)|safe }}</li>
-    <li>{{ "GeoJSON"|link(url_for('api.entity', id_=entity.id, format='geojson'), external=True)|safe }}</li>
-    <li>{{ "GeoJSON v2"|link(url_for('api.entity', id_=entity.id, format='geojson-v2'), external=True)|safe }}</li>
+    <li class="mb-1">{{ "Linked Places"|link(url_for('api.entity', id_=entity.id, format='lp'), external=True)|safe }}</li>
+    <li class="mb-1">{{ "Linked Open Art"|link(url_for('api.entity', id_=entity.id, format='loud'), external=True)|safe }}</li>
+    <li class="mb-1">{{ "GeoJSON"|link(url_for('api.entity', id_=entity.id, format='geojson'), external=True)|safe }}</li>
+    <li class="mb-1">{{ "GeoJSON v2"|link(url_for('api.entity', id_=entity.id, format='geojson-v2'), external=True)|safe }}</li>
     {% if entity.class_.name == 'place' %}
-      <li>{{ "THANADOS"|link(url_for('api.subunits', id_=entity.id), external=True)|safe }}</li>
-      <li>{{ "ARIADNEplus"|link(url_for('api.subunits', id_=entity.id, format='xml'), external=True)|safe }}</li>
+      <li class="mb-1">{{ "THANADOS"|link(url_for('api.subunits', id_=entity.id), external=True)|safe }}</li>
+      <li class="mb-1">{{ "ARIADNEplus"|link(url_for('api.subunits', id_=entity.id, format='xml'), external=True)|safe }}</li>
     {% endif %}
     {% if entity.class_.name in ['place', 'feature', 'stratigraphic_unit', 'artifact'] %}
-      <li>{{ "GeoPackage"|link(url_for('api.entity', id_=entity.id, format='gpkg'), external=True)|safe }}</li>
+      <li class="mb-1">{{ "GeoPackage"|link(url_for('api.entity', id_=entity.id, format='gpkg'), external=True)|safe }}</li>
+      <li class="mb-1">{{ "GeoPackage (Place Hierarchy)"|link(url_for('api.entities_linked_to_entity', id_=entity.id, format='gpkg', limit='0'), external=True)|safe }}</li>
     {% endif %}
     <li class="dropdown-divider"></li>
     <h6 class="dropdown-header px-0 py-1"><small>RDF</small></h6>
-    <li>{{ "RDF-XML"|link(url_for('api.entity', id_=entity.id, format='xml'), external=True)|safe }}</li>
-    <li>{{ "Pretty-XML"|link(url_for('api.entity', id_=entity.id, format='pretty-xml'), external=True)|safe }}</li>
-    <li>{{ "Turtle"|link(url_for('api.entity', id_=entity.id, format='turtle'), external=True)|safe }}</li>
-    <li>{{ "Notion 3"|link(url_for('api.entity', id_=entity.id, format='n3'), external=True)|safe }}</li>
-    <li>{{ "N-Triples"|link(url_for('api.entity', id_=entity.id, format='nt'),  external=True)|safe }}</li>
+    <li class="mb-1">{{ "RDF-XML"|link(url_for('api.entity', id_=entity.id, format='xml'), external=True)|safe }}</li>
+    <li class="mb-1">{{ "Pretty-XML"|link(url_for('api.entity', id_=entity.id, format='pretty-xml'), external=True)|safe }}</li>
+    <li class="mb-1">{{ "Turtle"|link(url_for('api.entity', id_=entity.id, format='turtle'), external=True)|safe }}</li>
+    <li class="mb-1">{{ "Notion 3"|link(url_for('api.entity', id_=entity.id, format='n3'), external=True)|safe }}</li>
+    <li class="mb-1">{{ "N-Triples"|link(url_for('api.entity', id_=entity.id, format='nt'),  external=True)|safe }}</li>
     <li class="dropdown-divider"></li>
     <h6 class="dropdown-header px-0 py-1"><small>CSV</small></h6>
-    <li>{{ "CSV"|link(url_for('api.entity', id_=entity.id, export='csv'))|safe }}</li>
-    <li>  {{ "CSV Network Analysis"|link(url_for('api.entity', id_=entity.id, export='csvNetwork'))|safe }}</li>
+    <li class="mb-1">{{ "CSV"|link(url_for('api.entity', id_=entity.id, export='csv'))|safe }}</li>
+    <li class="mb-1">  {{ "CSV Network Analysis"|link(url_for('api.entity', id_=entity.id, export='csvNetwork'))|safe }}</li>
   </ul>
 </div>

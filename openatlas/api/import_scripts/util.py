@@ -24,14 +24,6 @@ def get_type_by_name(type_name: str) -> Optional[Entity]:
     return None
 
 
-def get_reference_system_by_name(name: str) -> Optional[Entity]:
-    for system in g.reference_systems.values():
-        if system.name.lower().replace('_', ' ') \
-                == name.lower().replace('_', ' '):
-            return system
-    return None
-
-
 def get_exact_match() -> Entity:
     return get_or_create_type(g.reference_match_type, 'exact match')
 

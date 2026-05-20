@@ -136,6 +136,7 @@ def vocabulary_import_view(category: str, id_: str) -> str | Response:
     details = fetch_vocabulary_details(id_)
 
     class ImportVocabsHierarchyForm(FlaskForm):
+        vocabulary = BooleanField('use vocabulary as hierarchy')
         # noinspection PyTypeChecker
         concepts = SelectMultipleField(
             _('top concepts') if category == 'hierarchy' else _('groups'),
@@ -167,6 +168,7 @@ def vocabulary_import_view(category: str, id_: str) -> str | Response:
 
     if form.validate_on_submit() and form.confirm_import.data:
         form_data = {
+            'vocabulary': form.vocabulary.data,
             'choices': form.concepts.choices,
             'top_concepts': form.concepts.data,
             'classes': form.classes.data,
@@ -195,8 +197,9 @@ def vocabulary_import_view(category: str, id_: str) -> str | Response:
             'info': Tab(
                 'info',
                 content=_('You are about to import following hierarchy') +
-                ': ' +
-                link(details['title'], details['conceptUri'], external=True),
+                        ': ' +
+                        link(details['title'], details['conceptUri'],
+                             external=True),
                 form=form,
                 buttons=[manual('admin/vocabs')])},
         title=id_,

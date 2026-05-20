@@ -26,6 +26,13 @@ LANGUAGES = {
     'fr': 'Français',
     'pl': 'Polski'}
 
+EXTERNAL_API = [
+    'Cadaster',
+    'GeoNames',
+    'GND',
+    'OpenAtlas',
+    'Wikidata']
+
 # Paths are implemented operating system independent using pathlib.
 # To override them (in instance/production.py) either use them like here
 # or use absolute paths like e.g. pathlib.Path('/some/location/somewhere')
@@ -48,7 +55,7 @@ IMAGE_SIZE = {
     'table': '100'}
 
 # Security
-SESSION_COOKIE_SECURE = False  # Should be True in production.py if using HTTPS
+SESSION_COOKIE_SECURE = True  # Set to False if using locally without HTTPS
 REMEMBER_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
@@ -71,10 +78,6 @@ CSS = {
         'secondary': 'btn btn-outline-secondary btn-sm',
         'danger': 'btn btn-outline-danger btn-sm'}}
 
-# External APIs
-API_WIKIDATA = 'https://www.wikidata.org/w/api.php'
-API_GEONAMES = 'http://api.geonames.org/get'
-API_CADASTER = 'https://kataster.bev.gv.at/api/'
 
 USER_AGENT = {
     'User-Agent':

@@ -4,10 +4,11 @@ from __future__ import annotations
 import math
 import os
 import re
+import warnings
 from pathlib import Path
 from typing import Optional
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, MarkupResemblesLocatorWarning
 from flask import g
 from flask_babel import gettext as _
 from flask_login import current_user
@@ -24,8 +25,12 @@ def sanitize(
         return None
     if mode == 'ascii':
         return re.sub('[^A-Za-z0-9]+', '', string) or None
-    return BeautifulSoup(string, "html.parser").get_text().replace("<>", "") \
-        or None
+    with warnings.catch_warnings(record=False):
+        warnings.filterwarnings(
+            "ignore",
+            category=MarkupResemblesLocatorWarning)
+        return BeautifulSoup(
+            string, "html.parser").get_text().replace("<>", "") or None
 
 
 def convert_size(size_bytes: int) -> str:

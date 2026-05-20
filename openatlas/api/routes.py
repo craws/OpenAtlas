@@ -3,7 +3,8 @@ from openatlas.api.endpoints.content import (
     SystemClassCount)
 from openatlas.api.endpoints.entities import (
     GetByCidocClass, GetBySystemClass, GetByViewClass,
-    GetEntitiesLinkedToEntity, GetEntity, GetEntityPresentationView, GetLatest,
+    GetEntitiesLinkedToEntity, GetEntity, GetEntityByUUID,
+    GetEntityPresentationView, GetLatest,
     GetLinkedEntitiesByPropertyRecursive, GetQuery, GetSearchEntities,
     GetTableRows, GetTypeEntities, GetTypeEntitiesAll)
 from openatlas.api.endpoints.file import DisplayImage, EntityFiles, \
@@ -13,7 +14,7 @@ from openatlas.api.endpoints.iiif import (
     IIIFSequence)
 from openatlas.api.endpoints.special import (
     ExportDatabase, GetChainedEvents, GetEgoNetworkVisualisation,
-    GetGeometricEntities, GetNetworkVisualisation, GetSubunits)
+    GetGeometricEntities, GetNetworkVisualisation, GetSkolemProxy, GetSubunits)
 from openatlas.api.endpoints.type import (
     GetTypeByViewClass, GetTypeOverview, GetTypeTree)
 
@@ -21,6 +22,7 @@ entity = [
     [GetByViewClass, '/view_class/<string:class_>', 'view_class'],
     [GetByCidocClass, '/cidoc_class/<string:class_>', 'cidoc_class'],
     [GetEntity, '/entity/<int:id_>', 'entity'],
+    [GetEntityByUUID, '/uuid/<string:uuid>', 'entity_uuid'],
     [GetLatest, '/latest/<int:limit>', 'latest'],
     [GetQuery, '/query/', 'query'],
     [GetBySystemClass, '/system_class/<string:class_>', 'system_class'],
@@ -53,6 +55,7 @@ types = [
     [GetTypeTree, '/type_tree/', 'type_tree']]
 
 special = [
+    [GetSkolemProxy, '/generated/<path:subpath>', 'skolem_proxy'],
     [ExportDatabase, '/export_database/<string:format_>', 'export_database'],
     [GetGeometricEntities, '/geometric_entities/', 'geometric_entities'],
     [GetSubunits, '/subunits/<int:id_>', 'subunits'],

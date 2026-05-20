@@ -3,8 +3,8 @@ from collections import defaultdict
 from pathlib import Path
 
 from openatlas import app
-from openatlas.api.import_scripts.util import get_reference_system_by_name
-from openatlas.models.entity import Entity, insert
+from openatlas.models.entity import (
+    Entity, get_reference_system_by_name_safe, insert)
 
 # Download data from (Tab 'Distributionen/Distributions')
 # https://www.data.gv.at/datasets/5a56bef7-7b60-4822-9da7-1d118f312a4d
@@ -30,7 +30,7 @@ with app.test_request_context():
     app.preprocess_request()
 
     cadaster_hierarchy = Entity.get_by_id(CADASTER_HIERARCHY_ID)
-    cadaster_reference_system = get_reference_system_by_name('Cadaster')
+    cadaster_reference_system = get_reference_system_by_name_safe('Cadaster')
     entries = import_csv_data()
     cadaster_hierarchy_subs = {
         e.name: e for e in Entity.get_by_ids(cadaster_hierarchy.subs)}
@@ -46,7 +46,7 @@ with app.test_request_context():
             kg_entity.link('P89', cadaster_hierarchy)
             kg_entity.link(
                 'P67',
-                cadaster_reference_system,  # type: ignore
+                cadaster_reference_system,
                 kg_name,
                 inverse=True)
 
@@ -57,6 +57,6 @@ with app.test_request_context():
             gst_entity.link('P89', kg_entity)
             gst_entity.link(
                 'P67',
-                cadaster_reference_system,  # type: ignore
+                cadaster_reference_system,
                 f'{kg_name}/{gst_name}',
                 inverse=True)

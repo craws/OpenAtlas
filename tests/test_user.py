@@ -1,7 +1,8 @@
-from flask import g, url_for
+from flask import url_for
 from flask_login import current_user
 
 from openatlas import app
+from openatlas.models.entity import get_reference_system_by_name_safe
 from tests.base import TestBaseCase, insert
 
 
@@ -108,7 +109,8 @@ class UserTests(TestBaseCase):
         rv = c.post(url_for('insert', class_='reference_system'))
         assert b'403 - Forbidden' in rv.data
 
-        rv = c.get(url_for('delete', id_=g.wikidata.id))
+        wikidata = get_reference_system_by_name_safe('wikidata')
+        rv = c.get(url_for('delete', id_=wikidata.id))
         assert b'403 - Forbidden' in rv.data
 
         c.get(url_for('logout'))

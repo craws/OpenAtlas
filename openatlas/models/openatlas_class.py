@@ -70,9 +70,9 @@ def get_classes() -> None:
     classes = {}
     for row in db.get_classes():
         model_ = get_model(row['name'])
-        relations = {}
-        for name_, relation in model_['relations'].items():
-            relations[name_] = Relation(name_, **relation)
+        relations = {
+            name_: Relation(name_, **relation)
+            for name_, relation in model_['relations'].items()}
         classes[row['name']] = OpenatlasClass(
             name=row['name'],
             cidoc_class=g.cidoc_classes[row['cidoc_class_code']],

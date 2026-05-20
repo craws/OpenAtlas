@@ -19,7 +19,7 @@ class ArtifactTest(TestBaseCase):
                 'insert',
                 class_='artifact',
                 origin_id=place.id,
-                relation='artifact'))
+                relation='item'))
         assert b'+ Artifact' in rv.data
 
         rv = c.post(
@@ -33,16 +33,16 @@ class ArtifactTest(TestBaseCase):
         rv = c.get(url_for('view', id_=actor.id))
         assert b'Love-letter' in rv.data
 
-        rv = c.get(url_for('link_insert', origin_id=place.id, name='artifact'))
+        rv = c.get(url_for('link_insert', origin_id=place.id, name='item'))
         assert b'Love-letter' not in rv.data
 
         rv = c.post(
-            url_for('link_insert', origin_id=place.id, name='artifact'),
+            url_for('link_insert', origin_id=place.id, name='item'),
             data={'checkbox_values': [sub_artifact.id]},
             follow_redirects=True)
         assert b'Sub artifact' in rv.data
 
-        rv = c.get(url_for('index', group='artifact'))
+        rv = c.get(url_for('index', group='item'))
         assert b'Love-letter' in rv.data
 
         rv = c.get(url_for('update', id_=artifact_id))

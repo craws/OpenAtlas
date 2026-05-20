@@ -104,20 +104,20 @@ acquisition['relations'] = acquisition['relations'] | {
         'property': 'P24',
         'mode': 'direct',
         'multiple': True},
-    'given_artifact': {
-        'label': _('given artifact'),
-        'classes': class_groups['artifact']['classes'],
+    'given_item': {
+        'label': _('given item'),
+        'classes': class_groups['item']['classes'],
         'property': 'P24',
         'mode': 'direct',
         'multiple': True}}
 
 modification: dict[str, Any] = copy.deepcopy(class_)
 modification['label'] = _('modification')
-modification['display']['tooltip'] = _('modification of artifacts')
+modification['display']['tooltip'] = _('modification of items')
 modification['relations'] = modification['relations'] | {
-    'modified_object': {
-        'label': _('modified object'),
-        'classes': class_groups['artifact']['classes'],
+    'modified_item': {
+        'label': _('modified item'),
+        'classes': class_groups['item']['classes'],
         'property': 'P31',
         'multiple': True,
         'mode': 'direct'},
@@ -131,7 +131,7 @@ modification['relations'] = modification['relations'] | {
 move: dict[str, Any] = copy.deepcopy(class_)
 del move['relations']['location']
 move['label'] = _('move')
-move['display']['tooltip'] = _('movement of artifacts or persons')
+move['display']['tooltip'] = _('movement of items or persons')
 move['relations'] = move['relations'] | {
     'place_from': {
         'label': _('place from'),
@@ -151,9 +151,9 @@ move['relations'] = move['relations'] | {
         'property': 'P25',
         'multiple': True,
         'mode': 'direct'},
-    'moved_object': {
-        'label': _('moved object'),
-        'classes': class_groups['artifact']['classes'],
+    'moved_item': {
+        'label': _('moved item'),
+        'classes': class_groups['item']['classes'],
         'property': 'P25',
         'multiple': True,
         'mode': 'direct'}}

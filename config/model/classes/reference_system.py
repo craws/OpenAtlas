@@ -16,6 +16,8 @@ reference_system: dict[str, Any] = {
             'format': 'url'},
         'example_id': {
             'label': _('example id')},
+        'api': {
+            'label': _('API')},
         'reference_system_classes': {
             'label': _('classes')},
         'description': {}},

@@ -32,6 +32,12 @@ class Dates:
             'end_to':  datetime64_to_timestamp(self.end_to),
             'end_comment': sanitize(self.end_comment)}
 
+    def dates_available(self) -> bool:
+        if not self.begin_from and not self.begin_to \
+                and not self.end_from and not self.end_to:
+            return False
+        return True
+
 
 def timestamp_to_datetime64(string: str | None) -> numpy.datetime64 | None:
     if not string:

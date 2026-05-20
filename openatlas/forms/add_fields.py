@@ -116,7 +116,7 @@ def add_description(
                 validators=get_validators(attribute_description)))
         return
     source: Entity | None = entity
-    if entity.class_.name == 'source_translation':
+    if entity.class_.name == 'text':
         source = origin or entity.get_linked_entity('P73', inverse=True)
     setattr(
         form,
@@ -185,7 +185,12 @@ def add_relations(
                 entities[class_] = Entity.get_by_class(class_, True, True)
             items += entities[class_]
         if relation.classes in [['type'], ['administrative_unit']]:
-            if root := g.types[entity.root[0]] if entity.root else origin:
+            root = None
+            if entity.root:
+                root = g.types[entity.root[0]]
+            elif origin:
+                root = g.types[origin.root[0]] if origin.root else origin
+            if root:
                 setattr(
                     form,
                     relation.name,
@@ -195,10 +200,7 @@ def add_relations(
                         filter_ids=[entity.id] if entity else [],
                         is_type_form=True))
                 if root.directional:
-                    setattr(
-                        form,
-                        'name_inverse',
-                        StringField(_('inverse')))
+                    setattr(form, 'name_inverse', StringField(_('inverse')))
             else:  # It's a root type (hierarchy)
                 if entity.category in ('custom', 'place'):
                     form.multiple = BooleanField(

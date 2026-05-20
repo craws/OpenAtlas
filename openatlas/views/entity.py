@@ -10,15 +10,17 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.display.display import Display
+from openatlas.display.image_processing import (
+    check_iiif_file_exist, get_iiif_file_path)
 from openatlas.display.table import entity_table
 from openatlas.display.util import (
-    button, check_iiif_file_exist, get_chart_data, get_iiif_file_path,
-    hierarchy_crumbs, link, reference_systems, required_group)
+    button, get_chart_data, hierarchy_crumbs, link, reference_systems,
+    required_group)
 from openatlas.display.util2 import (
     get_file_path, is_authorized, manual, sanitize)
 from openatlas.forms.entity_form import get_entity_form, process_form
 from openatlas.forms.util import deletion_possible
-from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity, get_reference_system_by_name_safe
 from openatlas.models.gis import InvalidGeomException, get_gis_all
 from openatlas.models.openatlas_class import Relation
 
@@ -98,7 +100,8 @@ def insert(
         writable=os.access(app.config['UPLOAD_PATH'], os.W_OK),
         overlays=origin.get_overlays() if origin else None,
         title=_(entity.class_.group['name']),
-        geonames_module=entity.class_.name in g.geonames.classes,
+        geonames_module=entity.class_.name
+            in get_reference_system_by_name_safe('geonames').classes,
         crumbs=crumbs_for_insert(entity, origin, structure))
 
 
@@ -108,7 +111,7 @@ def crumbs_for_insert(
         structure: dict[str, Any] | None) -> list[Any]:
     crumbs = hierarchy_crumbs(origin or entity) + \
         [origin, f'+ {entity.class_.label}']
-    if entity.class_.group['name'] == 'artifact' and origin and structure:
+    if entity.class_.group['name'] == 'item' and origin and structure:
         if count := len([
                 i for i in structure['siblings']
                 if i.class_.name == entity.class_.name]):
@@ -142,7 +145,8 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         gis_data=gis_data,
         overlays=entity.get_overlays(),
         title=entity.name,
-        geonames_module=entity.class_.name in g.geonames.classes,
+        geonames_module=entity.class_.name
+            in get_reference_system_by_name_safe('geonames').classes,
         crumbs=hierarchy_crumbs(entity) +
         [entity, _('copy') if copy else _('edit')])
 
@@ -256,7 +260,7 @@ def redirect_url_insert(
             'insert',
             class_=class_,
             origin_id=entity.id,
-            relation=class_.replace('human_remains', 'artifact'))
+            relation='item')
     return url
 
 
@@ -266,16 +270,16 @@ def redirect_url_delete(entity: Entity) -> str:
         root = g.types[entity.root[0]] if entity.root else None
         url = url_for('view', id_=root.id) if root \
             else url_for('index', group='type')
-    elif entity.class_.group['name'] in ['artifact', 'place']:
+    elif entity.class_.group['name'] in ['item', 'place']:
         if parent := entity.get_linked_entity(
                 'P46',
                 g.class_groups['place']['classes'] +
-                g.class_groups['artifact']['classes'],
+                g.class_groups['item']['classes'],
                 True):
             url = \
                 url_for('view', id_=parent.id) + \
                 f'#tab-{entity.class_.name.replace('_', '-')}'
-    elif entity.class_.name == 'source_translation':
+    elif entity.class_.name == 'text':
         source = entity.get_linked_entity_safe('P73', inverse=True)
         url = f'{url_for('view', id_=source.id)}#tab-text'
     return url

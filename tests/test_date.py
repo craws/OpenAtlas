@@ -13,6 +13,7 @@ class DateTest(TestBaseCase):
                 'begin_year_from': -1949,
                 'begin_month_from': 2,
                 'begin_day_from': 8,
+                'begin_comment': 'it was a sunny day',
                 'begin_year_to': -1948,
                 'end_year_from': 1996,
                 'end_year_to': 1996}

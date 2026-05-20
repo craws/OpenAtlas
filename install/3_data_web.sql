@@ -8,7 +8,7 @@ INSERT INTO web.group (name) VALUES
   ('readonly');
 
 INSERT INTO web.settings (name, value) VALUES
-  ('database_version', '9.2.0'),
+  ('database_version', '9.3.0'),
   ('api_public', ''),
   ('default_language', 'en'),
   ('table_rows', '25'),

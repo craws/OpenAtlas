@@ -85,7 +85,8 @@ class ImportTest(ImportTestCase):
                 'name': 'Ring References',
                 'website_url': 'https://ring_references.org',
                 'resolver_url': 'https://ring_references.org',
-                'classes': ['place', 'person']})
+                'classes': ['place', 'person'],
+                'api': ''})
 
         with app.test_request_context():
             app.preprocess_request()

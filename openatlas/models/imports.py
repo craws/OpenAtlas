@@ -12,13 +12,14 @@ from shapely.errors import ShapelyError
 from shapely.geometry import LineString, Point, Polygon, mapping
 
 from openatlas.api.import_scripts.util import (
-    get_match_types, get_reference_system_by_name)
+    get_match_types)
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.error import EntityDoesNotExistError
 from openatlas.database import imports as db
 from openatlas.database.connect import Transaction
 from openatlas.display.util2 import sanitize
-from openatlas.models.entity import Entity, insert
+from openatlas.models.entity import (
+    Entity, get_reference_system_by_name, insert)
 
 
 class Project:
@@ -121,7 +122,7 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
             if value := row.get('openatlas_class'):
                 if value.lower().replace(' ', '_') in (
                         g.class_groups['place']['classes'] +
-                        g.class_groups['artifact']['classes']):
+                        g.class_groups['item']['classes']):
                     class_ = value.lower().replace(' ', '_')
             description = row.get('description')
             insert_data = {
@@ -137,7 +138,7 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
             if class_ in ['place', 'person', 'group'] and row.get('alias'):
                 insert_data['alias'] = row.get('alias').split(";")
             if class_ in g.class_groups['place']['classes'] \
-                    + g.class_groups['artifact']['classes']:
+                    + g.class_groups['item']['classes']:
                 gis_data = {'point': '[]', 'line': '[]', 'polygon': '[]'}
                 if coordinates := row.get('wkt'):
                     gis_data = get_coordinates_from_wkt(coordinates)
@@ -160,7 +161,7 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
         for entry in entities.values():
             if entry['entity'].class_.name in (
                     g.class_groups['place']['classes'] +
-                    g.class_groups['artifact']['classes']):
+                    g.class_groups['item']['classes']):
                 if entry['parent_id']:
                     entities[entry['parent_id']]['entity'].link(
                         'P46',
@@ -281,10 +282,10 @@ def get_coordinates_from_wkt(coordinates: str) -> dict[str, Any]:
     geometries = []
     if wkt_:
         if wkt_.geom_type in {
-                "MultiPoint",
-                "MultiLineString",
-                "MultiPolygon",
-                "GeometryCollection"}:
+            "MultiPoint",
+            "MultiLineString",
+            "MultiPolygon",
+            "GeometryCollection"}:
             for poly in wkt_.geoms:
                 geometries.append(convert_wkt_to_geojson(poly))
         else:

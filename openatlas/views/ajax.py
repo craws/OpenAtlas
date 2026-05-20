@@ -4,10 +4,13 @@ from flask import Response, g, jsonify, request
 from flask_babel import gettext as _
 
 from openatlas import app
-from openatlas.api.external.cadaster import fetch_cadaster
-from openatlas.api.external.geonames import fetch_geonames
-from openatlas.api.external.gnd import fetch_gnd
-from openatlas.api.external.wikidata import fetch_wikidata
+
+# pylint: disable=unused-import
+from openatlas.api.external.cadaster import Cadaster # noqa
+from openatlas.api.external.geonames import GeoNames # noqa
+from openatlas.api.external.gnd import GND # noqa
+from openatlas.api.external.openatlas_api import OpenAtlas # noqa
+from openatlas.api.external.wikidata import Wikidata # noqa
 from openatlas.display.util import display_info, required_group
 from openatlas.display.util2 import uc_first
 from openatlas.models.entity import Entity, insert
@@ -57,25 +60,10 @@ def ajax_create_entity() -> str:
     return str(entity.id)
 
 
-@app.route('/ajax/info/wikidata', methods=['POST'])
+@app.route('/ajax/api/<int:system_id>', methods=['GET', 'POST'])
 @required_group('readonly')
-def ajax_info_wikidata() -> str:
-    return display_info(fetch_wikidata(request.form['id_']))
-
-
-@app.route('/ajax/info/geonames', methods=['POST'])
-@required_group('readonly')
-def ajax_geonames_info() -> str:
-    return display_info(fetch_geonames(request.form['id_']))
-
-
-@app.route('/ajax/info/gnd', methods=['POST'])
-@required_group('readonly')
-def ajax_gnd_info() -> str:
-    return display_info(fetch_gnd(request.form['id_']))
-
-
-@app.route('/ajax/info/cadaster', methods=['POST'])
-@required_group('readonly')
-def ajax_cadaster_info() -> str:
-    return display_info(fetch_cadaster(request.form['id_']))
+def ajax_external_api(system_id: int) -> str:
+    system = g.reference_systems[system_id]
+    return display_info(globals()[system.api]().get_info(
+        request.form['id_'],
+        system))

@@ -1,0 +1,37 @@
+  <script>
+  /**
+   * GND autocomplete
+   * Documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
+   * Bootstrap version needs to be manually set d/t
+  */
+  $('input[data-reference-system={{ system.id }}]').autoComplete({
+    bootstrapVersion: '4',
+    resolver: 'custom',
+    formatResult: function (item) {
+      const formattedClass = item.system_class.replace(/_/g, ' ');
+      const systemClass = formattedClass.charAt(0).toUpperCase() + formattedClass.slice(1);
+      const desc = item.description ? `<br><small>${item.description}</small>` : '';
+      return {
+        value: item.id,
+        text: `${item.name} - ${systemClass}${desc}`
+      };
+    },
+    events: {
+      search: function (qry, callback) {
+        $.ajax({
+          url: "{{ system.website_url }}/api/search/all",
+          dataType: "json",
+          data: {
+            term: qry
+          },
+          success: function(data) {
+            console.log(data)
+            callback(data.results);
+          }
+        })
+      }
+    }
+  }).on('autocomplete.select', function(evt,item) {
+    $('input[data-reference-system={{ system.id }}]').val(item.id.substring(item.id.lastIndexOf('/') + 1));
+  });
+</script>

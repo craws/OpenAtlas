@@ -7,13 +7,14 @@ from flask_babel import gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import secure_filename
 from wtforms import (
-    BooleanField, HiddenField, SelectMultipleField, StringField, widgets)
+    BooleanField, HiddenField, SelectField, SelectMultipleField, StringField,
+    widgets)
 
 from openatlas import app
 from openatlas.database.connect import Transaction
-from openatlas.display.image_processing import resize_image
-from openatlas.display.util import (
-    check_iiif_activation, convert_image_to_iiif, get_binary_path)
+from openatlas.display.image_processing import (check_iiif_activation,
+                                                convert_image_to_iiif,
+                                                get_binary_path, resize_image)
 from openatlas.forms.add_fields import (
     add_buttons, add_class_types, add_date_fields, add_description,
     add_name_fields, add_reference_systems, add_relations, get_validators)
@@ -41,6 +42,15 @@ def get_entity_form(
     add_reference_systems(Form, entity.class_)
     for key, value in entity.class_.attributes.items():
         match key:
+            case 'api':
+                setattr(
+                    Form,
+                    key,
+                    SelectField(
+                        value['label'],
+                        choices=[('', '')] + [
+                            (name, name) for name
+                            in app.config['EXTERNAL_API']]))
             case 'creator' | 'license_holder':
                 selection = RightsHolder.get_rights_holders_by_entity_and_role(
                     entity.id,
@@ -51,17 +61,17 @@ def get_entity_form(
                     TableMultiField(
                         RightsHolder.get_rights_holder(),
                         selection))
+            case 'dates':
+                add_date_fields(Form, entity)
+            case 'description':
+                add_description(Form, entity, origin)
             case 'example_id' | 'resolver_url' | 'website_url':
                 setattr(
                     Form,
                     key,
                     StringField(
-                        value['label'],
-                        validators=get_validators(value)))
-            case 'dates':
-                add_date_fields(Form, entity)
-            case 'description':
-                add_description(Form, entity, origin)
+                            value['label'],
+                            validators = get_validators(value)))
             case 'file':
                 if not entity.id:
                     setattr(

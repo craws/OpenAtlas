@@ -8,9 +8,10 @@ from flask_babel import LazyString, format_number, gettext as _
 from flask_login import current_user
 
 from openatlas import app
-from openatlas.display.image_processing import check_processed_image
+from openatlas.display.image_processing import (check_iiif_file_exist,
+                                                check_processed_image)
 from openatlas.display.util import (
-    check_iiif_file_exist, edit_link, get_user_setting, link,
+    edit_link, get_user_setting, link,
     remove_link)
 from openatlas.display.util2 import (
     display_bool, get_file_path, is_authorized, sanitize, uc_first)
@@ -147,8 +148,10 @@ def get_table_cell_content(
         overlays: dict[int, Overlay]) -> str:
     html: str | None = 'no table function'
     match name:
+        case 'api':
+            html = e.api
         case 'begin':
-            html = table_date('first', e, range_, item)
+            html = table_date('first', e, range_, item, relation)
         case 'checkbox':
             html = f"""
                 <input
@@ -321,21 +324,20 @@ def table_date(
         mode: str,
         e: Entity,
         range_: Entity | None,
-        item: Link | Entity | None) -> str:
+        item: Link | Entity | None,
+        relation: Relation | None = None) -> str:
     html = getattr(e.dates, mode)
-    if range_ \
-            and range_.class_.group \
-            and item \
-            and not (html := getattr(item.dates, mode)):
-        if e.class_.group['name'] == 'actor' \
-                and range_.class_.group['name'] == 'event' \
-                and getattr(range_.dates, mode):
-            html = getattr(range_.dates, mode)
-        elif e.class_.group['name'] == 'event' \
-                and range_.class_.group['name'] == 'actor' \
-                and getattr(e.dates, mode):
-            html = getattr(e.dates, mode)
-        html = f'<span class="text-muted">{html}</span>' if html else ''
+    if relation and 'dates' in relation.additional_fields and item:
+        if not (html := getattr(item.dates, mode)) and range_:
+            if e.class_.group['name'] == 'actor' \
+                    and range_.class_.group['name'] == 'event' \
+                    and getattr(range_.dates, mode):
+                html = getattr(range_.dates, mode)
+            elif e.class_.group['name'] == 'event' \
+                    and range_.class_.group['name'] == 'actor' \
+                    and getattr(e.dates, mode):
+                html = getattr(e.dates, mode)
+            html = f'<span class="text-muted">{html}</span>' if html else ''
     return html
 
 

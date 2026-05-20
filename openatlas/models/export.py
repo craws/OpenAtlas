@@ -22,7 +22,7 @@ from openatlas.api.external.arche_class import ArcheFileMetadata
 from openatlas.api.formats.rdf import rdf_export_to_file
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.util import filter_by_type, get_reference_systems
-from openatlas.display.util import get_binary_path
+from openatlas.display.image_processing import get_binary_path
 from openatlas.models.entity import Entity
 
 
@@ -327,7 +327,7 @@ def get_arche_file_metadata(
             if link_.domain.class_.name == "external_reference":
                 url = link_.domain.name
                 break
-        if url is None:
+        if url is None:  # pragma: no cover
             continue
         license_urls[standard_type.id] = url
         if type_ids:

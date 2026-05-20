@@ -13,6 +13,16 @@ def get_by_id(
     return g.cursor.fetchone()
 
 
+def get_by_uuid(
+        uuid: str,
+        types: bool = False,
+        aliases: bool = False) -> dict[str, Any]:
+    g.cursor.execute(
+        select_sql(types, aliases) + ' WHERE e.uuid = %(uuid)s GROUP BY e.id;',
+        {'uuid': uuid})
+    return g.cursor.fetchone()
+
+
 def get_by_ids(
         ids: Iterable[int],
         types: bool = False,
@@ -93,8 +103,9 @@ def get_overview_counts_by_type(
         """
         SELECT openatlas_class_name AS name, COUNT(openatlas_class_name)
         FROM model.entity e
-        JOIN model.link t ON e.id = t.domain_id
-        WHERE openatlas_class_name IN %(classes)s AND t.range_id IN %(ids)s  
+                 JOIN model.link t ON e.id = t.domain_id
+        WHERE openatlas_class_name IN %(classes)s
+          AND t.range_id IN %(ids)s
         GROUP BY openatlas_class_name;
         """,
         {'ids': tuple(ids), 'classes': tuple(classes)})
@@ -240,6 +251,7 @@ def select_sql(types: bool = False, aliases: bool = False) -> str:
     sql = """
         SELECT
             e.id,
+            e.uuid,
             e.cidoc_class_code,
             e.name,
             e.description,
@@ -426,7 +438,8 @@ def get_links_of_entities(
         inverse: bool = False) -> list[dict[str, Any]]:
     sql = f"""
         SELECT
-            l.id, l.property_code,
+            l.id,
+            l.property_code,
             l.domain_id,
             l.range_id,
             l.description,
@@ -540,6 +553,7 @@ def get_types(with_count: bool) -> list[dict[str, Any]]:
     sql = f"""
         SELECT
             e.id,
+            e.uuid,
             e.name,
             e.cidoc_class_code,
             e.description,
@@ -734,13 +748,15 @@ def insert_reference_system(data: dict[str, Any]) -> None:
             name,
             website_url,
             resolver_url,
-            identifier_example)
+            identifier_example,
+            api)
         VALUES (
             %(entity_id)s,
             %(name)s,
             %(website_url)s,
             %(resolver_url)s,
-            %(identifier_example)s);
+            %(identifier_example)s,
+            %(api)s);
         """,
         data)
 
@@ -753,12 +769,14 @@ def update_reference_system(data: dict[str, Any]) -> None:
             name,
             website_url,
             resolver_url,
-            identifier_example
+            identifier_example,
+            api
         ) = (
             %(name)s,
             %(website_url)s,
             %(resolver_url)s,
-            %(identifier_example)s
+            %(identifier_example)s,
+            %(api)s
         ) WHERE entity_id = %(entity_id)s;
         """,
         data)
@@ -802,6 +820,7 @@ def get_reference_systems() -> list[dict[str, Any]]:
         """
         SELECT
             e.id,
+            e.uuid,
             e.name,
             e.cidoc_class_code,
             e.description,
@@ -812,6 +831,7 @@ def get_reference_systems() -> list[dict[str, Any]]:
             rs.resolver_url,
             rs.identifier_example,
             rs.system,
+            rs.api,
             array_to_json(
                 array_agg((t.range_id, t.description))
                     FILTER (WHERE t.range_id IS NOT NULL)
@@ -821,6 +841,7 @@ def get_reference_systems() -> list[dict[str, Any]]:
         LEFT JOIN model.link t ON e.id = t.domain_id AND t.property_code = 'P2'
         GROUP BY
             e.id,
+            e.uuid,
             e.name,
             e.cidoc_class_code,
             e.description,
@@ -830,7 +851,21 @@ def get_reference_systems() -> list[dict[str, Any]]:
             rs.website_url,
             rs.resolver_url,
             rs.identifier_example,
+            rs.api,
             rs.system,
             rs.entity_id;
         """)
     return list(g.cursor)
+
+
+def get_multiple_linked_entities(sub_ids: list[int]) -> list[int]:
+    g.cursor.execute(
+        """
+        SELECT domain_id, COUNT(*) AS "Count"
+        FROM model.link
+        WHERE property_code IN ('P2', 'P89') AND range_id IN %(sub_ids)s
+        GROUP BY domain_id
+        HAVING COUNT(*) > 1
+        """,
+        {'sub_ids': tuple(sub_ids)})
+    return [row[0] for row in list(g.cursor)]

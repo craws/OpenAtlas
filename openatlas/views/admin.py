@@ -17,12 +17,12 @@ from wtforms import StringField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app
-from openatlas.display.image_processing import create_resized_images
+from openatlas.display.image_processing import (
+    check_iiif_file_exist, create_resized_images)
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    button, check_iiif_file_exist, display_info, link, required_group,
-    send_mail)
+    button, display_info, link, required_group, send_mail)
 from openatlas.display.util2 import (
     convert_size, display_bool, is_authorized, manual, sanitize, uc_first)
 from openatlas.forms.display import display_form

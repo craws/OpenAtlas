@@ -79,7 +79,7 @@ def get_csv_links(entity_dict: dict[str, Any]) -> dict[str, Any]:
 
 def get_csv_geom_entry(entity: Entity) -> str:
     geom_data = []
-    if entity.class_.group.get('name') in ['place', 'artifact']:
+    if entity.class_.group.get('name') in ['place', 'item']:
         geom_data = get_gis_by_id(entity.get_linked_entity_safe('P53').id)
     elif entity.class_.name == 'object_location':
         geom_data = get_gis_by_id(entity.id)
