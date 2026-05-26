@@ -3,11 +3,14 @@ Letters
 
 .. toctree::
 
+.. Note:: May need adaptions to reflect new tab navigation and menu label
+  changes.
+
 The following step by step instruction describes how to enter a letter
 exchange event.
 The following elements are involved in the procedure:
 
-* :doc:`/entity/artifact`: The physical presentation of the letter
+* :doc:`artifact </entity/item>`: The physical presentation of the letter
 * :doc:`/entity/source`: The content of the letter
 * :doc:`/entity/event`: The **Move** of the letter from one place to another
 * :doc:`/entity/place`: Start or end point of the letter exchange
@@ -19,7 +22,7 @@ Adding an artifact
 The created artifact is the physical presentation of the letter. So the
 begin of the date field would be the creation of the letter, etc.
 
-* Click on :doc:`/entity/artifact` in the :doc:`/ui/menu` and create a new
+* Click on :doc:`/entity/item` in the :doc:`/ui/menu` and create a new
   entry by using the **+ Artifact** button
 * Choose a descriptive name
 * Select an appropriate :doc:`/entity/type` from the list, such as letter

@@ -42,7 +42,7 @@ Can be linked via tabs to
 * **Member of** - Use to specify a group an actor is a member of
 * **Member** - Link to actors to specify who was a member in a group (only
   available for groups)
-* :doc:`artifact` - Use to specify which artifacts and/or human remains are
+* :doc:`item` - Use to specify which artifacts and/or human remains are
   owned by an actor (e.g. human remains that are kept in a museum)
 * :doc:`reference` - Use to add citation
 * :doc:`file` - Add a file, e.g. a picture of a person or group

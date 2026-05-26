@@ -76,7 +76,7 @@ def view_iiif(id_: int) -> str:
             if file_.class_.group['name'] == 'file' \
                     and check_iiif_file_exist(file_.id):
                 manifests.append(get_manifest_url(file_.id))
-    return render_template('iiif.html', manifests=manifests)
+    return render_template('util/iiif.html', manifests=manifests)
 
 
 def get_manifest_url(id_: int) -> str:

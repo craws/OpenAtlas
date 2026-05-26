@@ -23,4 +23,13 @@ UPDATE model.openatlas_class SET name = 'text' WHERE name = 'source_translation'
 UPDATE model.entity SET name = 'Text' WHERE name = 'Source translation';
 UPDATE web.hierarchy SET name = 'Text' WHERE name = 'Source translation';
 
+-- Case study system type (#2705)
+INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, description)
+SELECT 'E55', 'type', 'Case study', 'Mark entities for different case studies, used e.g. for presentation sites.'
+WHERE NOT EXISTS (SELECT 1 FROM model.entity WHERE name='Case study' AND openatlas_class_name = 'type');
+
+INSERT INTO web.hierarchy (id, name, category, multiple, directional)
+SELECT (SELECT id FROM model.entity WHERE name='Case study'), 'Case study', 'custom', True, False
+WHERE NOT EXISTS (SELECT 1 FROM web.hierarchy WHERE name='Case study');
+
 END;

@@ -27,6 +27,7 @@ LANGUAGES = {
     'pl': 'Polski'}
 
 EXTERNAL_API = [
+    'APIS',
     'Cadaster',
     'GeoNames',
     'GND',

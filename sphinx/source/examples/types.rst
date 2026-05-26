@@ -3,6 +3,9 @@ Types
 
 .. toctree::
 
+.. Note:: May need adaptions to reflect new tab navigation and menu label
+  changes.
+
 :doc:`Types</entity/type>` are used to add information to all entities.
 They are organized hierarchically into trees and specific for each project.
 Furthermore, types help to show information in an organized way on a
@@ -41,7 +44,7 @@ Please fill out the form:
 * Decide if the type is single or multiple select (only available for custom
   types)
 * Choose to which classes the new type will be added, e.g.
-  :doc:`/entity/artifact` or :doc:`/entity/place`; the typ will only be
+  :doc:`/entity/item` or :doc:`/entity/place`; the typ will only be
   shown in the related form
 * You can also enter text into the **description** field which will be
   displayed when you mouse-over the information button next to the type’s

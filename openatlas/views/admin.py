@@ -49,7 +49,7 @@ def admin_index() -> str:
             'file',
             _('files'),
             content=render_template(
-                'file.html',
+                'util/file.html',
                 info=get_form_settings(FileForm()),
                 disk_space_info=get_disk_space_info()),
             buttons=[

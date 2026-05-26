@@ -289,7 +289,7 @@ def import_data(project_id: int, class_: str) -> str:
         except Exception:
             flash(_('error at import'), 'error')
             return render_template(
-                'import_data.html',
+                'util/import_data.html',
                 form=form,
                 messages=checks.messages,
                 file_data=file_data,
@@ -309,7 +309,7 @@ def import_data(project_id: int, class_: str) -> str:
             except Exception:  # pragma: no cover
                 flash(_('error transaction'), 'error')
     return render_template(
-        'import_data.html',
+        'util/import_data.html',
         form=form,
         file_data=file_data,
         table=table,
@@ -334,7 +334,7 @@ def check_data_for_table_representation(
     file_.save(str(file_path))
     data_frame: DataFrame = cast(
         DataFrame,
-        pd.read_csv(  # type: ignore[call-overload]
+        pd.read_csv(  # noqa
             str(file_path),
             dtype=str,
             skipinitialspace=True,

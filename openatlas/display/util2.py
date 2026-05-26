@@ -88,8 +88,7 @@ def manual(site: str) -> str:
     return f"""
         <a title="{uc_first(_('manual'))}"
             href="/static/manual/{site}.html" class="manual"
-            target="_blank"
-            rel="noopener noreferrer">
+            target="_blank" rel="noopener noreferrer">
           <i class="fas fs-4 fa-book"></i>
         </a>"""
 

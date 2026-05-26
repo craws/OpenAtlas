@@ -217,7 +217,7 @@ class TextAnnotation(HiddenInput):
     def __call__(self, field: Any, **kwargs: Any) -> str:
         return super().__call__(field, **kwargs) + Markup(
             render_template(
-                'text-annotation.html',
+                'forms/text-annotation.html',
                 field=field,
                 source_text=field.data,
                 linked_entities=field.linked_entities))

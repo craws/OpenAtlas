@@ -82,8 +82,8 @@ def sort_types(
         'administrative_units': []}
     for item in type_ids:
         type_id, _ = item
-        root = g.types[g.types[int(type_id)].root[0]]
-        if root.name in ['Administrative unit', 'Historical place']:
+        class_name = g.types[int(type_id)].class_.name
+        if class_name == 'administrative_unit':
             sorted_types['administrative_units'].append(item)
         else:
             sorted_types['types'].append(item)
@@ -97,8 +97,6 @@ def check_type_id(type_id: str, class_: str) -> bool:
         return False
     root_type = g.types[g.types[int(type_id)].root[0]]
     if class_ not in root_type.classes:
-        return False
-    if root_type.name in ['Administrative unit', 'Historical place']:
         return False
     return True
 

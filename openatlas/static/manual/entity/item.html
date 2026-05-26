@@ -7,7 +7,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Artifact &mdash; OpenAtlas 9.1.0 documentation</title>
+  <title>Item &mdash; OpenAtlas 9.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
       <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -16,14 +16,14 @@
   
       <script src="../_static/jquery.js?v=8dae8fb0"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=92dab87b"></script>
+      <script src="../_static/documentation_options.js?v=b756c04f"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../_static/design-tabs.js?v=f930bc37"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Reference" href="reference.html" />
-    <link rel="prev" title="Human remains" href="human_remains.html" /> 
+    <link rel="prev" title="Stratigraphic unit" href="stratigraphic_unit.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -57,8 +57,9 @@
 <li class="toctree-l2"><a class="reference internal" href="place.html">Place</a></li>
 <li class="toctree-l2"><a class="reference internal" href="feature.html">Feature</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stratigraphic_unit.html">Stratigraphic unit</a></li>
-<li class="toctree-l2"><a class="reference internal" href="human_remains.html">Human remains</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Artifact</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Item</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#artifact">Artifact</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#human-remains">Human remains</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">Reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="type.html">Type</a></li>
 <li class="toctree-l2"><a class="reference internal" href="file.html">File</a></li>
@@ -97,7 +98,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">Entity</a></li>
-      <li class="breadcrumb-item active">Artifact</li>
+      <li class="breadcrumb-item active">Item</li>
       <li class="wy-breadcrumbs-aside">
       </li>
   </ul>
@@ -106,10 +107,15 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="artifact">
-<h1>Artifact<a class="headerlink" href="#artifact" title="Link to this heading"></a></h1>
+  <section id="item">
+<h1>Item<a class="headerlink" href="#item" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
+<p>Items include <strong>artifacts</strong> and <strong>human remains</strong>. See below for their
+descriptions.</p>
+</section>
+<section id="artifact">
+<h1>Artifact<a class="headerlink" href="#artifact" title="Link to this heading"></a></h1>
 <p>CIDOC documentation:
 <a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/e22-human-made-object/version-7.1">E22 Human-Made Object</a></p>
 <p>Artifact such as coins or pottery can be entered in this form.</p>
@@ -129,11 +135,11 @@ view.</strong></p></li>
 <li><p><a class="reference internal" href="../ui/description.html"><span class="doc">Description</span></a></p></li>
 <li><p><strong>Carrier of source</strong> - if a <a class="reference internal" href="source.html"><span class="doc">Source</span></a> is depicted on the artifact</p></li>
 <li><p><a class="reference internal" href="../tools/map.html"><span class="doc">Map</span></a></p></li>
-<li><p><a class="reference internal" href="reference_system.html"><span class="doc">Reference System</span></a></p></li>
 <li><p><strong>Super</strong> - A <a class="reference internal" href="place.html"><span class="doc">Place</span></a>, <a class="reference internal" href="feature.html"><span class="doc">Feature</span></a>, <a class="reference internal" href="stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>, or
 artifact, which the entered artifact is a part of</p></li>
 <li><p><strong>Owned by</strong> - Link the artifact to an <a class="reference internal" href="actor.html"><span class="doc">Actor</span></a> (person or group) who
 owns it, such as a museum or a collector</p></li>
+<li><p><a class="reference internal" href="reference_system.html"><span class="doc">Reference System</span></a></p></li>
 </ul>
 </section>
 <section id="can-be-linked-via-tabs-to">
@@ -148,12 +154,60 @@ production</p></li>
 </ul>
 </section>
 </section>
+<section id="human-remains">
+<h1>Human remains<a class="headerlink" href="#human-remains" title="Link to this heading"></a></h1>
+<p>CIDOC documentation:
+<a class="extlink-cidoc_entity reference external" href="https://www.cidoc-crm.org/Entity/e20-biological-object/version-7.1">E20 Biological Object</a></p>
+<p>“Human remains” is used to record anthropological data based on each human
+bone. They are subunits of a <a class="reference internal" href="stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a> which itself is a
+subunit of <a class="reference internal" href="feature.html"><span class="doc">Feature</span></a>. Please note that information on the biological sex,
+gender, and age of an individual can be entered in the stratigraphic unit
+entry mask. For an archaeological workflow example see
+<a class="reference internal" href="../examples/archaeological_data.html"><span class="doc">Archaeological data</span></a>.</p>
+<section id="id1">
+<h2>Form fields<a class="headerlink" href="#id1" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="../ui/name.html"><span class="doc">Name</span></a></p></li>
+<li><p><a class="reference internal" href="type.html"><span class="doc">Type</span></a></p></li>
+<li><p><a class="reference internal" href="../ui/date.html"><span class="doc">Date</span></a></p></li>
+<li><p><a class="reference internal" href="../ui/description.html"><span class="doc">Description</span></a></p></li>
+<li><p><strong>Carrier of source</strong> - if a <a class="reference internal" href="source.html"><span class="doc">Source</span></a> is depicted on the remains</p></li>
+<li><p><a class="reference internal" href="../tools/map.html"><span class="doc">Map</span></a></p></li>
+<li><p><a class="reference internal" href="reference_system.html"><span class="doc">Reference System</span></a></p></li>
+<li><p><strong>Super</strong> - a <a class="reference internal" href="place.html"><span class="doc">Place</span></a>, <a class="reference internal" href="feature.html"><span class="doc">Feature</span></a>, <a class="reference internal" href="stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>, or
+human remains, which it is a part of</p></li>
+<li><p><strong>Owned by</strong> - the <a class="reference internal" href="actor.html"><span class="doc">Actor</span></a> (person or group) who owns the remains
+such as museum</p></li>
+<li><p><a class="reference internal" href="reference_system.html"><span class="doc">Reference System</span></a></p></li>
+</ul>
+</section>
+<section id="id2">
+<h2>Can be linked via tabs to<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="source.html"><span class="doc">Source</span></a> - Use, if a human remains is mentioned in a source</p></li>
+<li><p><a class="reference internal" href="event.html"><span class="doc">Event</span></a> - Acquisition, modification, move, and/or production can be
+linked</p></li>
+<li><p><strong>Subs</strong> - Use, to add sub human remains</p></li>
+<li><p><a class="reference internal" href="reference.html"><span class="doc">Reference</span></a></p></li>
+<li><p><a class="reference internal" href="file.html"><span class="doc">File</span></a></p></li>
+</ul>
+</section>
+<section id="super-and-subunits">
+<h2>Super and subunits<a class="headerlink" href="#super-and-subunits" title="Link to this heading"></a></h2>
+<p>In the OpenAtlas database Human remains can be subunits of a
+<a class="reference internal" href="stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a> (e.g. a human femur (human remains) of a skeleton
+(stratigraphic unit) in a grave (feature)). A
+Stratigraphic unit can consist of one or more Human remains (femur,
+humerus and first molar of the same individual etc.) as well as finds
+(artifacts).</p>
+</section>
+</section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="human_remains.html" class="btn btn-neutral float-left" title="Human remains" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="stratigraphic_unit.html" class="btn btn-neutral float-left" title="Stratigraphic unit" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="reference.html" class="btn btn-neutral float-right" title="Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

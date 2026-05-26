@@ -35,6 +35,7 @@ Form fields
   a sub event of a war), they can be linked here
 * **Preceding event** - Events can follow up other events, useful for e.g.
   entering a journey, link them here
+* :doc:`reference_system`
 
 Can be linked via tabs to
 -------------------------
@@ -52,12 +53,12 @@ Acquisition
 * **Donor**
 * **Receiver**
 * **Given place** - Select which :doc:`places <place>` changed ownership
-* **Given artifact** - Select which :doc:`artifacts <artifact>`
+* **Given artifact** - Select which :doc:`items <item>`
   changed ownership
 
 Modification
 ************
-* **Modified object** - Select :doc:`artifacts <artifact>` that were modified
+* **Modified object** - Select :doc:`items <item>` that were modified
 * **Modified place** - Select :doc:`places <place>` that were modified
 
 The actors who modified an artifact can be added as **performer** via tabs.
@@ -67,7 +68,7 @@ Move
 
 * **Place from** - :doc:`place` - as a starting point
 * **Place to** - :doc:`place` - as a destination point
-* **Moved** :doc:`artifact` - Select the artifact(s) moved in an event
+* **Moved** :doc:`item` - Select the items(s) moved in an event
 * **Moved** :doc:`Person <actor>` - Select the people moved in an event
 
 Unfortunately CIDOC CRM doesn't allow for a **moved by** relation for groups.
@@ -78,7 +79,7 @@ group and the move event. For more information please take a look at
 
 Production
 **********
-* :doc:`artifact` - Select artifact(s) that was/were produced during the
+* :doc:`Artifact <item>` - Select artifact(s) that was/were produced during the
   production event
 
 The creators of an artifact can be added as **performer** via tabs.

@@ -64,7 +64,7 @@ def rights_holder_view(id_: int) -> str | Response:
         'license_holder', 'size', 'extension', 'description']
     files_table = entity_table(linked_files, columns=columns)
     return render_template(
-        'rights_holder.html',
+        'util/rights_holder.html',
         rights_holder=rights_holder,
         files_table=files_table,
         buttons=buttons,

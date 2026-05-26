@@ -90,7 +90,12 @@ class ImportTest(ImportTestCase):
                 follow_redirects=True)
         assert b'OpenAtlas 2024' in rv.data
 
-        with open(self.static_path / 'examples' / 'example.csv', 'rb') as file:
+        data_frame = pd.read_csv(
+            self.static_path / 'examples' / 'example.csv',
+            keep_default_na=False)
+        data_frame.at[0, 'type_ids'] = f'{austria.id}'
+        data_frame.to_csv(self.test_path / 'example.csv', index=False)
+        with open(self.test_path / 'example.csv', 'rb') as file:
             rv = c.post(
                 url_for('import_data', class_='place', project_id=p_id),
                 data={'file': file, 'duplicate': True},

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="h-8" viewBox="0 0 112 32" width="112" height="32">
+  <g transform="translate(0, 0)">
+    <polygon fill="#C9283A" points="16.00,32.00 29.86,24.00 29.86,8.00 16.00,0.00 2.14,8.00 2.14,24.00"></polygon>
+  </g>
+  <g transform="translate(40, 0)">
+    <polygon fill="#F5B43B" points="16.00,32.00 29.86,24.00 29.86,8.00 16.00,0.00 2.14,8.00 2.14,24.00"></polygon>
+  </g>
+  <g transform="translate(80, 0)">
+    <polygon fill="#68A9F2" points="16.00,32.00 29.86,24.00 29.86,8.00 16.00,0.00 2.14,8.00 2.14,24.00"></polygon>
+  </g>
+</svg>

@@ -3,6 +3,9 @@ Places
 
 .. toctree::
 
+.. Note:: May need adaptions to reflect new tab navigation and menu label
+  changes.
+
 Below, you can find out how to enter new places and how to use the map.
 
 Create a new place

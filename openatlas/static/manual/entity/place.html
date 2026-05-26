@@ -7,7 +7,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Place &mdash; OpenAtlas 9.1.0 documentation</title>
+  <title>Place &mdash; OpenAtlas 9.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
       <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -16,7 +16,7 @@
   
       <script src="../_static/jquery.js?v=8dae8fb0"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=92dab87b"></script>
+      <script src="../_static/documentation_options.js?v=b756c04f"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../_static/design-tabs.js?v=f930bc37"></script>
@@ -57,8 +57,9 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Place</a></li>
 <li class="toctree-l2"><a class="reference internal" href="feature.html">Feature</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stratigraphic_unit.html">Stratigraphic unit</a></li>
-<li class="toctree-l2"><a class="reference internal" href="human_remains.html">Human remains</a></li>
-<li class="toctree-l2"><a class="reference internal" href="artifact.html">Artifact</a></li>
+<li class="toctree-l2"><a class="reference internal" href="item.html">Item</a></li>
+<li class="toctree-l2"><a class="reference internal" href="item.html#artifact">Artifact</a></li>
+<li class="toctree-l2"><a class="reference internal" href="item.html#human-remains">Human remains</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">Reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="type.html">Type</a></li>
 <li class="toctree-l2"><a class="reference internal" href="file.html">File</a></li>
@@ -142,7 +143,7 @@ view.</strong></p></li>
 possible to link to existing events in this way; you can link a place to
 an existing event via the event’s form though</p></li>
 <li><p><a class="reference internal" href="reference.html"><span class="doc">Reference</span></a></p></li>
-<li><p><a class="reference internal" href="artifact.html"><span class="doc">Artifact</span></a></p></li>
+<li><p><a class="reference internal" href="item.html"><span class="doc">Item</span></a></p></li>
 <li><p><a class="reference internal" href="actor.html"><span class="doc">Actor</span></a> - you can link a place to a newly created actor. It’s not
 possible to link to existing actors in this way; you can link a place to
 an existing actor via the actor’s form though</p></li>
@@ -158,17 +159,15 @@ position and/or extends in space. It can be connected to various
 other information (temporal, spatial, events, sources, etc.). Furthermore,
 places can be divided into multiple subunits to record archaeological
 information. For more information on subunits see <a class="reference internal" href="feature.html"><span class="doc">Feature</span></a>,
-<a class="reference internal" href="stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>, <a class="reference internal" href="artifact.html"><span class="doc">Artifact</span></a>, and <a class="reference internal" href="human_remains.html"><span class="doc">Human remains</span></a>
+<a class="reference internal" href="stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>, and <a class="reference internal" href="item.html"><span class="doc">Item</span></a>
 as well as a detailed workflow example (<a class="reference internal" href="../examples/archaeological_data.html"><span class="doc">Archaeological data</span></a>).</p>
 <p>An example of a place would be a graveyard. The place is the superior unit.
 Each grave of this cemetery is considered a <a class="reference internal" href="feature.html"><span class="doc">Feature</span></a> that forms the
 cemetery. Each of those graves is composed of one or many subunits
 (<a class="reference internal" href="stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>)such as burials in the very grave
 (e.g. a primary and a secondary burial) and its back filling. Each
-stratigraphic unit may have associated <a class="reference internal" href="artifact.html"><span class="doc">Artifact</span></a>, e.g. the grave goods
-of one of the burials or artifacts found in the back filling.
-Anthropological information can be added via
-<a class="reference internal" href="human_remains.html"><span class="doc">Human remains</span></a> - another subunit of stratigraphic unit.</p>
+stratigraphic unit may have associated <a class="reference internal" href="item.html"><span class="doc">items</span></a>, e.g. the grave goods
+of one of the burials or artifacts found in the back filling or human_remains.</p>
 <img alt="../_images/sub_unit.jpg" src="../_images/sub_unit.jpg" />
 </section>
 <section id="adding-multiple-places">

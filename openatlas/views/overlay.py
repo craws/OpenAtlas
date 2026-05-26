@@ -47,7 +47,7 @@ def overlay_insert(image_id: int, place_id: int) -> str | Response:
         return redirect(f"{url_for('view', id_=place_id)}#tab-file")
     place = Entity.get_by_id(place_id)
     return render_template(
-        'overlay.html',
+        'util/overlay.html',
         buttons=[manual('tools/map')],
         form=form,
         crumbs=[
@@ -87,7 +87,7 @@ def overlay_update(place_id: int, overlay_id: int) -> str | Response:
     form.bottom_left_easting.data = bounding[2][1]
     form.bottom_left_northing.data = bounding[2][0]
     return render_template(
-        'overlay.html',
+        'util/overlay.html',
         form=form,
         overlay=overlay,
         entity=place,

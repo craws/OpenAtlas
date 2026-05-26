@@ -1,16 +1,17 @@
 from typing import Optional
 
+import requests
 from flask import Response, g, jsonify, request
 from flask_babel import gettext as _
 
 from openatlas import app
-
 # pylint: disable=unused-import
-from openatlas.api.external.cadaster import Cadaster # noqa
-from openatlas.api.external.geonames import GeoNames # noqa
-from openatlas.api.external.gnd import GND # noqa
-from openatlas.api.external.openatlas_api import OpenAtlas # noqa
-from openatlas.api.external.wikidata import Wikidata # noqa
+from openatlas.api.external.apis import APIS  # noqa
+from openatlas.api.external.cadaster import Cadaster  # noqa
+from openatlas.api.external.geonames import GeoNames  # noqa
+from openatlas.api.external.gnd import GND  # noqa
+from openatlas.api.external.openatlas_api import OpenAtlas  # noqa
+from openatlas.api.external.wikidata import Wikidata  # noqa
 from openatlas.display.util import display_info, required_group
 from openatlas.display.util2 import uc_first
 from openatlas.models.entity import Entity, insert
@@ -67,3 +68,26 @@ def ajax_external_api(system_id: int) -> str:
     return display_info(globals()[system.api]().get_info(
         request.form['id_'],
         system))
+
+
+@app.route('/proxy/apis', methods=['GET'])
+def apis_proxy() -> Response | tuple[Response, int]:
+    system_url = request.args.get('system_url', '').rstrip('/')
+    apis_api_url = f'{system_url}/api/entities/'
+    try:
+        response = requests.get(
+            apis_api_url,
+            params={
+                'search': request.args.get('search', ''),
+                'format': 'json'},
+            headers={'User-Agent': 'Mozilla/5.0'},
+            timeout=10)
+        response.raise_for_status()
+        json_data = response.json()
+        if isinstance(json_data, dict) and 'results' in json_data:
+            data = json_data['results']  # pragma: no cover
+        else:
+            data = json_data
+        return jsonify(data)
+    except requests.exceptions.RequestException as e:
+        return jsonify({'error': str(e), 'results': []}), 502

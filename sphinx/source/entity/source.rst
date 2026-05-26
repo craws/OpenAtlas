@@ -16,13 +16,14 @@ Form fields
 * :doc:`/ui/name`
 * :doc:`type`
 * **Information carrier** - use if the source is depicted
-  on an :doc:`/entity/artifact` or a :doc:`/entity/human_remains`
+  on an :doc:`/entity/item`
 * **Content** - a summary or the whole text of the source.
   :doc:`/tools/text_annotation` can be used.
+* :doc:`reference_system`
 
 Can be linked via tabs to
 -------------------------
-* :doc:`event`, :doc:`actor`, :doc:`artifact`, :doc:`place`, and subunits it
+* :doc:`event`, :doc:`actor`, :doc:`item`, :doc:`place`, and subunits it
   references
 * :doc:`reference` - link to the literature the source is documented in, e.g.
   editions of charters or secondary sources

@@ -109,7 +109,7 @@ class FileTest(TestBaseCase):
         assert b'Remove custom logo' in rv.data
 
         rv = c.get(url_for('logo', id_=iiif_id), follow_redirects=True)
-        assert b'418' in rv.data
+        assert rv.status_code == 418
 
         rv = c.get(
             url_for('logo_remove', action='remove_logo'),

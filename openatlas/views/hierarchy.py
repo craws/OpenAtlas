@@ -121,15 +121,16 @@ def remove_class(id_: int, name: str) -> Response:
 @app.route('/hierarchy/delete/<int:id_>', methods=['GET', 'POST'])
 @required_group('manager')
 def hierarchy_delete(id_: int) -> Response:
-    type_ = g.types[id_]
-    if type_.category in ('standard', 'system'):
+    hierarchy = g.types[id_]
+    if hierarchy.category in ('standard', 'system') \
+            or hierarchy.name == 'Case study':
         abort(403)
-    if type_.subs:
+    if hierarchy.subs:
         return redirect(url_for('type_delete_recursive', id_=id_))
-    type_.delete()
+    hierarchy.delete()
     flash(_('entity deleted'))
     return redirect(
-        f'{url_for('index', group='type')}#menu-tab-{type_.category}')
+        f'{url_for('index', group='type')}#menu-tab-{hierarchy.category}')
 
 
 @app.route('/hierarchy/required_risk/<int:id_>')

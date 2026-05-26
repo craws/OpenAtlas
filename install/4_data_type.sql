@@ -212,6 +212,9 @@ INSERT INTO model.link (property_code, range_id, domain_id) VALUES
   ('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Weight'));
 
 INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, description) VALUES
+  ('E55', 'type', 'Case study', 'Mark entities for different case studies, used e.g. for presentation sites.');
+
+INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, description) VALUES
   ('E55', 'type_tools', 'Features for sexing', 'Bone features used for biological sex estimation of human remains.'),
   ('E55', 'type_tools', 'Radiocarbon', 'Used for radiocarbon dating'),
   ('E55', 'type_tools', 'Skull', NULL),
@@ -310,6 +313,7 @@ INSERT INTO web.hierarchy (id, name, category, multiple, directional) VALUES
   ((SELECT id FROM model.entity WHERE name='Actor relation'), 'Actor relation', 'standard', False, True),
   ((SELECT id FROM model.entity WHERE name='Artifact'), 'Artifact', 'standard', False, False),
   ((SELECT id FROM model.entity WHERE name='Bibliography'), 'Bibliography', 'standard', False, False),
+  ((SELECT id FROM model.entity WHERE name='Case study'), 'Case study', 'custom', True, False),
   ((SELECT id FROM model.entity WHERE name='Dimensions'), 'Dimensions', 'value', True, False),
   ((SELECT id FROM model.entity WHERE name='Edition'), 'Edition', 'standard', False, False),
   ((SELECT id FROM model.entity WHERE name='Event'), 'Event', 'standard', False, False),

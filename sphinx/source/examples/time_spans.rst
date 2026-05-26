@@ -3,6 +3,9 @@ Time Spans
 
 .. toctree::
 
+.. Note:: May need adaptions to reflect new tab navigation and menu label
+  changes.
+
 This section is focused on how the :doc:`Date</ui/date>` input fields work
 and how to enter time spans correctly.
 
@@ -17,7 +20,7 @@ Where to find the input fields
 * :doc:`Places</entity/place>`
 * :doc:`Features</entity/feature>`
 * :doc:`Stratigraphic Units</entity/stratigraphic_unit>`
-* :doc:`Artifacts</entity/artifact>`
+* :doc:`Artifacts </entity/item>`
 
 It is not provided for the input of:
 

@@ -58,7 +58,10 @@ def add_name_fields(form: Any, entity: Entity) -> None:
                 entity.class_.attributes['name']['label'],
                 validators=get_validators(entity.class_.attributes['name']),
                 render_kw={
-                    'readonly' if entity.system else 'autofocus': True}))
+                    'readonly' if entity.system or (
+                        entity.class_.name == 'type'
+                        and entity.name == 'Case study')
+                    else 'autofocus': True}))
     if 'alias' in entity.class_.attributes:
         setattr(form, 'alias', FieldList(RemovableListField()))
 

@@ -16,6 +16,7 @@ Form fields
 * :doc:`/ui/name` - or an **URL** field in case of an external references
 * :doc:`type`
 * :doc:`/ui/description`
+* :doc:`reference_system`
 
 Citation example
 ----------------

@@ -3,11 +3,14 @@ Artifacts
 
 .. toctree::
 
+.. Note:: May need adaptions to reflect new tab navigation and menu label
+  changes.
+
 This tutorial describes how to create a new artifact and add information to it.
 The following elements are involved:
 
-* :doc:`/entity/artifact`: A physical object, made by humans – e.g. a coin,
-  a letter, or a tool
+* :doc:`Artifact </entity/item>`: A physical object, made by humans –
+  e.g. a coin, a letter, or a tool
 * :doc:`/entity/actor`: As creator and/or owner of the artifact
 * :doc:`/entity/event`: Creation of the artifact
 * :doc:`/entity/file`: You can upload an image file connected to the artifact
@@ -17,7 +20,7 @@ Add a new artifact
 ------------------
 To create an artifact as representation of the object you want to add:
 
-* Click on :doc:`/entity/artifact` in the :doc:`/ui/menu` and create a new
+* Click on :doc:`/entity/item` in the :doc:`/ui/menu` and create a new
   entry by using the **+ Artifact** button
 * Choose a descriptive **name**
 * Select an appropriate :doc:`/entity/type` from the list

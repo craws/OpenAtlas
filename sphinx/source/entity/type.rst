@@ -48,6 +48,12 @@ multiple checkbox is greyed out and not selectable, the multiple option is
 used for at least one entity already. Check entries in type overview at
 **multiple linked entities** and make changes if necessary.
 
+**Case study** is a special case. It is provided by default and can't be
+deleted or renamed. It won't show up in forms initialy because it has no
+entries and is not connected to classes. But once set up it can be used to
+mark entries for different case studies on the same OpenAtlas instance which
+can in turn be used to e.g. filter data for presentation sites.
+
 Value types
 -----------
 Value types can be created, deleted, and renamed. They are used to add
@@ -82,6 +88,7 @@ Form fields
 * :doc:`reference_system`
 * :doc:`/ui/date`
 * A super (type) if it is a sub-type of another type
+* :doc:`reference_system`
 
 Can be linked via tabs to
 -------------------------

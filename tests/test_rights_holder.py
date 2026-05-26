@@ -47,7 +47,6 @@ class RightsHolderTests(TestBaseCase):
 
         rv = c.get(url_for('rights_holder_view', id_=9999))
         assert rv.status_code == 418
-        assert b'418' in rv.data
 
         rv = c.post(
             url_for(

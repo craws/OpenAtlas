@@ -20,6 +20,62 @@ inventory numbers of a museum can be used in this way.
 For step by step instructions how to add a reference system have a look at our
 :doc:`/examples/reference_systems` example.
 
+Usage at forms
+--------------
+Links consists of an identifier (ID) and a precision and can be entered when
+adding or updating an entity.
+
+ID
+**
+The identifier of an entity in the external reference system. For GeoNames
+and Wikidata IDs will be checked for a valid format.
+
+Precision
+*********
+When linking to an external reference a precision is required. Available
+options are the `SKOS <https://www.w3.org/TR/skos-primer/>`_ based definitions
+of confidence degree.
+
+* **Close match**: Concepts (here a dataset in OpenAtlas and a dataset in an
+  external reference system) are sufficiently similar, therefore they can be
+  used interchangeably in some information retrieval applications
+* **Exact match**: High degree of confidence that the concepts (a dataset in
+  OpenAtlas and a dataset in an external reference system) can be used
+  interchangeably
+
+E.g. if a historical project links the city of Vienna in Wikidata, a
+**close match** would be more suitable, as the Wikidata entry deals
+primarily with the current city Vienna and not the historical place.
+
+Configuration
+-------------
+Admins and manager can add, update, and delete external reference systems.
+
+* **Name** - e.g. Wikipedia; the name can not be changed for the
+  pre-installed reference systems Wikidata and GeoNames
+* **External reference match** - default precision selected in forms
+* **Website URL** - URL of the reference system (e.g.
+  `Wikidata <https://wikidata.org/>`_ for Wikidata)
+* **Resolver URL** - URL that - in combination with the ID - links to an
+  entity in the reference system (e.g. the resolver URL
+  **https://www.wikiwand.com/en/** in combination with the ID **Q123**
+  creates the external link: https://www.wikiwand.com/en/Q123 (September)
+* **Example ID** - an example id to show the desired format (e.g. Q123
+  for Wikidata)
+* **API** - functionality for external systems
+* **Classes** - a checkbox list of available classes, for GeoNames only place
+  is available
+* **Description** - a short description, shown in forms when mouse over
+  the **i** icon
+
+Classes can be removed from a reference system by clicking on the tab with the
+corresponding class name and clicking the **Remove** button. This button is
+only available if there are no entities of this class linked to it yet.
+
+Reference systems can be deleted only if no classes are attached to it.
+Wikidata and GeoNames are integrated into OpenAtlas and cannot be deleted but,
+if desired, can be disabled by removing the classes.
+
 Included by default
 -------------------
 The following reference systems are pre-installed. By using their provided
@@ -61,6 +117,8 @@ By default it is usable for **persons** in OpenAtlas.
 
 Cadaster
 ********
+Although not configured by default, the Cadaster reference system can be added
+to :ref:`administrative unit <place hierarchies>`.
 The `Austrian Cadaster <https://kataster.bev.gv.at/>`_ is the official
 directory of all properties in Austria, managed by the Federal Office of
 Metrology and Surveying (BEV). It is primarily used for
@@ -77,60 +135,15 @@ In OpenAtlas, you can link to two different types of entries:
     (e.g., ``01004/781/1``), you can link to a specific plot of land.
     OpenAtlas will use the ``/gst/{kgnr}/{gnr}`` endpoint for this.
 
-By default it is usable for :ref:`administrative unit <place hierarchies>`
-in OpenAtlas.
-
-Usage
------
-Links consists of an identifier (ID) and a precision and can be entered when
-adding or updating an entity.
-
-ID
-**
-The identifier of an entity in the external reference system. For GeoNames
-and Wikidata IDs will be checked for a valid format.
-
-Precision
+OpenAtlas
 *********
-When linking to an external reference a precision is required. Available
-options are the `SKOS <https://www.w3.org/TR/skos-primer/>`_ based definitions
-of confidence degree.
+Although not provided by default, reference systems to other OpenAtlas
+instances can be added. The **API** for these should be **OpenAtlas** and the
+**Website URL** should be the **base URL** (e.g. https://demo.openatlas.eu)
+because it is used by the resolver.
 
-* **Close match**: Concepts (here a dataset in OpenAtlas and a dataset in an
-  external reference system) are sufficiently similar, therefore they can be
-  used interchangeably in some information retrieval applications
-* **Exact match**: High degree of confidence that the concepts (a dataset in
-  OpenAtlas and a dataset in an external reference system) can be used
-  interchangeably
-
-E.g. if a historical project links the city of Vienna in Wikidata, a
-**close match** would be more suitable, as the Wikidata entry deals
-primarily with the current city Vienna and not the historical place.
-
-Configuration
--------------
-Admins and manager can add, update, and delete external reference systems.
-
-* **Name** - e.g. Wikipedia; the name can not be changed for the
-  pre-installed reference systems Wikidata and GeoNames
-* **External reference match** - default precision selected in forms
-* **Website URL** - URL of the reference system (e.g.
-  `Wikidata <https://wikidata.org/>`_ for Wikidata)
-* **Resolver URL** - URL that - in combination with the ID - links to an
-  entity in the reference system (e.g. the resolver URL
-  **https://www.wikiwand.com/en/** in combination with the ID **Q123**
-  creates the external link: https://www.wikiwand.com/en/Q123 (September)
-* **Example ID** - an example id to show the desired format (e.g. Q123
-  for Wikidata)
-* **Classes** - a checkbox list of available classes, for GeoNames only place
-  is available
-* **Description** - a short description, shown in forms when mouse over
-  the **i** icon
-
-Classes can be removed from a reference system by clicking on the tab with the
-corresponding class name and clicking the **Remove** button. This button is
-only available if there are no entities of this class linked to it yet.
-
-Reference systems can be deleted only if no classes are attached to it.
-Wikidata and GeoNames are integrated into OpenAtlas and cannot be deleted but,
-if desired, can be disabled by removing the classes.
+APIS
+****
+Although not provided by default, reference systems to
+`APIS <https://www.oeaw.ac.at/acdh/tools/apis-app>`_
+instances can be added. The **API** for these should be **APIS**.

@@ -3,6 +3,9 @@ Archaeological data
 
 .. toctree::
 
+.. Note:: May need adaptions to reflect new tab navigation and menu label
+  changes.
+
 The following steps describe how to enter archaeological data into OpenAtlas.
 These elements are involved in the procedure:
 
@@ -12,9 +15,9 @@ These elements are involved in the procedure:
 * :doc:`/entity/stratigraphic_unit`: A subunit of a feature such as a burial
   or the backfilling of a grave. A feature can consist of multiple subunits
   (Level 3)
-* :doc:`/entity/artifact`: An archaeological artifact, e.g. a coin or knife
+* :doc:`Artifact </entity/item>`: An archaeological artifact, e.g. a coin or knife
   (Level 4)
-* :doc:`/entity/human_remains`: Bones and teeth that carry anthropological
+* :doc:`Human remains </entity/item>`: Bones and teeth that carry anthropological
   information (Level 4)
 * :doc:`/entity/type`: Used for classification, can be extended by most
   users (depending on status)
@@ -103,7 +106,7 @@ can also always come back to an entry later to add or change information.
 
 Adding an artifact to the stratigraphic unit
 --------------------------------------------
-The following steps add an :doc:`/entity/artifact` to a
+The following steps add an :doc:`artifact </entity/item>` to a
 :doc:`/entity/stratigraphic_unit`.
 
 * Add an artifact to a stratigraphic unit by clicking the **Artifact tab**
@@ -131,8 +134,8 @@ existing super in the form.
 
 Adding human remains to the stratigraphic unit
 ----------------------------------------------
-Anthropological data can be entered by adding :doc:`/entity/human_remains`.
-You can do so by connecting a certain bone to a
+Anthropological data can be entered by adding :doc:`human_remains
+</entity/item>`. You can do so by connecting a certain bone to a
 :doc:`/entity/stratigraphic_unit` and add all the relevant information, e.g.
 pathological changes, measurements, discoloration, or additional information.
 Please note that additional information can be entered via custom types in

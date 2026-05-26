@@ -28,6 +28,7 @@ Form fields
   site and archived if a license is defined; furthermore it is just good
   practice to define licence
 * :doc:`/ui/description`
+* :doc:`reference_system`
 
 Form fields important for public sharing
 ----------------------------------------

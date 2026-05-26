@@ -7,7 +7,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reference System &mdash; OpenAtlas 9.1.0 documentation</title>
+  <title>Reference System &mdash; OpenAtlas 9.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
       <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -16,7 +16,7 @@
   
       <script src="../_static/jquery.js?v=8dae8fb0"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=92dab87b"></script>
+      <script src="../_static/documentation_options.js?v=b756c04f"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../_static/design-tabs.js?v=f930bc37"></script>
@@ -57,8 +57,9 @@
 <li class="toctree-l2"><a class="reference internal" href="place.html">Place</a></li>
 <li class="toctree-l2"><a class="reference internal" href="feature.html">Feature</a></li>
 <li class="toctree-l2"><a class="reference internal" href="stratigraphic_unit.html">Stratigraphic unit</a></li>
-<li class="toctree-l2"><a class="reference internal" href="human_remains.html">Human remains</a></li>
-<li class="toctree-l2"><a class="reference internal" href="artifact.html">Artifact</a></li>
+<li class="toctree-l2"><a class="reference internal" href="item.html">Item</a></li>
+<li class="toctree-l2"><a class="reference internal" href="item.html#artifact">Artifact</a></li>
+<li class="toctree-l2"><a class="reference internal" href="item.html#human-remains">Human remains</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference.html">Reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="type.html">Type</a></li>
 <li class="toctree-l2"><a class="reference internal" href="file.html">File</a></li>
@@ -123,63 +124,8 @@ Furthermore, analogue reference systems such as library catalogues or
 inventory numbers of a museum can be used in this way.</p>
 <p>For step by step instructions how to add a reference system have a look at our
 <a class="reference internal" href="../examples/reference_systems.html"><span class="doc">References Systems</span></a> example.</p>
-<section id="included-by-default">
-<h2>Included by default<a class="headerlink" href="#included-by-default" title="Link to this heading"></a></h2>
-<p>The following reference systems are pre-installed. By using their provided
-APIs, OpenAtlas can provide search functionality in the respective form fields
-and display information about already linked entities in the corresponding
-entity detail view.</p>
-<section id="wikidata">
-<h3>Wikidata<a class="headerlink" href="#wikidata" title="Link to this heading"></a></h3>
-<p><a class="reference external" href="https://wikidata.org/">Wikidata</a> is a collaboratively edited multilingual
-knowledge graph hosted by the Wikimedia Foundation. It is a common source of
-open data for Wikimedia projects such as Wikipedia. Everyone is able
-to use the information under the CC0 public domain license.</p>
-<p>By default it is usable for <strong>places, persons and groups</strong> within OpenAtlas.</p>
-</section>
-<section id="geonames">
-<h3>GeoNames<a class="headerlink" href="#geonames" title="Link to this heading"></a></h3>
-<p><a class="reference external" href="https://www.geonames.org/">GeoNames</a> is a user-editable geographical
-database available and accessible through various web services, under a
-Creative Commons attribution license. The GeoNames database contains over
-25,000,000 geographical names corresponding to over 11,800,000 unique features.</p>
-<p>The GeoNames search functionality is integrated in the map search field.
-This enables users to automatically use the provided coordinates and
-identifiers for specific places.</p>
-<p>By default it is usable for <strong>places</strong> in OpenAtlas.</p>
-</section>
-<section id="gnd">
-<h3>GND<a class="headerlink" href="#gnd" title="Link to this heading"></a></h3>
-<p>The <a class="reference external" href="https://d-nb.info/standards/elementset/gnd">GND</a> or Gemeinsame Normdatei
-(translated as Integrated Authority File) is an international authority
-file for the organisation of personal names, subject headings, and corporate
-bodies from catalogues. It is used mainly for documentation in libraries and
-increasingly also by archives and museums.</p>
-<p>By default it is usable for <strong>persons</strong> in OpenAtlas.</p>
-</section>
-<section id="cadaster">
-<h3>Cadaster<a class="headerlink" href="#cadaster" title="Link to this heading"></a></h3>
-<p>The <a class="reference external" href="https://kataster.bev.gv.at/">Austrian Cadaster</a> is the official
-directory of all properties in Austria, managed by the Federal Office of
-Metrology and Surveying (BEV). It is primarily used for
-<a class="reference internal" href="type.html#place-hierarchies"><span class="std std-ref">place hierarchies</span></a>
-(<a class="reference internal" href="type.html#place-hierarchies"><span class="std std-ref">administrative unit</span></a>).</p>
-<p>In OpenAtlas, you can link to two different types of entries:</p>
-<ul class="simple">
-<li><p><strong>Katastralgemeinde (Cadastral Community):</strong> By entering a single number
-(e.g., <code class="docutils literal notranslate"><span class="pre">01004</span></code>), you can link to a specific cadastral community.
-OpenAtlas will use the <code class="docutils literal notranslate"><span class="pre">/kgnr/{kgnr}</span></code> endpoint to retrieve the
-information.</p></li>
-<li><p><strong>Grundstück (Plot of Land):</strong> By entering an identifier with slashes
-(e.g., <code class="docutils literal notranslate"><span class="pre">01004/781/1</span></code>), you can link to a specific plot of land.
-OpenAtlas will use the <code class="docutils literal notranslate"><span class="pre">/gst/{kgnr}/{gnr}</span></code> endpoint for this.</p></li>
-</ul>
-<p>By default it is usable for <a class="reference internal" href="type.html#place-hierarchies"><span class="std std-ref">administrative unit</span></a>
-in OpenAtlas.</p>
-</section>
-</section>
-<section id="usage">
-<h2>Usage<a class="headerlink" href="#usage" title="Link to this heading"></a></h2>
+<section id="usage-at-forms">
+<h2>Usage at forms<a class="headerlink" href="#usage-at-forms" title="Link to this heading"></a></h2>
 <p>Links consists of an identifier (ID) and a precision and can be entered when
 adding or updating an entity.</p>
 <section id="id">
@@ -220,6 +166,7 @@ entity in the reference system (e.g. the resolver URL
 creates the external link: <a class="reference external" href="https://www.wikiwand.com/en/Q123">https://www.wikiwand.com/en/Q123</a> (September)</p></li>
 <li><p><strong>Example ID</strong> - an example id to show the desired format (e.g. Q123
 for Wikidata)</p></li>
+<li><p><strong>API</strong> - functionality for external systems</p></li>
 <li><p><strong>Classes</strong> - a checkbox list of available classes, for GeoNames only place
 is available</p></li>
 <li><p><strong>Description</strong> - a short description, shown in forms when mouse over
@@ -231,6 +178,74 @@ only available if there are no entities of this class linked to it yet.</p>
 <p>Reference systems can be deleted only if no classes are attached to it.
 Wikidata and GeoNames are integrated into OpenAtlas and cannot be deleted but,
 if desired, can be disabled by removing the classes.</p>
+</section>
+<section id="included-by-default">
+<h2>Included by default<a class="headerlink" href="#included-by-default" title="Link to this heading"></a></h2>
+<p>The following reference systems are pre-installed. By using their provided
+APIs, OpenAtlas can provide search functionality in the respective form fields
+and display information about already linked entities in the corresponding
+entity detail view.</p>
+<section id="id1">
+<h3>Wikidata<a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<p><a class="reference external" href="https://wikidata.org/">Wikidata</a> is a collaboratively edited multilingual
+knowledge graph hosted by the Wikimedia Foundation. It is a common source of
+open data for Wikimedia projects such as Wikipedia. Everyone is able
+to use the information under the CC0 public domain license.</p>
+<p>By default it is usable for <strong>places, persons and groups</strong> within OpenAtlas.</p>
+</section>
+<section id="geonames">
+<h3>GeoNames<a class="headerlink" href="#geonames" title="Link to this heading"></a></h3>
+<p><a class="reference external" href="https://www.geonames.org/">GeoNames</a> is a user-editable geographical
+database available and accessible through various web services, under a
+Creative Commons attribution license. The GeoNames database contains over
+25,000,000 geographical names corresponding to over 11,800,000 unique features.</p>
+<p>The GeoNames search functionality is integrated in the map search field.
+This enables users to automatically use the provided coordinates and
+identifiers for specific places.</p>
+<p>By default it is usable for <strong>places</strong> in OpenAtlas.</p>
+</section>
+<section id="gnd">
+<h3>GND<a class="headerlink" href="#gnd" title="Link to this heading"></a></h3>
+<p>The <a class="reference external" href="https://d-nb.info/standards/elementset/gnd">GND</a> or Gemeinsame Normdatei
+(translated as Integrated Authority File) is an international authority
+file for the organisation of personal names, subject headings, and corporate
+bodies from catalogues. It is used mainly for documentation in libraries and
+increasingly also by archives and museums.</p>
+<p>By default it is usable for <strong>persons</strong> in OpenAtlas.</p>
+</section>
+<section id="cadaster">
+<h3>Cadaster<a class="headerlink" href="#cadaster" title="Link to this heading"></a></h3>
+<p>Although not configured by default, the Cadaster reference system can be added
+to <a class="reference internal" href="type.html#place-hierarchies"><span class="std std-ref">administrative unit</span></a>.
+The <a class="reference external" href="https://kataster.bev.gv.at/">Austrian Cadaster</a> is the official
+directory of all properties in Austria, managed by the Federal Office of
+Metrology and Surveying (BEV). It is primarily used for
+<a class="reference internal" href="type.html#place-hierarchies"><span class="std std-ref">place hierarchies</span></a>
+(<a class="reference internal" href="type.html#place-hierarchies"><span class="std std-ref">administrative unit</span></a>).</p>
+<p>In OpenAtlas, you can link to two different types of entries:</p>
+<ul class="simple">
+<li><p><strong>Katastralgemeinde (Cadastral Community):</strong> By entering a single number
+(e.g., <code class="docutils literal notranslate"><span class="pre">01004</span></code>), you can link to a specific cadastral community.
+OpenAtlas will use the <code class="docutils literal notranslate"><span class="pre">/kgnr/{kgnr}</span></code> endpoint to retrieve the
+information.</p></li>
+<li><p><strong>Grundstück (Plot of Land):</strong> By entering an identifier with slashes
+(e.g., <code class="docutils literal notranslate"><span class="pre">01004/781/1</span></code>), you can link to a specific plot of land.
+OpenAtlas will use the <code class="docutils literal notranslate"><span class="pre">/gst/{kgnr}/{gnr}</span></code> endpoint for this.</p></li>
+</ul>
+</section>
+<section id="openatlas">
+<h3>OpenAtlas<a class="headerlink" href="#openatlas" title="Link to this heading"></a></h3>
+<p>Although not provided by default, reference systems to other OpenAtlas
+instances can be added. The <strong>API</strong> for these should be <strong>OpenAtlas</strong> and the
+<strong>Website URL</strong> should be the <strong>base URL</strong> (e.g. <a class="reference external" href="https://demo.openatlas.eu">https://demo.openatlas.eu</a>)
+because it is used by the resolver.</p>
+</section>
+<section id="apis">
+<h3>APIS<a class="headerlink" href="#apis" title="Link to this heading"></a></h3>
+<p>Although not provided by default, reference systems to
+<a class="reference external" href="https://www.oeaw.ac.at/acdh/tools/apis-app">APIS</a>
+instances can be added. The <strong>API</strong> for these should be <strong>APIS</strong>.</p>
+</section>
 </section>
 </section>
 

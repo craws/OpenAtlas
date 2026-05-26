@@ -17,12 +17,20 @@ def index_changelog() -> str:
 versions = {
     '9.3.0': ['TBA', {
         'feature': {
-            '2600': 'Add external references to references',
+            '2600': 'External references for references',
+            '2718': 'Renaming OpenAtlas classes',
+            '2796': 'Integration of UUID',
             '2775': 'Advanced image validation',
-            '2773': 'Standard API definitions for external reference systems',
-            '2525': 'OpenAtlas to OpenAtlas API',
+            '2781': 'Improve entity detail view',
+            '2705': 'Case study system type',
+            '2525': 'API: OpenAtlas to OpenAtlas interface',
+            '2319': 'API: OpenAtlas to APIS interface',
+            '2803': 'API: Refined linked.art format',
+            '2773': 'API: Generic functions for reference systems',
             '2774': 'Vocabs: include external links',
             '2782': 'Vocabs: Import top collection as type',
+            '2779': 'Replace fuzzywuzzy with RapidFuzz',
+            '2802': 'ACDH GitHub tests fail if hyphen in branch name',
             '2790': 'Refactor and minor improvements'},
         'fix': {
             '2789': 'Missing start/end dates in some tabs',

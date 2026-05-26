@@ -56,7 +56,9 @@ def annotation_image_insert(id_: int) -> str | Response:
         tabs={
             'annotation': Tab(
                 'annotation',
-                content=render_template('annotate_image.html', entity=image),
+                content=render_template(
+                    'util/annotate_image.html',
+                    entity=image),
                 table=table,
                 buttons=[manual('tools/image_annotation')],
                 form=form)},

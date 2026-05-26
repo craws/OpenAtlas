@@ -3,6 +3,9 @@ How to report an issue
 
 .. toctree::
 
+.. Note:: May need adaptions to reflect new tab navigation and menu label
+  changes.
+
 This short tutorial describes the best way to report an issue.
 OpenAtlas uses `Redmine <https://www.redmine.org/>`_ as an issue
 tracker. It is a flexible project management web application that is open

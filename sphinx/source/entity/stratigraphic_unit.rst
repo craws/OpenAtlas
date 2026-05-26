@@ -18,13 +18,13 @@ Form fields
 * :doc:`/ui/description`
 * **Super** - a :doc:`feature` which it is a part of
 * :doc:`/tools/map`
+* :doc:`reference_system`
 
 Can be linked via tabs to
 -------------------------
 * :doc:`source` - link if a stratigraphic unit is referenced in a source
 * :doc:`reference`
-* :doc:`artifact`
-* :doc:`human_remains`
+* :doc:`item`
 * :doc:`file`
 
 Anthropological analyses
@@ -39,6 +39,6 @@ In the OpenAtlas database a Stratigraphic unit is a subunit of a :doc:`feature`.
 A Feature can consist of one or more Stratigraphic units (e.g. grave as feature
 can contain one or more burials, a backfilling, etc.). Stratigraphic units
 themselves are structured in the same way and can be connected to
-:doc:`artifact` and :doc:`human_remains` as their subunits.
+:doc:`items <item>` as their subunits.
 
 .. image:: sub_unit.jpg

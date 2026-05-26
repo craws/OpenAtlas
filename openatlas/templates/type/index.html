@@ -65,7 +65,7 @@
                         {% endif %}
                         {% if category in ['custom', 'place', 'value'] and 'manager'|is_authorized %}
                           <div class="col-auto">{{ _('edit')|button(url_for('hierarchy_update', id_=type_.id))|safe }}</div>
-                          {% if not type_.system %}
+                          {% if not type_.system and type_.name != 'Case study' %}
                             <div class="col-auto">
                               {% if type_.count > 0 or type_.subs %}
                                 {{ _('delete')|button(url_for('hierarchy_delete', id_=type_.id))|safe }}

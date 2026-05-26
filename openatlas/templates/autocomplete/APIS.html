@@ -1,0 +1,42 @@
+<script>
+  /**
+   * APIS autocomplete
+   * Documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
+   * Bootstrap version needs to be manually set d/t
+   */
+  $('input[data-reference-system={{ system.id }}]').autoComplete({
+    bootstrapVersion: '4',
+    resolver: 'custom',
+    formatResult: function (item) {
+      console.log(item)
+      return {
+        value: item.uri,
+        text: item.name
+      };
+    },
+    events: {
+      search: function (qry, callback) {
+        $.ajax({
+          url: "/proxy/apis",
+          dataType: "json",
+          data: {
+            search: qry,
+            system_url: "{{ system.website_url }}"
+          },
+          success: function (data) {
+            callback(data);
+          }
+        })
+      }
+    }
+  }).on('autocomplete.select', function (evt, item) {
+    if (item.uri) {
+      let cleanUri = item.uri.split('?')[0];
+      if (cleanUri.endsWith('/')) {
+        cleanUri = cleanUri.slice(0, -1);
+      }
+      let idFromServer = cleanUri.substring(cleanUri.lastIndexOf('/') + 1);
+      $('input[data-reference-system={{ system.id }}]').val(idFromServer);
+    }
+  });
+</script>

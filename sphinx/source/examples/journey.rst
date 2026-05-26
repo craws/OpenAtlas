@@ -3,6 +3,9 @@ Journey
 
 .. toctree::
 
+.. Note:: May need adaptions to reflect new tab navigation and menu label
+  changes.
+
 A journey can be tracked in OpenAtlas as a series of move events as
 described in the following steps. For more information on move events in
 general see this :doc:`tutorial<move_event>`.

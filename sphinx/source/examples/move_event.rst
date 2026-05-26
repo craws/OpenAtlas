@@ -3,6 +3,9 @@ Move events
 
 .. toctree::
 
+.. Note:: May need adaptions to reflect new tab navigation and menu label
+  changes.
+
 Various move events can be mapped via OpenAtlas, including journeys and the
 sending and receiving of letters.
 

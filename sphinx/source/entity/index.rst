@@ -25,8 +25,7 @@ The :doc:`/ui/menu` structure reflects that workflow.
    place
    feature
    stratigraphic_unit
-   human_remains
-   artifact
+   item
    reference
    type
    file

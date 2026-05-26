@@ -3,6 +3,9 @@ References Systems
 
 .. toctree::
 
+.. Note:: May need adaptions to reflect new tab navigation and menu label
+  changes.
+
 To create **Linked Open Data** (LOD) it is possible to connect entered
 information with a :doc:`/entity/reference_system`. Online available
 **controlled vocabularies** and **gazetteers** are particularly suitable for
