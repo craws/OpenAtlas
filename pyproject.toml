@@ -1,6 +1,6 @@
 [project]
 name = "openatlas"
-version = "9.2.0"
+version = "9.3.0"
 description = "An open source database system for handling complex historical and archaeological data"
 readme = "README.md"
 license = "GPL-2.0-only"

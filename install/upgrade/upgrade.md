@@ -28,9 +28,20 @@ One Python library is not needed by OpenAtlas anymore and may be removed:
 
     apt purge python3-fuzzywuzzy
 
-SESSION_COOKIE_SECURE in config/default.py now defaults to True.
+Node packages are updated. Please run following command in
+**openatlas/static/**
+
+    cd openatlas/static
+    npm install
+
+SESSION_COOKIE_SECURE in config/default.py now defaults to **True**.
 In case OpenAtlas is installed locally without https it may has to be
-set to False in instance/production.py
+set to **False** in instance/production.py
+
+**Case study** is now a system type. For existing instances the database
+upgrade script will add one, if not already present. In case it was used with a
+different name, it should be renamed to Case study before running the upgrade
+script.
 
 ### 9.1.x to 9.2.0
 9.2.0.sql is needed but will be taken care of by the database upgrade script.
@@ -50,10 +61,11 @@ A code base update (e.g. with git pull) and a webserver restart is sufficient.
 ### 9.0.0 to 9.1.0
 9.1.0.sql is needed but will be taken care of by the database upgrade script.
 
-Node packages are updated. Please run following command in *openatlas/static/*
+Node packages are updated. Please run following command in
+**openatlas/static/**
 
     cd openatlas/static
-    npm install --legacy-peer-deps
+    npm install
 
 ### 8.15.x to 9.0.0
 WARNING - this is a major release and requires software upgrades. If you are

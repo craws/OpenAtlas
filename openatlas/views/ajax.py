@@ -71,6 +71,7 @@ def ajax_external_api(system_id: int) -> str:
 
 
 @app.route('/proxy/apis', methods=['GET'])
+@required_group('readonly')
 def apis_proxy() -> Response | tuple[Response, int]:
     system_url = request.args.get('system_url', '').rstrip('/')
     apis_api_url = f'{system_url}/api/entities/'

@@ -15,13 +15,16 @@ def index_changelog() -> str:
 
 
 versions = {
-    '9.3.0': ['TBA', {
+    '9.4.0': ['TBA', {
+        'feature': {
+            '2816': 'Refactor and minor improvements'}}],
+    '9.3.0': ['2026-05-27', {
         'feature': {
             '2600': 'External references for references',
             '2718': 'Renaming OpenAtlas classes',
             '2796': 'Integration of UUID',
             '2775': 'Advanced image validation',
-            '2781': 'Improve entity detail view',
+            '2781': 'Display OpenAtlas class at entity detail views',
             '2705': 'Case study system type',
             '2525': 'API: OpenAtlas to OpenAtlas interface',
             '2319': 'API: OpenAtlas to APIS interface',
