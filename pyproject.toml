@@ -48,6 +48,7 @@ dependencies = [
     "wtforms==3.1.2",
     "xmltodict==0.13.0",
     "fiona>=1.10.0",
+    "openpyxl>=3.1.5",
 ]
 
 [project.optional-dependencies]
@@ -59,6 +60,8 @@ dev = [
     "coverage>=7.6.0",
     "pytest>=5.1.0",
     "pytest-cov>=5.0.0",
+    "mypy>=1.15.0",
+    "pylint>=3.3.4-1"
 ]
 
 [project.urls]
