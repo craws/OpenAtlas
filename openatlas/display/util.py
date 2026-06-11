@@ -212,15 +212,19 @@ def format_entity_date(
         object_: Optional[Entity] = None,
         with_comment: Optional[bool] = False) -> str:
     html = link(object_) if object_ else ''
-    if getattr(dates, f'{mode}_from'):
+    from_ = getattr(dates, f'{mode}_from')
+    to = getattr(dates, f'{mode}_to')
+    if from_ or to:
         html += ', ' if html else ''
-        if getattr(dates, f'{mode}_to'):
+        if from_ and to:
             html += _(
                 'between %(begin)s and %(end)s',
-                begin=format_date(getattr(dates, f'{mode}_from')),
-                end=format_date(getattr(dates, f'{mode}_to')))
+                begin=format_date(from_),
+                end=format_date(to))
+        elif from_:
+            html += format_date(from_)
         else:
-            html += format_date(getattr(dates, f'{mode}_from'))
+            html += format_date(to)
         if with_comment and (comment := getattr(dates, f'{mode}_comment')):
             html += f' ({comment})'
     return html

@@ -54,9 +54,25 @@ class DateTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Begin dates cannot start after end dates' in rv.data
 
-            data['begin_year_from'] = ''
+            # An end date inside the begin span is rejected
+            data['begin_year_from'] = 5
+            data['begin_year_to'] = 7
+            data['end_year_from'] = 6
+            data['end_year_to'] = ''
             rv = c.post(
                 url_for('insert', class_='place'),
                 data=data,
                 follow_redirects=True)
-            assert b'Required for time span' in rv.data
+            assert b'Begin dates cannot start after end dates' in rv.data
+
+            # A standalone *_to date (without *_from) is now allowed
+            data['begin_year_to'] = ''
+            data['begin_year_from'] = ''
+            data['end_year_from'] = ''
+            data['end_year_to'] = ''
+            rv = c.post(
+                url_for('insert', class_='place'),
+                data=data,
+                follow_redirects=True)
+            assert b'Date place' in rv.data
+

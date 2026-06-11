@@ -45,11 +45,6 @@ def validate_dates(form: FlaskForm) -> bool:
     valid = True
     dates = {}
     for prefix in ['begin_', 'end_']:
-        if getattr(form, f'{prefix}year_to').data \
-                and not getattr(form, f'{prefix}year_from').data:
-            getattr(form, f'{prefix}year_from').errors.append(
-                _("Required for time span"))
-            valid = False
         for postfix in ['_from', '_to']:
             if getattr(form, f'{prefix}year{postfix}').data:
                 date = form_to_datetime64(
@@ -61,7 +56,8 @@ def validate_dates(form: FlaskForm) -> bool:
                     getattr(form, f'{prefix}minute{postfix}').data
                     if f'{prefix}minute{postfix}' in form else None,
                     getattr(form, f'{prefix}second{postfix}').data
-                    if f'{prefix}second{postfix}' in form else None)
+                    if f'{prefix}second{postfix}' in form else None,
+                    to_date=postfix == '_to')
                 if not date:
                     getattr(form, f'{prefix}day{postfix}').errors.append(
                         _('not a valid date'))
@@ -78,20 +74,14 @@ def validate_dates(form: FlaskForm) -> bool:
                 field = getattr(form, f'{prefix}_year_from')
                 field.errors.append(_('First date cannot be after second.'))
                 valid = False
-    if 'begin_from' in dates and 'end_from' in dates:
-        field = getattr(form, 'begin_year_from')
-        if len(dates) == 4 and (
-                dates['begin_from'] > dates['end_from']
-                or dates['begin_to'] > dates['end_to']):
-            field.errors.append(_('Begin dates cannot start after end dates.'))
+    has_begin = 'begin_from' in dates or 'begin_to' in dates
+    has_end = 'end_from' in dates or 'end_to' in dates
+    if valid and has_begin and has_end:
+        begin = dates['begin_to'] \
+            if 'begin_to' in dates else dates['begin_from']
+        end = dates['end_from'] if 'end_from' in dates else dates['end_to']
+        if begin > end:
+            getattr(form, 'begin_year_from').errors.append(
+                _('Begin dates cannot start after end dates.'))
             valid = False
-        elif len(dates) != 4:
-            first = dates['begin_to'] \
-                if 'begin_to' in dates else dates['begin_from']
-            second = dates['end_from'] \
-                if 'end_from' in dates else dates['end_to']
-            if first > second:
-                field.errors.append(
-                    _('Begin dates cannot start after end dates.'))
-                valid = False
     return valid

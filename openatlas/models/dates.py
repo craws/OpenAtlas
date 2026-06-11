@@ -16,12 +16,10 @@ class Dates:
         self.end_from = timestamp_to_datetime64(data.get('end_from'))
         self.end_to = timestamp_to_datetime64(data.get('end_to'))
         self.end_comment = data.get('end_comment')
-        self.first = format_date_part(self.begin_from, 'year') \
-            if self.begin_from else None
-        self.last = format_date_part(self.end_from, 'year') \
-            if self.end_from else None
-        if self.end_from and self.end_to:
-            self.last = format_date_part(self.end_to, 'year')
+        begin = self.begin_from or self.begin_to
+        self.first = format_date_part(begin, 'year') if begin else None
+        end = self.end_to or self.end_from
+        self.last = format_date_part(end, 'year') if end else None
 
     def to_timestamp(self) -> dict[str, Any]:
         return {
