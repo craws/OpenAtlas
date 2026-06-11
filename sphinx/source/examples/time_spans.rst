@@ -100,14 +100,56 @@ span with a 100 % certainty.
 
 Example: The exact date of death of King Stephen I of Hungary is known - 15
 August 1038 AD - but for the date of birth only a time span from 01.01.975 AD
-to 31.12.975 AD can be given. As first input field corresponds to the earliest
-possible start of the time span, 975 - 01 - 01 should be entered. The second
-line corresponds to the latest possible end of the time span, in this case 975
-- 12 - 31.
-As end 15 August 1038 can be stated in the third line (the fourth line will
-be filled automatically).
+to 31.12.975 AD can be given. As the first input field corresponds to the
+earliest possible start of the time span, 975 - 01 - 01 should be entered. The
+second line corresponds to the latest possible end of the time span, in this
+case 975 - 12 - 31.
+Since the exact end date of 15 August 1038 is known, this can simply be entered
+in the third line (leaving the fourth line empty).
 
 .. image:: date_stephen.png
+
+
+Standalone End/To Dates
+^^^^^^^^^^^^^^^^^^^^^^^
+
+In addition to traditional time spans, OpenAtlas supports entering standalone
+**end/to** dates without requiring their corresponding **start/from** dates.
+This is highly valuable for recording historical facts where only the upper limit
+of a time span (the latest possible date) is known.
+
+**Begin To (without Begin From):**
+
+This situation often arises with charters or consecration documents. For
+example, a historical charter might state that a church was patronized or
+consecrated on **1150-06-15**. We know with 100% certainty that the church
+existed *by* this date. It almost certainly existed prior to this, but there
+are no surviving records to determine how long before.
+
+To document this:
+
+* Leave the first line (**Begin From**) empty.
+* Enter **1150 - 06 - 15** into the second line (**Begin To**).
+
+This registers the start of the entity's existence as occurring at some unknown
+point up to and including **1150-06-15**.
+
+**End To (without End From):**
+
+A similar scenario applies when documenting the end of an entity's existence.
+For instance, a traveler's itinerary from **1220-10-04** might note that a
+church had already been destroyed or was no longer standing. While we know the
+destruction was complete *by* that date, we do not know when the process of its
+end/destruction started.
+
+To document this:
+
+* Leave the third line (**End From**) empty.
+* Enter **1220 - 10 - 04** into the fourth line (**End To**).
+
+This registers the end of the entity's existence as completed *by*
+**1220-10-04** at the latest, without making assumptions about when it began
+to end.
 
 
 Activate hours, minutes, and seconds

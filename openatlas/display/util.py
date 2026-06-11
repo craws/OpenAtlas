@@ -18,9 +18,8 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.display.image_processing import (check_iiif_activation,
-                                                check_iiif_file_exist,
-                                                check_processed_image)
+from openatlas.display.image_processing import (
+    check_iiif_activation, check_iiif_file_exist, check_processed_image)
 from openatlas.display.util2 import (
     convert_size, get_file_path, is_authorized, uc_first)
 from openatlas.models.cidoc import CidocClass, CidocProperty
@@ -53,10 +52,10 @@ def edit_link(url: str) -> str:
 
 def reference_systems(entity: Entity) -> str:
     if 'reference_system' not in entity.class_.extra \
-        or not (links := entity.get_links(
-            'P67',
-            ['reference_system'],
-            inverse=True)):
+            or not (links := entity.get_links(
+        'P67',
+        ['reference_system'],
+        inverse=True)):
         return ''
     html = f'<h2>{uc_first(_('external reference systems'))}</h2>'
     html += '<ul class="list-group list-group-flush bg-none">'
@@ -72,7 +71,7 @@ def reference_systems(entity: Entity) -> str:
         if system.api:
             show = f'<span id="show">{uc_first(_('show info'))}</span>'
             hide = '<span id="hide" class="d-none">' + \
-                f'{uc_first(_('hide info'))}</span>'
+                   f'{uc_first(_('hide info'))}</span>'
             show_info_button += f"""
                 <button id="{system.id}-switch"
                   class="mt-1 me-1 {app.config["CSS"]["button"]["secondary"]}"
@@ -98,12 +97,12 @@ def reference_systems(entity: Entity) -> str:
               </div>
               {show_info_button}
               {link(
-                _('show on %(system_name)s', system_name=link_.domain.name),
-                system.resolver_url + link_.description,
-                external=True,
-                icon='fa-external-link-alt',
-                class_="btn btn-sm btn-outline-primary mt-1")
-               if system.resolver_url else ''}
+            _('show on %(system_name)s', system_name=link_.domain.name),
+            system.resolver_url + link_.description,
+            external=True,
+            icon='fa-external-link-alt',
+            class_="btn btn-sm btn-outline-primary mt-1")
+        if system.resolver_url else ''}
               {info_div}
             </li>
             """
@@ -124,7 +123,7 @@ def get_appearance(entity: Entity) -> tuple[str, str]:
         event = link_.domain
         actor = link_.range
         html = f' {_('at an')} ' + \
-            link(_('event'), url_for('view', id_=event.id))
+               link(_('event'), url_for('view', id_=event.id))
         if not actor.dates.first:
             if link_.dates.first and (
                     not first_year
@@ -235,14 +234,14 @@ def menu(entity: Optional[Entity]) -> str:
     html = ''
     group = entity.class_.group['name'] if entity else ''
     for item, label in {
-            'source': _('source'),
-            'event': _('event'),
-            'actor': _('actor'),
-            'place': _('place'),
-            'item': _('item'),
-            'reference': _('reference'),
-            'type': _('type'),
-            'file': _('file')}.items():
+        'source': _('source'),
+        'event': _('event'),
+        'actor': _('actor'),
+        'place': _('place'),
+        'item': _('item'),
+        'reference': _('reference'),
+        'type': _('type'),
+        'file': _('file')}.items():
         active = ''
         request_parts = request.path.split('/')
         if group == item \
@@ -293,7 +292,7 @@ def profile_image(
     else:
         url = url_for('view', id_=entity.image_id)
     max_width = '100%' if max_width_100 else '{width}px'
-    html =  \
+    html = \
         f'<img style="max-width:{max_width}" alt="{entity.name}" src="{src}">'
     if not link_image:
         return html
@@ -629,8 +628,8 @@ def get_backup_file_data() -> dict[str, Any]:
     latest_file = None
     latest_file_date = None
     for file in [
-            f for f in path.iterdir()
-            if (path / f).is_file() and f.name != '.gitignore']:
+        f for f in path.iterdir()
+        if (path / f).is_file() and f.name != '.gitignore']:
         file_date = datetime.fromtimestamp((path / file).stat().st_ctime)
         if not latest_file_date or file_date > latest_file_date:
             latest_file = file
