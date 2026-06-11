@@ -55,12 +55,13 @@ def populate_reference_systems(form: Any, entity: Entity) -> None:
 def populate_dates(form: Any, dates: Dates) -> None:
     for item in ['begin', 'end']:
         if from_ := getattr(dates, f'{item}_from'):
-            getattr(form, f'{item}_year_from').data = \
-                format_date_part(from_, 'year')
-            getattr(form, f'{item}_month_from').data = \
-                format_date_part(from_, 'month')
-            getattr(form, f'{item}_day_from').data = \
-                format_date_part(from_, 'day')
+            if hasattr(form, f'{item}_year_from'):
+                getattr(form, f'{item}_year_from').data = \
+                    format_date_part(from_, 'year')
+                getattr(form, f'{item}_month_from').data = \
+                    format_date_part(from_, 'month')
+                getattr(form, f'{item}_day_from').data = \
+                    format_date_part(from_, 'day')
             if 'begin_hour_from' in form:
                 getattr(form, f'{item}_hour_from').data = \
                     format_date_part(from_, 'hour')
@@ -69,12 +70,13 @@ def populate_dates(form: Any, dates: Dates) -> None:
                 getattr(form, f'{item}_second_from').data = \
                     format_date_part(from_, 'second')
         if to := getattr(dates, f'{item}_to'):
-            getattr(form, f'{item}_year_to').data = \
-                format_date_part(to, 'year')
-            getattr(form, f'{item}_month_to').data = \
-                format_date_part(to, 'month')
-            getattr(form, f'{item}_day_to').data = \
-                format_date_part(to, 'day')
+            if hasattr(form, f'{item}_year_to'):
+                getattr(form, f'{item}_year_to').data = \
+                    format_date_part(to, 'year')
+                getattr(form, f'{item}_month_to').data = \
+                    format_date_part(to, 'month')
+                getattr(form, f'{item}_day_to').data = \
+                    format_date_part(to, 'day')
             if 'begin_hour_from' in form:
                 getattr(form, f'{item}_hour_to').data = \
                     format_date_part(to, 'hour')
@@ -82,5 +84,7 @@ def populate_dates(form: Any, dates: Dates) -> None:
                     format_date_part(to, 'minute')
                 getattr(form, f'{item}_second_to').data = \
                     format_date_part(to, 'second')
-    form.begin_comment.data = dates.begin_comment
-    form.end_comment.data = dates.end_comment
+    if hasattr(form, 'begin_comment'):
+        form.begin_comment.data = dates.begin_comment
+    if hasattr(form, 'end_comment'):
+        form.end_comment.data = dates.end_comment
