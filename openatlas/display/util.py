@@ -221,9 +221,9 @@ def format_entity_date(
                 begin=format_date(from_),
                 end=format_date(to))
         elif from_:
-            html += format_date(from_)
+            html += f'{_('from')} {format_date(from_)}'
         else:
-            html += format_date(to)
+            html += f'{_('by')} {format_date(to)}'
         if with_comment and (comment := getattr(dates, f'{mode}_comment')):
             html += f' ({comment})'
     return html

@@ -88,14 +88,14 @@ class DateTest(TestBaseCase):
                 dates_with_only_to,
                 'begin',
                 with_comment=True)
-            assert formatted_only_to_date == '1500-12-31 (Test Comment)'
+            assert formatted_only_to_date == 'by 1500-12-31 (Test Comment)'
 
             dates_with_only_from = Dates({
                 'begin_from': '1400-01-01 00:00:00'})
             formatted_only_from_date = format_entity_date(
                 dates_with_only_from,
                 'begin')
-            assert formatted_only_from_date == '1400-01-01'
+            assert formatted_only_from_date == 'from 1400-01-01'
 
             dates_with_both_from_and_to = Dates({
                 'begin_from': '1400-01-01 00:00:00',

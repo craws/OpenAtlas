@@ -74,24 +74,27 @@ $(document).ready(function () {
   });
 
   /* Show and hide function for date input fields */
-  $("#date-switcher").attr(
+  const dateSwitcher = $("#date-switcher");
+  const dateSwitch = $(".date-switch");
+
+  dateSwitcher.attr(
     "aria-pressed",
-    !$(".date-switch").hasClass('d-none')
+    !dateSwitch.hasClass('d-none')
   );
 
-  $("#date-switcher").click(function () {
+  dateSwitcher.click(function () {
     toggleDateFieldVisible(this);
   });
-  $("#date-switcher").on('keydown', function (event) {
+  dateSwitcher.on('keydown', function (event) {
     if (!onActivateKeyInput(event)) return;
     toggleDateFieldVisible(this);
   });
 
   function toggleDateFieldVisible(el) {
-    $(".date-switch").toggleClass('d-none');
-    $("#date-switcher").attr(
+    dateSwitch.toggleClass('d-none');
+    dateSwitcher.attr(
       "aria-pressed",
-      !$(".date-switch").hasClass('d-none')
+      !dateSwitch.hasClass('d-none')
     );
     $(el).text(function (i, text) {
       return $.trim(text) === translate.show ? translate.hide : translate.show;
@@ -99,8 +102,13 @@ $(document).ready(function () {
   }
 
   /* Hide date fields if there are any and if they are empty */
-  if ($('#begin_year_from').length &&
-    $('#begin_year_from').val() == '' && $('#end_year_from').val() == '') {
+  const beginYearFrom = $('#begin_year_from');
+  const beginYearTo = $('#begin_year_to');
+  const endYearFrom = $('#end_year_from');
+  const endYearTo = $('#end_year_to');
+  if (beginYearFrom.length &&
+    beginYearFrom.val() === '' && beginYearTo.val() === '' &&
+    endYearFrom.val() === '' && endYearTo.val() === '') {
     $('.date-switch').addClass('d-none');
   }
 
