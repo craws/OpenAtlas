@@ -77,7 +77,7 @@ def populate_dates(form: Any, dates: Dates) -> None:
                     format_date_part(to, 'month')
                 getattr(form, f'{item}_day_to').data = \
                     format_date_part(to, 'day')
-            if 'begin_hour_from' in form:
+            if f'{item}_hour_to' in form:
                 getattr(form, f'{item}_hour_to').data = \
                     format_date_part(to, 'hour')
                 getattr(form, f'{item}_minute_to').data = \

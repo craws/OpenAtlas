@@ -284,11 +284,11 @@ def process_dates(form: Any) -> dict[str, Any]:
                 form.begin_month_to.data,
                 form.begin_day_to.data,
                 form.begin_hour_to.data
-                if 'begin_hour_from' in form else None,
+                if 'begin_hour_to' in form else None,
                 form.begin_minute_to.data
-                if 'begin_hour_from' in form else None,
+                if 'begin_hour_to' in form else None,
                 form.begin_second_to.data
-                if 'begin_hour_from' in form else None,
+                if 'begin_hour_to' in form else None,
                 to_date=True)
     if hasattr(form, 'end_year_from') \
             and (form.end_year_from.data or form.end_year_to.data):
@@ -306,9 +306,9 @@ def process_dates(form: Any) -> dict[str, Any]:
                 form.end_year_to.data,
                 form.end_month_to.data,
                 form.end_day_to.data,
-                form.end_hour_to.data if 'end_hour_from' in form else None,
-                form.end_minute_to.data if 'end_hour_from' in form else None,
-                form.end_second_to.data if 'end_hour_from' in form else None,
+                form.end_hour_to.data if 'end_hour_to' in form else None,
+                form.end_minute_to.data if 'end_hour_to' in form else None,
+                form.end_second_to.data if 'end_hour_to' in form else None,
                 to_date=True)
     return dates.to_timestamp()
 

@@ -4,7 +4,7 @@ from openatlas import app
 from tests.base import TestBaseCase
 
 from openatlas.display.util import format_entity_date
-from openatlas.models.dates import Dates
+from openatlas.models.dates import Dates, form_to_datetime64
 
 
 class DateTest(TestBaseCase):
@@ -27,6 +27,43 @@ class DateTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Date place' in rv.data
 
+            data['begin_year_from'] = ''
+            data['begin_year_to'] = ''
+            data['end_year_from'] = ''
+            data['end_year_to'] = 1220
+            data['end_month_to'] = 10
+            data['end_day_to'] = 4
+            rv = c.post(
+                url_for('insert', class_='place'),
+                data=data,
+                follow_redirects=True)
+            assert b'Date place' in rv.data
+
+            data['begin_year_to'] = 1300
+            data['begin_month_to'] = ''
+            data['begin_day_to'] = ''
+            data['end_year_to'] = 1200
+            data['end_month_to'] = ''
+            data['end_day_to'] = ''
+            rv = c.post(
+                url_for('insert', class_='place'),
+                data=data,
+                follow_redirects=True)
+            assert b'Begin dates cannot start after end dates' in rv.data
+
+            data['begin_year_from'] = 1100
+            data['begin_month_from'] = ''
+            data['begin_day_from'] = ''
+            data['begin_year_to'] = ''
+            data['end_year_from'] = ''
+            data['end_year_to'] = 1200
+            rv = c.post(
+                url_for('insert', class_='place'),
+                data=data,
+                follow_redirects=True)
+            assert b'Date place' in rv.data
+
+            data['begin_month_from'] = 2
             data['begin_day_from'] = 31
             rv = c.post(
                 url_for('insert', class_='place'),
@@ -36,6 +73,7 @@ class DateTest(TestBaseCase):
 
             data['begin_day_from'] = 5
             data['begin_year_from'] = 20
+            data['begin_year_to'] = 10
             rv = c.post(
                 url_for('insert', class_='place'),
                 data=data,
@@ -57,7 +95,6 @@ class DateTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Begin dates cannot start after end dates' in rv.data
 
-            # An end date inside the begin span is rejected
             data['begin_year_to'] = 7
             data['begin_year_from'] = 5
             data['end_year_from'] = 6
@@ -68,7 +105,6 @@ class DateTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Begin dates cannot start after end dates' in rv.data
 
-            # A standalone *_to date (without *_from) is now allowed
             data['begin_year_from'] = ''
             data['begin_year_to'] = ''
             data['end_year_from'] = ''
@@ -105,3 +141,11 @@ class DateTest(TestBaseCase):
                 'begin')
             assert formatted_between_date == \
                    'between 1400-01-01 and 1500-12-31'
+
+            dates_with_end_only_to = Dates({
+                'end_to': '1220-10-04 00:00:00'})
+            formatted_end_only_to_date = format_entity_date(
+                dates_with_end_only_to,
+                'end')
+            assert formatted_end_only_to_date == 'by 1220-10-04'
+
