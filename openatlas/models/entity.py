@@ -812,6 +812,8 @@ class Entity:
         systems = {}
         for row in db.get_reference_systems():
             system = Entity(row)
+            if system.name == 'GeoNames':
+                g.geonames_id = system.id  # Needed for GeoNames import form
             for class_ in g.classes.values():
                 if system.id in class_.reference_systems:
                     system.classes.append(class_.name)

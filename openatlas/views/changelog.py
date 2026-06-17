@@ -17,8 +17,10 @@ def index_changelog() -> str:
 versions = {
     '9.4.0': ['TBA', {
         'feature': {
-            '2816': 'Refactor and minor improvements'},
+            '2816': 'Refactor and minor improvements'}}],
+    '9.3.1': ['2026-06-12', {
         'fix': {
+            '2822': 'GeoNames import does not work',
             '2821': 'Problem while entering new types/type hierarchy'}}],
     '9.3.0': ['2026-05-27', {
         'feature': {
