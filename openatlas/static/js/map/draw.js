@@ -485,7 +485,7 @@ function updateHiddenInputFields() {
 }
 
 function importGeonamesID(geo, popup, map) {
-  $('[data-reference-system="GeoNames"]').val(geo.geonameId).change();
+  $('[data-reference-system="' + geoNamesID + '"]').val(geo.geonameId).change();
   map.closePopup(popup);
 }
 

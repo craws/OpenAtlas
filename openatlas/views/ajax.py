@@ -73,6 +73,7 @@ def ajax_external_api(system_id: int) -> str:
 @app.route('/proxy/apis', methods=['GET'])
 @required_group('readonly')
 def apis_proxy() -> Response | tuple[Response, int]:
+    # Needs call from server to avoid CORS issues at APIS
     system_url = request.args.get('system_url', '').rstrip('/')
     apis_api_url = f'{system_url}/api/entities/'
     try:
@@ -84,11 +85,9 @@ def apis_proxy() -> Response | tuple[Response, int]:
             headers={'User-Agent': 'Mozilla/5.0'},
             timeout=10)
         response.raise_for_status()
-        json_data = response.json()
-        if isinstance(json_data, dict) and 'results' in json_data:
-            data = json_data['results']  # pragma: no cover
-        else:
-            data = json_data
+        data = response.json()
+        if isinstance(data, dict) and 'results' in data:
+            data = data['results']  # pragma: no cover
         return jsonify(data)
     except requests.exceptions.RequestException as e:
         return jsonify({'error': str(e), 'results': []}), 502
