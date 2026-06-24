@@ -8,6 +8,8 @@ from typing import Any, Optional
 import pandas as pd
 
 from config.default import FILES_PATH
+from openatlas import app
+from openatlas.models.entity import Entity
 
 FILE_PATH = FILES_PATH / 'Anthro Daten' / 'Datenbank_Anthro.xlsx'
 
@@ -3452,8 +3454,119 @@ def parse_anthro_data(file_path: Path) -> list[AnthroIndividual]:
 
 if __name__ == "__main__":
     try:
+        app.preprocess_request()
+
+        anthro_types = {
+            'preservation_anthro': Entity.get_by_id(31380),
+            'quantitative_preservation': Entity.get_by_id(31381),
+            'quantitative_preservation_absent_99': Entity.get_by_id(31382),
+            'quantitative_preservation_0_to_25_percent_1':
+                Entity.get_by_id(31383),
+            'quantitative_preservation_25_to_75_percent_2':
+                Entity.get_by_id(31384),
+            'quantitative_preservation_75_to_99_percent_3':
+                Entity.get_by_id(31385),
+            'quantitative_preservation_100_percent_4': Entity.get_by_id(31386),
+            'bone_preservation': Entity.get_by_id(31387),
+            'bone_preservation_excellent_1': Entity.get_by_id(31388),
+            'bone_preservation_good_2': Entity.get_by_id(31389),
+            'bone_preservation_fair_3': Entity.get_by_id(31390),
+            'bone_preservation_poor_4': Entity.get_by_id(31391),
+            'bone_preservation_fragments_5': Entity.get_by_id(31392),
+            'cortical_preservation': Entity.get_by_id(31393),
+            'cortical_preservation_0_percent_sound_1': Entity.get_by_id(31396),
+            'cortical_preservation_1_to_24_percent_sound_2':
+                Entity.get_by_id(31397),
+            'cortical_preservation_25_to_49_percent_sound_3':
+                Entity.get_by_id(31398),
+            'cortical_preservation_50_to_74_percent_sound_4':
+                Entity.get_by_id(31399),
+            'cortical_preservation_75_to_99_percent_sound_5':
+                Entity.get_by_id(31400),
+            'cortical_preservation_100_percent_sound_6':
+                Entity.get_by_id(31401),
+            'burial_information_anthro': Entity.get_by_id(31402),
+            'disturbance': Entity.get_by_id(31403),
+            'burial_type': Entity.get_by_id(31404),
+            'disturbance_complete_1': Entity.get_by_id(31405),
+            'disturbance_disturbed_2': Entity.get_by_id(31406),
+            'disturbance_isolated_elements_3': Entity.get_by_id(31407),
+            'burial_type_single_1': Entity.get_by_id(31408),
+            'burial_type_multiple_2': Entity.get_by_id(31409),
+            'burial_type_commingled_3': Entity.get_by_id(31410),
+            'pathology_categories_anthro': Entity.get_by_id(31411),
+            'pathology_status': Entity.get_by_id(31412),
+            'trauma': Entity.get_by_id(31413),
+            'dental_status': Entity.get_by_id(31414),
+            'trauma_perimortal_1': Entity.get_by_id(31415),
+            'trauma_intravital_2': Entity.get_by_id(31416),
+            'trauma_healing_3': Entity.get_by_id(31417),
+            'trauma_sharp_force_1': Entity.get_by_id(31419),
+            'trauma_blunt_force_2': Entity.get_by_id(31420),
+            'trauma_ballistic_3': Entity.get_by_id(31421),
+            'cobb_angle': Entity.get_by_id(31422),
+            'cobb_angle_below_10_degree': Entity.get_by_id(31423),
+            'cobb_angle_10_to_20_degree': Entity.get_by_id(31424),
+            'cobb_angle_21_to_40_degree': Entity.get_by_id(31425),
+            'cobb_angle_41_to_70_degree': Entity.get_by_id(31426),
+            'cobb_angle_71_to_100_degree': Entity.get_by_id(31427),
+            'cobb_angle_100_to_120_degree': Entity.get_by_id(31428),
+            'cobb_angle_above_120_degree': Entity.get_by_id(31429),
+            'pathology_status_active_1': Entity.get_by_id(31430),
+            'pathology_status_healed_2': Entity.get_by_id(31431),
+            'pathology_status_healing_3': Entity.get_by_id(31432),
+            'pathology_status_healed_and_active_4': Entity.get_by_id(31433),
+            'pathology_status_healed_and_healing_5': Entity.get_by_id(31434),
+            'pathology_status_active_and_healing_6': Entity.get_by_id(31435),
+            'pathology_status_active_healing_healed_7':
+                Entity.get_by_id(31436),
+            'pathology_status_no_pathologies_0': Entity.get_by_id(31437),
+            'caries_severity': Entity.get_by_id(31438),
+            'caries_position': Entity.get_by_id(31439),
+            'calcul_periodontal_deh_severity': Entity.get_by_id(31440),
+            'abscess': Entity.get_by_id(31441),
+            'deh_type': Entity.get_by_id(31442),
+            'caries_severity_pit_small_fissure_1': Entity.get_by_id(31443),
+            'caries_severity_medium_large_2': Entity.get_by_id(31444),
+            'caries_severity_large_3': Entity.get_by_id(31445),
+            'caries_severity_only_root_remaining_4': Entity.get_by_id(31446),
+            'caries_position_occlusal_1': Entity.get_by_id(31447),
+            'caries_position_lingual_2': Entity.get_by_id(31448),
+            'caries_position_buccal_3': Entity.get_by_id(31449),
+            'caries_position_mesial_4': Entity.get_by_id(31450),
+            'caries_position_distal_5': Entity.get_by_id(31451),
+            'caries_position_multiple_6': Entity.get_by_id(31452),
+            'calc_periodontal_deh_severity_slight_1': Entity.get_by_id(31453),
+            'calc_periodontal_deh_severity_medium_2': Entity.get_by_id(31454),
+            'calc_periodontal_deh_severity_considerable_3':
+                Entity.get_by_id(31455),
+            'abscess_buccal_1': Entity.get_by_id(31456),
+            'abscess_labial_2': Entity.get_by_id(31457),
+            'abscess_internal_3': Entity.get_by_id(31458),
+            'abscess_buccal_and_labial_4': Entity.get_by_id(31459),
+            'deh_type_pit_1': Entity.get_by_id(31460),
+            'deh_type_line_2': Entity.get_by_id(31461),
+            'deh_type_groove_3': Entity.get_by_id(31462),
+            'deh_type_multiple_4': Entity.get_by_id(31463),
+            'alveolar_status': Entity.get_by_id(31464),
+            'alveolar_status_alveola_open_1': Entity.get_by_id(31465),
+            'alveolar_status_alveola_closing_2': Entity.get_by_id(31466),
+            'alveolar_status_alveola_closed_3': Entity.get_by_id(31467),
+            'age_anthro': Entity.get_by_id(31468),
+            'age_brackets_in_years': Entity.get_by_id(31469),
+            'age_younger_than_16_years_1': Entity.get_by_id(31470),
+            'age_16_to_17_years_2': Entity.get_by_id(31471),
+            'age_18_to_20_years_3': Entity.get_by_id(31472),
+            'age_21_to_25_years_4': Entity.get_by_id(31473),
+            'age_26_to_30_years_5': Entity.get_by_id(31474),
+            'age_31_to_40_years_6': Entity.get_by_id(31475),
+            'age_41_to_50_years_7': Entity.get_by_id(31476),
+            'age_older_than_50_years_8': Entity.get_by_id(31477),
+        }
+
         data_list = parse_anthro_data(FILE_PATH)
         print(f"Imported {len(data_list)} individuals.")
+        print(f"Loaded {len(anthro_types)} anthro type entities.")
         if data_list:
             first = data_list[0]
             print(f"Example Individual: {first.ind_nr}")
