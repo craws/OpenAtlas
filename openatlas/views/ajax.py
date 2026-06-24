@@ -1,5 +1,4 @@
 from typing import Optional
-
 import requests
 from flask import Response, g, jsonify, request
 from flask_babel import gettext as _
@@ -8,6 +7,7 @@ from openatlas import app
 # pylint: disable=unused-import
 from openatlas.api.external.apis import APIS  # noqa
 from openatlas.api.external.cadaster import Cadaster  # noqa
+from openatlas.api.external.doi import DOI # noqa
 from openatlas.api.external.geonames import GeoNames  # noqa
 from openatlas.api.external.gnd import GND  # noqa
 from openatlas.api.external.openatlas_api import OpenAtlas  # noqa
@@ -73,7 +73,6 @@ def ajax_external_api(system_id: int) -> str:
 @app.route('/proxy/apis', methods=['GET'])
 @required_group('readonly')
 def apis_proxy() -> Response | tuple[Response, int]:
-    # Needs call from server to avoid CORS issues at APIS
     system_url = request.args.get('system_url', '').rstrip('/')
     apis_api_url = f'{system_url}/api/entities/'
     try:
@@ -82,7 +81,7 @@ def apis_proxy() -> Response | tuple[Response, int]:
             params={
                 'search': request.args.get('search', ''),
                 'format': 'json'},
-            headers={'User-Agent': 'Mozilla/5.0'},
+            headers=app.config['USER_AGENT'],
             timeout=10)
         response.raise_for_status()
         data = response.json()
@@ -91,3 +90,21 @@ def apis_proxy() -> Response | tuple[Response, int]:
         return jsonify(data)
     except requests.exceptions.RequestException as e:
         return jsonify({'error': str(e), 'results': []}), 502
+
+
+@app.route('/proxy/crossref', methods=['GET'])
+@required_group('readonly')
+def crossref_proxy() -> Response | tuple[Response, int]:
+    try:
+        response = requests.get(
+            'https://api.crossref.org/works',
+            params={
+                'query': request.args.get('query', ''),
+                'rows': request.args.get('rows', '10')},
+            headers=app.config['USER_AGENT'],
+            proxies=app.config['PROXIES'],
+            timeout=10)
+        response.raise_for_status()
+        return jsonify(response.json())
+    except requests.exceptions.RequestException as e:
+        return jsonify({'error': str(e), 'message': {'items': []}}), 502

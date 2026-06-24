@@ -277,23 +277,32 @@ class LoudFormatter:
                     'api.display', filename=file_.stem, _external=True),
                 "type": "DigitalObject",
                 "_label": file_.stem}]
+        digital_object['right_held_by'] = []
         for license_holder in entity.license_holder or []:
-            digital_object['right_held_by'] = [{
-                'id': self.generate_skolem_id(
-                    license_holder.id, 'rights_holder'),
+            license_holder.uuid = self.generate_skolem_id(
+                license_holder.id,
+                'rights_holder')
+            digital_object['right_held_by'].append({
+                'id': license_holder.uuid,
                 '_label': license_holder.name,
-                'type': (license_holder.class_ or 'Actor').capitalize()}]
+                'type': (license_holder.class_ or 'Actor').capitalize(),
+                'identified_by': self._inline_identifiers(license_holder)})
+        carried_out_by = []
         for creator in entity.creator or []:
-            digital_object['created_by'] = {
-                'id': self.generate_skolem_id(
-                    creator.id, f'{entity.id}_creation_{creator.id}'),
-                '_label': f'Creation of {entity.name}',
-                'type': 'Creation',
-                'carried_out_by': [{
-                    'id': self.generate_skolem_id(
-                        creator.id, 'rights_holder'),
-                    '_label': creator.name,
-                    'type': (creator.class_ or 'Actor').capitalize()}]}
+            creator.uuid = self.generate_skolem_id(
+                creator.id,
+                'rights_holder')
+            carried_out_by.append({
+                'id': creator.uuid,
+                '_label': creator.name,
+                'type': (creator.class_ or 'Actor').capitalize(),
+                'identified_by': self._inline_identifiers(creator)})
+        digital_object['created_by'] = {
+            'id': self.generate_skolem_id(
+                entity.id, f'{entity.id}_creation'),
+            '_label': f'Creation of {entity.name}',
+            'type': 'Creation',
+            'carried_out_by': carried_out_by}
         if license_ := get_license_type(entity):
             digital_object['referred_to_by'] = [
                 self._build_license(license_, entity.name)]
@@ -385,8 +394,8 @@ class LoudFormatter:
         property_['content'] = target.name
         return property_
 
-    @staticmethod
     def _handle_p2(
+            self,
             property_: dict[str, Any],
             link_: Link,
             is_domain: bool) -> dict[str, Any]:
@@ -405,7 +414,34 @@ class LoudFormatter:
                 "id": "https://vocab.getty.edu/aat/300379096",
                 'type': "Type",
                 '_label': target.description}]
+            return property_
+        self._append_type_references(property_, target)
         return property_
+
+    def _append_type_references(
+            self,
+            property_: dict[str, Any],
+            type_entity: Entity) -> None:
+        equivalents: list[dict[str, Any]] = []
+        attributed_by: list[dict[str, Any]] = []
+        for type_link in self.type_refs.get(type_entity.id, []):
+            url = reference_url(type_link)
+            if not validators.url(url):  # pragma: no cover
+                continue
+            ref = {
+                'id': url,
+                'type': 'Type',
+                '_label': type_entity.name}
+            if is_close_match(type_link):  # pragma: no cover
+                attributed_by.append(close_match_attribution(
+                    self.generate_skolem_id(type_link.id, 'close_match'),
+                    ref))
+            else:
+                equivalents.append(ref)
+        if equivalents:
+            property_['equivalent'] = equivalents
+        if attributed_by:  # pragma: no cover
+            property_['attributed_by'] = attributed_by
 
     def _handle_p73(
             self,

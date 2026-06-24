@@ -115,6 +115,20 @@ increasingly also by archives and museums.
 
 By default it is usable for **persons** in OpenAtlas.
 
+DOI
+***
+The `DOI <https://www.doi.org/>`_ (Digital Object Identifier) is a persistent
+identifier for digital resources such as publications, datasets, and editions.
+In OpenAtlas, enter only the DOI identifier itself (e.g.
+``10.1163/9789004712126_015``), not the full URL or domain.
+
+The autocomplete search uses `Crossref <https://www.crossref.org/>`_. However,
+all DOI identifiers can be stored and resolved, even if they are not found via
+autocomplete.
+
+DOI is included by default and is usable for **edition, bibliography and
+external reference** in OpenAtlas.
+
 Cadaster
 ********
 Although not configured by default, the Cadaster reference system can be added

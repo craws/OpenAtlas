@@ -149,7 +149,7 @@ class Api(ApiTestCase):
         assert len(rv['results']) == 16
         rv = c.get(url_for('api_04.network_visualisation', download=True))
         rv = rv.get_json()
-        assert len(rv['results']) == 161
+        assert len(rv['results']) == 162
 
         rv = c.get(
             url_for(
@@ -743,12 +743,12 @@ class Api(ApiTestCase):
                 "relationToID": [{
                     "operator": "equal",
                     "values": [place.id]}]}]),
-            (167, [{
+            (168, [{
                 "typeIDWithSubs": [{
                     "operator": "notEqual",
                     "values": [boundary_mark.id],
                     "logicalOperator": "and"}]}]),
-            (169, [{
+            (170, [{
                 "typeName": [{
                     "operator": "notEqual",
                     "values": ["Boundary Mark", "Height"],

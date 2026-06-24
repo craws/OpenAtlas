@@ -17,9 +17,7 @@ class APIS(ExternalApi):  # pylint: disable=too-few-public-methods
         try:
             response = requests.get(
                 f'{base_url}/{id_}',
-                headers={
-                    "Accept": "application/json",
-                    "User-Agent": "Mozilla/5.0"},
+                headers=app.config['USER_AGENT'],
                 proxies=app.config['PROXIES'],
                 timeout=10)
             response.raise_for_status()

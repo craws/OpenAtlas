@@ -1,0 +1,53 @@
+  <script>
+  /**
+   * DOI (Crossref) autocomplete
+   * Documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
+   * API: https://api.crossref.org/swagger-ui/index.html
+  */
+  (function() {
+    const $input = $('input[data-reference-system={{ system.id }}]');
+    $input.autoComplete({
+      bootstrapVersion: '4',
+      minLength: 3,
+      resolver: 'custom',
+      formatResult: function (item) {
+        const title = item.title ? item.title[0] : 'No title';
+        const authors = item.author ? item.author.map(a => a.family).join(', ') : '';
+        const year = (item.issued && item.issued['date-parts'] && item.issued['date-parts'][0]) ? item.issued['date-parts'][0][0] : '';
+        const category = [authors, year].filter(Boolean).join(', ');
+
+        return {
+           value: item.DOI,
+           text: `${title} - ${category}<br><small>${item.DOI}</small>`
+        };
+      },
+      events: {
+        search: (function() {
+          let timeout;
+          return function (qry, callback) {
+            clearTimeout(timeout);
+            timeout = setTimeout(function() {
+              $.ajax({
+                url: "/proxy/crossref",
+                data: {
+                  query: qry,
+                  rows: 10
+                }
+              }).done(function(data) {
+                if (data && data.message && data.message.items) {
+                  callback(data.message.items);
+                } else {
+                  callback([]);
+                }
+              }).fail(function() {
+                callback([]);
+              });
+            }, 400);
+          };
+        })()
+      }
+    }).on('autocomplete.select', function(evt, item) {
+      $input.val(item.DOI);
+    });
+  })();
+</script>

@@ -33,6 +33,27 @@ class ReferenceSystemTest(TestBaseCase):
         rv = c.post(
             url_for(
                 'ajax_external_api',
+                system_id=get_reference_system_by_name_safe('DOI').id),
+            data={'id_': '10.1163/9789004712126_015'})
+        assert b'OpenAtlas: An Open-Source Application' in rv.data
+
+        rv = c.post(
+            url_for(
+                'ajax_external_api',
+                system_id=get_reference_system_by_name_safe('DOI').id),
+            data={'id_': '10.5194/ica-proc-4-14-2021'})
+        assert b'Beyond East and West' in rv.data
+
+        rv = c.post(
+            url_for(
+                'ajax_external_api',
+                system_id=get_reference_system_by_name_safe('DOI').id),
+            data={'id_': '10.11141/ia.64.11'})
+        assert b'Integrating Data on Early Medieval Graves' in rv.data
+
+        rv = c.post(
+            url_for(
+                'ajax_external_api',
                 system_id=get_reference_system_by_name_safe('Cadaster').id),
             data={'id_': '01004/784/1'})
         assert b'784/1' in rv.data
@@ -83,6 +104,12 @@ class ReferenceSystemTest(TestBaseCase):
         assert b'Carrot' in rv.data
 
         rv = c.get(url_for('apis_proxy', system_url='wrong', search='Carr'))
+        assert b'error' in rv.data
+
+        rv = c.get(url_for('crossref_proxy', rows='10', query='OpenAtlas'))
+        assert b'OpenAtlas' in rv.data
+
+        rv = c.get(url_for('crossref_proxy', rows='wrong', query='Open'))
         assert b'error' in rv.data
 
         data['reference_system_classes'] = ['place']

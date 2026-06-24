@@ -29,6 +29,7 @@ LANGUAGES = {
 EXTERNAL_API = [
     'APIS',
     'Cadaster',
+    'DOI',
     'GeoNames',
     'GND',
     'OpenAtlas',

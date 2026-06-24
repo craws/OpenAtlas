@@ -8,11 +8,10 @@ from flask_babel import LazyString, format_number, gettext as _
 from flask_login import current_user
 
 from openatlas import app
-from openatlas.display.image_processing import (check_iiif_file_exist,
-                                                check_processed_image)
+from openatlas.display.image_processing import (
+    check_iiif_file_exist, check_processed_image)
 from openatlas.display.util import (
-    edit_link, get_user_setting, link,
-    remove_link)
+    edit_link, get_user_setting, link, remove_link)
 from openatlas.display.util2 import (
     display_bool, get_file_path, is_authorized, sanitize, uc_first)
 from openatlas.models.dates import format_date
