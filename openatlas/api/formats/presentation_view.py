@@ -142,12 +142,13 @@ def get_relation_types_dict_for_locations(
 def get_presentation_references(
         links_inverse: list[Link],
         entity_ids: list[int]) -> list[dict[str, Any]]:
-    references = []
-    check_for_duplicates: dict[int, str] = defaultdict(str)
+    references = {}
     for link in links_inverse:
         if link.domain.class_.group.get('name') != 'reference' \
-                or link.range.id not in entity_ids \
-                or check_for_duplicates[link.domain.id] == link.description:
+                or link.range.id not in entity_ids:
+            continue
+        if references.get(link.domain.id):
+            references[link.domain.id]['pages'] += f', {link.description}'
             continue
         ref = {
             'id': link.domain.id,
@@ -159,9 +160,8 @@ def get_presentation_references(
             ref.update({
                 'type': link.domain.standard_type.name,
                 'typeId': link.domain.standard_type.id})
-        check_for_duplicates[link.domain.id] = link.description
-        references.append(ref)
-    return references
+        references[link.domain.id] = ref
+    return list(references.values())
 
 
 def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
