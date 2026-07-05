@@ -98,7 +98,6 @@ def before_request() -> Response | None:
 
 
 def setup_files() -> None:
-    from openatlas.models.entity import Entity
     from openatlas.models.rights_holder import RightsHolder
     g.files = {}
     for file_ in app.config['UPLOAD_PATH'].iterdir():

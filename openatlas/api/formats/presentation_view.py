@@ -142,7 +142,7 @@ def get_relation_types_dict_for_locations(
 def get_presentation_references(
         links_inverse: list[Link],
         entity_ids: list[int]) -> list[dict[str, Any]]:
-    references = {}
+    references: dict[int, Any] = {}
     for link in links_inverse:
         if link.domain.class_.group.get('name') != 'reference' \
                 or link.range.id not in entity_ids:
