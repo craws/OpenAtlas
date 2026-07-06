@@ -171,6 +171,7 @@ VALUES
 
   ('P107', (SELECT id FROM model.entity WHERE name='Sam'), (SELECT id FROM model.entity WHERE name='The Fellowship'), NULL, (SELECT id FROM model.entity WHERE name='Bishop') ),
   ('P67', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Frodo et. al.'), '987', NULL ),
+  ('P67', (SELECT id FROM model.entity WHERE name='Home of Baggins'), (SELECT id FROM model.entity WHERE name='Frodo et. al.'), '123', NULL ),
   ('P2', (SELECT id FROM model.entity WHERE name='Radiocarbon'), (SELECT id FROM model.entity WHERE name='Bar'), '{"labId": "VERA", "specId": "23451A", "radiocarbonYear": 2040, "range": 30, "timeScale": "BP"}', NULL ),
   ('P67', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Frodo et. al.'), '234', NULL ),
   ('P67', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Translation of Silmarillion'), '234', NULL ),

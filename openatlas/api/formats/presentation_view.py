@@ -28,6 +28,7 @@ def get_presentation_types(
     location_types = {}
     if entity.class_.group.get('name') == 'place':
         location_types = get_location_link(links).range.types
+    entity_links = [link_ for link_ in links if link_.domain.id == entity.id]
     for type_ in entity.types | location_types:
         is_standard = False
         if entity.standard_type:
@@ -43,7 +44,7 @@ def get_presentation_types(
                 'identifier': url_for(
                     'api.entity', id_=g.types[root].id, _external=True)}
                 for root in type_.root]}
-        type_dict.update(get_value_for_types(type_, links))
+        type_dict.update(get_value_for_types(type_, entity_links))
         types.append(type_dict)
     return types
 
