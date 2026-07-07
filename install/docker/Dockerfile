@@ -13,7 +13,10 @@ RUN --mount=type=cache,target=/var/cache/apt \
     apt install -y --no-install-recommends gettext npm python3-pip git postgresql-client-17 python3-xmltodict python3-lxml &&\
     apt install -y --no-install-recommends dos2unix locales locales-all vim w3c-sgml-lib nano less &&\
     mkdir -p /var/www/openatlas /var/www/.cache /var/www/.local /var/www/.npm &&\
-    chown -R www-data:www-data /var/www/.cache /var/www/.local /var/www/.npm /var/log/apache2 /var/run/apache2
+    mkdir -p /var/www/openatlas/files/uploads &&\
+    mkdir -p /var/www/openatlas/files/processed_images/resized &&\
+    mkdir -p /var/www/openatlas/files/export/arche /var/www/openatlas/files/export/rdf /var/www/openatlas/files/export/sql &&\
+    chown -R www-data:www-data /var/www/.cache /var/www/.local /var/www/.npm /var/log/apache2 /var/run/apache2 /var/www/openatlas/files
 RUN cp -rp /usr/lib/iipimage-server/ /var/www/iipsrv/ &&\
     mkdir /var/www/iipsrv/tests &&\
     chown -R www-data /var/www/iipsrv/ &&\
