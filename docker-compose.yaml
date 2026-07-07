@@ -1,6 +1,6 @@
 services:
   postgres:
-    image: "postgis/postgis:17-3.4"
+    image: "postgis/postgis:17-3.5"
     environment:
       - POSTGRES_DB=${POSTGRES_DB}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
