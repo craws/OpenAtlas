@@ -9,54 +9,9 @@ Before you begin, ensure you have the following installed and configured:
 1.  **Git:** Required to clone the OpenAtlas repository.
     * Install Git: [https://git-scm.com/book/en/v2/Getting-Started-Installing-Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 2.  **Docker and Docker Compose:**
-    * **Linux:** Docker Engine and the Docker Compose plugin (V2 command `docker compose`). See Linux installation steps below.
-    * **Windows:** Docker Desktop. See Windows installation steps below.
-3.  **Operating System:**
-    * **Linux:** A modern distribution (e.g., Debian 11+,).
-    * **Windows:** Windows 10/11 64-bit: Pro, Enterprise, or Education. Windows Home edition *requires* WSL 2 to be enabled and used as the Docker Desktop backend.
-
-## Docker Installation
-
-Follow the instructions for your operating system.
-
-### Linux
-
-1.  **Install Docker Engine:** Follow the official Docker guide for your specific distribution. **Using the official Docker repository is highly recommended** over default distribution packages (like `docker.io` on Debian/Ubuntu).
-    * Debian: [https://docs.docker.com/engine/install/debian/](https://docs.docker.com/engine/install/debian/)
-    * Other distributions: [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/)
-2.  **Install Docker Compose Plugin:** The `docker compose` V2 command (without a hyphen) is required. It's usually included when installing `docker-ce` from the official repository. Verify with `docker compose version`. If not present, follow the Docker Compose installation guide: [https://docs.docker.com/compose/install/linux/](https://docs.docker.com/compose/install/linux/)
-3.  **!!! Manage Docker as a non-root user (CRITICAL POST-INSTALL STEP) !!!**
-    * To run Docker commands without `sudo` and avoid permission errors when interacting with the Docker daemon socket, add your user to the `docker` group:
-        ```bash
-        sudo usermod -aG docker ${USER}
-        ```
-    * **IMPORTANT:** You **must log out and log back in** (or restart your system) for this group change to take effect! You can verify group membership with the `groups` command after logging back in.
-4.  **Start and Enable Docker Service:**
-    ```bash
-    sudo systemctl start docker
-    sudo systemctl enable docker # Optional: Start Docker automatically on system boot
-    ```
-5.  **Verify Installation:** Check that Docker Engine and Compose are installed correctly:
-    ```bash
-    docker --version
-    docker compose version
-    # Test running a simple container (should run without sudo after login/logout)
-    docker run hello-world
-    ```
-
-### Windows
-
-1.  **Install Docker Desktop:** Download and install Docker Desktop for Windows from the official website:
-    * [https://docs.docker.com/desktop/install/windows-install/](https://docs.docker.com/desktop/install/windows-install/)
-2.  **Enable WSL 2 Backend (Recommended):** Docker Desktop works best with the Windows Subsystem for Linux version 2 (WSL 2). It's the default for new installations, but ensure it's enabled in Docker Desktop settings (Settings > General > "Use the WSL 2 based engine").
-    * If you need to install or enable WSL 2 itself, follow Microsoft's guide: [https://learn.microsoft.com/en-us/windows/wsl/install](https://learn.microsoft.com/en-us/windows/wsl/install)
-3.  **Docker Compose Included:** Docker Desktop includes the `docker compose` command. No separate installation is needed.
-4.  **Verify Installation:** Check the Docker Desktop dashboard shows it's running ("Docker Desktop is running"). You can also open a terminal (Command Prompt, PowerShell, or a WSL terminal) and run:
-    ```powershell
-    docker --version
-    docker compose version
-    docker run hello-world
-    ```
+    * **Linux:** Docker Engine and the Docker Compose plugin (V2 command `docker compose`): [https://docs.docker.com/engine/install/](https://docs.docker.com/engine/install/). Also enable running Docker as non-root user: [https://docs.docker.com/engine/install/linux-postinstall/](https://docs.docker.com/engine/install/linux-postinstall/) *Note: Using [Podman](https://podman.io/) is also supported.*
+    * **Windows:** Docker Desktop: [https://docs.docker.com/desktop/setup/install/windows-install/](https://docs.docker.com/desktop/setup/install/windows-install/).
+    * **MacOS:** Docker Desktop: [https://docs.docker.com/desktop/setup/install/mac-install/](https://docs.docker.com/desktop/setup/install/mac-install/)
 
 ## Running OpenAtlas
 
@@ -70,11 +25,11 @@ Follow the instructions for your operating system.
 2.  **Set Environment Variables:**
     OpenAtlas requires database credentials, which are passed via a `.env` file in the project's root directory (the same directory as `docker-compose.yaml`).
 
-    * Windows (Cmd):
+    * Windows (cmd):
         ```cmd
         (echo POSTGRES_DB=openatlas & echo POSTGRES_PASSWORD=openatlas) > .env
         ```
-    * Linux or Windows (PowerShell/Git Bash):
+    * Linux/MacOS/Windows (WSL):
         ```bash
         printf "POSTGRES_DB=openatlas\nPOSTGRES_PASSWORD=openatlas\n" > .env
         ```
@@ -117,14 +72,7 @@ Follow the instructions for your operating system.
 Once the containers are up and running (check `docker compose ps` shows services as "running" or "healthy", you can access the applications in your web browser:
 
 * **OpenAtlas Backend/UI:** [http://localhost:8080](http://localhost:8080)
-* **OpenAtlas Discovery Frontend:** [http://localhost:3000](http://localhost:3000) (If included in your `docker-compose.yaml`)
-
-## Initial Login and Setup
-
-* Log into the OpenAtlas UI ([http://localhost:8080](http://localhost:8080)) using the default administrator credentials:
-    * Username: `OpenAtlas`
-    * Password: `change_me_PLEASE!`
-* **IMPORTANT: Change the default administrator password immediately** in your user profile settings for security. Follow any other initial setup steps prompted by the application.
+* **OpenAtlas Discovery Frontend:** [http://localhost:3000](http://localhost:3000) (If included in your `docker-compose.yaml`, included by default)
 
 ## Stopping the Application
 
@@ -141,7 +89,7 @@ Once the containers are up and running (check `docker compose ps` shows services
 
 ## Troubleshooting and Maintenance
 
-* **Permission Denied (Linux):** If you encounter `permission denied while trying to connect to the Docker daemon socket` errors, double-check that you have added your user to the `docker` group and **logged out and back in** (see Linux installation Step 3).
+* **Permission Denied (Linux):** If you encounter `permission denied while trying to connect to the Docker daemon socket` errors, double-check that you have added your user to the `docker` group and **logged out and back in** (see post-install steps).
 * **Check Container Status:** Use `docker compose ps` to see which services are running, stopped, or unhealthy.
 * **Check Logs:** Use `docker compose logs -f [SERVICE_NAME]` (e.g., `docker compose logs -f openatlas`) to view logs for specific services and diagnose issues.
 * **Rebuild Custom Images:** If you modify code that requires rebuilding the custom Docker images (e.g., changes in the application source code included in the Dockerfile build context, or changes to the Dockerfile itself):
