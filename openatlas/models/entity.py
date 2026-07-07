@@ -413,17 +413,18 @@ class Entity:
 
     def get_untyped(self) -> list[Entity]:
         untyped = []
-        for entity in Entity.get_by_class(self.classes, types=True):
-            linked = False
-            to_check = entity
-            if self.class_.name == 'administrative_unit':
-                to_check = entity.get_linked_entity_safe('P53', types=True)
-            for type_ in to_check.types:
-                if type_.root[0] == self.id:
-                    linked = True
-                    break
-            if not linked:
-                untyped.append(entity)
+        if self.classes:
+            for entity in Entity.get_by_class(self.classes, types=True):
+                linked = False
+                to_check = entity
+                if self.class_.name == 'administrative_unit':
+                    to_check = entity.get_linked_entity_safe('P53', types=True)
+                for type_ in to_check.types:
+                    if type_.root[0] == self.id:
+                        linked = True
+                        break
+                if not linked:
+                    untyped.append(entity)
         return untyped
 
     def update_hierarchy(

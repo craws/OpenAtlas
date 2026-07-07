@@ -19,7 +19,10 @@ versions = {
         'feature': {
             '2601': 'DOI added as external reference system',
             '2780': 'Remove file table',
-            '2816': 'Refactor and minor improvements'}}],
+            '2816': 'Refactor and minor improvements'},
+        'fix': {
+            '2849': 'API presentation view references',
+            '2848': 'Error making a type without classes required'}}],
     '9.3.2': ['2026-06-17', {
         'fix': {
             '2826': 'API: Outdated information for network'}}],

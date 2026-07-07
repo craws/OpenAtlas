@@ -7,8 +7,7 @@ from flask_babel import gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import secure_filename
 from wtforms import (
-    BooleanField, HiddenField, SelectField, SelectMultipleField, StringField,
-    widgets)
+    HiddenField, SelectField, SelectMultipleField, StringField, widgets)
 
 from openatlas import app
 from openatlas.database.connect import Transaction
