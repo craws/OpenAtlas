@@ -109,7 +109,11 @@ Once the containers are up and running (check `docker compose ps` shows services
     2.  **Manually delete the database directory on your host machine:**
         ```bash
         # WARNING: This permanently deletes all database data!
-        rm -rf ./data/db # Linux/macOS/Git Bash
+        docker volume rm openatlas_db-data
+        ```
+        **Delete the database and all related files**
+        ```bash
+        docker volume rm openatlas_db-data openatlas-uploads openatlas-resized openatlas-export
         ```
     3.  Restart the services: `docker compose up -d`. The `postgres` container will start with an empty data directory, triggering the initialization process.
 
@@ -124,7 +128,7 @@ To initialize the database from an existing SQL dump file (`.sql`) instead of us
 2.  **Clean Database Directory:** Make sure no previous database exists, as the PostgreSQL entrypoint scripts only run initialization procedures when the data directory is empty. **Delete the host directory:**
     ```bash
     # WARNING: Permanently deletes any existing DB data! Use with caution.
-    rm -rf ./data/db # Linux/macOS/Git Bash
+    docker volume rm openatlas_db-data
     # or delete manually/use rmdir/Remove-Item on Windows (see "Reset" section)
     ```
 3.  **Place Dump File:** Copy or move your `.sql` dump file to a location accessible by the Docker build context, for example, inside the project directory like `./files/export/my_database_dump.sql`.
@@ -132,7 +136,7 @@ To initialize the database from an existing SQL dump file (`.sql`) instead of us
     * Open the `docker-compose.yaml` file in a text editor.
     * Locate the `postgres` service definition.
     * Inside its `volumes:` section:
-        * **Ensure the database data volume is present:** `- ./data/db:/var/lib/postgresql/data`
+        * **Ensure the database data volume is present:** `- db-data:/var/lib/postgresql/data`
         * **Comment out** any lines that mount individual SQL files from `./install/` into `/docker-entrypoint-initdb.d/`. For example:
             ```yaml
             # - ./install/0_extensions.sql:/docker-entrypoint-initdb.d/0_extensions.sql
@@ -143,12 +147,12 @@ To initialize the database from an existing SQL dump file (`.sql`) instead of us
         * **Add or uncomment** a line to mount your *single dump file* into the init directory. Adjust the *host path* (before the colon) to point to your actual dump file:
             ```yaml
             volumes:
-              - ./data/db:/var/lib/postgresql/data
+              - db-data:/var/lib/postgresql/data
               # Ensure lines like the ones above are commented out
               # Mount your dump file:
-              - ./files/export/my_database_dump.sql:/docker-entrypoint-initdb.d/dump.sql
+              - ./files/export/my_database_dump.sql:/docker-entrypoint-initdb.d/dump.sql:Z
             ```
-            *(Replace `./files/export/my_database_dump.sql` with the actual path to your dump file relative to the `docker-compose.yaml` file, or provide an absolute path)*. The name inside the container (`dump.sql`) doesn't matter as much as long as it ends with `.sql`, `.sql.gz`, or `.sh`.
+            *(Replace `./files/export/my_database_dump.sql` with the actual path to your dump file relative to the `docker-compose.yaml` file, or provide an absolute path)*. The name inside the container (`dump.sql`) doesn't matter as much as long as it ends with `.sql`, `.sql.gz`, or `.sh`. The trailing `:Z` sets the correct SELinux context on systems that require it (harmless if not needed).
 5.  **Start Docker Compose:**
     Start the services. The PostgreSQL container will detect the empty data directory and execute the script(s) found in `/docker-entrypoint-initdb.d/` alphabetically.
     ```bash
