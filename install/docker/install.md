@@ -87,6 +87,46 @@ Once the containers are up and running (check `docker compose ps` shows services
     ```
     **Note:** This command does **not** delete data in host *bind mounts* like the `./data/db` directory used by default for PostgreSQL data.
 
+## Database Management
+
+### Fresh Install
+
+```bash
+docker compose up --detach
+```
+
+On first run, `initdb` automatically creates the schema from the SQL scripts in `./install/`.
+
+### Resetting the Database
+
+```bash
+docker compose down
+docker volume rm openatlas_db-data openatlas_openatlas-export
+docker compose up --detach
+```
+
+### Restoring from a Dump
+
+Requires placing an SQL file at `openatlas-initdb-1:/var/www/openatlas/files/export/dump.sql`.
+
+```bash
+docker compose down
+docker volume rm openatlas_db-data openatlas_openatlas-export
+docker compose up --no-start
+docker cp ./my_dump.sql openatlas-initdb-1:/var/www/openatlas/files/export/dump.sql
+docker compose start
+```
+
+`initdb` detects the dump automatically and restores it instead of running the install scripts.
+
+### Verify
+
+```bash
+docker logs openatlas-initdb-1
+```
+
+Look for `Initialization verified.` at the end.
+
 ## Troubleshooting and Maintenance
 
 * **Permission Denied (Linux):** If you encounter `permission denied while trying to connect to the Docker daemon socket` errors, double-check that you have added your user to the `docker` group and **logged out and back in** (see post-install steps).
@@ -104,58 +144,3 @@ Once the containers are up and running (check `docker compose ps` shows services
     ```bash
     docker compose up -d --force-recreate
     ```
-* **Reset the Database:** To completely wipe the database and force re-initialization using the `initdb` service or a dump file on the next startup:
-    1.  **Stop the services:** `docker compose down`
-    2.  **Manually delete the database directory on your host machine:**
-        ```bash
-        # WARNING: This permanently deletes all database data!
-        docker volume rm openatlas_db-data
-        ```
-        **Delete the database and all related files**
-        ```bash
-        docker volume rm openatlas_db-data openatlas-uploads openatlas-resized openatlas-export
-        ```
-    3.  Restart the services: `docker compose up -d`. The `postgres` container will start with an empty data directory, triggering the initialization process.
-
-## Restoring a Database Dump
-
-To initialize the database from an existing SQL dump file (`.sql`) instead of using the default `initdb` scripts provided in `./install/`:
-
-1.  **Stop Containers:** Ensure services are stopped:
-    ```bash
-    docker compose down
-    ```
-2.  **Clean Database Directory:** Make sure no previous database exists, as the PostgreSQL entrypoint scripts only run initialization procedures when the data directory is empty. **Delete the host directory:**
-    ```bash
-    # WARNING: Permanently deletes any existing DB data! Use with caution.
-    docker volume rm openatlas_db-data
-    # or delete manually/use rmdir/Remove-Item on Windows (see "Reset" section)
-    ```
-3.  **Place Dump File:** Copy or move your `.sql` dump file to a location accessible by the Docker build context, for example, inside the project directory like `./files/export/my_database_dump.sql`.
-4.  **Modify `docker-compose.yaml`:**
-    * Open the `docker-compose.yaml` file in a text editor.
-    * Locate the `postgres` service definition.
-    * Inside its `volumes:` section:
-        * **Ensure the database data volume is present:** `- db-data:/var/lib/postgresql/data`
-        * **Comment out** any lines that mount individual SQL files from `./install/` into `/docker-entrypoint-initdb.d/`. For example:
-            ```yaml
-            # - ./install/0_extensions.sql:/docker-entrypoint-initdb.d/0_extensions.sql
-            # - ./install/1_structure.sql:/docker-entrypoint-initdb.d/1_structure.sql
-            # - ./install/2_data_model.sql:/docker-entrypoint-initdb.d/2_data_model.sql
-            # ... etc ...
-            ```
-        * **Add or uncomment** a line to mount your *single dump file* into the init directory. Adjust the *host path* (before the colon) to point to your actual dump file:
-            ```yaml
-            volumes:
-              - db-data:/var/lib/postgresql/data
-              # Ensure lines like the ones above are commented out
-              # Mount your dump file:
-              - ./files/export/my_database_dump.sql:/docker-entrypoint-initdb.d/dump.sql:Z
-            ```
-            *(Replace `./files/export/my_database_dump.sql` with the actual path to your dump file relative to the `docker-compose.yaml` file, or provide an absolute path)*. The name inside the container (`dump.sql`) doesn't matter as much as long as it ends with `.sql`, `.sql.gz`, or `.sh`. The trailing `:Z` sets the correct SELinux context on systems that require it (harmless if not needed).
-5.  **Start Docker Compose:**
-    Start the services. The PostgreSQL container will detect the empty data directory and execute the script(s) found in `/docker-entrypoint-initdb.d/` alphabetically.
-    ```bash
-    docker compose up -d
-    ```
-    Monitor the PostgreSQL logs (`docker compose logs -f postgres`) to check the import progress and watch for any errors during the restore process. This might take a while for large dump files.
