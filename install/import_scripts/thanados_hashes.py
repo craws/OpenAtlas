@@ -1,10 +1,13 @@
-import csv
 import glob
 import json
 import os
 import re
 from flask import g
 from openatlas import app
+
+# List of all allowed languages in tags
+ALLOWED_LANGS = ("de", "en", "cz", "la", "fr", "sl")
+VALID_TAGS = set(f"##{lang}_##" for lang in ALLOWED_LANGS) | set(f"##_{lang}##" for lang in ALLOWED_LANGS)
 
 
 def classify_mismatch(text: str) -> str:
@@ -21,40 +24,33 @@ def classify_mismatch(text: str) -> str:
         return "mismatch_general"
 
     # 1. Check for duplicate/repeated open tags used to close (e.g. ##en_## ... ##en_##)
-    if len(re.findall(r"##en_##", text)) > 1 and "##_en##" not in text:
-        return "mismatch_open_tag_used_as_close"
-    if len(re.findall(r"##de_##", text)) > 1 and "##_de##" not in text:
-        return "mismatch_open_tag_used_as_close"
+    for lang in ALLOWED_LANGS:
+        if len(re.findall(rf"##{lang}_##", text)) > 1 and f"##_{lang}##" not in text:
+            return "mismatch_open_tag_used_as_close"
 
     # 2. Check for duplicate nested open tags (e.g. ##de_####de_##)
-    if "##de_####de_##" in text or "##en_####en_##" in text:
-        return "mismatch_duplicated_open_tags"
+    for lang in ALLOWED_LANGS:
+        if f"##{lang}_####{lang}_##" in text:
+            return "mismatch_duplicated_open_tags"
 
     # 3. Check for opening tags without a closing tag
-    has_open_de = "##de_##" in text
-    has_close_de = "##_de##" in text
-    has_open_en = "##en_##" in text
-    has_close_en = "##_en##" in text
-
-    if has_open_de and not has_close_de:
-        return "mismatch_opening_without_closing"
-    if has_open_en and not has_close_en:
-        return "mismatch_opening_without_closing"
+    for lang in ALLOWED_LANGS:
+        if f"##{lang}_##" in text and f"##_{lang}##" not in text:
+            return "mismatch_opening_without_closing"
 
     # 4. Check for closing tags without an opening tag
-    if has_close_de and not has_open_de:
-        return "mismatch_closing_without_opening"
-    if has_close_en and not has_open_en:
-        return "mismatch_closing_without_opening"
+    for lang in ALLOWED_LANGS:
+        if f"##_{lang}##" in text and f"##{lang}_##" not in text:
+            return "mismatch_closing_without_opening"
 
     # 5. Check for mismatched nesting (e.g. en open, de close)
     parts = text.split("##")
     stack = []
     for i, part in enumerate(parts):
         if i % 2 == 1:
-            if part in ("de_", "en_"):
+            if part.endswith("_") and part[:-1] in ALLOWED_LANGS:
                 stack.append(part[:-1])
-            elif part in ("_de", "_en"):
+            elif part.startswith("_") and part[1:] in ALLOWED_LANGS:
                 if not stack or stack[-1] != part[1:]:
                     return "mismatch_nesting_error"
                 stack.pop()
@@ -113,18 +109,20 @@ def clean_and_translate_old(desc: str) -> str:
 def clean_missing_hash(desc: str) -> str:
     """
     Cleans up missing hash tag typos (e.g. #de_## or ##en_#) by replacing them
-    with standard double hash tags (e.g. ##de_## or ##en_##).
+    with standard double hash tags (e.g. ##de_## or ##en_##) for all allowed languages.
     """
     if not desc:
         return ""
 
+    langs_pattern = "|".join(f"{lang}_" for lang in ALLOWED_LANGS) + "|" + "|".join(f"_{lang}" for lang in ALLOWED_LANGS)
+    
     def replace_start(match):
         return f"##{match.group(1)}##"
-    text = re.sub(r"(?<!#)#(de_|en_|_de|_en)##(?!#)", replace_start, desc, flags=re.IGNORECASE)
+    text = re.sub(rf"(?<!#)#({langs_pattern})##(?!#)", replace_start, desc, flags=re.IGNORECASE)
 
     def replace_end(match):
         return f"##{match.group(1)}##"
-    text = re.sub(r"(?<!#)##(de_|en_|_de|_en)#(?!#)", replace_end, text, flags=re.IGNORECASE)
+    text = re.sub(rf"(?<!#)##({langs_pattern})#(?!#)", replace_end, text, flags=re.IGNORECASE)
 
     return text
 
@@ -136,63 +134,71 @@ def clean_opening_without_closing(desc: str) -> str:
     if not desc:
         return ""
 
-    # Normalize single-hash dangling endings like ##_en or ##_de
-    text = re.sub(r"##_en$", "##_en##", desc.strip(), flags=re.IGNORECASE)
-    text = re.sub(r"##_de$", "##_de##", text, flags=re.IGNORECASE)
+    text = desc.strip()
+    
+    # Normalize single-hash dangling endings like ##_en or ##_de for all allowed languages
+    for lang in ALLOWED_LANGS:
+        text = re.sub(rf"##_{lang}$", f"##_{lang}##", text, flags=re.IGNORECASE)
 
-    has_en_open = "##en_##" in text
-    has_en_close = "##_en##" in text
-    has_de_open = "##de_##" in text
-    has_de_close = "##_de##" in text
-
-    if has_en_open and has_de_open:
-        idx_en_open = text.find("##en_##")
-        idx_de_open = text.find("##de_##")
-
-        if idx_en_open < idx_de_open:
-            if not has_en_close or text.find("##_en##") > idx_de_open:
-                text = text.replace("##de_##", "##_en##\r\n\r\n##de_##", 1)
-            if not "##_de##" in text[idx_de_open:]:
-                text = text.strip() + "\r\n##_de##"
-        else:
-            if not has_de_close or text.find("##_de##") > idx_en_open:
-                text = text.replace("##en_##", "##_de##\r\n\r\n##en_##", 1)
-            if not "##_en##" in text[idx_en_open:]:
-                text = text.strip() + "\r\n##_en##"
-
-    elif has_en_open and not has_de_open:
-        if not has_en_close:
-            text = text.strip() + "\r\n##_en##"
-
-    elif has_de_open and not has_en_open:
-        if not has_de_close:
-            text = text.strip() + "\r\n##_de##"
-
-    return text
+    # Split by tags, keeping the tags.
+    tag_regex = re.compile(rf"##(?:(?:{'|'.join(ALLOWED_LANGS)})_|_(?:{'|'.join(ALLOWED_LANGS)}))##", re.IGNORECASE)
+    parts = tag_regex.split(text)
+    tags = tag_regex.findall(text)
+    
+    # Rebuild the string, inserting missing closing tags where needed.
+    new_parts = []
+    open_stack = []
+    
+    for i in range(len(parts)):
+        new_parts.append(parts[i])
+        if i < len(tags):
+            tag = tags[i]
+            # Parse tag content (e.g. "de_" or "_de")
+            tag_content = tag[2:-2]
+            if tag_content.endswith("_"):
+                lang = tag_content[:-1]
+                # If another tag is open, close it first before opening this one!
+                while open_stack:
+                    popped = open_stack.pop()
+                    new_parts.append(f"##_{popped}##\r\n\r\n")
+                open_stack.append(lang)
+                new_parts.append(tag)
+            else:
+                lang = tag_content[1:]
+                if lang in open_stack:
+                    # Close any nested/open tags up to this one
+                    while open_stack:
+                        popped = open_stack.pop()
+                        new_parts.append(f"##_{popped}##" if popped == lang else f"##_{popped}##\r\n\r\n")
+                        if popped == lang:
+                            break
+                else:
+                    # Closing tag without opening, just append it
+                    new_parts.append(tag)
+                    
+    # At the end of the text, close any remaining open tags
+    while open_stack:
+        popped = open_stack.pop()
+        new_parts.append(f"\r\n##_{popped}##")
+        
+    return "".join(new_parts)
 
 
 def clean_open_tag_used_as_close(desc: str) -> str:
     """
-    Replaces duplicate opening tags used as closing tags (e.g. the second ##en_##) with standard closing tags (e.g. ##_en##).
+    Replaces duplicate opening tags used as closing tags (e.g. the second ##en_##) with standard closing tags (e.g. ##_en##) for all allowed languages.
     """
     if not desc:
         return ""
 
     text = desc
 
-    # Replaces the second occurrence of ##en_## if ##_en## is not in original description
-    if "##_en##" not in desc:
-        en_matches = list(re.finditer(r"##en_##", text, flags=re.IGNORECASE))
-        if len(en_matches) >= 2:
-            start, end = en_matches[1].span()
-            text = text[:start] + "##_en##" + text[end:]
-
-    # Replaces the second occurrence of ##de_## if ##_de## is not in original description
-    if "##_de##" not in desc:
-        de_matches = list(re.finditer(r"##de_##", text, flags=re.IGNORECASE))
-        if len(de_matches) >= 2:
-            start, end = de_matches[1].span()
-            text = text[:start] + "##_de##" + text[end:]
+    for lang in ALLOWED_LANGS:
+        if f"##_{lang}##" not in desc:
+            matches = list(re.finditer(rf"##{lang}_##", text, flags=re.IGNORECASE))
+            if len(matches) >= 2:
+                start, end = matches[1].span()
+                text = text[:start] + f"##_{lang}##" + text[end:]
 
     return text
 
@@ -226,8 +232,9 @@ def classify_description(text: str) -> str | None:
 
     # Check if there is any other double-hash or single-hash typo remaining.
     # If not, ignore the description.
+    langs_pattern = "|".join(f"{lang}_" for lang in ALLOWED_LANGS) + "|" + "|".join(f"_{lang}" for lang in ALLOWED_LANGS)
     missing_hash_pattern = re.compile(
-        r"(?<!#)#(de_|en_|_de|_en)##(?!#)|(?<!#)##(de_|en_|_de|_en)#(?!#)",
+        rf"(?<!#)#({langs_pattern})##(?!#)|(?<!#)##({langs_pattern})#(?!#)",
         re.IGNORECASE
     )
     if '##' not in clean_text and not missing_hash_pattern.search(clean_text):
@@ -262,12 +269,14 @@ def classify_description(text: str) -> str | None:
 
     # 5. Check for invalid/custom tags or patterns
     tags = re.findall(r'##[^#]+##', clean_text)
-    invalid_tags = [t for t in tags if t not in ("##de_##", "##_de##", "##en_##", "##_en##")]
+    invalid_tags = [t for t in tags if t not in VALID_TAGS]
     if invalid_tags:
         for tag in invalid_tags:
-            if re.sub(r'\s+', '', tag.lower()) in ("##de_##", "##_de##", "##en_##", "##_en##"):
+            tag_clean = re.sub(r'\s+', '', tag.lower())
+            if tag_clean in VALID_TAGS:
                 return "tag_whitespace"
-            if tag.strip("# ").lower() in ("de", "en", "de_", "_de", "en_", "_en"):
+            tag_stripped = tag.strip("# ").lower()
+            if tag_stripped in ALLOWED_LANGS or (tag_stripped.endswith("_") and tag_stripped[:-1] in ALLOWED_LANGS) or (tag_stripped.startswith("_") and tag_stripped[1:] in ALLOWED_LANGS):
                 return "tag_missing_underscore"
         return "no_lang_tag"
 
@@ -277,11 +286,13 @@ def classify_description(text: str) -> str | None:
         # If it is followed by a word (e.g. ##RCD), it's custom_tags.
         # Otherwise, it's mismatch_code.
         word_match = re.match(r'^[a-zA-ZÄÖÜäöüß]+', parts[-1])
-        if word_match and not parts[-1].startswith(("de_", "en_", "_de", "_en")):
+        if word_match and not any(parts[-1].startswith((f"{lang}_", f"_{lang}")) for lang in ALLOWED_LANGS):
             full_tag = f"##{parts[-1]}##"
-            if re.sub(r'\s+', '', full_tag.lower()) in ("##de_##", "##_de##", "##en_##", "##_en##"):
+            tag_clean = re.sub(r'\s+', '', full_tag.lower())
+            if tag_clean in VALID_TAGS:
                 return "tag_whitespace"
-            if parts[-1].strip().lower() in ("de", "en", "de_", "_de", "en_", "_en"):
+            tag_stripped = parts[-1].strip().lower()
+            if tag_stripped in ALLOWED_LANGS or (tag_stripped.endswith("_") and tag_stripped[:-1] in ALLOWED_LANGS) or (tag_stripped.startswith("_") and tag_stripped[1:] in ALLOWED_LANGS):
                 return "tag_missing_underscore"
             return "no_lang_tag"
         return classify_mismatch(clean_text)
@@ -295,7 +306,7 @@ def classify_description(text: str) -> str | None:
     for i, part in enumerate(parts):
         if i % 2 == 1:
             # Odd index: Tag content
-            if part in ("de_", "en_"):
+            if part.endswith("_") and part[:-1] in ALLOWED_LANGS:
                 lang = part[:-1]
                 if lang in stack:
                     # Duplicate open tag used to close, or invalid nesting
@@ -303,19 +314,22 @@ def classify_description(text: str) -> str | None:
                 stack.append(lang)
                 languages_seen.add(lang)
                 inside_block = True
-            elif part in ("_de", "_en"):
+            elif part.startswith("_") and part[1:] in ALLOWED_LANGS:
+                lang = part[1:]
                 if not stack:
                     return classify_mismatch(clean_text)
                 popped = stack.pop()
-                if popped != part[1:]:
+                if popped != lang:
                     return classify_mismatch(clean_text)
                 if not stack:
                     inside_block = False
             else:
                 full_tag = f"##{part}##"
-                if re.sub(r'\s+', '', full_tag.lower()) in ("##de_##", "##_de##", "##en_##", "##_en##"):
+                tag_clean = re.sub(r'\s+', '', full_tag.lower())
+                if tag_clean in VALID_TAGS:
                     return "tag_whitespace"
-                if part.strip().lower() in ("de", "en", "de_", "_de", "en_", "_en"):
+                tag_stripped = part.strip().lower()
+                if tag_stripped in ALLOWED_LANGS or (tag_stripped.endswith("_") and tag_stripped[:-1] in ALLOWED_LANGS) or (tag_stripped.startswith("_") and tag_stripped[1:] in ALLOWED_LANGS):
                     return "tag_missing_underscore"
                 return "no_lang_tag"
         else:
@@ -394,101 +408,29 @@ for category_name, list_of_entities in categories.items():
     if not list_of_entities:
         continue
 
-    if category_name == "no_lang_tag":
-        # Write CSV
-        output_filename_csv = f"thanados_{category_name}.csv"
-        output_path_csv = os.path.join(base_path, output_filename_csv)
-        with open(output_path_csv, "w", newline="", encoding="utf-8") as f:
-            writer = csv.writer(f)
-            writer.writerow(["id", "name", "description"])
-            for entity in list_of_entities:
-                link = f"https://thanados.openatlas.eu/entity/{entity['id']}"
-                writer.writerow([link, entity["name"], entity["description"]])
-        print(f"Saved {len(list_of_entities)} entities to {output_path_csv}")
-
-        # Write JSON with links as IDs
-        json_entities = []
-        for entity in list_of_entities:
-            entity_copy = entity.copy()
-            entity_copy["id"] = f"https://thanados.openatlas.eu/entity/{entity['id']}"
-            json_entities.append(entity_copy)
-
-        output_filename_json = f"thanados_{category_name}.json"
-        output_path_json = os.path.join(base_path, output_filename_json)
-        with open(output_path_json, "w", encoding="utf-8") as f:
-            json.dump(json_entities, f, ensure_ascii=False, indent=4)
-        print(f"Saved {len(json_entities)} entities to {output_path_json}")
-    elif category_name == "old_translation":
-        # For old_translation, we add a new key "description_translated"
-        translated_entities = []
-        for entity in list_of_entities:
-            entity_copy = entity.copy()
+    # Write JSON with links as URLs
+    json_entities = []
+    for entity in list_of_entities:
+        entity_copy = entity.copy()
+        entity_copy["url"] = f"https://thanados.openatlas.eu/entity/{entity['id']}"
+        
+        # Apply translation/correction logic depending on category
+        if category_name == "old_translation":
             entity_copy["description_translated"] = clean_and_translate_old(entity["description"])
-            translated_entities.append(entity_copy)
-
-        output_filename = f"thanados_{category_name}.json"
-        output_path = os.path.join(base_path, output_filename)
-        with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(translated_entities, f, ensure_ascii=False, indent=4)
-        print(f"Saved {len(translated_entities)} entities to {output_path}")
-    elif category_name == "missing_hash":
-        # For missing_hash, we add a new key "description_translated"
-        translated_entities = []
-        for entity in list_of_entities:
-            entity_copy = entity.copy()
+        elif category_name == "missing_hash":
             entity_copy["description_translated"] = clean_missing_hash(entity["description"])
-            translated_entities.append(entity_copy)
-
-        output_filename = f"thanados_{category_name}.json"
-        output_path = os.path.join(base_path, output_filename)
-        with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(translated_entities, f, ensure_ascii=False, indent=4)
-        print(f"Saved {len(translated_entities)} entities to {output_path}")
-    elif category_name == "mismatch_opening_without_closing":
-        # For mismatch_opening_without_closing, we add a new key "description_translated"
-        translated_entities = []
-        for entity in list_of_entities:
-            entity_copy = entity.copy()
+        elif category_name == "mismatch_opening_without_closing":
             entity_copy["description_translated"] = clean_opening_without_closing(entity["description"])
-            translated_entities.append(entity_copy)
-
-        output_filename = f"thanados_{category_name}.json"
-        output_path = os.path.join(base_path, output_filename)
-        with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(translated_entities, f, ensure_ascii=False, indent=4)
-        print(f"Saved {len(translated_entities)} entities to {output_path}")
-    elif category_name == "mismatch_open_tag_used_as_close":
-        # For mismatch_open_tag_used_as_close, we add a new key "description_translated"
-        translated_entities = []
-        for entity in list_of_entities:
-            entity_copy = entity.copy()
+        elif category_name == "mismatch_open_tag_used_as_close":
             entity_copy["description_translated"] = clean_open_tag_used_as_close(entity["description"])
-            translated_entities.append(entity_copy)
+            
+        json_entities.append(entity_copy)
 
-        output_filename = f"thanados_{category_name}.json"
-        output_path = os.path.join(base_path, output_filename)
-        with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(translated_entities, f, ensure_ascii=False, indent=4)
-        print(f"Saved {len(translated_entities)} entities to {output_path}")
-    elif category_name == "only_one_translation":
-        # Write JSON with links as IDs
-        json_entities = []
-        for entity in list_of_entities:
-            entity_copy = entity.copy()
-            entity_copy["id"] = f"https://thanados.openatlas.eu/entity/{entity['id']}"
-            json_entities.append(entity_copy)
-
-        output_filename_json = f"thanados_{category_name}.json"
-        output_path_json = os.path.join(base_path, output_filename_json)
-        with open(output_path_json, "w", encoding="utf-8") as f:
-            json.dump(json_entities, f, ensure_ascii=False, indent=4)
-        print(f"Saved {len(json_entities)} entities to {output_path_json}")
-    else:
-        output_filename = f"thanados_{category_name}.json"
-        output_path = os.path.join(base_path, output_filename)
-        with open(output_path, "w", encoding="utf-8") as f:
-            json.dump(list_of_entities, f, ensure_ascii=False, indent=4)
-        print(f"Saved {len(list_of_entities)} entities to {output_path}")
+    output_filename = f"thanados_{category_name}.json"
+    output_path = os.path.join(base_path, output_filename)
+    with open(output_path, "w", encoding="utf-8") as f:
+        json.dump(json_entities, f, ensure_ascii=False, indent=4)
+    print(f"Saved {len(json_entities)} entities to {output_path}")
 
 # Merge all automatically corrected categories into one file
 corrected_categories = [
@@ -502,6 +444,7 @@ for cat in corrected_categories:
     list_of_entities = categories[cat]
     for entity in list_of_entities:
         entity_copy = entity.copy()
+        entity_copy["url"] = f"https://thanados.openatlas.eu/entity/{entity['id']}"
         if cat == "old_translation":
             entity_copy["description_translated"] = clean_and_translate_old(entity["description"])
         elif cat == "missing_hash":
