@@ -90,4 +90,19 @@ DROP TABLE model.file_info;
 UPDATE model.entity SET name = 'Yes' WHERE name = 'yes_temp';
 UPDATE model.entity SET name = 'No' WHERE name = 'no_temp';
 
+-- Created additional indexes (#2704)
+CREATE INDEX IF NOT EXISTS cidoc_class_code_idx ON model.cidoc_class (code);
+CREATE INDEX IF NOT EXISTS entity_openatlas_class_name_idx ON model.entity (openatlas_class_name);
+CREATE INDEX IF NOT EXISTS entity_cidoc_class_code_idx ON model.entity (cidoc_class_code);
+CREATE INDEX IF NOT EXISTS gis_entity_id_idx ON model.gis (entity_id);
+CREATE INDEX IF NOT EXISTS link_property_code_idx ON model.link (property_code);
+CREATE INDEX IF NOT EXISTS link_domain_id_idx ON model.link (domain_id);
+CREATE INDEX IF NOT EXISTS link_range_id_idx ON model.link (range_id);
+CREATE INDEX IF NOT EXISTS link_type_id_idx ON model.link (type_id);
+CREATE INDEX IF NOT EXISTS property_code_idx ON model.property (code);
+CREATE INDEX IF NOT EXISTS property_range_class_code_idx ON model.property (range_class_code);
+CREATE INDEX IF NOT EXISTS property_domain_class_code_idx ON model.property (domain_class_code);
+CREATE INDEX IF NOT EXISTS user_log_user_idx ON web.user_log (user_id);
+CREATE INDEX IF NOT EXISTS user_log_entity_idx ON web.user_log (entity_id);
+
 END;
