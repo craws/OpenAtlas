@@ -8,6 +8,7 @@ from openatlas import app
 from openatlas.api.external.apis import APIS  # noqa
 from openatlas.api.external.cadaster import Cadaster  # noqa
 from openatlas.api.external.doi import DOI # noqa
+from openatlas.api.external.gettyaat import GettyAAT  # noqa
 from openatlas.api.external.geonames import GeoNames  # noqa
 from openatlas.api.external.gnd import GND  # noqa
 from openatlas.api.external.openatlas_api import OpenAtlas  # noqa

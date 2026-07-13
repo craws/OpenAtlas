@@ -1,0 +1,77 @@
+<script>
+  /**
+   * Getty AAT autocomplete via SPARQL (English only)
+   * Documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
+   * Endpoint: https://vocab.getty.edu/sparql
+  */
+  (function() {
+    const $input = $('input[data-reference-system={{ system.id }}]');
+    $input.autoComplete({
+      bootstrapVersion: '4',
+      minLength: 3,
+      resolver: 'custom',
+      formatResult: function (item) {
+        const id = item.subject.value.split('/').pop();
+        const label = item.label.value;
+        const scopeNote = item.scopeNote ? item.scopeNote.value : 'No description available';
+
+        return {
+           id: id,
+           text: label,
+           html: `<strong>${label}</strong> - <small>ID: ${id}</small><br><small class="text-muted">${scopeNote}</small>`
+        };
+      },
+      events: {
+        search: (function() {
+          let timeout;
+          return function (qry, callback) {
+            clearTimeout(timeout);
+            timeout = setTimeout(function() {
+
+
+              const sparqlQuery = `
+                PREFIX aat: <http://vocab.getty.edu/aat/>
+                PREFIX gvp: <http://vocab.getty.edu/ontology#>
+                PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+                PREFIX xl: <http://www.w3.org/2008/05/skos-xl#>
+
+                SELECT ?subject ?label ?scopeNote WHERE {
+                  ?subject skos:prefLabel ?label .
+                  FILTER (lang(?label) = "en")
+                  FILTER (regex(?label, "^${qry}", "i"))
+                  OPTIONAL {
+                    ?subject skos:scopeNote [rdfs:label ?scopeNote]
+                    FILTER (lang(?scopeNote) = "en")
+                  }
+                } LIMIT 10
+              `;
+
+              $.ajax({
+                url: "https://vocab.getty.edu/sparql",
+                headers: {
+                  "Accept": "application/sparql-results+json"
+                },
+                data: {
+                  query: sparqlQuery,
+                  format: "json"
+                },
+                dataType: "json"
+              }).done(function(data) {
+                if (data && data.results && data.results.bindings) {
+                  callback(data.results.bindings);
+                } else {
+                  callback([]);
+                }
+              }).fail(function() {
+                callback([]);
+              });
+            }, 400);
+          };
+        })()
+      }
+    }).on('autocomplete.select', function(evt, item) {
+      $input.val(item.id);
+    });
+  })();
+</script>

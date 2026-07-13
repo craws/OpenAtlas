@@ -3,6 +3,43 @@ BEGIN;
 -- Raise database version
 UPDATE web.settings SET value = '9.4.0' WHERE name = 'database_version';
 
+-- Standard API field for GettyAAT (#2810)
+INSERT INTO model.entity (name, cidoc_class_code, description, openatlas_class_name)
+SELECT
+    'GettyAAT',
+    'E32',
+    'Getty AAT (Art and Architecture Thesaurus) is a controlled vocabulary for art and architecture terms. Please enter only the Getty AAT identifier itself, not the full URL or domain.',
+    'reference_system'
+WHERE NOT EXISTS (
+    SELECT 1 FROM model.entity WHERE name='GettyAAT' AND openatlas_class_name = 'reference_system'
+);
+
+INSERT INTO web.reference_system (system, name, api, entity_id, resolver_url, website_url, identifier_example)
+VALUES (
+    true,
+    'GettyAAT',
+    'GettyAAT',
+    (SELECT id FROM model.entity WHERE name = 'GettyAAT' AND openatlas_class_name = 'reference_system'),
+    'https://vocab.getty.edu/aat/',
+    'https://www.getty.edu/research/tools/vocabularies/aat/',
+    '300387513')
+ON CONFLICT (name) DO UPDATE SET resolver_url = 'https://vocab.getty.edu/aat/', system=true, api='GettyAAT';
+
+INSERT INTO web.reference_system_openatlas_class (reference_system_id, openatlas_class_name)
+SELECT (SELECT entity_id FROM web.reference_system WHERE name='GettyAAT'), 'type'
+WHERE NOT EXISTS (
+    SELECT 1 FROM web.reference_system_openatlas_class
+    WHERE
+        reference_system_id=(SELECT entity_id FROM web.reference_system WHERE name='GettyAAT')
+        AND openatlas_class_name = 'type'
+);
+
+INSERT INTO model.link (property_code, range_id, domain_id) VALUES (
+    'P2',
+    (SELECT id FROM model.entity WHERE name='exact match'),
+    (SELECT id FROM model.entity WHERE name='GettyAAT' AND openatlas_class_name = 'reference_system')
+);
+
 -- Standard API field for DOI with Crossref (#2601, #2617)
 INSERT INTO model.entity (name, cidoc_class_code, description, openatlas_class_name)
 SELECT
