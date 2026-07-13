@@ -11,14 +11,17 @@
       minLength: 3,
       resolver: 'custom',
       formatResult: function (item) {
-        const id = item.subject.value.split('/').pop();
-        const label = item.label.value;
-        const scopeNote = item.scopeNote ? item.scopeNote.value : 'No description available';
+        const id = item.id && item.id.value
+          ? item.id.value
+          : item.subject.value.split('/').pop();
+        const label = item.label && item.label.value ? item.label.value : id;
+        const scopeNote = item.scopeNote && item.scopeNote.value
+          ? item.scopeNote.value
+          : '';
 
         return {
-           id: id,
-           text: label,
-           html: `<strong>${label}</strong> - <small>ID: ${id}</small><br><small class="text-muted">${scopeNote}</small>`
+           value: id,
+           text: `<strong>${label}</strong> - <small>${id}</small>${scopeNote ? `<br><small class="text-muted">${scopeNote}</small>` : ''}`
         };
       },
       events: {
@@ -27,7 +30,9 @@
           return function (qry, callback) {
             clearTimeout(timeout);
             timeout = setTimeout(function() {
-
+              const safeQry = qry
+                .replace(/\\/g, '\\\\')
+                .replace(/"/g, '\\"');
 
               const sparqlQuery = `
                 PREFIX aat: <http://vocab.getty.edu/aat/>
@@ -36,10 +41,11 @@
                 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
                 PREFIX xl: <http://www.w3.org/2008/05/skos-xl#>
 
-                SELECT ?subject ?label ?scopeNote WHERE {
+                SELECT ?subject ?id ?label ?scopeNote WHERE {
                   ?subject skos:prefLabel ?label .
+                  BIND(REPLACE(STR(?subject), "^.*/", "") AS ?id)
                   FILTER (lang(?label) = "en")
-                  FILTER (regex(?label, "^${qry}", "i"))
+                  FILTER (regex(?label, "${safeQry}", "i"))
                   OPTIONAL {
                     ?subject skos:scopeNote [rdfs:label ?scopeNote]
                     FILTER (lang(?scopeNote) = "en")
@@ -71,7 +77,7 @@
         })()
       }
     }).on('autocomplete.select', function(evt, item) {
-      $input.val(item.id);
+      $input.val(item.id && item.id.value ? item.id.value : item.value);
     });
   })();
 </script>

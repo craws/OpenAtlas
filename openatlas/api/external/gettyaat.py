@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 import requests
 
 from openatlas import app
@@ -12,6 +14,23 @@ class GettyAAT(ExternalApi):  # pylint: disable=too-few-public-methods
 
     @staticmethod
     def get_info(id_: str, system: Entity) -> dict[str, object]:
+        def as_list(value: Any) -> list[Any]:
+            if value is None:
+                return []
+            if isinstance(value, list):
+                return value
+            return [value]
+
+        def get_item_link(item: Any) -> str | None:
+            if isinstance(item, dict):
+                uri = item.get('id') or item.get('@id')
+                if not uri:
+                    return None
+                return link(item.get('_label') or uri, uri, external=True)
+            if isinstance(item, str) and item.startswith('http'):
+                return link(item, item, external=True)
+            return None
+
         info: dict[str, object] = {}
         try:
             response = requests.get(
@@ -28,69 +47,37 @@ class GettyAAT(ExternalApi):  # pylint: disable=too-few-public-methods
         except Exception:  # pragma: no cover
             return info
 
-        subject_uri = f'http://vocab.getty.edu/aat/{id_}'
+        if label := data.get('_label'):
+            info['title'] = label
 
-        pref_label = None
-        fallback_label = None
-        scope_note = None
-        broader_terms = []
+        if notes := data.get('subject_of'):
+            for note in as_list(notes):
+                if isinstance(note, dict):
+                    if note.get('language')[0]['_label'] == 'en':
+                        info['note'] = note.get('content')
+                        break
+                    elif 'content' in note:
+                        info['note'] = note['content']
 
-        for item in data.get('@graph', []):
-            if item.get('@id') == subject_uri:
-                labels = item.get(
-                    'http://www.w3.org/2008/05/skos-xl#prefLabel', [])
+        broader_links = [
+            value for value in (
+                get_item_link(item)
+                for item in as_list(data.get('broader')))
+            if value]
+        if broader_links:
+            info['broader terms'] = broader_links
 
-                skos_labels = item.get(
-                    'http://www.w3.org/2004/02/skos/core#prefLabel', [])
-                if not isinstance(skos_labels, list):
-                    skos_labels = [skos_labels]
+        equivalent_links = [
+            value for value in (
+                get_item_link(item)
+                for item in as_list(data.get('equivalent')))
+            if value]
+        if equivalent_links:
+            info['equivalent terms'] = equivalent_links
 
-                for label_obj in skos_labels:
-                    if isinstance(label_obj, dict):
-                        lang = label_obj.get('@language')
-                        val = label_obj.get('@value')
-                        if lang == 'de':
-                            pref_label = val
-                        elif lang == 'en' and not fallback_label:
-                            fallback_label = val
-                    elif isinstance(label_obj, str):
-                        fallback_label = label_obj
-
-                notes = item.get(
-                    'http://www.w3.org/2004/02/skos/core#scopeNote', [])
-                if not isinstance(notes, list):
-                    notes = [notes]
-                for note in notes:
-                    if isinstance(note, dict) and '@value' in note:
-                        scope_note = note['@value']
-                    elif isinstance(note, str):
-                        scope_note = note
-
-            elif item.get('@id') != subject_uri:
-                label_obj = item.get(
-                    'http://www.w3.org/2004/02/skos/core#prefLabel')
-                if label_obj:
-                    if isinstance(label_obj, list):
-                        label_obj = label_obj[0]
-                    val = label_obj.get('@value') if \
-                        isinstance(label_obj,dict) else label_obj
-                    if val and val not in broader_terms:
-                        broader_terms.append(val)
-
-        final_title = pref_label or fallback_label or f"AAT Concept {id_}"
-        info['title'] = final_title
-
-        if scope_note:
-            info['description'] = scope_note
-
-        if broader_terms:
-            info['hierarchy'] = ' > '.join(broader_terms[:3])
-
-        info['Getty AAT Link'] = link(
+        info['Getty AAT'] = link(
             id_,
-            f'http://vocab.getty.edu/page/aat/{id_}',
+            f'https://vocab.getty.edu/page/aat/{id_}',
             external=True)
-
-        info['type'] = 'Getty AAT Thesaurus Term'
 
         return info
