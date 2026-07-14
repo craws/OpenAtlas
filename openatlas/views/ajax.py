@@ -1,3 +1,4 @@
+import json
 from typing import Optional
 import requests
 from flask import Response, g, jsonify, request
@@ -109,3 +110,33 @@ def crossref_proxy() -> Response | tuple[Response, int]:
         return jsonify(response.json())
     except requests.exceptions.RequestException as e:
         return jsonify({'error': str(e), 'message': {'items': []}}), 502
+
+
+@app.route('/proxy/gettyaat', methods=['GET'])
+@required_group('readonly')
+def gettyaat_proxy() -> Response | tuple[Response, int]:
+    search = request.args.get('search', '').strip()
+    if not search:
+        return jsonify([])
+    try:
+        # The Getty Reconciliation API is used instead of the public SPARQL
+        # endpoint because it is faster and more reliable for prefix searches.
+        response = requests.post(
+            'https://services.getty.edu/vocab/reconcile/',
+            data={'queries': json.dumps(
+                {'q0': {'query': search, 'type': '/aat'}})},
+            headers=app.config['USER_AGENT'],
+            proxies=app.config['PROXIES'],
+            timeout=10)
+        response.raise_for_status()
+        results = response.json().get('q0', {}).get('result', [])
+        # Map the response to the SPARQL binding format expected by the
+        # autocomplete template so the frontend stays unchanged.
+        return jsonify([
+            {
+                'id': {'value': item.get('id', '').replace('aat/', '')},
+                'label': {'value': item.get('name')},
+                'score': {'value': str(item.get('score'))}}
+            for item in results])
+    except (requests.exceptions.RequestException, ValueError) as e:
+        return jsonify({'error': str(e), 'results': []}), 502

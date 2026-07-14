@@ -30,42 +30,13 @@
           return function (qry, callback) {
             clearTimeout(timeout);
             timeout = setTimeout(function() {
-              const safeQry = qry
-                .replace(/\\/g, '\\\\')
-                .replace(/"/g, '\\"');
-
-              const sparqlQuery = `
-                PREFIX aat: <http://vocab.getty.edu/aat/>
-                PREFIX gvp: <http://vocab.getty.edu/ontology#>
-                PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-                PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-                PREFIX xl: <http://www.w3.org/2008/05/skos-xl#>
-
-                SELECT ?subject ?id ?label ?scopeNote WHERE {
-                  ?subject skos:prefLabel ?label .
-                  BIND(REPLACE(STR(?subject), "^.*/", "") AS ?id)
-                  FILTER (lang(?label) = "en")
-                  FILTER (regex(?label, "${safeQry}", "i"))
-                  OPTIONAL {
-                    ?subject skos:scopeNote [rdfs:label ?scopeNote]
-                    FILTER (lang(?scopeNote) = "en")
-                  }
-                } LIMIT 10
-              `;
-
               $.ajax({
-                url: "https://vocab.getty.edu/sparql",
-                headers: {
-                  "Accept": "application/sparql-results+json"
-                },
-                data: {
-                  query: sparqlQuery,
-                  format: "json"
-                },
+                url: "/proxy/gettyaat",
+                data: { search: qry },
                 dataType: "json"
               }).done(function(data) {
-                if (data && data.results && data.results.bindings) {
-                  callback(data.results.bindings);
+                if (Array.isArray(data)) {
+                  callback(data);
                 } else {
                   callback([]);
                 }
