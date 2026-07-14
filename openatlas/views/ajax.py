@@ -119,19 +119,15 @@ def gettyaat_proxy() -> Response | tuple[Response, int]:
     if not search:
         return jsonify([])
     try:
-        # The Getty Reconciliation API is used instead of the public SPARQL
-        # endpoint because it is faster and more reliable for prefix searches.
         response = requests.post(
             'https://services.getty.edu/vocab/reconcile/',
             data={'queries': json.dumps(
                 {'q0': {'query': search, 'type': '/aat'}})},
             headers=app.config['USER_AGENT'],
             proxies=app.config['PROXIES'],
-            timeout=10)
+            timeout=30)
         response.raise_for_status()
         results = response.json().get('q0', {}).get('result', [])
-        # Map the response to the SPARQL binding format expected by the
-        # autocomplete template so the frontend stays unchanged.
         return jsonify([
             {
                 'id': {'value': item.get('id', '').replace('aat/', '')},
