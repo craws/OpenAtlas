@@ -1,5 +1,5 @@
 #!/bin/bash
-# This is only needed in case of a docker installation
+# Container entrypoint — handles both normal startup and one-shot DB initialization ("initdb" mode)
 
 # shellcheck disable=SC1091
 

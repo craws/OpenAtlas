@@ -24,7 +24,7 @@ RUN cp -rp /usr/lib/iipimage-server/ /var/www/iipsrv/ &&\
 RUN rm /etc/apache2/mods-available/iipsrv.conf
 COPY /install/iipsrv.conf /etc/apache2/mods-available/iipsrv.conf
 COPY --chown=www-data:www-data / /var/www/openatlas/
-RUN cd /var/www/openatlas && cp install/docker/entrypoint.sh /entrypoint.sh &&\
+RUN cd /var/www/openatlas && cp install/container/entrypoint.sh /entrypoint.sh &&\
     cp install/example_apache.conf /etc/apache2/sites-available/000-default.conf &&\
     chmod a+x /entrypoint.sh &&\
     dos2unix /entrypoint.sh &&\
