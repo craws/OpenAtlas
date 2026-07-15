@@ -7,7 +7,7 @@ This software was developed and tested on Linux/Debian 13.2
 [Debian](https://www.debian.org/) 13.2 system following these instructions.
 
 Another (experimental) way to install it would be via
-[Docker](https://www.docker.com/).
+[Podman](https://podman.io/).
 For more information take a look at the end of this document.
 
 It may also work on other Linux distributions or even on non Linux systems, but
@@ -190,7 +190,7 @@ Run tests with coverage
 
     pytest
 
-# Installing OpenAtlas with Docker (Experimental)
+# Installing OpenAtlas with Podman (Experimental)
 
-A Docker setup is available for local development. Please follow the
-[detailed Docker installation instructions here](install/docker/install.md).
+A Podman setup is available for local development. Please follow the
+[detailed Podman installation instructions here](install/container/install.md).
