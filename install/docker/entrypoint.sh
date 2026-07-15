@@ -27,7 +27,7 @@ if [ "${1:-}" = "initdb" ]; then
     exit 0
   fi
 
-  DUMP="/var/www/openatlas/files/export/dump.sql"
+  DUMP="/var/www/openatlas/files/dump.sql"
   if [ -s "$DUMP" ]; then
     echo "Dump found at $DUMP. Importing..."
     psql "$DB_URL" -v ON_ERROR_STOP=0 -f "$DUMP"

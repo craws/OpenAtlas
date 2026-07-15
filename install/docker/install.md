@@ -111,9 +111,9 @@ Requires placing an SQL file at `openatlas-initdb-1:/var/www/openatlas/files/exp
 
 ```bash
 docker compose down
-docker volume rm openatlas_db-data openatlas_openatlas-export
+docker volume rm openatlas_db-data
 docker compose up --no-start
-docker cp ./my_dump.sql openatlas-initdb-1:/var/www/openatlas/files/export/dump.sql
+docker cp ./my_dump.sql openatlas-initdb-1:/var/www/openatlas/files/dump.sql
 docker compose start
 ```
 
