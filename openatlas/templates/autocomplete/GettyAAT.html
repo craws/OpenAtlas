@@ -1,8 +1,8 @@
 <script>
   /**
-   * Getty AAT autocomplete via SPARQL (English only)
+   * Getty AAT autocomplete
    * Documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
-   * Endpoint: https://vocab.getty.edu/sparql
+   * Endpoint: https://services.getty.edu/vocab/reconcile/
   */
   (function() {
     const $input = $('input[data-reference-system={{ system.id }}]');
@@ -11,17 +11,14 @@
       minLength: 3,
       resolver: 'custom',
       formatResult: function (item) {
-        const id = item.id && item.id.value
-          ? item.id.value
-          : item.subject.value.split('/').pop();
-        const label = item.label && item.label.value ? item.label.value : id;
-        const scopeNote = item.scopeNote && item.scopeNote.value
-          ? item.scopeNote.value
-          : '';
+        const id = item.id ? item.id.replace('aat/', '') : '';
+        const label = item.name || id;
+        const scopeNote = item.description || '';
 
         return {
            value: id,
-           text: `<strong>${label}</strong> - <small>${id}</small>${scopeNote ? `<br><small class="text-muted">${scopeNote}</small>` : ''}`
+           text: `<strong>${label}</strong> - <small>${id}</small>${scopeNote ?
+             `<br><small class="text-muted">${scopeNote}</small>` : ''}`
         };
       },
       events: {
@@ -31,12 +28,20 @@
             clearTimeout(timeout);
             timeout = setTimeout(function() {
               $.ajax({
-                url: "/proxy/gettyaat",
-                data: { search: qry },
+                url: 'https://services.getty.edu/vocab/reconcile/',
+                method: 'POST',
+                data: {
+                  queries: JSON.stringify({
+                    q0: {
+                      query: qry,
+                      type: '/aat'
+                    }
+                  })
+                },
                 dataType: "json"
               }).done(function(data) {
-                if (Array.isArray(data)) {
-                  callback(data);
+                if (data && data.q0 && Array.isArray(data.q0.result)) {
+                  callback(data.q0.result);
                 } else {
                   callback([]);
                 }
@@ -48,7 +53,7 @@
         })()
       }
     }).on('autocomplete.select', function(evt, item) {
-      $input.val(item.id && item.id.value ? item.id.value : item.value);
+      $input.val(item.id ? item.id.replace('aat/', '') : item.value);
     });
   })();
 </script>
