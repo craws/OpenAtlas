@@ -32,6 +32,7 @@ EXTERNAL_API = [
     'Cadaster',
     'DOI',
     'GeoNames',
+    'GettyAAT',
     'GND',
     'OpenAtlas',
     'Wikidata']

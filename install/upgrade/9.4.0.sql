@@ -105,4 +105,42 @@ CREATE INDEX IF NOT EXISTS property_domain_class_code_idx ON model.property (dom
 CREATE INDEX IF NOT EXISTS user_log_user_idx ON web.user_log (user_id);
 CREATE INDEX IF NOT EXISTS user_log_entity_idx ON web.user_log (entity_id);
 
+-- Standard API field for GettyAAT (#2810)
+INSERT INTO model.entity (name, cidoc_class_code, description, openatlas_class_name)
+SELECT
+    'Getty AAT',
+    'E32',
+    'Getty AAT (Art and Architecture Thesaurus) is a controlled vocabulary for art and architecture terms. AAT is a thesaurus containing generic terms, dates, relationships, sources, and notes for work types, roles, materials, styles, cultures, techniques, and other concepts related to art, architecture, and other cultural heritage (e.g., amphora, oil paint, olieverf, acetolysis, sintering, orthographic drawings, Olmeca, Rinascimento, Buddhism, watercolors, asa-no-ha-toji, sralais). Please enter only the Getty AAT identifier itself, not the full URL or domain.',
+    'reference_system'
+WHERE NOT EXISTS (
+    SELECT 1 FROM model.entity WHERE name='Getty AAT' AND openatlas_class_name = 'reference_system'
+);
+
+INSERT INTO web.reference_system (system, name, api, entity_id, resolver_url, website_url, identifier_example)
+VALUES (
+    true,
+    'Getty AAT',
+    'GettyAAT',
+    (SELECT id FROM model.entity WHERE name = 'Getty AAT' AND openatlas_class_name = 'reference_system'),
+    'https://vocab.getty.edu/page/aat/',
+    'https://www.getty.edu/research/tools/vocabularies/aat/',
+    '300387513')
+ON CONFLICT (name) DO UPDATE SET resolver_url = 'https://vocab.getty.edu/aat/', system=true, api='GettyAAT';
+
+INSERT INTO web.reference_system_openatlas_class (reference_system_id, openatlas_class_name)
+SELECT (SELECT entity_id FROM web.reference_system WHERE name='Getty AAT'), 'type'
+WHERE NOT EXISTS (
+    SELECT 1 FROM web.reference_system_openatlas_class
+    WHERE
+        reference_system_id=(SELECT entity_id FROM web.reference_system WHERE name='Getty AAT')
+        AND openatlas_class_name = 'type'
+);
+
+INSERT INTO model.link (property_code, range_id, domain_id) VALUES (
+    'P2',
+    (SELECT id FROM model.entity WHERE name='exact match'),
+    (SELECT id FROM model.entity WHERE name='Getty AAT' AND openatlas_class_name = 'reference_system')
+);
+
+
 END;

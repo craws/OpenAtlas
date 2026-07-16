@@ -33,6 +33,16 @@ class ReferenceSystemTest(TestBaseCase):
         rv = c.post(
             url_for(
                 'ajax_external_api',
+                system_id=get_reference_system_by_name_safe('Getty AAT').id),
+            data={'id_': '300011798'})
+        assert b'bone' in rv.data
+        assert b'bone and bone components materials' in rv.data
+        assert b'wikidata.org/entity/Q814769' in rv.data
+        assert b'forms the skeleton' in rv.data
+
+        rv = c.post(
+            url_for(
+                'ajax_external_api',
                 system_id=get_reference_system_by_name_safe('DOI').id),
             data={'id_': '10.1163/9789004712126_015'})
         assert b'OpenAtlas: An Open-Source Application' in rv.data
