@@ -23,15 +23,26 @@ def classify_mismatch(text: str) -> str:
     if not text:
         return "mismatch_general"
 
-    # 1. Check for duplicate/repeated open tags used to close (e.g. ##en_## ... ##en_##)
+    # 1. Check for duplicate/adjacent open tags (double tagging, e.g. ##en_####en_##).
+    # This must be checked before the generic "open tag used as close" case below,
+    # otherwise two identical adjacent open tags would be misclassified.
+    for lang in ALLOWED_LANGS:
+        # Directly adjacent duplicate open tags, e.g. ##en_####en_##.
+        if f"##{lang}_####{lang}_##" in text:
+            return "mismatch_duplicated_open_tags"
+        # Same open tag repeated (with content in between), e.g. ##en_##...##en_##,
+        # without any closing tag anywhere.
+        if len(re.findall(rf"##{lang}_##", text)) > 1 and f"##_{lang}##" not in text:
+            # Distinguish "double tagging" (repeated open tags with no unique text
+            # that belongs together) from open-tag-used-as-close. If any two
+            # occurrences are directly adjacent it is double tagging.
+            if re.search(rf"(##{lang}_##){{2,}}", text):
+                return "mismatch_duplicated_open_tags"
+
+    # 2. Check for duplicate/repeated open tags used to close (e.g. ##en_## ... ##en_##)
     for lang in ALLOWED_LANGS:
         if len(re.findall(rf"##{lang}_##", text)) > 1 and f"##_{lang}##" not in text:
             return "mismatch_open_tag_used_as_close"
-
-    # 2. Check for duplicate nested open tags (e.g. ##de_####de_##)
-    for lang in ALLOWED_LANGS:
-        if f"##{lang}_####{lang}_##" in text:
-            return "mismatch_duplicated_open_tags"
 
     # 3. Check for opening tags without a closing tag
     for lang in ALLOWED_LANGS:
@@ -104,6 +115,90 @@ def clean_and_translate_old(desc: str) -> str:
     elif after:
         return f"##de_##\r\n{after}\r\n##_de##"
     return ""
+
+
+# Old-system language markers (e.g. "##English", "##Czech", "##German")
+# mapped to the modern language code they should become.
+OLD_LANG_MARKERS = {
+    "en": ["english", "englisch"],
+    "de": [
+        "german", "deutsch", "germam", "germna", "gerrman",
+        "geerman", "geman", "geran", "germa", "gernan", "gderman"
+    ],
+    "cz": ["czech", "tschechisch", "tschechische", "cesky", "cesky"],
+}
+# Reverse lookup: marker word -> language code.
+OLD_MARKER_TO_LANG = {
+    word: lang for lang, words in OLD_LANG_MARKERS.items() for word in words
+}
+# Regex matching any old-system language marker (e.g. ##English, ##Czech, ##German).
+ALL_OLD_MARKER_REGEX = re.compile(
+    r"(?<!_)##(" + "|".join(OLD_MARKER_TO_LANG.keys()) + r")\b",
+    re.IGNORECASE
+)
+# Regex matching a proper opening language tag (e.g. ##en_##).
+PROPER_OPEN_TAG_REGEX = re.compile(
+    r"##(?:" + "|".join(ALLOWED_LANGS) + r")_##",
+    re.IGNORECASE
+)
+
+
+def clean_old_lang_markers(desc: str) -> str:
+    """
+    Convert descriptions that mix proper language tags with old-system
+    language markers (e.g. ##English, ##Czech, ##German) into cleanly
+    tagged blocks. Text is grouped by language and each block is wrapped
+    in ##xx_## ... ##_xx##.
+    """
+    if not desc:
+        return ""
+
+    all_markers = "|".join(OLD_MARKER_TO_LANG.keys())
+    langs = "|".join(ALLOWED_LANGS)
+    token_re = re.compile(
+        r"(##(?:(?:" + langs + r")_|_(?:" + langs + r"))##"
+        r"|##(?:" + all_markers + r")\b)",
+        re.IGNORECASE
+    )
+
+    blocks = []
+    current_lang = None
+    current_text = ""
+
+    def flush():
+        nonlocal current_text
+        if current_lang and current_text.strip():
+            blocks.append((current_lang, current_text.strip()))
+        current_text = ""
+
+    for token in token_re.split(desc):
+        if not token:
+            continue
+        low = token.lower()
+        if token_re.fullmatch(token):
+            inner = token[2:].rstrip("#").rstrip()
+            if inner.startswith("_"):
+                # Closing tag: close current block.
+                flush()
+                current_lang = None
+            elif inner.endswith("_"):
+                # Proper opening tag.
+                flush()
+                current_lang = inner[:-1].lower()
+            else:
+                # Old-system marker word.
+                flush()
+                current_lang = OLD_MARKER_TO_LANG[low[2:].strip()]
+        else:
+            current_text += token
+    flush()
+
+    if not blocks:
+        return ""
+
+    return "\r\n\r\n".join(
+        f"##{lang}_##\r\n{text}\r\n##_{lang}##" for lang, text in blocks
+    )
 
 
 def clean_missing_hash(desc: str) -> str:
@@ -249,6 +344,13 @@ def classify_description(text: str) -> str | None:
 
     lower_desc = clean_text.lower()
 
+    # 1b. Check for old-system language markers (e.g. ##English, ##Czech, ##German)
+    # that appear alongside proper language tags. These can be automatically
+    # converted into clean language blocks. Untagged old-only descriptions
+    # (no proper ##xx_## tag) are handled by 'old_translation' below.
+    if PROPER_OPEN_TAG_REGEX.search(clean_text) and ALL_OLD_MARKER_REGEX.search(clean_text):
+        return "old_lang_marker"
+
     # 2. Check for old translation system typos and variants
     old_patterns = [
         "german", "deutsch", "germam", "germna",
@@ -374,6 +476,7 @@ categories = {
     "correct": [],
     "only_one_translation": [],
     "old_translation": [],
+    "old_lang_marker": [],
     "missing_hash": [],
     "license_tag": [],
     "tag_whitespace": [],
@@ -417,6 +520,8 @@ for category_name, list_of_entities in categories.items():
         # Apply translation/correction logic depending on category
         if category_name == "old_translation":
             entity_copy["description_translated"] = clean_and_translate_old(entity["description"])
+        elif category_name == "old_lang_marker":
+            entity_copy["description_translated"] = clean_old_lang_markers(entity["description"])
         elif category_name == "missing_hash":
             entity_copy["description_translated"] = clean_missing_hash(entity["description"])
         elif category_name == "mismatch_opening_without_closing":
@@ -435,6 +540,7 @@ for category_name, list_of_entities in categories.items():
 # Merge all automatically corrected categories into one file
 corrected_categories = [
     "old_translation",
+    "old_lang_marker",
     "missing_hash",
     "mismatch_opening_without_closing",
     "mismatch_open_tag_used_as_close"
@@ -447,12 +553,23 @@ for cat in corrected_categories:
         entity_copy["url"] = f"https://thanados.openatlas.eu/entity/{entity['id']}"
         if cat == "old_translation":
             entity_copy["description_translated"] = clean_and_translate_old(entity["description"])
+        elif cat == "old_lang_marker":
+            entity_copy["description_translated"] = clean_old_lang_markers(entity["description"])
         elif cat == "missing_hash":
             entity_copy["description_translated"] = clean_missing_hash(entity["description"])
         elif cat == "mismatch_opening_without_closing":
             entity_copy["description_translated"] = clean_opening_without_closing(entity["description"])
         elif cat == "mismatch_open_tag_used_as_close":
             entity_copy["description_translated"] = clean_open_tag_used_as_close(entity["description"])
+
+        # Safety: never emit a correction that would blank the description
+        # or that does not actually change anything.
+        translated = entity_copy.get("description_translated", "")
+        if not translated or not translated.strip():
+            print(f"Skipping entity {entity['id']} ({cat}): empty translation result.")
+            continue
+        if translated == entity["description"]:
+            continue
         all_corrected_entities.append(entity_copy)
 
 if all_corrected_entities:

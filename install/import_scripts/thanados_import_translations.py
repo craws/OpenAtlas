@@ -26,9 +26,12 @@ def main():
         try:
             count = 0
             skipped = 0
+            conflicts = 0
             for entity in entities:
                 entity_id = entity["id"]
                 description_translated = entity["description_translated"]
+                # Original description captured when the snapshot/JSON was built.
+                original_description = entity.get("description")
 
                 # Fetch the current model.entity entry to make sure it exists
                 # before replacing its description (secure, no blind updates).
@@ -47,6 +50,18 @@ def main():
                     skipped += 1
                     continue
 
+                # Safety guard: only apply the correction if the current
+                # description still matches the original snapshot. If it was
+                # changed in the meantime (e.g. a manual fix by a colleague),
+                # skip it so we never overwrite newer edits with stale data.
+                if original_description is not None and row["description"] != original_description:
+                    print(
+                        f"Conflict: entity {entity_id} was modified since the "
+                        f"snapshot was taken, skipping to avoid overwriting."
+                    )
+                    conflicts += 1
+                    continue
+
                 g.cursor.execute(
                     "UPDATE model.entity SET description = %s WHERE id = %s",
                     (description_translated, entity_id)
@@ -58,7 +73,7 @@ def main():
             Transaction.commit()
             print(
                 f"Successfully committed {count} entity description updates "
-                f"to the database ({skipped} skipped)."
+                f"to the database ({skipped} skipped, {conflicts} conflicts)."
             )
         except Exception as e:
             Transaction.rollback()
