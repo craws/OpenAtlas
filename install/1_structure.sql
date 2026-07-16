@@ -83,6 +83,19 @@ DROP TRIGGER IF EXISTS update_modified ON model.annotation_text;
 DROP TRIGGER IF EXISTS update_modified ON model.annotation_image;
 DROP TRIGGER IF EXISTS on_delete_entity ON model.entity;
 DROP TRIGGER IF EXISTS update_modified ON import.project;
+DROP INDEX IF EXISTS web.user_log_user_idx;
+DROP INDEX IF EXISTS web.user_log_entity_idx;
+DROP INDEX IF EXISTS model.property_range_class_code_idx;
+DROP INDEX IF EXISTS model.property_domain_class_code_idx;
+DROP INDEX IF EXISTS model.property_code_idx;
+DROP INDEX IF EXISTS model.link_type_id_idx;
+DROP INDEX IF EXISTS model.link_range_id_idx;
+DROP INDEX IF EXISTS model.link_property_code_idx;
+DROP INDEX IF EXISTS model.link_domain_id_idx;
+DROP INDEX IF EXISTS model.gis_entity_id_idx;
+DROP INDEX IF EXISTS model.entity_openatlas_class_name_idx;
+DROP INDEX IF EXISTS model.entity_cidoc_class_code_idx;
+DROP INDEX IF EXISTS model.cidoc_class_code_idx;
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_username_key;
 ALTER TABLE IF EXISTS ONLY web.user_tokens DROP CONSTRAINT IF EXISTS user_tokens_pkey;
 ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_user_id_name_key;
@@ -2272,6 +2285,97 @@ ALTER TABLE ONLY web.user_tokens
 
 ALTER TABLE ONLY web."user"
     ADD CONSTRAINT user_username_key UNIQUE (username);
+
+
+--
+-- Name: cidoc_class_code_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX cidoc_class_code_idx ON model.cidoc_class USING btree (code);
+
+
+--
+-- Name: entity_cidoc_class_code_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX entity_cidoc_class_code_idx ON model.entity USING btree (cidoc_class_code);
+
+
+--
+-- Name: entity_openatlas_class_name_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX entity_openatlas_class_name_idx ON model.entity USING btree (openatlas_class_name);
+
+
+--
+-- Name: gis_entity_id_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX gis_entity_id_idx ON model.gis USING btree (entity_id);
+
+
+--
+-- Name: link_domain_id_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX link_domain_id_idx ON model.link USING btree (domain_id);
+
+
+--
+-- Name: link_property_code_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX link_property_code_idx ON model.link USING btree (property_code);
+
+
+--
+-- Name: link_range_id_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX link_range_id_idx ON model.link USING btree (range_id);
+
+
+--
+-- Name: link_type_id_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX link_type_id_idx ON model.link USING btree (type_id);
+
+
+--
+-- Name: property_code_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX property_code_idx ON model.property USING btree (code);
+
+
+--
+-- Name: property_domain_class_code_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX property_domain_class_code_idx ON model.property USING btree (domain_class_code);
+
+
+--
+-- Name: property_range_class_code_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX property_range_class_code_idx ON model.property USING btree (range_class_code);
+
+
+--
+-- Name: user_log_entity_idx; Type: INDEX; Schema: web; Owner: openatlas
+--
+
+CREATE INDEX user_log_entity_idx ON web.user_log USING btree (entity_id);
+
+
+--
+-- Name: user_log_user_idx; Type: INDEX; Schema: web; Owner: openatlas
+--
+
+CREATE INDEX user_log_user_idx ON web.user_log USING btree (user_id);
 
 
 --
