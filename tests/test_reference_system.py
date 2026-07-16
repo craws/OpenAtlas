@@ -36,6 +36,9 @@ class ReferenceSystemTest(TestBaseCase):
                 system_id=get_reference_system_by_name_safe('Getty AAT').id),
             data={'id_': '300011798'})
         assert b'bone' in rv.data
+        assert b'bone and bone components materials' in rv.data
+        assert b'wikidata.org/entity/Q814769' in rv.data
+        assert b'forms the skeleton' in rv.data
 
         rv = c.post(
             url_for(
