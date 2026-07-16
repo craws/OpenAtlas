@@ -391,7 +391,8 @@ INSERT INTO model.entity (name, cidoc_class_code, description, openatlas_class_n
   ('Wikidata', 'E32', 'A free and open knowledge base and common source of open data providing persistent identifier and links to other sources.', 'reference_system'),
   ('GND',      'E32', 'GND stands for Gemeinsame Normdatei (Integrated Authority File) and offers a broad range of elements to describe authorities.', 'reference_system'),
   ('DOI',      'E32', 'A DOI (Digital Object Identifier) is a persistent identifier for digital resources. OpenAtlas uses Crossref for autocomplete, but any DOI can be stored and resolved, even if it is not found there. Please enter only the DOI identifier itself, not the full URL or domain.', 'reference_system'),
-  ('Cadaster', 'E32', 'Austrian cadastre from the Federal Office of Metrology and Surveying Austria', 'reference_system');
+  ('Cadaster', 'E32', 'Austrian cadastre from the Federal Office of Metrology and Surveying Austria', 'reference_system'),
+  ('Getty AAT', 'E32', 'Getty AAT (Art and Architecture Thesaurus) is a controlled vocabulary for art and architecture terms. AAT is a thesaurus containing generic terms, dates, relationships, sources, and notes for work types, roles, materials, styles, cultures, techniques, and other concepts related to art, architecture, and other cultural heritage (e.g., amphora, oil paint, olieverf, acetolysis, sintering, orthographic drawings, Olmeca, Rinascimento, Buddhism, watercolors, asa-no-ha-toji, sralais). Please enter only the Getty AAT identifier itself, not the full URL or domain.', 'reference_system');
 
 INSERT INTO web.reference_system (system, name, api, entity_id, resolver_url, website_url, identifier_example)
 VALUES
@@ -399,10 +400,12 @@ VALUES
   (true, 'Wikidata', 'Wikidata', (SELECT id FROM model.entity WHERE name = 'Wikidata' AND cidoc_class_code = 'E32'), 'https://www.wikidata.org/entity/', 'https://www.wikidata.org', 'Q123'),
   (true, 'GND',      'GND',      (SELECT id FROM model.entity WHERE name = 'GND'      AND cidoc_class_code = 'E32'), 'https://lobid.org/gnd/', 'https://d-nb.info/standards/elementset/gnd', '119338467'),
   (true, 'DOI',      'DOI',      (SELECT id FROM model.entity WHERE name = 'DOI'      AND cidoc_class_code = 'E32'), 'https://doi.org/', 'https://www.crossref.org/', '10.5281/zenodo.20451000'),
-  (true, 'Cadaster', 'Cadaster', (SELECT id FROM model.entity WHERE name = 'Cadaster' AND cidoc_class_code = 'E32'), 'https://kataster.bev.gv.at/api/gst/', 'https://kataster.bev.gv.at/', '01004/784/1');
+  (true, 'Cadaster', 'Cadaster', (SELECT id FROM model.entity WHERE name = 'Cadaster' AND cidoc_class_code = 'E32'), 'https://kataster.bev.gv.at/api/gst/', 'https://kataster.bev.gv.at/', '01004/784/1'),
+  (true, 'Getty AAT', 'GettyAAT', (SELECT id FROM model.entity WHERE name = 'Getty AAT' AND cidoc_class_code = 'E32'), 'https://vocab.getty.edu/page/aat/', 'https://www.getty.edu/research/tools/vocabularies/aat/', '300387513');
 
 INSERT INTO model.link (property_code, range_id, domain_id) VALUES
   ('P2', (SELECT id FROM model.entity WHERE name='exact match'), (SELECT id FROM model.entity WHERE name='Cadaster')),
+  ('P2', (SELECT id FROM model.entity WHERE name='exact match'), (SELECT id FROM model.entity WHERE name='Getty AAT')),
   ('P2', (SELECT id FROM model.entity WHERE name='exact match'), (SELECT id FROM model.entity WHERE name='DOI'));
 
 INSERT INTO web.reference_system_openatlas_class (reference_system_id, openatlas_class_name) VALUES
@@ -410,6 +413,7 @@ INSERT INTO web.reference_system_openatlas_class (reference_system_id, openatlas
   ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), 'place'),
   ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), 'person'),
   ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), 'group'),
+  ((SELECT entity_id FROM web.reference_system WHERE name='Getty AAT'), 'type'),
   ((SELECT entity_id FROM web.reference_system WHERE name='GND'), 'person'),
   ((SELECT entity_id FROM web.reference_system WHERE name='DOI'), 'edition'),
   ((SELECT entity_id FROM web.reference_system WHERE name='DOI'), 'external_reference'),

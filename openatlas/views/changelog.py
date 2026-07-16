@@ -19,6 +19,7 @@ versions = {
         'feature': {
             '924': 'Multi instance capability',
             '2601': 'DOI added as external reference system',
+            '2810': 'Getty AAT added as external reference system',
             '2704': 'Additional database indexes for performance',
             '2780': 'Remove file table',
             '2816': 'Refactor and minor improvements'},

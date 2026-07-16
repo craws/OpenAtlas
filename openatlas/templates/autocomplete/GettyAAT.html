@@ -1,0 +1,59 @@
+<script>
+  /**
+   * Getty AAT autocomplete
+   * Documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
+   * Endpoint: https://services.getty.edu/vocab/reconcile/
+  */
+  (function() {
+    const $input = $('input[data-reference-system={{ system.id }}]');
+    $input.autoComplete({
+      bootstrapVersion: '4',
+      minLength: 3,
+      resolver: 'custom',
+      formatResult: function (item) {
+        const id = item.id ? item.id.replace('aat/', '') : '';
+        const label = item.name || id;
+        const scopeNote = item.description || '';
+
+        return {
+           value: id,
+           text: `<strong>${label}</strong> - <small>${id}</small>${scopeNote ?
+             `<br><small class="text-muted">${scopeNote}</small>` : ''}`
+        };
+      },
+      events: {
+        search: (function() {
+          let timeout;
+          return function (qry, callback) {
+            clearTimeout(timeout);
+            timeout = setTimeout(function() {
+              $.ajax({
+                url: 'https://services.getty.edu/vocab/reconcile/',
+                method: 'POST',
+                data: {
+                  queries: JSON.stringify({
+                    q0: {
+                      query: qry,
+                      type: '/aat'
+                    }
+                  })
+                },
+                dataType: "json"
+              }).done(function(data) {
+                if (data && data.q0 && Array.isArray(data.q0.result)) {
+                  callback(data.q0.result);
+                } else {
+                  callback([]);
+                }
+              }).fail(function() {
+                callback([]);
+              });
+            }, 400);
+          };
+        })()
+      }
+    }).on('autocomplete.select', function(evt, item) {
+      $input.val(item.id ? item.id.replace('aat/', '') : item.value);
+    });
+  })();
+</script>
