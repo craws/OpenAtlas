@@ -210,7 +210,7 @@ def clean_missing_hash(desc: str) -> str:
         return ""
 
     langs_pattern = "|".join(f"{lang}_" for lang in ALLOWED_LANGS) + "|" + "|".join(f"_{lang}" for lang in ALLOWED_LANGS)
-    
+
     def replace_start(match):
         return f"##{match.group(1)}##"
     text = re.sub(rf"(?<!#)#({langs_pattern})##(?!#)", replace_start, desc, flags=re.IGNORECASE)
@@ -230,7 +230,7 @@ def clean_opening_without_closing(desc: str) -> str:
         return ""
 
     text = desc.strip()
-    
+
     # Normalize single-hash dangling endings like ##_en or ##_de for all allowed languages
     for lang in ALLOWED_LANGS:
         text = re.sub(rf"##_{lang}$", f"##_{lang}##", text, flags=re.IGNORECASE)
@@ -239,11 +239,11 @@ def clean_opening_without_closing(desc: str) -> str:
     tag_regex = re.compile(rf"##(?:(?:{'|'.join(ALLOWED_LANGS)})_|_(?:{'|'.join(ALLOWED_LANGS)}))##", re.IGNORECASE)
     parts = tag_regex.split(text)
     tags = tag_regex.findall(text)
-    
+
     # Rebuild the string, inserting missing closing tags where needed.
     new_parts = []
     open_stack = []
-    
+
     for i in range(len(parts)):
         new_parts.append(parts[i])
         if i < len(tags):
@@ -270,12 +270,12 @@ def clean_opening_without_closing(desc: str) -> str:
                 else:
                     # Closing tag without opening, just append it
                     new_parts.append(tag)
-                    
+
     # At the end of the text, close any remaining open tags
     while open_stack:
         popped = open_stack.pop()
         new_parts.append(f"\r\n##_{popped}##")
-        
+
     return "".join(new_parts)
 
 
@@ -515,8 +515,8 @@ for category_name, list_of_entities in categories.items():
     json_entities = []
     for entity in list_of_entities:
         entity_copy = entity.copy()
-        entity_copy["url"] = f"https://thanados.openatlas.eu/entity/{entity['id']}"
-        
+        entity_copy["url"] = f"https://thanados.openatlas.eu/update/{entity['id']}"
+
         # Apply translation/correction logic depending on category
         if category_name == "old_translation":
             entity_copy["description_translated"] = clean_and_translate_old(entity["description"])
@@ -528,7 +528,7 @@ for category_name, list_of_entities in categories.items():
             entity_copy["description_translated"] = clean_opening_without_closing(entity["description"])
         elif category_name == "mismatch_open_tag_used_as_close":
             entity_copy["description_translated"] = clean_open_tag_used_as_close(entity["description"])
-            
+
         json_entities.append(entity_copy)
 
     output_filename = f"thanados_{category_name}.json"
