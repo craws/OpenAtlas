@@ -109,5 +109,3 @@ def crossref_proxy() -> Response | tuple[Response, int]:
         return jsonify(response.json())
     except requests.exceptions.RequestException as e:
         return jsonify({'error': str(e), 'message': {'items': []}}), 502
-
-
