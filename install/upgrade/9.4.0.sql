@@ -142,5 +142,28 @@ INSERT INTO model.link (property_code, range_id, domain_id) VALUES (
     (SELECT id FROM model.entity WHERE name='Getty AAT' AND openatlas_class_name = 'reference_system')
 );
 
+-- Standard API field for VIAF (#2809)
+INSERT INTO model.entity (name, cidoc_class_code, description, openatlas_class_name)
+SELECT
+    'VIAF',
+    'E32',
+    'VIAF (Virtual International Authority File) is a major international service that clusters authority data from national libraries and cultural institutions worldwide into single, unified clusters.',
+    'reference_system'
+WHERE NOT EXISTS (
+    SELECT 1 FROM model.entity WHERE name='VIAF' AND openatlas_class_name = 'reference_system'
+);
+
+INSERT INTO web.reference_system (system, name, api, entity_id, resolver_url, website_url, identifier_example)
+VALUES (
+    true,
+    'VIAF',
+    'VIAF',
+    (SELECT id FROM model.entity WHERE name = 'VIAF' AND openatlas_class_name = 'reference_system'),
+    'https://viaf.org/viaf/',
+    'https://viaf.org/',
+    '6215151353538552720009')
+ON CONFLICT (name) DO UPDATE SET resolver_url = 'https://viaf.org/viaf/', system=true, api='VIAF';
+
+
 
 END;

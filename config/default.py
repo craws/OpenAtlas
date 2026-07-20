@@ -35,6 +35,7 @@ EXTERNAL_API = [
     'GettyAAT',
     'GND',
     'OpenAtlas',
+    'VIAF',
     'Wikidata']
 
 # Paths are implemented operating system independent using pathlib.
