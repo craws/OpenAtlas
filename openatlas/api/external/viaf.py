@@ -21,7 +21,6 @@ class VIAF(ExternalApi):  # pylint: disable=too-few-public-methods
                     **app.config['USER_AGENT']},
                 proxies=app.config['PROXIES'],
                 timeout=10).json()
-            print(data)
         except Exception:  # pragma: no cover
             return info
 
