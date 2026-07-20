@@ -1,0 +1,59 @@
+<script>
+  /**
+   * Kulturpool autocomplete
+   * Documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
+   * Endpoint: https://api.kulturpool.at/search/
+  */
+  (function() {
+    const $input = $('input[data-reference-system={{ system.id }}]');
+    $input.autoComplete({
+      bootstrapVersion: '4',
+      minLength: 3,
+      resolver: 'custom',
+      formatResult: function (item) {
+        const doc = item.document;
+        const id = doc.id;
+        const label = doc.title && doc.title.length > 0 ? doc.title[0] : id;
+        const institution = doc.dataProvider || '';
+
+        return {
+           value: id,
+           text: `<strong>${label}</strong>${institution ? ` - <small>${institution}</small>` : ''}<br><small>${id}</small>`
+        };
+      },
+      events: {
+        search: (function() {
+          let timeout;
+          return function (qry, callback) {
+            clearTimeout(timeout);
+            timeout = setTimeout(function() {
+              $.ajax({
+                url: 'https://api.kulturpool.at/search/',
+                data: {
+                  q: qry,
+                  per_page: 20
+                },
+                dataType: "json"
+              }).done(function(data) {
+                if (data && Array.isArray(data.hits)) {
+                  const hits = data.hits.filter(function(hit) {
+                    return hit.document && hit.document.edmType;
+                  });
+                  callback(hits);
+                } else {
+                  callback([]);
+                }
+              }).fail(function() {
+                callback([]);
+              });
+            }, 400);
+          };
+        })()
+      }
+    }).on('autocomplete.select', function(evt, item) {
+      if (item && item.document && item.document.id) {
+        $input.val(item.document.id);
+      }
+    });
+  })();
+</script>

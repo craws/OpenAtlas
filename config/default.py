@@ -34,6 +34,7 @@ EXTERNAL_API = [
     'GeoNames',
     'GettyAAT',
     'GND',
+    'Kulturpool',
     'OpenAtlas',
     'Wikidata']
 
