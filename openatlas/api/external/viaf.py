@@ -34,7 +34,8 @@ class VIAF(ExternalApi):  # pylint: disable=too-few-public-methods
                     f'https://viaf.org/viaf/{str(viaf_data['ns1:viafID'])}',
                     external=True)
 
-            headings = viaf_data.get('ns1:mainHeadings', {}).get('ns1:data', [])
+            headings = viaf_data.get(
+                'ns1:mainHeadings', {}).get('ns1:data', [])
             if isinstance(headings, list) and headings:
                 info['title'] = headings[0].get('ns1:text', '')
             elif isinstance(headings, dict):  # pragma: no cover
