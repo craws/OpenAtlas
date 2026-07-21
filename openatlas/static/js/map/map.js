@@ -331,7 +331,7 @@ const control = L.control.groupedLayers(baseMaps, groupedOverlays, GroupOptions)
 
 const geoSearchControl = L.control.geonames({
   username: geoNamesUsername, // Geonames account username.  Must be provided.
-  maxresults: 20, // Maximum number of results to display per search.
+  maxresults: 40, // Maximum number of results to display per search.
   zoomLevel: 12, // Max zoom level to zoom to for location. If null, will use the map's max zoom level.
   featureClasses: ["A", "H", "L", "P", "R", "T", "U", "V", "S"], // Feature classes to search against.  See: http://www.geonames.org/export/codes.html.
   showMarker: false, // Show a marker at the location the selected location.

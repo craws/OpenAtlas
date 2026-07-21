@@ -2,7 +2,8 @@
   /**
    * GND autocomplete
    * Documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
-   * Bootstrap version needs to be manually set d/t
+   * The plugin only supports Bootstrap 3/4; its Bootstrap 4 markup is
+   * compatible with the Bootstrap 5 styles used by OpenAtlas.
   */
   $('input[data-reference-system={{ system.id }}]').autoComplete({
     bootstrapVersion: '4',
@@ -20,6 +21,7 @@
           dataType: "jsonp",
           data: {
             q: qry,
+            size: 100,
             format: "json:preferredName"
           },
           success: function(data) {
