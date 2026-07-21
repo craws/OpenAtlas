@@ -36,6 +36,7 @@ EXTERNAL_API = [
     'GND',
     'Kulturpool',
     'OpenAtlas',
+    'VIAF',
     'Wikidata']
 
 # Paths are implemented operating system independent using pathlib.

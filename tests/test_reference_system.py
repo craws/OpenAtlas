@@ -64,6 +64,13 @@ class ReferenceSystemTest(TestBaseCase):
         rv = c.post(
             url_for(
                 'ajax_external_api',
+                system_id=get_reference_system_by_name_safe('VIAF').id),
+            data={'id_': '95218067'})
+        assert b'Tolkien, J.R.R. (John Ronald Reuel), 1892-1973' in rv.data
+
+        rv = c.post(
+            url_for(
+                'ajax_external_api',
                 system_id=get_reference_system_by_name_safe('DOI').id),
             data={'id_': '10.11141/ia.64.11'})
         assert b'Integrating Data on Early Medieval Graves' in rv.data
@@ -119,6 +126,9 @@ class ReferenceSystemTest(TestBaseCase):
 
         rv = c.get(url_for('apis_proxy', system_url=apis_url, search='Carr'))
         assert b'Carrot' in rv.data
+
+        rv = c.get(url_for('viaf_proxy', query='Tolkien'))
+        assert b'Tolkien' in rv.data
 
         rv = c.get(url_for('apis_proxy', system_url='wrong', search='Carr'))
         assert b'error' in rv.data
