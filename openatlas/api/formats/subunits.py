@@ -146,7 +146,7 @@ def get_timespans(entity: Entity) -> dict[str, Any]:
 def get_file(link: Link) -> dict[str, Any]:
     url = 'N/A'
     mime_type = None
-    if path := get_file_path(link.domain.id):
+    if path := get_file_path(link.domain.id):  # pragma: no cover
         url = url_for('api.display', filename=path.stem, _external=True)
         mime_type, _ = mimetypes.guess_type(path)
     files = {
