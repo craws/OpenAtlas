@@ -1,10 +1,13 @@
+import mimetypes
 from operator import attrgetter
 from typing import Any, Optional
 
-from flask import g
+from flask import g, url_for
+from mako.util import to_list
 
 from openatlas.api.resources.util import (
-    geometry_to_geojson, get_license_name, get_reference_systems,
+    geometry_to_geojson, get_iiif_manifest_and_path, get_license_name,
+    get_reference_systems,
     remove_duplicate_entities, replace_empty_list_values_in_dict_with_none)
 from openatlas.display.util2 import get_file_path
 from openatlas.models.entity import Entity, Link
@@ -79,7 +82,7 @@ def transform_coordinates_for_xml(coord: list[float]) -> list[Any]:
 
 
 def get_properties(data: dict[str, Any]) -> dict[str, Any]:
-    return replace_empty_list_values_in_dict_with_none({
+    properties_ = {
         'name': data['entity'].name,
         'aliases': get_aliases(data),
         'description': data['entity'].description,
@@ -89,8 +92,14 @@ def get_properties(data: dict[str, Any]) -> dict[str, Any]:
         'externalReferences':
             get_ref_system(data['links_inverse'], data['parser']),
         'references': get_references(data['links_inverse'], data['parser']),
-        'files': get_file(data),
-        'types': get_types(data)})
+        'files': [
+            get_file(link_) for link_ in data['links_inverse']
+            if link_.domain.class_.name == 'file'],
+        'types': get_types(data)}
+    if properties_['files'] and data['parser']['format'] == 'xml':
+        properties_['files'] = [
+            {'file': file} for file in to_list(properties_['files'])]
+    return replace_empty_list_values_in_dict_with_none(properties_)
 
 
 def get_aliases(data: dict[str, Any]) -> list[Any]:
@@ -134,36 +143,31 @@ def get_timespans(entity: Entity) -> dict[str, Any]:
         'latestEnd': str(entity.dates.end_to) or None}
 
 
-def get_file(data: dict[str, Any]) -> list[dict[str, Any]]:
-    files = []
-    for link in data['links_inverse']:
-        if link.domain.class_.name != 'file':
-            continue
-        path = get_file_path(link.domain.id)
-        files.append({
-            'id': link.domain.id,
-            'name': link.domain.name,
-            'fileName': path.name if path else None,
-            'license': get_license_name(link.domain),
-            'creator': ', '.join([rh.name for rh in link.domain.creator]),
-            'licenseHolder': ', '.join([
-                rh.name for rh in link.domain.license_holder]),
-            'publicShareable': link.domain.public,
-            'source': link.domain.description or None})
-    if data['parser']['format'] == 'xml':
-        return [{'file': file} for file in files]
+def get_file(link: Link) -> dict[str, Any]:
+    url = 'N/A'
+    mime_type = None
+    if path := get_file_path(link.domain.id):
+        url = url_for('api.display', filename=path.stem, _external=True)
+        mime_type, _ = mimetypes.guess_type(path)
+    files = {
+        'id': link.domain.id,
+        'name': link.domain.name,
+        'fileName': link.domain.name,
+        'license': get_license_name(link.domain),
+        'creator': ', '.join([rh.name for rh in link.domain.creator]),
+        'licenseHolder': ', '.join([
+            rh.name for rh in link.domain.license_holder]),
+        'publicShareable': link.domain.public,
+        'mimetype': mime_type,
+        'url': url,
+        'source': link.domain.description or None}
+    files.update(get_iiif_manifest_and_path(link.domain.id))
     return files
 
 
 def get_standard_type(data: dict[str, Any]) -> dict[str, Any]:
     type_ = data['entity'].standard_type
-    type_ref_link = \
-        [link for link in data['ext_reference_links'] if
-         link.range.id == type_.id]
-    types_dict = {
-        'id': type_.id,
-        'name': type_.name,
-        'externalReferences': get_ref_system(type_ref_link, data['parser'])}
+    types_dict = get_type_dict(type_, data)
     hierarchy = [g.types[root].name for root in type_.root]
     hierarchy.reverse()
     types_dict['path'] = ' > '.join(map(str, hierarchy))
@@ -171,19 +175,29 @@ def get_standard_type(data: dict[str, Any]) -> dict[str, Any]:
     return types_dict
 
 
+def get_type_dict(type_: Entity, data: dict[str, Any]) -> dict[str, Any]:
+    type_ref_link = \
+        [link for link in data['ext_reference_links'] if
+         link.range.id == type_.id]
+    return {
+        'id': type_.id,
+        'name': type_.name,
+        'descriptions': type_.description,
+        'typeHierarchy': [{
+            'label': g.types[root].name,
+            'descriptions': g.types[root].description,
+            'identifier': url_for(
+                'api.entity', id_=g.types[root].id, _external=True)}
+            for root in type_.root],
+        'externalReferences': get_ref_system(type_ref_link, data['parser'])}
+
+
 def get_types(data: dict[str, Any]) -> Optional[list[dict[str, Any]]]:
     types = []
     for type_ in data['entity'].types:
         if type_.category == 'standard':
             continue
-        type_ref_link = [
-            link for link in data['ext_reference_links']
-            if link.range.id == type_.id]
-        types_dict = {
-            'id': type_.id,
-            'name': type_.name,
-            'externalReferences':
-                get_ref_system(type_ref_link, data['parser'])}
+        types_dict = get_type_dict(type_, data)
         for link in data['links']:
             if link.range.id == type_.id and link.description:
                 types_dict['value'] = link.description
