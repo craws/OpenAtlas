@@ -285,6 +285,8 @@ def subunit_template(id_: str) -> dict[str, List]:
         'name': fields.String,
         'id': fields.Integer,
         'rootId': fields.Integer,
+        'description': fields.String,
+        'typeHierarchy': fields.Raw,
         'path': fields.String,
         'externalReferences': fields.List(fields.Nested(external_references))}
     references = {
@@ -296,12 +298,17 @@ def subunit_template(id_: str) -> dict[str, List]:
         'id': fields.Integer,
         'name': fields.String,
         'fileName': fields.String,
-        'license': fields.String,
+        'mimetype': fields.String,
+        'url': fields.String,
+        'IIIFManifest': fields.String,
+        'IIIFBasePath': fields.String,
         'source': fields.String}
     types = {
         'id': fields.Integer,
         'rootId': fields.Integer,
         'name': fields.String,
+        'description': fields.String,
+        'typeHierarchy': fields.Raw,
         'path': fields.String,
         'value': fields.Float,
         'unit': fields.String,

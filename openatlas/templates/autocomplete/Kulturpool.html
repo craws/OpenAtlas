@@ -1,8 +1,8 @@
 <script>
   /**
-   * Getty AAT autocomplete
+   * Kulturpool autocomplete
    * Documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
-   * Endpoint: https://services.getty.edu/vocab/reconcile/
+   * Endpoint: https://api.kulturpool.at/search/
   */
   (function() {
     const $input = $('input[data-reference-system={{ system.id }}]');
@@ -11,14 +11,14 @@
       minLength: 3,
       resolver: 'custom',
       formatResult: function (item) {
-        const id = item.id ? item.id.replace('aat/', '') : '';
-        const label = item.name || id;
-        const scopeNote = item.description || '';
+        const doc = item.document;
+        const id = doc.id;
+        const label = doc.title && doc.title.length > 0 ? doc.title[0] : id;
+        const institution = doc.dataProvider || '';
 
         return {
            value: id,
-           text: `<strong>${label}</strong> - <small>${id}</small>${scopeNote ?
-             `<br><small class="text-muted">${scopeNote}</small>` : ''}`
+           text: `<strong>${label}</strong>${institution ? ` - <small>${institution}</small>` : ''}<br><small>${id}</small>`
         };
       },
       events: {
@@ -28,21 +28,18 @@
             clearTimeout(timeout);
             timeout = setTimeout(function() {
               $.ajax({
-                url: 'https://services.getty.edu/vocab/reconcile/',
-                method: 'POST',
+                url: 'https://api.kulturpool.at/search/',
                 data: {
-                  queries: JSON.stringify({
-                    q0: {
-                      query: qry,
-                      limit: 60,
-                      type: '/aat'
-                    }
-                  })
+                  q: qry,
+                  per_page: 20
                 },
                 dataType: "json"
               }).done(function(data) {
-                if (data && data.q0 && Array.isArray(data.q0.result)) {
-                  callback(data.q0.result);
+                if (data && Array.isArray(data.hits)) {
+                  const hits = data.hits.filter(function(hit) {
+                    return hit.document && hit.document.edmType;
+                  });
+                  callback(hits);
                 } else {
                   callback([]);
                 }
@@ -54,7 +51,9 @@
         })()
       }
     }).on('autocomplete.select', function(evt, item) {
-      $input.val(item.id ? item.id.replace('aat/', '') : item.value);
+      if (item && item.document && item.document.id) {
+        $input.val(item.document.id);
+      }
     });
   })();
 </script>

@@ -166,4 +166,26 @@ ON CONFLICT (name) DO UPDATE SET resolver_url = 'https://viaf.org/viaf/', system
 
 
 
+-- Standard API field for Kulturpool (#2627)
+INSERT INTO model.entity (name, cidoc_class_code, description, openatlas_class_name)
+SELECT
+    'Kulturpool',
+    'E32',
+    'Kulturpool is Austria''s central digital portal for art, culture, and science, aggregating millions of digital objects and metadata from nationwide museums, libraries, and archives. Administered by the Natural History Museum Vienna (NHM), it serves as the official national aggregator for the European digital platform Europeana.',
+    'reference_system'
+WHERE NOT EXISTS (
+    SELECT 1 FROM model.entity WHERE name='Kulturpool' AND openatlas_class_name = 'reference_system'
+);
+
+INSERT INTO web.reference_system (system, name, api, entity_id, resolver_url, website_url, identifier_example)
+VALUES (
+    true,
+    'Kulturpool',
+    'Kulturpool',
+    (SELECT id FROM model.entity WHERE name = 'Kulturpool' AND openatlas_class_name = 'reference_system'),
+    'https://kulturpool.at/objekte/',
+    'https://kulturpool.at/',
+    'dfc50104-275f-44b7-aa9f-00975528a671')
+ON CONFLICT (name) DO UPDATE SET resolver_url = 'https://kulturpool.at/objekte/', system=true, api='Kulturpool';
+
 END;
