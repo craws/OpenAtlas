@@ -81,6 +81,13 @@ def transform_coordinates_for_xml(coord: list[float]) -> list[Any]:
 
 
 def get_properties(data: dict[str, Any]) -> dict[str, Any]:
+    files = [
+        get_file(link_) for link_ in data['links_inverse']
+        if link_.domain.class_.name == 'file']
+
+    if files and data['parser']['format'] == 'xml':
+        files: list[dict[str, Any]] = [{'file': file} for file in files]
+
     properties_ = {
         'name': data['entity'].name,
         'aliases': get_aliases(data),
@@ -91,13 +98,8 @@ def get_properties(data: dict[str, Any]) -> dict[str, Any]:
         'externalReferences':
             get_ref_system(data['links_inverse'], data['parser']),
         'references': get_references(data['links_inverse'], data['parser']),
-        'files': [
-            get_file(link_) for link_ in data['links_inverse']
-            if link_.domain.class_.name == 'file'],
+        'files': files,
         'types': get_types(data)}
-    if properties_['files'] and data['parser']['format'] == 'xml':
-        properties_['files'] = [
-            {'file': file} for file in properties_['files']]
     return replace_empty_list_values_in_dict_with_none(properties_)
 
 
