@@ -89,3 +89,8 @@ a.manual svg.svg-inline--fa {
     margin-left: 1em;
 }
 
+.leaflet-geonames-search ul {
+    max-height: 400px !important;
+    overflow-y: auto !important;
+}
+

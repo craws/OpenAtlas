@@ -48,6 +48,7 @@ L.Control.Geonames = L.Control.extend({
 
         // keep mouse events from causing map to drag or zoom map
         L.DomEvent.disableClickPropagation(this._container);
+        L.DomEvent.disableScrollPropagation(this._container);
 
         var link = this._link = L.DomUtil.create('a', this.options.className, this._container);
         link.href = '#';
