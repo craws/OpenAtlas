@@ -3,7 +3,6 @@ from operator import attrgetter
 from typing import Any, Optional
 
 from flask import g, url_for
-from mako.util import to_list
 
 from openatlas.api.resources.util import (
     geometry_to_geojson, get_iiif_manifest_and_path, get_license_name,
@@ -98,7 +97,7 @@ def get_properties(data: dict[str, Any]) -> dict[str, Any]:
         'types': get_types(data)}
     if properties_['files'] and data['parser']['format'] == 'xml':
         properties_['files'] = [
-            {'file': file} for file in to_list(properties_['files'])]
+            {'file': file} for file in properties_['files']]
     return replace_empty_list_values_in_dict_with_none(properties_)
 
 
