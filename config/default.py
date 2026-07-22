@@ -30,6 +30,7 @@ LANGUAGES = {
 EXTERNAL_API = [
     'APIS',
     'Cadaster',
+    'ChronOntology',
     'DOI',
     'GeoNames',
     'GettyAAT',
