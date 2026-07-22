@@ -403,7 +403,7 @@ VALUES
   (true, 'Wikidata', 'Wikidata', (SELECT id FROM model.entity WHERE name = 'Wikidata' AND cidoc_class_code = 'E32'), 'https://www.wikidata.org/entity/', 'https://www.wikidata.org', 'Q123'),
   (true, 'GND',      'GND',      (SELECT id FROM model.entity WHERE name = 'GND'      AND cidoc_class_code = 'E32'), 'https://lobid.org/gnd/', 'https://d-nb.info/standards/elementset/gnd', '119338467'),
   (true, 'DOI',      'DOI',      (SELECT id FROM model.entity WHERE name = 'DOI'      AND cidoc_class_code = 'E32'), 'https://doi.org/', 'https://www.crossref.org/', '10.5281/zenodo.20451000'),
-   (true, 'Cadaster', 'Cadaster', (SELECT id FROM model.entity WHERE name = 'Cadaster' AND cidoc_class_code = 'E32'), 'https://kataster.bev.gv.at/api/gst/', 'https://kataster.bev.gv.at/', '01004/784/1'),
+  (true, 'Cadaster', 'Cadaster', (SELECT id FROM model.entity WHERE name = 'Cadaster' AND cidoc_class_code = 'E32'), 'https://kataster.bev.gv.at/api/gst/', 'https://kataster.bev.gv.at/', '01004/784/1'),
   (true, 'VIAF', 'VIAF', (SELECT id FROM model.entity WHERE name = 'VIAF' AND cidoc_class_code = 'E32'), 'https://viaf.org/viaf/', 'https://viaf.org', '6215151353538552720009'),
   (true, 'ChronOntology', 'ChronOntology', (SELECT id FROM model.entity WHERE name = 'ChronOntology' AND cidoc_class_code = 'E32'), 'https://chronontology.dainst.org/period/', 'https://chronontology.dainst.org/', 'UCBAClZzVqwh'),
   (true, 'Kulturpool', 'Kulturpool', (SELECT id FROM model.entity WHERE name = 'Kulturpool' AND cidoc_class_code = 'E32'), 'https://kulturpool.at/objekte/', 'https://kulturpool.at/', 'dfc50104-275f-44b7-aa9f-00975528a671'),
