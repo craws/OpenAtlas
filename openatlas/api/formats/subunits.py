@@ -86,7 +86,7 @@ def get_properties(data: dict[str, Any]) -> dict[str, Any]:
         if link_.domain.class_.name == 'file']
 
     if files and data['parser']['format'] == 'xml':
-        files: list[dict[str, Any]] = [{'file': file} for file in files]
+        files = [{'file': file} for file in files]
 
     properties_ = {
         'name': data['entity'].name,
