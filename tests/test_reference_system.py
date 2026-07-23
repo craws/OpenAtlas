@@ -71,7 +71,8 @@ class ReferenceSystemTest(TestBaseCase):
         rv = c.post(
             url_for(
                 'ajax_external_api',
-                system_id=get_reference_system_by_name_safe('ChronOntology').id),
+                system_id=get_reference_system_by_name_safe('ChronOntology').id
+            ),
             data={'id_': '4qH80NOs7z4u'})
         assert b'El Adam phase' in rv.data
 

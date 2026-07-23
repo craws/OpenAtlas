@@ -84,7 +84,7 @@ class ChronOntology(ExternalApi):  # pylint: disable=too-few-public-methods
             if not english_name:
                 continue  # pragma: no cover
 
-            place_id = str(key).rstrip('/').split('/')[-1]
+            place_id = str(key).rstrip('/').rsplit('/', maxsplit=1)[-1]
             if not place_id:
                 continue  # pragma: no cover
 
