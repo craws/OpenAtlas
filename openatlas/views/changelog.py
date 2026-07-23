@@ -18,11 +18,12 @@ versions = {
     '9.4.0': ['TBA', {
         'feature': {
             '924': 'Multi instance capability',
+            '2855': 'Scrollable lists for external reference systems',
             '2601': 'External reference system for DOI',
             '2627': 'External reference system for Kulturpool',
             '2809': 'External reference system for VIAF',
             '2810': 'External reference system for Getty AAT',
-            '2855': 'Scrollable lists for external reference systems',
+            '2812': 'External reference system for ChronOntology',
             '2613': 'ARCHE export: SQL dump',
             '2864': 'API: 0.4.15',
             '2704': 'Additional database indexes for performance',
