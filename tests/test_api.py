@@ -744,12 +744,12 @@ class Api(ApiTestCase):
                 "relationToID": [{
                     "operator": "equal",
                     "values": [place.id]}]}]),
-            (174, [{
+            (175, [{
                 "typeIDWithSubs": [{
                     "operator": "notEqual",
                     "values": [boundary_mark.id],
                     "logicalOperator": "and"}]}]),
-            (176, [{
+            (177, [{
                 "typeName": [{
                     "operator": "notEqual",
                     "values": ["Boundary Mark", "Height"],

@@ -177,6 +177,17 @@ institutions for classification and indexing.
 
 In OpenAtlas, Getty AAT is automatically linked to **types**.
 
+ChronOntology
+*************
+`iDAI.chronontology <https://chronontology.dainst.org/>`_ is a web service
+hosted by the German Archaeological Institute (DAI) that connects chronological
+terms—such as epochs, periods, and historical events—with dating information.
+It provides standardized temporal definitions and relationships to facilitate
+interoperability across archaeological and historical research datasets.
+
+It is not bound to a specific class by default in OpenAtlas and can be configured
+for the required classes.
+
 OpenAtlas
 *********
 Although not provided by default, reference systems to other OpenAtlas

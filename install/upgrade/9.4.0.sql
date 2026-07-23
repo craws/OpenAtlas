@@ -188,4 +188,27 @@ VALUES (
     'dfc50104-275f-44b7-aa9f-00975528a671')
 ON CONFLICT (name) DO UPDATE SET resolver_url = 'https://kulturpool.at/objekte/', system=true, api='Kulturpool';
 
+
+-- Standard API field for ChronOntology (#2812)
+INSERT INTO model.entity (name, cidoc_class_code, description, openatlas_class_name)
+SELECT
+    'ChronOntology',
+    'E32',
+    'iDAI.chronontology is a Linked Open Data gazetteer developed by the German Archaeological Institute (DAI) that connects and organizes historical and prehistoric period definitions across space, time, and scholarly disciplines. It provides a standardized framework for mapping chronological terms and their spatial overlaps, making regional period names machine-readable and interoperable across different databases.',
+    'reference_system'
+WHERE NOT EXISTS (
+    SELECT 1 FROM model.entity WHERE name='ChronOntology' AND openatlas_class_name = 'reference_system'
+);
+
+INSERT INTO web.reference_system (system, name, api, entity_id, resolver_url, website_url, identifier_example)
+VALUES (
+    true,
+    'ChronOntology',
+    'ChronOntology',
+    (SELECT id FROM model.entity WHERE name = 'ChronOntology' AND openatlas_class_name = 'reference_system'),
+    'https://chronontology.dainst.org/period/',
+    'https://chronontology.dainst.org/',
+    'UCBAClZzVqwh')
+ON CONFLICT (name) DO UPDATE SET resolver_url = 'https://chronontology.dainst.org/period/', system=true, api='ChronOntology';
+
 END;
