@@ -82,7 +82,7 @@ class GetSubunits(Resource):
     @staticmethod
     def get(id_: int) -> tuple[Resource, int] | Response | dict[str, Any]:
         entity = ApiEntity.get_by_id(id_, types=True, aliases=True)
-        if entity.class_.group.get('name') in  ['place', 'artifact']:
+        if entity.class_.group.get('name') not in  ['place', 'artifact']:
             raise NotAPlaceError
         root_entity = entity
         if root_ids := get_linked_entities_recursive(id_, ['P46'], True):
