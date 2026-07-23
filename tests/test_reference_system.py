@@ -71,6 +71,14 @@ class ReferenceSystemTest(TestBaseCase):
         rv = c.post(
             url_for(
                 'ajax_external_api',
+                system_id=get_reference_system_by_name_safe('ChronOntology').id
+            ),
+            data={'id_': '4qH80NOs7z4u'})
+        assert b'El Adam phase' in rv.data
+
+        rv = c.post(
+            url_for(
+                'ajax_external_api',
                 system_id=get_reference_system_by_name_safe('DOI').id),
             data={'id_': '10.11141/ia.64.11'})
         assert b'Integrating Data on Early Medieval Graves' in rv.data
@@ -137,6 +145,12 @@ class ReferenceSystemTest(TestBaseCase):
         assert b'OpenAtlas' in rv.data
 
         rv = c.get(url_for('crossref_proxy', rows='wrong', query='Open'))
+        assert b'error' in rv.data
+
+        rv = c.get(url_for('chronontology_proxy', size='10', q='Wien*'))
+        assert b'Wien' in rv.data or b'results' in rv.data
+
+        rv = c.get(url_for('chronontology_proxy', size='wrong', q='Wien*'))
         assert b'error' in rv.data
 
         data['reference_system_classes'] = ['place']
