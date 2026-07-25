@@ -1,10 +1,7 @@
 Examples
 ========
 
-.. Note:: May need adaptions to reflect new tab navigation and menu label
-  changes.
-
-Here, you can find step by step - examples for typical data entry scenarios,
+Here, you can find step-by-step examples for typical data entry scenarios,
 some of them are very project-specific, others have a broader scope. Please
 keep in mind, that there are always several different ways to enter the same
 set of data. The following examples are suggestions, but please discuss the

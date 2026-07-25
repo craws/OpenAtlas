@@ -3,9 +3,6 @@ Journey
 
 .. toctree::
 
-.. Note:: May need adaptions to reflect new tab navigation and menu label
-  changes.
-
 A journey can be tracked in OpenAtlas as a series of move events as
 described in the following steps. For more information on move events in
 general see this :doc:`tutorial<move_event>`.
@@ -49,8 +46,8 @@ The following steps will create a move event:
   parts of a trip. Unlike **sub events**, these can be put in chronological
   order. Use **sub events** to capture events that happen at the same time
   (for more information see :doc:`move event tutorial<move_event>`).
-* Click the **Insert** button to save the data or **Insert and continue**
-  button to save and start to enter another move event
+* Click the **Insert** button to save the data, or the **Insert and continue**
+  button to save and start entering another move event
 
 Link actors to the journey
 --------------------------

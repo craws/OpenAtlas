@@ -3,11 +3,8 @@ Profession
 
 .. toctree::
 
-.. Note:: May need adaptions to reflect new tab navigation and menu label
-  changes.
-
 The following steps describe how to enter the profession of a person
-In OpenAtlas a profession exists in connection to a group e.g. a group of
+In OpenAtlas, a profession exists in connection to a group, e.g. a group of
 people working as bakers or professors at a university.
 To add a profession to a person, follow the steps below:
 
