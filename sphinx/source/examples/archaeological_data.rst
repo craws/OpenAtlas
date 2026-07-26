@@ -6,16 +6,16 @@ Archaeological data
 The following steps describe how to enter archaeological data into OpenAtlas.
 These elements are involved in the procedure:
 
-* :doc:`/entity/place`: The archaeological site itself (Level 1)
+* :doc:`/entity/place`: The archaeological site itself (level 1)
 * :doc:`/entity/feature`: A subunit of the place, e.g. one or more graves,
-  buildings, or pits. Each place can consist of multiple subunits (Level 2)
+  buildings, or pits. Each place can consist of multiple subunits (level 2)
 * :doc:`/entity/stratigraphic_unit`: A subunit of a feature such as a burial
   or the backfilling of a grave. A feature can consist of multiple subunits
-  (Level 3)
+  (level 3)
 * :doc:`Artifact </entity/item>`: An archaeological artifact, e.g. a coin or
-  knife (Level 4)
+  knife (level 4)
 * :doc:`Human remains </entity/item>`: Bones and teeth that carry
-  anthropological information (Level 4)
+  anthropological information (level 4)
 * :doc:`/entity/type`: Used for classification, can be extended by most
   users (depending on status)
 * :doc:`/entity/reference`: Citation the information is coming from, such as

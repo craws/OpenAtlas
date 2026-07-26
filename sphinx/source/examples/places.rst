@@ -54,7 +54,7 @@ The :doc:`/tools/map` has multiple functionalities:
   * **Linestring**: A line can be drawn to show the location of e.g. a
     border, a street, or an old river bed. Double-click on the last drawn
     point to end the drawing mode
-* **Shape** (rectangular symbol): You can use this to draw any shape
+  * **Shape** (rectangular symbol): You can use this to draw any shape
     that represents the location - use this if the exact location of a
     physical thing is known such as the outline of a certain building with
     or the exact shape of a grave in a georeferenced burial ground plot. To
@@ -84,4 +84,4 @@ systems, information cannot be saved without stating which kind of match
 it is.
 
 By clicking the **Insert** or **Insert and continue** button, you can save
-the information
+the information.
