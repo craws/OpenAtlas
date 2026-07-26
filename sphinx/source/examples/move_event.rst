@@ -3,9 +3,6 @@ Move events
 
 .. toctree::
 
-.. Note:: May need adaptions to reflect new tab navigation and menu label
-  changes.
-
 Various move events can be mapped via OpenAtlas, including journeys and the
 sending and receiving of letters.
 
@@ -20,7 +17,7 @@ information:
 
 * A descriptive **name** for the move event; as in other forms, a name
   is required to save information
-* A fitting **type** for the move event; if you can not find one in the
+* A fitting **type** for the move event; if you cannot find one in the
   list, it might be possible for you to add new types - depending on
   your :doc:`user group</admin/user>` (please see this
   :doc:`tutorial<types>` for more information)
@@ -55,7 +52,7 @@ information:
 * Enter a start and end **date** of the move event if known
 * Additionally you can enter a **description** of the event as free text
 
-By clicking the **Insert** or **Insert and continue** button you can save
+By clicking the **Insert** or **Insert and continue** button, you can save
 the entered data. After saving the information, you can link sources, actors,
 references, files, and notes via the respective buttons on the landing page of
 your new entry.

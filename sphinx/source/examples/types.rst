@@ -3,14 +3,11 @@ Types
 
 .. toctree::
 
-.. Note:: May need adaptions to reflect new tab navigation and menu label
-  changes.
-
 :doc:`Types</entity/type>` are used to add information to all entities.
-They are organized hierarchically into trees and specific for each project.
+They are organized hierarchically into trees and specific to each project.
 Furthermore, types help to show information in an organized way on a
 presentation site. So use types instead of free text wherever possible.
-There are different kind of types: A distinction is made between different
+There are different kinds of types: A distinction is made between different
 groups of types:
 
 * Standard types - These are the types displayed as "Type" in each form.
@@ -19,7 +16,7 @@ groups of types:
   pre-installed
 * Custom types - These types help to customize each instance of OpenAtlas;
   they can be created, edited, renamed, and deleted by each project to cover
-  as much information on their data as possible; only few types come
+  as much information on their data as possible; only a few types come
   pre-installed as examples
 * Value types - These are used to add numerical information such as
   measurements
@@ -37,23 +34,23 @@ menu item. Furthermore, new types can be created here if necessary.
 
 Create a new type tree
 ----------------------
-To create a new custom type or value type tree press the +Type button.
+To create a new custom type or value type tree, press the **+ Custom hierarchy** or **+ Value hierarchy** button.
 Please fill out the form:
 
 * Choose a descriptive **name** for the new type
 * Decide if the type is single or multiple select (only available for custom
   types)
 * Choose to which classes the new type will be added, e.g.
-  :doc:`/entity/item` or :doc:`/entity/place`; the typ will only be
+  :doc:`/entity/item` or :doc:`/entity/place`; the type will only be
   shown in the related form
 * You can also enter text into the **description** field which will be
   displayed when you mouse-over the information button next to the type’s
   name in forms.
 
-By pressing **insert** you can create a new type tree.
+By pressing **Insert** you can create a new type tree.
 
 To edit an already existing type tree, go to the type you want to edit,
-click on its name and push the edit button next to the name.
+click on its name and press the **Edit** button next to the name.
 
 .. image:: type_2.png
     :width: 400px
@@ -84,7 +81,7 @@ You can then add the following information:
   description will be displayed when you mouse-over the information button next
   to the type’s name in the data entry form
 
-By pressing insert you can create a new type tree.
+By pressing **Insert** you can create a new type tree.
 
-To edit an already existing type, click on that type. Find the edit button in
-the overview and change information after clicking that button.
+To edit an already existing type, click on that type. Find the **Edit** button in
+the overview and change the information after clicking that button.
