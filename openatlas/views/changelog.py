@@ -28,6 +28,7 @@ versions = {
             '2864': 'API: 0.4.15',
             '2704': 'Additional database indexes for performance',
             '2780': 'Remove file table',
+            '2699': 'Update manual examples',
             '2816': 'Refactor and minor improvements'},
         'fix': {
             '2848': 'Error making a type without classes required',
