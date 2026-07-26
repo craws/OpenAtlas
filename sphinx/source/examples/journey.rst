@@ -58,8 +58,8 @@ possible for groups in the current version of CIDOC CRM.
 Alternatively, actors (persons and groups) can be added via the actor tab where
 it is also possible to create new actor entities via the **+ Person** and
 **+ Group** button. In this case a more general **participated at** relation
-will be created between actors and events. It is also possible to add additional
-information:
+will be created between actors and events. It is also possible to add
+additional information:
 
 * Via type you can define the role of an actor in a journey; if
   there is no suitable type in the list, a new one can be created

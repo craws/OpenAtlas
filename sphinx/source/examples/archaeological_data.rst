@@ -12,10 +12,10 @@ These elements are involved in the procedure:
 * :doc:`/entity/stratigraphic_unit`: A subunit of a feature such as a burial
   or the backfilling of a grave. A feature can consist of multiple subunits
   (Level 3)
-* :doc:`Artifact </entity/item>`: An archaeological artifact, e.g. a coin or knife
-  (Level 4)
-* :doc:`Human remains </entity/item>`: Bones and teeth that carry anthropological
-  information (Level 4)
+* :doc:`Artifact </entity/item>`: An archaeological artifact, e.g. a coin or
+  knife (Level 4)
+* :doc:`Human remains </entity/item>`: Bones and teeth that carry
+  anthropological information (Level 4)
 * :doc:`/entity/type`: Used for classification, can be extended by most
   users (depending on status)
 * :doc:`/entity/reference`: Citation the information is coming from, such as
@@ -59,7 +59,9 @@ In a next step you can add a :doc:`/entity/feature` to the
 of a settlement, etc. To add a feature to a place
 
 * Click on the place to which you want to assign a feature
-* Next, create a new entry using the **+ Add** button, then click the **+ Feature** button in the **Feature** section, or click **Insert and add feature** when saving a place's information
+* Next, create a new entry using the **+ Add** button, then click the
+  **+ Feature** button in the **Feature** section, or click
+  **Insert and add feature** when saving a place's information
 * Choose a descriptive name
 * Select an appropriate :doc:`/entity/type` from the list
 * Add further information, e.g. dimensions or a description; keep in mind
@@ -79,7 +81,11 @@ Every :doc:`/entity/feature` can consist of one or more
 :doc:`/entity/stratigraphic_unit`.
 For a grave this would be one or more burials and/or the backfilling.
 
-* Click on the relevant place to which you have added the feature to which you now wish to assign a stratigraphic unit. Then click on the relevant feature and then click the **+ Add** button. Next, use the **+ Stratigraphic unit** button, or click **Insert and add stratigraphic unit** when saving information on a feature to open the stratigraphic unit form
+* Click on the relevant place to which you have added the feature to which you
+  now wish to assign a stratigraphic unit. Then click on the relevant feature
+  and then click the **+ Add** button. Next, use the **+ Stratigraphic unit**
+  button, or click **Insert and add stratigraphic unit** when saving
+  information on a feature to open the stratigraphic unit form
 * Choose a descriptive name
 * Select an appropriate :doc:`/entity/type` from the list, e.g. burial or
   interface
@@ -115,9 +121,9 @@ The following steps add an :doc:`artifact </entity/item>` to a
   another artifact to the same super immediately
 * Add a file or citation if desired by using the **File** tab
 
-Artifacts can also be added directly to a place or feature. To do so click on the
-relevant location and then on the feature that has been added. Next, click on
-the stratigraphic unit associated with the feature and then on the **+ Add**
+Artifacts can also be added directly to a place or feature. To do so click on
+the relevant location and then on the feature that has been added. Next, click
+on the stratigraphic unit associated with the feature and then on the **+ Add**
 button. Under the **Item** section, you can now add an artifact using the **+
 Artifact** button. The "super" of an artifact (a place, feature, or
 stratigraphic unit) can be changed in the artifact's form after pressing the
@@ -149,12 +155,12 @@ and age of an individual.
   another bone or tooth to the same super immediately
 * Add a file or citation if desired by using the **File** tab
 
-Human remains can also be added directly to a place or feature. To do so, click on the
-relevant location and then on the feature that has been added. Next, click on
-the stratigraphic unit associated with the feature and then on the **+ Add**
-button. Under the **Item** section, you can now add human remains using the **+
-Human remains** button. The "super" of a human remains entry (a place,
-feature, or stratigraphic unit) can be changed in the form after pressing the
-**Edit** button. You can also create human remains entries by clicking the
-**Item** tab in the menu and the **+ Human remains** button afterwards. The
-remains can then be linked to an existing super in the form.
+Human remains can also be added directly to a place or feature. To do so, click
+on the relevant location and then on the feature that has been added. Next,
+click on the stratigraphic unit associated with the feature and then on the
+**+ Add** button. Under the **Item** section, you can now add human remains
+using the **+Human remains** button. The "super" of a human remains entry (a
+place, feature, or stratigraphic unit) can be changed in the form after
+pressing the **Edit** button. You can also create human remains entries by
+clicking the **Item** tab in the menu and the **+ Human remains** button
+afterwards. The remains can then be linked to an existing super in the form.

@@ -40,7 +40,9 @@ link a creator by adding a creation event (see below).
 
 Add a reference to the artifact
 -------------------------------
-To link a reference to an artifact, select the artifact you wish to reference and click the **+ Add** button. Then scroll down to the :doc:`/entity/reference` section.
+To link a reference to an artifact, select the artifact you wish to reference
+and click the **+ Add** button. Then scroll down to the
+:doc:`/entity/reference` section.
 
 .. image:: reference_tab.png
     :width: 400px
@@ -66,15 +68,19 @@ Then scroll down to the **File** section and choose from the following options:
 
 Link a creation event
 ---------------------
-To link a creation event to an artifact, select the artifact to which you want to assign a creation event, and click the **+ Add** button. Then scroll down to the **Production** section.
+To link a creation event to an artifact, select the artifact to which you want
+to assign a creation event, and click the **+ Add** button. Then scroll down to
+the **Production** section.
 
 Then choose from the following options:
 
-* Link the artifact to an already existing creation event by using the **Link** button
+* Link the artifact to an already existing creation event by using the
+  **Link** button
 * Create a new creation event by using the **+ Production** button
 * Choose a descriptive **name** for the creation event
 * Select an appropriate :doc:`/entity/type` from the list
-* Add other information as needed, such as a date, or add free text in the description field
+* Add other information as needed, such as a date, or add free text in the
+  description field
 * Press **Insert** to save the entry
 
 .. image:: insert_production.png
@@ -91,13 +97,15 @@ Next, click the **+ Add** button.
 
 In the **Performer** section, choose from the following options:
 
-* Link the creation event to an already existing creator by using the **Link** button
+* Link the creation event to an already existing creator by using the
+  **Link** button
 * Create a creator by using the **+ Person** button
-* Create a new group as actor connected to the creation event by using the **+ Group** button
+* Create a new group as actor connected to the creation event by using the
+  **+ Group** button
 
-Please use **Link** here to choose an actor as creator. If you want to add a new
-actor, go back to the event page, choose **Actor**, link again, and follow the steps
-below. You can now add the following information:
+Please use **Link** here to choose an actor as creator. If you want to add a
+new actor, go back to the event page, choose **Actor**, link again, and follow
+the steps below. You can now add the following information:
 
 * Type of actor, in this case choose creator
 * Actor: choose the creator of the artifact from a list of already added actors

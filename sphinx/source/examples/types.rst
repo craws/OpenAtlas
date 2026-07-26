@@ -34,7 +34,8 @@ menu item. Furthermore, new types can be created here if necessary.
 
 Create a new type tree
 ----------------------
-To create a new custom type or value type tree, press the **+ Custom hierarchy** or **+ Value hierarchy** button.
+To create a new custom type or value type tree, press the
+**+ Custom hierarchy** or **+ Value hierarchy** button.
 Please fill out the form:
 
 * Choose a descriptive **name** for the new type
@@ -83,5 +84,5 @@ You can then add the following information:
 
 By pressing **Insert** you can create a new type tree.
 
-To edit an already existing type, click on that type. Find the **Edit** button in
-the overview and change the information after clicking that button.
+To edit an already existing type, click on that type. Find the **Edit** button
+in the overview and change the information after clicking that button.
