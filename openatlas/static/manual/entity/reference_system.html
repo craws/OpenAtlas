@@ -7,7 +7,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reference System &mdash; OpenAtlas 9.3.0 documentation</title>
+  <title>Reference System &mdash; OpenAtlas 9.4.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
       <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -16,7 +16,7 @@
   
       <script src="../_static/jquery.js?v=8dae8fb0"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=b756c04f"></script>
+      <script src="../_static/documentation_options.js?v=cb047409"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../_static/design-tabs.js?v=f930bc37"></script>
@@ -213,6 +213,18 @@ bodies from catalogues. It is used mainly for documentation in libraries and
 increasingly also by archives and museums.</p>
 <p>By default it is usable for <strong>persons</strong> in OpenAtlas.</p>
 </section>
+<section id="doi">
+<h3>DOI<a class="headerlink" href="#doi" title="Link to this heading"></a></h3>
+<p>The <a class="reference external" href="https://www.doi.org/">DOI</a> (Digital Object Identifier) is a persistent
+identifier for digital resources such as publications, datasets, and editions.
+In OpenAtlas, enter only the DOI identifier itself (e.g.
+<code class="docutils literal notranslate"><span class="pre">10.1163/9789004712126_015</span></code>), not the full URL or domain.</p>
+<p>The autocomplete search uses <a class="reference external" href="https://www.crossref.org/">Crossref</a>. However,
+all DOI identifiers can be stored and resolved, even if they are not found via
+autocomplete.</p>
+<p>DOI is included by default and is usable for <strong>edition, bibliography and
+external reference</strong> in OpenAtlas.</p>
+</section>
 <section id="cadaster">
 <h3>Cadaster<a class="headerlink" href="#cadaster" title="Link to this heading"></a></h3>
 <p>Although not configured by default, the Cadaster reference system can be added
@@ -232,6 +244,41 @@ information.</p></li>
 (e.g., <code class="docutils literal notranslate"><span class="pre">01004/781/1</span></code>), you can link to a specific plot of land.
 OpenAtlas will use the <code class="docutils literal notranslate"><span class="pre">/gst/{kgnr}/{gnr}</span></code> endpoint for this.</p></li>
 </ul>
+</section>
+<section id="kulturpool">
+<h3>Kulturpool<a class="headerlink" href="#kulturpool" title="Link to this heading"></a></h3>
+<p><a class="reference external" href="https://kulturpool.at/">Kulturpool</a> is the central Austrian search portal for
+digitalised cultural heritage. It aggregates metadata from Austrian museums,
+libraries, and archives to make heritage items publicly accessible.</p>
+<p>It is not bound to a specific class by default in OpenAtlas and can be configured
+for the required classes.</p>
+</section>
+<section id="viaf">
+<h3>VIAF<a class="headerlink" href="#viaf" title="Link to this heading"></a></h3>
+<p><a class="reference external" href="https://viaf.org/">VIAF</a> (Virtual International Authority File) is an international
+service that combines multiple national authority files into a single unified resource.
+It primary links regional identifiers for personal and corporate names to enable
+cross-institutional data retrieval.</p>
+<p>It is not bound to a specific class by default in OpenAtlas and can be configured
+for the required classes.</p>
+</section>
+<section id="getty-aat">
+<h3>Getty AAT<a class="headerlink" href="#getty-aat" title="Link to this heading"></a></h3>
+<p>The <a class="reference external" href="https://www.getty.edu/research/tools/vocabularies/aat/">Getty Art &amp; Architecture Thesaurus</a>
+(AAT) is a structured vocabulary containing terms, concepts, and object types related to art,
+architecture, and material culture. It provides standardized terminology used by heritage
+institutions for classification and indexing.</p>
+<p>In OpenAtlas, Getty AAT is automatically linked to <strong>types</strong>.</p>
+</section>
+<section id="chronontology">
+<h3>ChronOntology<a class="headerlink" href="#chronontology" title="Link to this heading"></a></h3>
+<p><a class="reference external" href="https://chronontology.dainst.org/">iDAI.chronontology</a> is a web service
+hosted by the German Archaeological Institute (DAI) that connects chronological
+terms—such as epochs, periods, and historical events—with dating information.
+It provides standardized temporal definitions and relationships to facilitate
+interoperability across archaeological and historical research datasets.</p>
+<p>It is not bound to a specific class by default in OpenAtlas and can be configured
+for the required classes.</p>
 </section>
 <section id="openatlas">
 <h3>OpenAtlas<a class="headerlink" href="#openatlas" title="Link to this heading"></a></h3>

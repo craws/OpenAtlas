@@ -16,6 +16,7 @@ class FileTest(TestBaseCase):
             place = insert('place', 'File keeper')
             reference = insert('edition', 'Ancient Books', 'Really!')
             license_type = get_hierarchy('License')
+            public_type = get_hierarchy('Public sharing allowed')
 
         logo = Path(
             app.root_path) / 'static' / 'images' / 'layout' / 'logo.png'
@@ -25,7 +26,8 @@ class FileTest(TestBaseCase):
                 data={
                     'name': 'OpenAtlas logo',
                     'public': True,
-                    'file': [img_1, img_2]},
+                    'file': [img_1, img_2],
+                    str(public_type.id): public_type.subs[0]},
                 follow_redirects=True)
         assert b'An entry has been created' in rv.data
 
@@ -38,7 +40,7 @@ class FileTest(TestBaseCase):
             file_without_creator_id = files[0].id
 
         rv = c.get(url_for('view', id_=file_without_creator_id))
-        assert b'but license is missing ' in rv.data
+        assert b'Creator ' not in rv.data
 
         with open(logo, 'rb') as img:
             rv = c.post(
@@ -46,7 +48,7 @@ class FileTest(TestBaseCase):
                 data={
                     'name': 'OpenAtlas logo',
                     'file': img,
-                    'public': True,
+                    str(public_type.id): public_type.subs[0],
                     str(license_type.id): license_type.subs[0]},
                 follow_redirects=True)
         assert b'An entry has been created' in rv.data
@@ -59,7 +61,7 @@ class FileTest(TestBaseCase):
                 'file': img,
                 'creator': f'{rights_holder_ids}',
                 'license_holder': f'{rights_holder_ids}',
-                'public': True}
+                str(public_type.id): public_type.subs[0]}
             rv = c.post(url_for('insert', class_='file'), data=data)
             iiif_id = rv.location.split('/')[-1]
 
@@ -133,7 +135,9 @@ class FileTest(TestBaseCase):
 
         rv = c.post(
             url_for('update', id_=iiif_id),
-            data={'name': 'Updated file'},
+            data={
+                'name': 'Updated file',
+                str(public_type.id): public_type.subs[0]},
             follow_redirects=True)
         assert b'Changes have been saved' in rv.data
 

@@ -303,33 +303,41 @@ INSERT INTO model.link (property_code, domain_id, range_id) VALUES
 INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name) VALUES
   ('E55', 'type_tools', 'Humerus'),
   ('E55', 'type_tools', 'Femur');
-
 INSERT INTO model.link (property_code, domain_id, range_id) VALUES
   ('P127', (SELECT id FROM model.entity WHERE name='Humerus'), (SELECT id FROM model.entity WHERE name='Robusticity')),
   ('P127', (SELECT id FROM model.entity WHERE name='Femur'), (SELECT id FROM model.entity WHERE name='Robusticity'));
 
-INSERT INTO web.hierarchy (id, name, category, multiple, directional) VALUES
-  ((SELECT id FROM model.entity WHERE name='Actor function'), 'Actor function', 'standard', False, False),
-  ((SELECT id FROM model.entity WHERE name='Actor relation'), 'Actor relation', 'standard', False, True),
-  ((SELECT id FROM model.entity WHERE name='Artifact'), 'Artifact', 'standard', False, False),
-  ((SELECT id FROM model.entity WHERE name='Bibliography'), 'Bibliography', 'standard', False, False),
-  ((SELECT id FROM model.entity WHERE name='Case study'), 'Case study', 'custom', True, False),
-  ((SELECT id FROM model.entity WHERE name='Dimensions'), 'Dimensions', 'value', True, False),
-  ((SELECT id FROM model.entity WHERE name='Edition'), 'Edition', 'standard', False, False),
-  ((SELECT id FROM model.entity WHERE name='Event'), 'Event', 'standard', False, False),
-  ((SELECT id FROM model.entity WHERE name='External reference'), 'External reference', 'standard', False, False),
-  ((SELECT id FROM model.entity WHERE name='External reference match'), 'External reference match', 'system', False, False),
-  ((SELECT id FROM model.entity WHERE name='Feature'), 'Feature', 'standard', False, False),
-  ((SELECT id FROM model.entity WHERE name='Features for sexing'), 'Features for sexing', 'tools', False, False),
-  ((SELECT id FROM model.entity WHERE name='Human remains' AND cidoc_class_code = 'E55'), 'Human remains', 'standard', False, False),
-  ((SELECT id FROM model.entity WHERE name='Involvement'), 'Involvement', 'standard', False, False),
-  ((SELECT id FROM model.entity WHERE name='License'), 'License', 'standard', False, False),
-  ((SELECT id FROM model.entity WHERE name='Place'), 'Place', 'standard', False, False),
-  ((SELECT id FROM model.entity WHERE name='Radiocarbon'), 'Radiocarbon', 'tools', False, False),
-  ((SELECT id FROM model.entity WHERE name='Sex'), 'Sex', 'custom', True, False),
-  ((SELECT id FROM model.entity WHERE name='Source'), 'Source', 'standard', False, False),
-  ((SELECT id FROM model.entity WHERE name='Stratigraphic unit'), 'Stratigraphic unit', 'standard', False, False),
-  ((SELECT id FROM model.entity WHERE name='Text'), 'Text', 'standard', False, False);
+INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, description) VALUES
+    ('E55', 'type', 'Public sharing allowed', 'Mark files for public sharing, e.g. on presentation sites'),
+    ('E55', 'type', 'Yes', ''),
+    ('E55', 'type', 'No', '');
+INSERT INTO model.link (property_code, range_id, domain_id) VALUES
+  ('P127', (SELECT id FROM model.entity WHERE name='Public sharing allowed'), (SELECT id FROM model.entity WHERE name='Yes')),
+  ('P127', (SELECT id FROM model.entity WHERE name='Public sharing allowed'), (SELECT id FROM model.entity WHERE name='No'));
+
+INSERT INTO web.hierarchy (id, name, category, multiple, directional, required) VALUES
+  ((SELECT id FROM model.entity WHERE name='Actor function'), 'Actor function', 'standard', False, False, False),
+  ((SELECT id FROM model.entity WHERE name='Actor relation'), 'Actor relation', 'standard', False, True, False),
+  ((SELECT id FROM model.entity WHERE name='Artifact'), 'Artifact', 'standard', False, False, False),
+  ((SELECT id FROM model.entity WHERE name='Bibliography'), 'Bibliography', 'standard', False, False, False),
+  ((SELECT id FROM model.entity WHERE name='Case study'), 'Case study', 'custom', True, False, False),
+  ((SELECT id FROM model.entity WHERE name='Dimensions'), 'Dimensions', 'value', True, False, False),
+  ((SELECT id FROM model.entity WHERE name='Edition'), 'Edition', 'standard', False, False, False),
+  ((SELECT id FROM model.entity WHERE name='Event'), 'Event', 'standard', False, False, False),
+  ((SELECT id FROM model.entity WHERE name='External reference'), 'External reference', 'standard', False, False, False),
+  ((SELECT id FROM model.entity WHERE name='External reference match'), 'External reference match', 'system', False, False, False),
+  ((SELECT id FROM model.entity WHERE name='Feature'), 'Feature', 'standard', False, False, False),
+  ((SELECT id FROM model.entity WHERE name='Features for sexing'), 'Features for sexing', 'tools', False, False, False),
+  ((SELECT id FROM model.entity WHERE name='Human remains' AND cidoc_class_code = 'E55'), 'Human remains', 'standard', False, False, False),
+  ((SELECT id FROM model.entity WHERE name='Involvement'), 'Involvement', 'standard', False, False, False),
+  ((SELECT id FROM model.entity WHERE name='License'), 'License', 'standard', False, False, False),
+  ((SELECT id FROM model.entity WHERE name='Place'), 'Place', 'standard', False, False, False),
+  ((SELECT id FROM model.entity WHERE name='Public sharing allowed'), 'Public sharing allowed', 'system', False, False, True),
+  ((SELECT id FROM model.entity WHERE name='Radiocarbon'), 'Radiocarbon', 'tools', False, False, False),
+  ((SELECT id FROM model.entity WHERE name='Sex'), 'Sex', 'custom', True, False, False),
+  ((SELECT id FROM model.entity WHERE name='Source'), 'Source', 'standard', False, False, False),
+  ((SELECT id FROM model.entity WHERE name='Stratigraphic unit'), 'Stratigraphic unit', 'standard', False, False, False),
+  ((SELECT id FROM model.entity WHERE name='Text'), 'Text', 'standard', False, False, False);
 
 
 INSERT INTO model.openatlas_class (name, cidoc_class_code, new_types_allowed, write_access_group_name, standard_type_id) VALUES
@@ -370,6 +378,7 @@ INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) V
   ((SELECT id FROM web.hierarchy WHERE name='Human remains'), 'human_remains'),
   ((SELECT id FROM web.hierarchy WHERE name='License'), 'file'),
   ((SELECT id FROM web.hierarchy WHERE name='Place'), 'place'),
+  ((SELECT id FROM web.hierarchy WHERE name='Public sharing allowed'), 'file'),
   ((SELECT id FROM web.hierarchy WHERE name='External reference match'), 'reference_system'),
   ((SELECT id FROM web.hierarchy WHERE name='Sex'), 'person'),
   ((SELECT id FROM web.hierarchy WHERE name='Source'), 'source'),
@@ -381,21 +390,37 @@ INSERT INTO model.entity (name, cidoc_class_code, description, openatlas_class_n
   ('GeoNames', 'E32', 'Geographical database covering all countries and many places.', 'reference_system'),
   ('Wikidata', 'E32', 'A free and open knowledge base and common source of open data providing persistent identifier and links to other sources.', 'reference_system'),
   ('GND',      'E32', 'GND stands for Gemeinsame Normdatei (Integrated Authority File) and offers a broad range of elements to describe authorities.', 'reference_system'),
-  ('Cadaster', 'E32', 'Austrian cadastre from the Federal Office of Metrology and Surveying Austria', 'reference_system');
+  ('DOI',      'E32', 'A DOI (Digital Object Identifier) is a persistent identifier for digital resources. OpenAtlas uses Crossref for autocomplete, but any DOI can be stored and resolved, even if it is not found there. Please enter only the DOI identifier itself, not the full URL or domain.', 'reference_system'),
+  ('Cadaster', 'E32', 'Austrian cadastre from the Federal Office of Metrology and Surveying Austria.', 'reference_system'),
+  ('ChronOntology', 'E32', 'iDAI.chronontology is a Linked Open Data gazetteer developed by the German Archaeological Institute (DAI) that connects and organizes historical and prehistoric period definitions across space, time, and scholarly disciplines. It provides a standardized framework for mapping chronological terms and their spatial overlaps, making regional period names machine-readable and interoperable across different databases.', 'reference_system'),
+  ('VIAF', 'E32', 'VIAF (Virtual International Authority File) is a major international service that clusters authority data from national libraries and cultural institutions worldwide into single, unified clusters.', 'reference_system'),
+  ('Kulturpool', 'E32', 'Kulturpool is Austria''s central digital portal for art, culture, and science, aggregating millions of digital objects and metadata from nationwide museums, libraries, and archives. Administered by the Natural History Museum Vienna (NHM), it serves as the official national aggregator for the European digital platform Europeana.', 'reference_system'),
+  ('Getty AAT', 'E32', 'Getty AAT (Art and Architecture Thesaurus) is a controlled vocabulary for art and architecture terms. AAT is a thesaurus containing generic terms, dates, relationships, sources, and notes for work types, roles, materials, styles, cultures, techniques, and other concepts related to art, architecture, and other cultural heritage (e.g., amphora, oil paint, olieverf, acetolysis, sintering, orthographic drawings, Olmeca, Rinascimento, Buddhism, watercolors, asa-no-ha-toji, sralais). Please enter only the Getty AAT identifier itself, not the full URL or domain.', 'reference_system');
 
 INSERT INTO web.reference_system (system, name, api, entity_id, resolver_url, website_url, identifier_example)
 VALUES
   (true, 'GeoNames', 'GeoNames', (SELECT id FROM model.entity WHERE name = 'GeoNames' AND cidoc_class_code = 'E32'), 'https://www.geonames.org/', 'https://www.geonames.org/', '1234567'),
   (true, 'Wikidata', 'Wikidata', (SELECT id FROM model.entity WHERE name = 'Wikidata' AND cidoc_class_code = 'E32'), 'https://www.wikidata.org/entity/', 'https://www.wikidata.org', 'Q123'),
   (true, 'GND',      'GND',      (SELECT id FROM model.entity WHERE name = 'GND'      AND cidoc_class_code = 'E32'), 'https://lobid.org/gnd/', 'https://d-nb.info/standards/elementset/gnd', '119338467'),
-  (true, 'Cadaster', 'Cadaster', (SELECT id FROM model.entity WHERE name = 'Cadaster' AND cidoc_class_code = 'E32'), 'https://kataster.bev.gv.at/api/gst/', 'https://kataster.bev.gv.at/', '01004/784/1');
+  (true, 'DOI',      'DOI',      (SELECT id FROM model.entity WHERE name = 'DOI'      AND cidoc_class_code = 'E32'), 'https://doi.org/', 'https://www.crossref.org/', '10.5281/zenodo.20451000'),
+  (true, 'Cadaster', 'Cadaster', (SELECT id FROM model.entity WHERE name = 'Cadaster' AND cidoc_class_code = 'E32'), 'https://kataster.bev.gv.at/api/gst/', 'https://kataster.bev.gv.at/', '01004/784/1'),
+  (true, 'VIAF', 'VIAF', (SELECT id FROM model.entity WHERE name = 'VIAF' AND cidoc_class_code = 'E32'), 'https://viaf.org/viaf/', 'https://viaf.org', '6215151353538552720009'),
+  (true, 'ChronOntology', 'ChronOntology', (SELECT id FROM model.entity WHERE name = 'ChronOntology' AND cidoc_class_code = 'E32'), 'https://chronontology.dainst.org/period/', 'https://chronontology.dainst.org/', 'UCBAClZzVqwh'),
+  (true, 'Kulturpool', 'Kulturpool', (SELECT id FROM model.entity WHERE name = 'Kulturpool' AND cidoc_class_code = 'E32'), 'https://kulturpool.at/objekte/', 'https://kulturpool.at/', 'dfc50104-275f-44b7-aa9f-00975528a671'),
+  (true, 'Getty AAT', 'GettyAAT', (SELECT id FROM model.entity WHERE name = 'Getty AAT' AND cidoc_class_code = 'E32'), 'https://vocab.getty.edu/page/aat/', 'https://www.getty.edu/research/tools/vocabularies/aat/', '300387513');
 
 INSERT INTO model.link (property_code, range_id, domain_id) VALUES
-  ('P2', (SELECT id FROM model.entity WHERE name='exact match'), (SELECT id FROM model.entity WHERE name='Cadaster'));
+  ('P2', (SELECT id FROM model.entity WHERE name='exact match'), (SELECT id FROM model.entity WHERE name='Cadaster')),
+  ('P2', (SELECT id FROM model.entity WHERE name='exact match'), (SELECT id FROM model.entity WHERE name='Getty AAT')),
+  ('P2', (SELECT id FROM model.entity WHERE name='exact match'), (SELECT id FROM model.entity WHERE name='DOI'));
 
 INSERT INTO web.reference_system_openatlas_class (reference_system_id, openatlas_class_name) VALUES
   ((SELECT entity_id FROM web.reference_system WHERE name='GeoNames'), 'place'),
   ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), 'place'),
   ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), 'person'),
   ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), 'group'),
-  ((SELECT entity_id FROM web.reference_system WHERE name='GND'), 'person');
+  ((SELECT entity_id FROM web.reference_system WHERE name='Getty AAT'), 'type'),
+  ((SELECT entity_id FROM web.reference_system WHERE name='GND'), 'person'),
+  ((SELECT entity_id FROM web.reference_system WHERE name='DOI'), 'edition'),
+  ((SELECT entity_id FROM web.reference_system WHERE name='DOI'), 'external_reference'),
+  ((SELECT entity_id FROM web.reference_system WHERE name='DOI'), 'bibliography');

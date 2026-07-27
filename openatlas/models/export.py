@@ -390,6 +390,10 @@ def open_tmp_sql_file() -> str:
             mode='w+',
             suffix='.sql',
             delete=False) as tmp_sql:
+
+        tmp_sql.write("CREATE EXTENSION IF NOT EXISTS postgis;\n\n")
+        tmp_sql.flush()
+
         command = [
             pg_dump_bin,
             '-h', app.config['DATABASE_HOST'],
@@ -397,7 +401,6 @@ def open_tmp_sql_file() -> str:
             '-U', app.config['DATABASE_USER'],
             '-p', str(app.config['DATABASE_PORT']),
             '--schema=model',
-            '--schema=public',
             '--schema=import']
         try:
             subprocess.run(

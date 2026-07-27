@@ -1,5 +1,6 @@
 import datetime
 import locale
+import os
 from typing import Optional
 
 from flask import Flask, g, redirect, request, session, url_for
@@ -21,7 +22,12 @@ app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 app.config.from_object('config.default')
 app.config.from_object('config.api')
-app.config.from_pyfile('production.py')
+
+CONFIG_PATH = ''
+if 'INSTANCE_PATH' in os.environ:  # Used for multi instance
+    CONFIG_PATH = os.environ['INSTANCE_PATH'] + 'instance/'  # pragma: no cover
+app.config.from_pyfile(f'{CONFIG_PATH}production.py')
+
 app.config['WTF_CSRF_TIME_LIMIT'] = None  # Set CSRF token valid for session
 locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 jwt = JWTManager(app)
@@ -98,7 +104,6 @@ def before_request() -> Response | None:
 
 
 def setup_files() -> None:
-    from openatlas.models.entity import Entity
     from openatlas.models.rights_holder import RightsHolder
     g.files = {}
     for file_ in app.config['UPLOAD_PATH'].iterdir():
@@ -111,13 +116,14 @@ def setup_files() -> None:
         g.display_file_ext += app.config['PROCESSABLE_EXT']
     if g.settings['iiif'] and g.settings['iiif_path']:
         g.writable_paths.append(g.settings['iiif_path'])
-    file_info = Entity.get_file_info()
     g.rights_holder = RightsHolder.get_rights_holder()
     rights_holder_info = RightsHolder.get_rights_holder_information()
-    for file_id, info in file_info.items():
+    file_info = {}
+    for file_id in g.files:
         rights = rights_holder_info.get(file_id, {})
-        info['creator'] = rights.get('creator', [])
-        info['license_holder'] = rights.get('license_holder', [])
+        file_info[file_id] = {
+            'creator': rights.get('creator', []),
+            'license_holder': rights.get('license_holder', [])}
     g.file_info = file_info
 
 

@@ -23,39 +23,23 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 # pylint: disable=wrong-import-position
 from config.database_versions import DATABASE_VERSIONS
-from config.default import (
-    DATABASE_PASS, DATABASE_VERSION, DATABASE_NAME, DATABASE_USER,
-    DATABASE_HOST, DATABASE_PORT, SQL_PATH, VERSION)
-from instance import production
-from openatlas.database.connect import open_connection
+from openatlas import app
 from openatlas.database import settings as db_settings
+from openatlas.database.connect import open_connection
 from openatlas.models.export import sql_export
-
-config = {
-    'DATABASE_NAME': DATABASE_NAME,
-    'DATABASE_USER': DATABASE_USER,
-    'DATABASE_PASS': DATABASE_PASS,
-    'DATABASE_PORT': DATABASE_PORT,
-    'DATABASE_HOST': DATABASE_HOST}
 
 start = time.time()
 
-for item in config:
-    try:
-        config[item] = vars(production)[item]
-    except Exception:
-        pass
-
-db = open_connection(config)
+db = open_connection(app.config)
 cursor = db.cursor(cursor_factory=extras.DictCursor)
 settings = db_settings.get_settings(cursor)
 
 
 def database_upgrade() -> None:
-    print(f"{VERSION} OpenAtlas version")
+    print(f"{app.config['VERSION']} OpenAtlas version")
     check_database_version_exist()
     print(f"{settings['database_version']} Database version")
-    print(f"{DATABASE_VERSION} Database version required")
+    print(f"{app.config['DATABASE_VERSION']} Database version required")
     check_database_version_supported()
     check_upgrade_needed()
     backup_database()
@@ -97,17 +81,19 @@ def check_database_version_exist() -> None:
 
 
 def check_upgrade_needed() -> None:
-    if DATABASE_VERSION == settings['database_version']:
+    if app.config['DATABASE_VERSION'] == settings['database_version']:
         finish('Current database version already matches the required one.')
 
 
 def check_database_version_supported() -> None:
-    if DATABASE_VERSION not in DATABASE_VERSIONS:
-        finish(f"Version {VERSION} isn't supported for automatic upgrades.")
+    if app.config['DATABASE_VERSION'] not in DATABASE_VERSIONS:
+        finish(
+            f"Version {app.config['VERSION']} isn't supported for "
+            f"automatic upgrades.")
 
 
 def backup_database() -> None:
-    path = SQL_PATH
+    path = app.config['SQL_PATH']
     if not os.access(path, os.W_OK):
         finish(
             f'Directory for database backup not writeable ({path}). Aborting!')

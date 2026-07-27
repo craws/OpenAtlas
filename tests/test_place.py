@@ -122,11 +122,15 @@ class PlaceTest(TestBaseCase):
             follow_redirects=True)
         assert b'An invalid geometry was entered' in rv.data
 
+        public_type = get_hierarchy('Public sharing allowed')
         with open(Path(app.root_path) / 'static' / 'images' / 'layout'
                   / 'logo.png', 'rb') as img:
             rv = c.post(
                 url_for('insert', class_='file'),
-                data={'name': 'X-Files', 'file': img},
+                data={
+                    'name': 'X-Files',
+                    'file': img,
+                    str(public_type.id): public_type.subs[0]},
                 follow_redirects=True)
         assert b'An entry has been created' in rv.data
 

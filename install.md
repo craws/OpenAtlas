@@ -7,12 +7,11 @@ This software was developed and tested on Linux/Debian 13.2
 [Debian](https://www.debian.org/) 13.2 system following these instructions.
 
 Another (experimental) way to install it would be via
-[Docker](https://www.docker.com/).
+[Podman](https://podman.io/).
 For more information take a look at the end of this document.
 
-It may also work on other Linux distributions or even non Linux systems with
-using the [requirements.txt](requirements.txt), but substantially more
-knowledge about server administration would be needed.
+It may also work on other Linux distributions or even on non Linux systems, but
+substantially more knowledge about server administration would be needed.
 
 Feel free to also consult our own
 [documentation](https://redmine.openatlas.eu/projects/uni/wiki/Debian_server_installation)
@@ -150,6 +149,25 @@ If using Debian, prevent systemd to try to start the service itself:
 Further configuration can be done at the IIIF tab in the admin area of the web
 application.
 
+## Multi instance installation
+
+It is possible to install one OpenAtlas application used by multiple instances.
+
+Basically you can install the application at e.g. /usr/local/openatlas and than
+copy the files from **/install/multi_instance** to a directory of your choice.
+
+The file folders of each installation than have to be made accessible for
+ Apache:
+
+    sudo chown -R www-data files
+
+In case you want a different application location you can change the
+**OPENATLAS_INSTALLATION** value in the **application_path.py** file.
+
+The webserver configuration should than point to the **openatlas.wsgi**
+instance file and other paths should be adapted to the application installation
+directory.
+
 ## Tests
 Install required packages:
 
@@ -172,7 +190,7 @@ Run tests with coverage
 
     pytest
 
-# Installing OpenAtlas with Docker (Experimental)
+# Installing OpenAtlas with Podman (Experimental)
 
-A Docker setup is available for local development. Please follow the
-[detailed Docker installation instructions here](install/docker/install.md).
+A Podman setup is available for local development. Please follow the
+[detailed Podman installation instructions here](install/container/install.md).

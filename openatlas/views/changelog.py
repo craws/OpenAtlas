@@ -17,7 +17,27 @@ def index_changelog() -> str:
 versions = {
     '9.4.0': ['TBA', {
         'feature': {
-            '2816': 'Refactor and minor improvements'}}],
+            '924': 'Multi instance capability',
+            '2855': 'Scrollable lists for external reference systems',
+            '2601': 'External reference system for DOI',
+            '2627': 'External reference system for Kulturpool',
+            '2809': 'External reference system for VIAF',
+            '2810': 'External reference system for Getty AAT',
+            '2812': 'External reference system for ChronOntology',
+            '2613': 'ARCHE export: SQL dump',
+            '2864': 'API: 0.4.15',
+            '2704': 'Additional database indexes for performance',
+            '2780': 'Remove file table',
+            '2699': 'Update manual examples',
+            '2816': 'Refactor and minor improvements'},
+        'fix': {
+            '2848': 'Error making a type without classes required',
+            '2849': 'API: presentation view references',
+            '2853': 'API: PV place hierarchy get wrong types',
+            '2856': 'URIs encoding error in API responses in Turtle format'}}],
+    '9.3.2': ['2026-06-17', {
+        'fix': {
+            '2826': 'API: Outdated information for network'}}],
     '9.3.1': ['2026-06-12', {
         'fix': {
             '2822': 'GeoNames import does not work',

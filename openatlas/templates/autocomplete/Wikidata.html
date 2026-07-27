@@ -2,7 +2,6 @@
 /**
 * Wikidata autocomplete
 * Documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
-* Bootstrap version needs to be manually set d/t
 */
 $('input[data-reference-system={{ system.id }}]').autoComplete({
   bootstrapVersion: '4',
@@ -16,7 +15,7 @@ $('input[data-reference-system={{ system.id }}]').autoComplete({
   events: {
     search: function (qry, callback) {
       $.ajax(
-        `https://www.wikidata.org/w/api.php?action=wbsearchentities&language=en&format=json&origin=*&search=${qry}`,
+        `https://www.wikidata.org/w/api.php?action=wbsearchentities&language=en&format=json&origin=*&limit=40&search=${qry}`,
       ).done(function (res) {
         callback(res.search)
       });
