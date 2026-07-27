@@ -9,14 +9,14 @@ import validators
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.api_v04.resources.error import (
+from openatlas.api.resources.error import (
     EntityDoesNotExistError, InvalidSearchSyntax, InvalidSearchValueError,
     LastEntityError, UrlNotValid)
-from openatlas.api.api_v04.resources.resolve_endpoints import get_loud_context
-from openatlas.api.api_v04.resources.search import get_search_values, search_entity
-from openatlas.api.api_v04.resources.search_validation import (
+from openatlas.api.resources.resolve_endpoints import get_loud_context
+from openatlas.api.resources.search import get_search_values, search_entity
+from openatlas.api.resources.search_validation import (
     check_if_date_search, validate_search_parameters)
-from openatlas.api.api_v04.resources.util import (
+from openatlas.api.resources.util import (
     flatten_list_and_remove_duplicates, geometry_to_geojson,
     get_location_link, get_value_for_types,
     replace_empty_list_values_in_dict_with_none)

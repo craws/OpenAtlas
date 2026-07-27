@@ -4,7 +4,7 @@ from flask_cors import CORS
 from flask_restful import Api
 
 from openatlas import app
-from openatlas.api.api_v04.routes import routes
+from openatlas.api.routes import routes
 
 app.config['SWAGGER'] = {
     'openapi': '3.0.2',

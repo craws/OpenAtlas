@@ -7,15 +7,15 @@ from flask import Response, g, jsonify, send_file, url_for
 from flask_restful import Resource, marshal
 
 from openatlas import app
-from openatlas.api.api_v04.resources.api_entity import ApiEntity
-from openatlas.api.api_v04.resources.database_mapper import get_links_by_id_network
-from openatlas.api.api_v04.resources.error import (
+from openatlas.api.resources.api_entity import ApiEntity
+from openatlas.api.resources.database_mapper import get_links_by_id_network
+from openatlas.api.resources.error import (
     DisplayFileNotFoundError, EntityNotAFileError, FileIdNotInteger,
     NoLicenseError, NotPublicError)
-from openatlas.api.api_v04.resources.parser import files, image
-from openatlas.api.api_v04.resources.resolve_endpoints import download
-from openatlas.api.api_v04.resources.templates import licensed_file_template
-from openatlas.api.api_v04.resources.util import (
+from openatlas.api.resources.parser import files, image
+from openatlas.api.resources.resolve_endpoints import download
+from openatlas.api.resources.templates import licensed_file_template
+from openatlas.api.resources.util import (
     get_iiif_manifest_and_path, get_license_name)
 from openatlas.database.overlay import get_by_object
 from openatlas.display.image_processing import (check_iiif_activation,

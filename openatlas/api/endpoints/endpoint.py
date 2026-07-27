@@ -15,19 +15,19 @@ from flask import (
 from flask_restful import marshal
 
 from openatlas import app
-from openatlas.api.api_v04.endpoints.parser import Parser
-from openatlas.api.api_v04.formats.csv import (
+from openatlas.api.endpoints.parser import Parser
+from openatlas.api.formats.csv import (
     build_dataframe, build_link_dataframe, get_csv_links, get_csv_types)
-from openatlas.api.api_v04.formats.linked_places import (
+from openatlas.api.formats.linked_places import (
     get_lp_file, get_lp_links, get_lp_time)
-from openatlas.api.api_v04.formats.loud import get_loud_entities
-from openatlas.api.api_v04.formats.rdf import rdf_output
-from openatlas.api.api_v04.resources.resolve_endpoints import (
+from openatlas.api.formats.loud import get_loud_entities
+from openatlas.api.formats.rdf import rdf_output
+from openatlas.api.resources.resolve_endpoints import (
     download, parse_loud_context)
-from openatlas.api.api_v04.resources.templates import (
+from openatlas.api.resources.templates import (
     geojson_collection_template, geojson_pagination, linked_place_pagination,
     linked_places_template, loud_pagination, loud_template)
-from openatlas.api.api_v04.resources.util import (
+from openatlas.api.resources.util import (
     date_to_str, geometry_to_geojson,
     get_location_link, get_reference_systems,
     get_type_references, replace_empty_list_values_in_dict_with_none)
