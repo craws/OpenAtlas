@@ -53,7 +53,7 @@ fi
 
 source /etc/apache2/envvars
 
-cookie_key=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c 32;echo;)
+cookie_key=$(python3 -c 'import secrets, string; print("".join(secrets.choice(string.ascii_letters + string.digits + "_") for _ in range(32)))')
 export COOKIE_KEY=${COOKIE_KEY:-$cookie_key}
 export MAIL_PASSWORD=${MAIL_PASSWORD:-CHANGE ME}
 

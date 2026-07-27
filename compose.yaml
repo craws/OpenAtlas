@@ -46,6 +46,12 @@ services:
       - openatlas-uploads:/var/www/openatlas/files/uploads
       - openatlas-resized:/var/www/openatlas/files/processed_images/resized
       - openatlas-export:/var/www/openatlas/files/export
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
     depends_on:
       postgres:
         condition: service_healthy

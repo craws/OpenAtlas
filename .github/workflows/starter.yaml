@@ -119,6 +119,27 @@ jobs:
       - name: Docker compose
         run: |
           docker compose up --detach
+          echo "Waiting for openatlas to be healthy..."
+          for i in {1..30}; do
+            STATUS=$(docker inspect --format='{{.State.Status}}' openatlas-openatlas-1 || echo "missing")
+            if [ "$STATUS" != "running" ]; then
+              echo "Container is in status: $STATUS"
+              docker compose logs
+              exit 1
+            fi
+            HEALTH=$(docker inspect --format='{{.State.Health.Status}}' openatlas-openatlas-1 || echo "unknown")
+            if [ "$HEALTH" == "healthy" ]; then
+              echo "Service is healthy!"
+              break
+            fi
+            echo "Waiting... ($i/30) - Status: $STATUS, Health: $HEALTH"
+            sleep 10
+          done
+          if [ "$(docker inspect --format='{{.State.Health.Status}}' openatlas-openatlas-1)" != "healthy" ]; then
+            echo "Healthcheck timed out!"
+            docker compose logs
+            exit 1
+          fi
 
       - name: Docker service overview
         run: |
@@ -143,7 +164,7 @@ jobs:
           DATABASE_PORT=5432
           DATABASE_PASS='${{env.POSTGRES_PASSWORD}}'
           MAIL_PASSWORD='asdQWEtzu123'
-          SECRET_KEY='$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c 32;echo;)'  # Used for cookies
+          SECRET_KEY='$(python3 -c "import secrets, string; print(''.join(secrets.choice(string.ascii_letters + string.digits + '_') for _ in range(32)))")'  # Used for cookies
           DEBUG = True
           WTF_CSRF_ENABLED = False
           WTF_CSRF_METHODS: list[str] = []
@@ -191,8 +212,8 @@ jobs:
           detached: true
       - name: Run tests
         run: |
-          (docker exec -i openatlas-openatlas-1 /bin/bash -c "(cd /var/www/openatlas/tests && pytest) || (echo Tests exited with $?; exit 1)") ||\
-          (echo Retry; docker exec -i openatlas-openatlas-1 /bin/bash -c "(cd /var/www/openatlas/tests && pytest)")
+          docker exec -i openatlas-openatlas-1 /bin/bash -c "cd /var/www/openatlas/tests && python3 -m pytest" || \
+          (echo "Retry with direct pytest command"; docker exec -i openatlas-openatlas-1 /bin/bash -c "cd /var/www/openatlas/tests && pytest")
   build_openatlas_modern:
     needs: [setup_workflow_env]
     environment: ${{ needs.setup_workflow_env.outputs.environment }}
@@ -269,14 +290,26 @@ jobs:
         run: |
           docker compose -f compose-gunicorn.yaml up --detach
           echo "Waiting for openatlas-gunicorn to be healthy..."
-          for i in {1..20}; do
-            if [ "$(docker inspect --format='{{.State.Health.Status}}' openatlas-openatlas-gunicorn-1)" == "healthy" ]; then
+          for i in {1..30}; do
+            STATUS=$(docker inspect --format='{{.State.Status}}' openatlas-openatlas-gunicorn-1 || echo "missing")
+            if [ "$STATUS" != "running" ]; then
+              echo "Container is in status: $STATUS"
+              docker compose -f compose-gunicorn.yaml logs
+              exit 1
+            fi
+            HEALTH=$(docker inspect --format='{{.State.Health.Status}}' openatlas-openatlas-gunicorn-1 || echo "unknown")
+            if [ "$HEALTH" == "healthy" ]; then
               echo "Service is healthy!"
               break
             fi
-            echo "Waiting... ($i/20)"
+            echo "Waiting... ($i/30) - Status: $STATUS, Health: $HEALTH"
             sleep 10
           done
+          if [ "$(docker inspect --format='{{.State.Health.Status}}' openatlas-openatlas-gunicorn-1)" != "healthy" ]; then
+            echo "Healthcheck timed out!"
+            docker compose -f compose-gunicorn.yaml logs
+            exit 1
+          fi
 
       - name: Docker service overview
         run: |
@@ -301,7 +334,7 @@ jobs:
           DATABASE_PORT=5432
           DATABASE_PASS='${{env.POSTGRES_PASSWORD}}'
           MAIL_PASSWORD='asdQWEtzu123'
-          SECRET_KEY='$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c 32;echo;)'  # Used for cookies
+          SECRET_KEY='$(python3 -c "import secrets, string; print(''.join(secrets.choice(string.ascii_letters + string.digits + '_') for _ in range(32)))")'  # Used for cookies
           DEBUG = True
           WTF_CSRF_ENABLED = False
           WTF_CSRF_METHODS: list[str] = []
