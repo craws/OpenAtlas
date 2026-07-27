@@ -11,7 +11,7 @@ from flask_wtf.csrf import CSRFProtect
 from psycopg2 import extras
 from werkzeug.wrappers import Response
 
-from openatlas.api.api_v04.resources.error import AccessDeniedError
+from openatlas.api.resources.error import AccessDeniedError
 from openatlas.database.checks import check_type_count_needed
 from openatlas.database.connect import close_connection, open_connection
 from openatlas.database.token import check_token_revoked
@@ -128,7 +128,7 @@ def setup_files() -> None:
 
 
 def setup_api() -> None:
-    from openatlas.api.api_v04.resources.openapi_util import write_openapi_instance
+    from openatlas.api.resources.openapi_util import write_openapi_instance
     if request.path.startswith('/swagger'):
         write_openapi_instance()
     elif request.path.startswith('/api/'):

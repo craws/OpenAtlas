@@ -11,7 +11,7 @@ from rdflib import BNode, Graph, Literal, Namespace, RDF, URIRef
 from rdflib.namespace import XSD
 
 from openatlas import app
-from openatlas.api.api_v04.resources.resolve_endpoints import get_loud_context
+from openatlas.api.resources.resolve_endpoints import get_loud_context
 
 
 class _SuppressYearBeforeCommonEraWarning(logging.Filter):

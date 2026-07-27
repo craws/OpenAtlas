@@ -5,7 +5,7 @@ from typing import Any
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.api_v04.resources.api_entity import ApiEntity
+from openatlas.api.resources.api_entity import ApiEntity
 from tests.base import ApiTestCase, get_hierarchy
 
 

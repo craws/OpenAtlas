@@ -11,7 +11,7 @@ from openatlas import app
 from openatlas.models.entity import Entity
 
 if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.api.api_v04.endpoints.parser import Parser
+    from openatlas.api.endpoints.parser import Parser
 
 start = {
     'earliest': fields.String,

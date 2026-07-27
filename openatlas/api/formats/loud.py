@@ -8,10 +8,10 @@ import validators
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.api_v04.formats.loud_helpers import (
+from openatlas.api.formats.loud_helpers import (
     ARCHAEOLOGY_AAT, BIBLIOGRAPHY_AAT, MIME_CLASSIFICATIONS, TYPE_OVERWRITES,
     UNIT_MAP, aat_type, category_aat, get_language, primary_name)
-from openatlas.api.api_v04.resources.util import (
+from openatlas.api.resources.util import (
     date_to_utc_iso_str, get_iiif_manifest_and_path, get_license_type,
     is_float, remove_spaces_dashes)
 from openatlas.database.gis import get_wkt_by_id

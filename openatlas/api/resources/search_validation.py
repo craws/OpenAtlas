@@ -1,7 +1,7 @@
 from typing import Any
 
 from openatlas import app
-from openatlas.api.api_v04.resources.error import (
+from openatlas.api.resources.error import (
     InvalidSearchCategoryError, InvalidSearchValueError, LogicalOperatorError,
     NoSearchStringError, OperatorError, OperatorNotSupported,
     ValueNotIntegerError)

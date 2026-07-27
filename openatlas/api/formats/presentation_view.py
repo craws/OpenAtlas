@@ -7,8 +7,8 @@ from typing import Any, Optional
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.api_v04.endpoints.parser import Parser
-from openatlas.api.api_v04.resources.util import (
+from openatlas.api.endpoints.parser import Parser
+from openatlas.api.resources.util import (
     date_to_str, geometry_to_feature_collection, get_crm_relation_x,
     get_iiif_manifest_and_path, get_license_name, get_location_link,
     get_reference_systems, get_value_for_types, to_camel_case)

@@ -4,8 +4,8 @@ from typing import Any
 from flask import g
 
 from openatlas import app
-from openatlas.api.api_v04.endpoints.parser import Parser
-from openatlas.api.api_v04.resources.database_mapper import (
+from openatlas.api.endpoints.parser import Parser
+from openatlas.api.resources.database_mapper import (
     get_all_links_for_network, get_links_by_id_network,
     get_place_linked_to_location_id, get_types_linked_to_network_ids)
 from openatlas.models.entity import Link

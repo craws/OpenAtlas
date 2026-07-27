@@ -5,11 +5,11 @@ from flask import Response, g, make_response, session
 from flask_restful import Resource, marshal
 
 from openatlas import app
-from openatlas.api.api_v04.resources.api_entity import ApiEntity
-from openatlas.api.api_v04.resources.error import NotATypeError
-from openatlas.api.api_v04.resources.parser import default, entity_, locale, openapi
-from openatlas.api.api_v04.resources.resolve_endpoints import download
-from openatlas.api.api_v04.resources.templates import (
+from openatlas.api.resources.api_entity import ApiEntity
+from openatlas.api.resources.error import NotATypeError
+from openatlas.api.resources.parser import default, entity_, locale, openapi
+from openatlas.api.resources.resolve_endpoints import download
+from openatlas.api.resources.templates import (
     backend_details_template, class_mapping_template, class_overview_template,
     overview_template, properties_template)
 
