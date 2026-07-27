@@ -1,6 +1,6 @@
 FROM debian:13
 
-RUN --mount=type=cache,target=/var/cache/apt \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     export DEBIAN_FRONTEND=noninteractive &&\
     apt update && apt dist-upgrade -y --no-install-recommends &&\
     apt install -y --no-install-recommends python3 python3-bcrypt python3-dateutil python3-psycopg2 python3-levenshtein python3-flask &&\

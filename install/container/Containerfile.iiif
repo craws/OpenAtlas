@@ -3,7 +3,7 @@ FROM debian:13
 ARG CANTALOUPE_VERSION=5.0.7
 ENV CANTALOUPE_HOME=/opt/cantaloupe
 
-RUN --mount=type=cache,target=/var/cache/apt \
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
     export DEBIAN_FRONTEND=noninteractive && \
     apt update && apt dist-upgrade -y --no-install-recommends && \
     apt install -y --no-install-recommends \
