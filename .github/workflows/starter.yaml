@@ -193,6 +193,153 @@ jobs:
         run: |
           (docker exec -i openatlas-openatlas-1 /bin/bash -c "(cd /var/www/openatlas/tests && pytest) || (echo Tests exited with $?; exit 1)") ||\
           (echo Retry; docker exec -i openatlas-openatlas-1 /bin/bash -c "(cd /var/www/openatlas/tests && pytest)")
+  build_openatlas_modern:
+    needs: [setup_workflow_env]
+    environment: ${{ needs.setup_workflow_env.outputs.environment }}
+    permissions:
+      packages: write
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create tags based on git data
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: |
+            ${{ needs.setup_workflow_env.outputs.registry_root }}container-preview-gunicorn
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=raw,value={{sha}}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Build and push
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: install/container/Containerfile.gunicorn
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  test_openatlas_modern:
+    env:
+      POSTGRES_PASSWORD: verysecret
+      POSTGRES_DB: openatlas_test
+      POSTGRES_USER: openatlas
+    runs-on: ubuntu-latest
+    needs: [setup_workflow_env, build_openatlas_modern]
+    environment: ${{ needs.setup_workflow_env.outputs.environment }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fetch container image built above
+        run: |
+          container_name_tag="$(echo -n '${{ needs.setup_workflow_env.outputs.registry_root }}container-preview-gunicorn' | tr '_' '-' | tr '[:upper:]' '[:lower:]'):$(git rev-parse --short HEAD)"
+          docker pull $container_name_tag
+          docker tag $container_name_tag openatlas-openatlas-gunicorn
+
+      - name: Docker compose
+        run: |
+          docker compose -f compose-gunicorn.yaml up --detach
+
+      - name: Docker service overview
+        run: |
+          docker ps
+          docker network ls
+
+      - name: File folders ownership
+        run: |
+          ls -la
+          sudo chown -R 33:33 ./files/uploads
+          sudo chown -R 33:33 ./files/processed_images/resized
+          sudo chown -R 33:33 ./files/export
+
+      - name: Write testing.py
+        run: |
+          set -x
+          cat <<EOF > testing.py
+          SERVER_NAME='local.host'
+          DATABASE_NAME='${{env.POSTGRES_DB}}'
+          DATABASE_USER='openatlas'
+          DATABASE_HOST='postgres'
+          DATABASE_PORT=5432
+          DATABASE_PASS='${{env.POSTGRES_PASSWORD}}'
+          MAIL_PASSWORD='asdQWEtzu123'
+          SECRET_KEY='$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c 32;echo;)'  # Used for cookies
+          DEBUG = True
+          WTF_CSRF_ENABLED = False
+          WTF_CSRF_METHODS: list[str] = []
+          ARCHE = {
+              'id': 0,
+              'url': 'https://arche-curation.acdh-dev.oeaw.ac.at/'}
+          IIIF = {
+              'enabled': False,
+              'path': '',
+              'url': '',
+              'version': 2,
+              'conversion': False,
+              'compression': 'jpeg'}
+          ARCHE_METADATA = {
+              'topCollection': 'OpenAtlas Test Collection',
+              'language': 'en',
+              'depositor': ['Alice', 'https://orcid.org/0000-0001-7608-7446'],
+              'acceptedDate': "2024-01-01",
+              'hasMetadataCreator': [
+                  'https://orcid.org/0000-0003-2576-2266',
+                  'https://orcid.org/0000-0001-7608-7446',
+                  'Alice'],
+              'curator': [
+                  'https://orcid.org/0000-0003-2576-2266',
+                  'https://orcid.org/0000-0002-4911-8451',
+                  'Alice'],
+              'principalInvestigator': [
+                  'Stefan',
+                  'https://orcid.org/0000-0003-2576-2266',
+                  'https://orcid.org/0000-0002-4911-8451'],
+              'relatedDiscipline':
+                  ['https://vocabs.acdh.oeaw.ac.at/oefosdisciplines/601003',
+                   'https://vocabs.acdh.oeaw.ac.at/oefosdisciplines/602001'],
+              'typeIds': [],
+              'excludeReferenceSystems': []}
+          EOF
+          sudo chown 33:33 testing.py
+          docker cp -a testing.py openatlas-openatlas-gunicorn-1:/var/www/openatlas/instance/
+          docker exec -i openatlas-openatlas-gunicorn-1 /bin/bash -c "cd /var/www/openatlas/instance/ && ls -la && cat testing.py && cat production.py"
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+        with:
+          detached: true
+      - name: Run tests
+        run: |
+          (docker exec -i openatlas-openatlas-gunicorn-1 /bin/bash -c "(cd /var/www/openatlas/tests && pytest) || (echo Tests exited with $?; exit 1)") ||\
+          (echo Retry; docker exec -i openatlas-openatlas-gunicorn-1 /bin/bash -c "(cd /var/www/openatlas/tests && pytest)")
   _3:
     needs: [setup_workflow_env, test_openatlas]
     uses: acdh-oeaw/gl-autodevops-minimal-port/.github/workflows/deploy.yml@main

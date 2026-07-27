@@ -67,6 +67,36 @@ Before you begin, ensure you have the following installed and configured:
     podman compose logs -f discovery  # OpenAtlas Discovery frontend logs
     ```
 
+## Gunicorn and Nginx Variant (PoC)
+
+An additional experimental stack is available for testing OpenAtlas behind Nginx with Gunicorn instead of Apache. It uses the same PostgreSQL, database initialization, and OpenAtlas Discovery services as the default setup.
+
+Start this variant from the project root after setting the environment variables above:
+
+```bash
+podman compose -f compose-gunicorn.yaml up --detach
+```
+
+OpenAtlas is then available at [http://localhost:8081](http://localhost:8081). To follow the application and reverse-proxy logs, run:
+
+```bash
+podman compose -f compose-gunicorn.yaml logs -f openatlas-gunicorn
+podman compose -f compose-gunicorn.yaml logs -f openatlas-nginx
+```
+
+To rebuild this variant after changing its image or application code, use:
+
+```bash
+podman compose -f compose-gunicorn.yaml build
+podman compose -f compose-gunicorn.yaml up -d --force-recreate
+```
+
+Stop the Gunicorn and Nginx variant with:
+
+```bash
+podman compose -f compose-gunicorn.yaml down
+```
+
 ## Accessing the Applications
 
 Once the containers are up and running (check `podman compose ps` shows services as "running" or "healthy", you can access the applications in your web browser:
