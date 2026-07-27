@@ -71,7 +71,21 @@ Before you begin, ensure you have the following installed and configured:
 
 An additional experimental stack is available for testing OpenAtlas behind Nginx with Gunicorn instead of Apache. It uses the same PostgreSQL, database initialization, and OpenAtlas Discovery services as the default setup.
 
-Start this variant from the project root after setting the environment variables above:
+### Development dependencies
+
+To install development dependencies (e.g. `pytest`) at runtime in the Gunicorn container, set the `UV_DEV` environment variable to `true` in your `.env` file:
+
+```bash
+echo "UV_DEV=true" >> .env
+```
+
+Or pass it directly when starting the containers:
+
+```bash
+UV_DEV=true podman compose -f compose-gunicorn.yaml up --detach
+```
+
+Start this variant from the project root after setting the database environment variables as described above:
 
 ```bash
 podman compose -f compose-gunicorn.yaml up --detach

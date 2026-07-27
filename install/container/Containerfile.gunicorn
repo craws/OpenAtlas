@@ -35,6 +35,10 @@ RUN cp install/container/entrypoint.gunicorn.sh /entrypoint.sh && \
     dos2unix /entrypoint.sh && \
     cd openatlas/static && npm install
 
+
+RUN mkdir -p /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/dist-packages && \
+    chown -R www-data:www-data /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/dist-packages /usr/local/bin
+
 USER www-data
 
 ENV LC_ALL=en_US.UTF-8

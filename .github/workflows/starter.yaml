@@ -244,6 +244,7 @@ jobs:
       POSTGRES_PASSWORD: verysecret
       POSTGRES_DB: openatlas_test
       POSTGRES_USER: openatlas
+      UV_DEV: true
     runs-on: ubuntu-latest
     needs: [setup_workflow_env, build_openatlas_modern]
     environment: ${{ needs.setup_workflow_env.outputs.environment }}

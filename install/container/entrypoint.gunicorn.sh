@@ -59,5 +59,10 @@ EOF
 
 python3 /var/www/openatlas/install/upgrade/database_upgrade.py
 
+if [ "${UV_DEV:-false}" = "true" ]; then
+  echo "Installing dev dependencies..."
+  uv pip install --system ".[dev]"
+fi
+
 echo ""
 exec "$@"
