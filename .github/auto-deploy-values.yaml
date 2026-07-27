@@ -5,7 +5,7 @@ postgis:
   name: "${POSTGRES_DB}"
   # ${POSTGRES_PASSWORD} is ignored, it has to be openatlas
   password: "${POSTGRES_PASSWORD}"
-  version: "15-3.4"
+  version: "17-3.5"
 
 service:
   name: "web"

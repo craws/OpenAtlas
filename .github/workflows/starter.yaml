@@ -204,6 +204,7 @@ jobs:
       APP_NAME: ${{ needs.setup_workflow_env.outputs.APP_NAME }}-${{ needs.setup_workflow_env.outputs.environment_short }}
       APP_ROOT: ${{ needs.setup_workflow_env.outputs.APP_ROOT }}
       default_port: ${{ needs.setup_workflow_env.outputs.default_port}}
+      HELM_UPGRADE_EXTRA_ARGS: "--timeout 10m"
   with_db_demo_deploy:
     needs: [setup_workflow_env, test_openatlas]
     uses: acdh-oeaw/gl-autodevops-minimal-port/.github/workflows/deploy.yml@main
@@ -216,6 +217,7 @@ jobs:
       APP_NAME: ${{ needs.setup_workflow_env.outputs.APP_NAME }}-with_db_demo_deploy
       APP_ROOT: ${{ needs.setup_workflow_env.outputs.APP_ROOT }}
       default_port: ${{ needs.setup_workflow_env.outputs.default_port}}
+      HELM_UPGRADE_EXTRA_ARGS: "--timeout 10m"
   openatlas_demo:
     needs: [setup_workflow_env, test_openatlas]
     uses: acdh-oeaw/gl-autodevops-minimal-port/.github/workflows/deploy.yml@main
@@ -228,3 +230,4 @@ jobs:
       APP_NAME: ${{ needs.setup_workflow_env.outputs.APP_NAME }}-openatlas-demo
       APP_ROOT: ${{ needs.setup_workflow_env.outputs.APP_ROOT }}
       default_port: ${{ needs.setup_workflow_env.outputs.default_port}}
+      HELM_UPGRADE_EXTRA_ARGS: "--timeout 10m"
