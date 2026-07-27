@@ -23,7 +23,7 @@ RUN apt-get update && \
     mkdir -p /var/www/openatlas/files/uploads && \
     mkdir -p /var/www/openatlas/files/processed_images/resized && \
     mkdir -p /var/www/openatlas/files/export/arche /var/www/openatlas/files/export/rdf /var/www/openatlas/files/export/sql && \
-    chown -R www-data:www-data /var/www/.cache /var/www/.local /var/www/.npm /var/www/openatlas/files
+    chown -R www-data:www-data /var/www/.cache /var/www/.local /var/www/.npm /var/www/openatlas
 
 WORKDIR /var/www/openatlas
 

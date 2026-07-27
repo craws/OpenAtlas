@@ -119,6 +119,8 @@ jobs:
       - name: Docker compose
         run: |
           docker compose up --detach
+          docker exec openatlas-openatlas-1 chown -R 33:33 /var/www/openatlas
+          docker exec openatlas-openatlas-1 chmod -R u+w /var/www/openatlas
           echo "Waiting for openatlas to be healthy..."
           for i in {1..30}; do
             STATUS=$(docker inspect --format='{{.State.Status}}' openatlas-openatlas-1 || echo "missing")
@@ -289,6 +291,9 @@ jobs:
       - name: Docker compose
         run: |
           docker compose -f compose-gunicorn.yaml up --detach
+          # Fix permissions for package installation
+          docker exec openatlas-openatlas-gunicorn-1 chown -R 33:33 /var/www/openatlas
+          docker exec openatlas-openatlas-gunicorn-1 chmod -R u+w /var/www/openatlas
           echo "Waiting for openatlas-gunicorn to be healthy..."
           for i in {1..30}; do
             STATUS=$(docker inspect --format='{{.State.Status}}' openatlas-openatlas-gunicorn-1 || echo "missing")
