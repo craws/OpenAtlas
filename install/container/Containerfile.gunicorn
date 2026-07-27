@@ -9,9 +9,11 @@ RUN apt-get update && \
         libpq-dev \
         libmagickwand-dev \
         libmagic1 \
+        libvips-tools \
         gdal-bin \
         libgdal-dev \
         gettext \
+        p7zip-full \
         npm \
         git \
         postgresql-client-17 \

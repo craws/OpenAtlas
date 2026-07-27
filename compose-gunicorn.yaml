@@ -61,7 +61,7 @@ services:
       context: .
       dockerfile: install/container/Containerfile.iiif
     ports:
-      - "8180:8080"
+      - "8180:80"
     volumes:
       - openatlas-iiif-tests:/var/www/iipsrv/tests:ro
     depends_on:

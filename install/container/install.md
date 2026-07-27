@@ -91,14 +91,14 @@ Start this variant from the project root after setting the database environment 
 podman compose -f compose-gunicorn.yaml up --detach
 ```
 
-### Optional IIIF service (Gunicorn stack)
+### Optional IIIF service (Gunicorn stack, Cantaloupe)
 
-The Gunicorn/Nginx stack can now run IIIF in a dedicated container (`iiif`).
-This keeps OpenAtlas and IIIF separate and follows container best practice
-without changing OpenAtlas core code.
+The Gunicorn/Nginx stack can run IIIF in a dedicated Cantaloupe container
+(`iiif`). This keeps OpenAtlas and IIIF separate without changing OpenAtlas
+core code.
 
 - OpenAtlas writes converted files to a shared path under `/var/www/iipsrv/`
-- The IIIF container serves that shared path at `http://localhost:8180/iiif/<folder>/`
+- Cantaloupe serves IIIF at `http://localhost:8180/iiif/2/` (identifier only)
 
 For tests/CI, keep using `tests` as folder name:
 
@@ -106,7 +106,7 @@ For tests/CI, keep using `tests` as folder name:
 IIIF = {
     'enabled': True,
     'path': '/var/www/iipsrv/tests/',
-    'url': 'http://iiif/iiif/tests/',
+    'url': 'http://iiif/iiif/2/',
     'version': 2,
     'conversion': True,
     'compression': 'jpeg'}
@@ -115,7 +115,7 @@ IIIF = {
 For host/browser access to generated images, use:
 
 ```text
-http://localhost:8180/iiif/tests/<your-image>.jpg/full/max/0/default.jpg
+http://localhost:8180/iiif/2/<your-image>.tiff/full/full/0/default.jpg
 ```
 
 For production, use a neutral folder name (for example `images`) and a public
@@ -125,7 +125,7 @@ HTTPS URL:
 IIIF = {
     'enabled': True,
     'path': '/var/www/iipsrv/images/',
-    'url': 'https://iiif.your-domain.tld/iiif/images/',
+    'url': 'https://iiif.your-domain.tld/iiif/2/',
     'version': 2,
     'conversion': True,
     'compression': 'jpeg'}

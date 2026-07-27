@@ -341,7 +341,7 @@ jobs:
           IIIF = {
               'enabled': True,
               'path': '/var/www/iipsrv/tests/',
-              'url': 'http://iiif/iiif/tests/',
+              'url': 'http://iiif/iiif/2/',
               'version': 2,
               'conversion': True,
               'compression': 'jpeg'}
@@ -370,7 +370,7 @@ jobs:
           EOF
           sudo chown 33:33 testing.py
           docker cp -a testing.py openatlas-openatlas-gunicorn-1:/var/www/openatlas/instance/
-          docker exec -i openatlas-openatlas-gunicorn-1 /bin/bash -c "cd /var/www/openatlas/install/ && sed -i 's@http://localhost/iiif/@http://iiif/iiif/@g' data_test.sql"
+          docker exec -i openatlas-openatlas-gunicorn-1 /bin/bash -c "cd /var/www/openatlas/install/ && sed -i 's@http://localhost/iiif/tests/@http://iiif/iiif/2/@g' data_test.sql"
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}

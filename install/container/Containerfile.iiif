@@ -1,29 +1,31 @@
 FROM debian:13
 
+ARG CANTALOUPE_VERSION=5.0.7
+ENV CANTALOUPE_HOME=/opt/cantaloupe
+
 RUN --mount=type=cache,target=/var/cache/apt \
     export DEBIAN_FRONTEND=noninteractive && \
     apt update && apt dist-upgrade -y --no-install-recommends && \
     apt install -y --no-install-recommends \
-        apache2 \
-        libapache2-mod-fcgid \
-        iipimage-server \
+        ca-certificates \
+        curl \
+        unzip \
+        openjdk-21-jre-headless \
         locales-all && \
     rm -rf /var/lib/apt/lists/* && \
-    mkdir -p /var/www/iipsrv/tests && \
-    cp -p /usr/lib/iipimage-server/iipsrv.fcgi /var/www/iipsrv/ && \
+    mkdir -p /opt /etc/cantaloupe /var/www/iipsrv/tests && \
+    curl -fsSL -o /tmp/cantaloupe.zip \
+      "https://github.com/cantaloupe-project/cantaloupe/releases/download/v${CANTALOUPE_VERSION}/cantaloupe-${CANTALOUPE_VERSION}.zip" && \
+    unzip /tmp/cantaloupe.zip -d /opt && \
+    mv "/opt/cantaloupe-${CANTALOUPE_VERSION}" "${CANTALOUPE_HOME}" && \
+    rm -f /tmp/cantaloupe.zip && \
     chown -R www-data:www-data /var/www/iipsrv
 
-RUN rm -f /etc/apache2/mods-available/iipsrv.conf
-COPY /install/iipsrv.conf /etc/apache2/mods-available/iipsrv.conf
+COPY /install/container/cantaloupe.properties /etc/cantaloupe/cantaloupe.properties
 
-RUN sed -i 's~^Listen.*~Listen 8080~' /etc/apache2/ports.conf && \
-    sed -i 's~^<VirtualHost \*:80>~<VirtualHost *:8080>~' /etc/apache2/sites-available/000-default.conf && \
-    a2enmod fcgid && \
-    a2enmod iipsrv
-
-EXPOSE 8080
+EXPOSE 8182
 ENV LC_ALL=en_US.UTF-8
 ENV LANG=en_US.UTF-8
 ENV LANGUAGE=en_US.UTF-8
 
-CMD ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
+CMD ["sh", "-c", "exec java -Djava.net.preferIPv4Stack=true -Dcantaloupe.config=/etc/cantaloupe/cantaloupe.properties -Xmx512m -jar /opt/cantaloupe/cantaloupe-*.jar"]
