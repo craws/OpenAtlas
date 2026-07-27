@@ -119,8 +119,6 @@ jobs:
       - name: Docker compose
         run: |
           docker compose up --detach
-          docker exec openatlas-openatlas-1 chown -R 33:33 /var/www/openatlas
-          docker exec openatlas-openatlas-1 chmod -R u+w /var/www/openatlas
           echo "Waiting for openatlas to be healthy..."
           for i in {1..30}; do
             STATUS=$(docker inspect --format='{{.State.Status}}' openatlas-openatlas-1 || echo "missing")
@@ -157,7 +155,6 @@ jobs:
 
       - name: Write testing.py
         run: |
-          set -x
           cat <<EOF > testing.py
           SERVER_NAME='local.host'
           DATABASE_NAME='${{env.POSTGRES_DB}}'
@@ -206,7 +203,6 @@ jobs:
           sudo chown 33:33 testing.py
           docker cp -a testing.py openatlas-openatlas-1:/var/www/openatlas/instance/
           docker exec -i openatlas-openatlas-1 /bin/bash -c "cd /var/www/openatlas/install/ && sed -i 's@http://localhost/iiif/@http://localhost:8080/iiif/@g' data_test.sql"
-          docker exec -i openatlas-openatlas-1 /bin/bash -c "cd /var/www/openatlas/instance/ && ls -la && cat testing.py && cat production.py"
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
@@ -327,7 +323,6 @@ jobs:
 
       - name: Write testing.py
         run: |
-          set -x
           cat <<EOF > testing.py
           SERVER_NAME='local.host'
           DATABASE_NAME='${{env.POSTGRES_DB}}'
@@ -344,11 +339,11 @@ jobs:
               'id': 0,
               'url': 'https://arche-curation.acdh-dev.oeaw.ac.at/'}
           IIIF = {
-              'enabled': False,
-              'path': '',
-              'url': '',
+              'enabled': True,
+              'path': '/var/www/iipsrv/tests/',
+              'url': 'http://iiif/iiif/tests/',
               'version': 2,
-              'conversion': False,
+              'conversion': True,
               'compression': 'jpeg'}
           ARCHE_METADATA = {
               'topCollection': 'OpenAtlas Test Collection',
@@ -375,7 +370,7 @@ jobs:
           EOF
           sudo chown 33:33 testing.py
           docker cp -a testing.py openatlas-openatlas-gunicorn-1:/var/www/openatlas/instance/
-          docker exec -i openatlas-openatlas-gunicorn-1 /bin/bash -c "cd /var/www/openatlas/instance/ && ls -la && cat testing.py && cat production.py"
+          docker exec -i openatlas-openatlas-gunicorn-1 /bin/bash -c "cd /var/www/openatlas/install/ && sed -i 's@http://localhost/iiif/@http://iiif/iiif/@g' data_test.sql"
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}

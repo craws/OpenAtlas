@@ -91,6 +91,46 @@ Start this variant from the project root after setting the database environment 
 podman compose -f compose-gunicorn.yaml up --detach
 ```
 
+### Optional IIIF service (Gunicorn stack)
+
+The Gunicorn/Nginx stack can now run IIIF in a dedicated container (`iiif`).
+This keeps OpenAtlas and IIIF separate and follows container best practice
+without changing OpenAtlas core code.
+
+- OpenAtlas writes converted files to a shared path under `/var/www/iipsrv/`
+- The IIIF container serves that shared path at `http://localhost:8180/iiif/<folder>/`
+
+For tests/CI, keep using `tests` as folder name:
+
+```python
+IIIF = {
+    'enabled': True,
+    'path': '/var/www/iipsrv/tests/',
+    'url': 'http://iiif/iiif/tests/',
+    'version': 2,
+    'conversion': True,
+    'compression': 'jpeg'}
+```
+
+For host/browser access to generated images, use:
+
+```text
+http://localhost:8180/iiif/tests/<your-image>.jpg/full/max/0/default.jpg
+```
+
+For production, use a neutral folder name (for example `images`) and a public
+HTTPS URL:
+
+```python
+IIIF = {
+    'enabled': True,
+    'path': '/var/www/iipsrv/images/',
+    'url': 'https://iiif.your-domain.tld/iiif/images/',
+    'version': 2,
+    'conversion': True,
+    'compression': 'jpeg'}
+```
+
 OpenAtlas is then available at [http://localhost:8081](http://localhost:8081). To follow the application and reverse-proxy logs, run:
 
 ```bash

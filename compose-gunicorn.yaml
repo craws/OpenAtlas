@@ -43,6 +43,7 @@ services:
       - openatlas-uploads:/var/www/openatlas/files/uploads
       - openatlas-resized:/var/www/openatlas/files/processed_images/resized
       - openatlas-export:/var/www/openatlas/files/export
+      - openatlas-iiif-tests:/var/www/iipsrv/tests
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/"]
       interval: 10s
@@ -54,6 +55,18 @@ services:
         condition: service_healthy
       initdb:
         condition: service_completed_successfully
+
+  iiif:
+    build:
+      context: .
+      dockerfile: install/container/Containerfile.iiif
+    ports:
+      - "8180:8080"
+    volumes:
+      - openatlas-iiif-tests:/var/www/iipsrv/tests:ro
+    depends_on:
+      openatlas-gunicorn:
+        condition: service_started
 
   openatlas-nginx:
     image: nginx:alpine
@@ -91,3 +104,4 @@ volumes:
   openatlas-uploads:
   openatlas-resized:
   openatlas-export:
+  openatlas-iiif-tests:

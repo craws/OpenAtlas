@@ -20,10 +20,11 @@ RUN apt-get update && \
         locales-all && \
     rm -rf /var/lib/apt/lists/* && \
     mkdir -p /var/www/openatlas /var/www/.cache /var/www/.local /var/www/.npm && \
+    mkdir -p /var/www/iipsrv/tests && \
     mkdir -p /var/www/openatlas/files/uploads && \
     mkdir -p /var/www/openatlas/files/processed_images/resized && \
     mkdir -p /var/www/openatlas/files/export/arche /var/www/openatlas/files/export/rdf /var/www/openatlas/files/export/sql && \
-    chown -R www-data:www-data /var/www/.cache /var/www/.local /var/www/.npm /var/www/openatlas
+    chown -R www-data:www-data /var/www/.cache /var/www/.local /var/www/.npm /var/www/openatlas /var/www/iipsrv
 
 WORKDIR /var/www/openatlas
 
