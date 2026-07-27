@@ -1,6 +1,6 @@
 from flask import g
 
-from openatlas.api.resources.error import (
+from openatlas.api.api_v04.resources.error import (
     EntityDoesNotExistError, InvalidCidocClassCodeError,
     InvalidSystemClassError, InvalidViewClassError)
 from openatlas.models.entity import Entity

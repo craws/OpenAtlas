@@ -4,7 +4,7 @@ from typing import Any
 from flask import g, jsonify, render_template, request
 
 from openatlas import app
-from openatlas.api.resources.error import (
+from openatlas.api.api_v04.resources.error import (
     AccessDeniedError, DisplayFileNotFoundError, EntityDoesNotExistError,
     EntityNotAFileError, EntityNotAnEventError, FileIdNotInteger,
     IIIFMetadataNotFound, InvalidCidocClassCodeError, InvalidLimitError,

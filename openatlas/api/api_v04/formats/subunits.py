@@ -4,7 +4,7 @@ from typing import Any, Optional
 
 from flask import g, url_for
 
-from openatlas.api.resources.util import (
+from openatlas.api.api_v04.resources.util import (
     geometry_to_geojson, get_iiif_manifest_and_path, get_license_name,
     get_reference_systems,
     remove_duplicate_entities, replace_empty_list_values_in_dict_with_none)

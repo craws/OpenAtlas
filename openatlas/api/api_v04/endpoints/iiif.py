@@ -8,12 +8,12 @@ from flask import Response, g, jsonify, url_for
 from flask_babel import gettext as _
 from flask_restful import Resource
 
-from openatlas.api.endpoints.parser import Parser
-from openatlas.api.resources.api_entity import ApiEntity
-from openatlas.api.resources.error import (
+from openatlas.api.api_v04.endpoints.parser import Parser
+from openatlas.api.api_v04.resources.api_entity import ApiEntity
+from openatlas.api.api_v04.resources.error import (
     DisplayFileNotFoundError, IIIFMetadataNotFound)
-from openatlas.api.resources.parser import iiif
-from openatlas.api.resources.util import get_license_name, get_license_url
+from openatlas.api.api_v04.resources.parser import iiif
+from openatlas.api.api_v04.resources.util import get_license_name, get_license_url
 from openatlas.display.image_processing import (
     check_iiif_file_exist, get_actual_mime)
 from openatlas.display.util2 import get_file_path
