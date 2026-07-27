@@ -4,7 +4,8 @@ from flask_cors import CORS
 from flask_restful import Api
 
 from openatlas import app
-from openatlas.api.routes import routes
+from openatlas.api.api_v1.routes import api_v1
+from openatlas.api.api_v04.routes import routes
 
 app.config['SWAGGER'] = {
     'openapi': '3.0.2',
@@ -26,6 +27,7 @@ openapi_file = app.config['OPENAPI_FILE']
 if app.config['OPENAPI_INSTANCE_FILE'].exists():
     openapi_file = app.config['OPENAPI_INSTANCE_FILE']
 Swagger(app, parse=False, template_file=str(openapi_file))
+app.register_api(api_v1)
 
 blueprint = Blueprint('api', __name__, url_prefix='/api')
 api = Api(blueprint)

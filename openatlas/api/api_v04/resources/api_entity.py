@@ -29,6 +29,8 @@ class ApiEntity(Entity):
             entity = Entity.get_by_uuid(uuid, types=types, aliases=aliases)
         except Exception as e:
             raise EntityDoesNotExistError from e
+        if not entity:
+            raise EntityDoesNotExistError
         return entity
 
     @staticmethod

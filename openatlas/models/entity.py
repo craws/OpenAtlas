@@ -3,6 +3,7 @@ from __future__ import annotations
 import ast
 import json
 from typing import Any, Iterable, Optional
+from uuid import UUID
 
 from flask import g, request
 from werkzeug.exceptions import abort
@@ -539,13 +540,14 @@ class Entity:
 
     @staticmethod
     def get_by_uuid(
-            uuid: str,
+            uuid: UUID | str,
             types: bool = False,
             aliases: bool = False,
-            with_location: bool = True) -> Entity:
+            with_location: bool = True) -> Entity | None:
         data = db.get_by_uuid(uuid, types, aliases)
         if not data:
-            abort(418)
+            return None
+
         entity = Entity(data)
         if entity.class_.name == 'place' and with_location:
             entity.location = entity.get_linked_entity_safe('P53', types=True)

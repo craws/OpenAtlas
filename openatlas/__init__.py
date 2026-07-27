@@ -3,7 +3,7 @@ import locale
 import os
 from typing import Optional
 
-from flask import Flask, g, redirect, request, session, url_for
+from flask import g, redirect, request, session, url_for
 from flask_babel import Babel
 from flask_jwt_extended import JWTManager, verify_jwt_in_request
 from flask_login import current_user
@@ -18,7 +18,15 @@ from openatlas.database.token import check_token_revoked
 from openatlas.database.user import admins_available
 from openatlas.models.openatlas_class import get_classes
 
-app: Flask = Flask(__name__, instance_relative_config=True)
+from flask_openapi3 import OpenAPI, Info
+
+info = Info(title="OpenAtlas API V1", version="1.0.0")
+app: OpenAPI = OpenAPI(
+    __name__,
+    instance_relative_config=True,
+    info=info,
+    doc_prefix="/api/1/docs")
+
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 app.config.from_object('config.default')
 app.config.from_object('config.api')

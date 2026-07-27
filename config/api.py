@@ -76,6 +76,12 @@ OTHER = {
 
 API_FORMATS = RDF_FORMATS | JSON_FORMATS | OTHER
 
+LOD_HEADER = [
+    'application/ld+json',
+    'text/turtle',
+    'application/rdf+xml',
+    'application/n-triples']
+
 # ---------------------------------------------------------------------
 # Search and Filter Configuration
 # ---------------------------------------------------------------------

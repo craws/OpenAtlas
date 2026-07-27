@@ -36,6 +36,8 @@ dependencies = [
     "python-gettext==4.0",
     "python-magic==0.4.27",
     "pyyaml~=6.0.1",
+    "pydantic~=2.10.6",
+    "flask-openapi3==4.1.0",
     "rapidfuzz>=3.14.3",
     "rdflib==7.1.1",
     "requests==2.32.3",
@@ -59,6 +61,7 @@ dev = [
     "coverage>=7.6.0",
     "pytest>=5.1.0",
     "pytest-cov>=5.0.0",
+    "schemathesis>=4.24.3",
 ]
 
 [project.urls]
