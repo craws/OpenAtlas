@@ -4,7 +4,7 @@ from typing import Any, Optional
 
 from flask import g, json, url_for
 
-from openatlas.api.resources.api_entity import ApiEntity
+from openatlas.api.api_v04.resources.api_entity import ApiEntity
 from openatlas.display.image_processing import (check_iiif_activation,
                                                 check_iiif_file_exist)
 from openatlas.models.entity import Entity, Link

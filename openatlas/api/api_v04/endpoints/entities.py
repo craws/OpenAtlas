@@ -3,18 +3,19 @@ from typing import Any
 from flask import Response, g
 from flask_restful import Resource, marshal
 
-from openatlas.api.endpoints.endpoint import Endpoint
-from openatlas.api.endpoints.parser import Parser
-from openatlas.api.formats.presentation_view import get_presentation_view
-from openatlas.api.resources.api_entity import ApiEntity
-from openatlas.api.resources.database_mapper import get_api_search, \
+from openatlas.api.api_v04.endpoints.endpoint import Endpoint
+from openatlas.api.api_v04.endpoints.parser import Parser
+from openatlas.api.api_v04.formats.presentation_view import \
+    get_presentation_view
+from openatlas.api.api_v04.resources.api_entity import ApiEntity
+from openatlas.api.api_v04.resources.database_mapper import get_api_search, \
     get_api_simple_search
-from openatlas.api.resources.error import (
+from openatlas.api.api_v04.resources.error import (
     InvalidLimitError, InvalidSystemClassError, NotATypeError, QueryEmptyError)
-from openatlas.api.resources.parser import entity_, presentation, \
+from openatlas.api.api_v04.resources.parser import entity_, presentation, \
     properties, query, search_parser
-from openatlas.api.resources.templates import presentation_template
-from openatlas.api.resources.util import (
+from openatlas.api.api_v04.resources.templates import presentation_template
+from openatlas.api.api_v04.resources.util import (
     get_entities_from_type_with_subs, get_entities_linked_to_special_type,
     get_entities_linked_to_special_type_recursive, get_linked_entities_api)
 from openatlas.models.entity import Entity

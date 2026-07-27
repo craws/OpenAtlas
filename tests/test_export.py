@@ -5,7 +5,7 @@ from typing import Any
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.resources.api_entity import ApiEntity
+from openatlas.api.api_v04.resources.api_entity import ApiEntity
 from openatlas.models.export import current_date_for_filename
 from tests.base import ImportTestCase, get_hierarchy
 

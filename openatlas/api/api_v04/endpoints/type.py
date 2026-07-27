@@ -4,9 +4,9 @@ from typing import Any
 from flask import Response, g, jsonify, url_for
 from flask_restful import Resource, marshal
 
-from openatlas.api.resources.parser import default, entity_
-from openatlas.api.resources.resolve_endpoints import download
-from openatlas.api.resources.templates import (
+from openatlas.api.api_v04.resources.parser import default, entity_
+from openatlas.api.api_v04.resources.resolve_endpoints import download
+from openatlas.api.api_v04.resources.templates import (
     type_by_view_class_template, type_overview_template, type_tree_template)
 from openatlas.models.entity import Entity
 

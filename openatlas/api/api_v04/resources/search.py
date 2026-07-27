@@ -4,7 +4,7 @@ from typing import Any
 
 from flask import g
 
-from openatlas.api.resources.util import (
+from openatlas.api.api_v04.resources.util import (
     flatten_list_and_remove_duplicates, get_linked_entities_id_api)
 from openatlas.models.entity import Entity
 

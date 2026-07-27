@@ -1,21 +1,21 @@
-from openatlas.api.endpoints.content import (
+from openatlas.api.api_v04.endpoints.content import (
     ClassMapping, Classes, GetBackendDetails, GetOpenAPISchema, GetProperties,
     SystemClassCount)
-from openatlas.api.endpoints.entities import (
+from openatlas.api.api_v04.endpoints.entities import (
     GetByCidocClass, GetBySystemClass, GetByViewClass,
     GetEntitiesLinkedToEntity, GetEntity, GetEntityByUUID,
     GetEntityPresentationView, GetLatest,
     GetLinkedEntitiesByPropertyRecursive, GetQuery, GetSearchEntities,
     GetTableRows, GetTypeEntities, GetTypeEntitiesAll)
-from openatlas.api.endpoints.file import DisplayImage, EntityFiles, \
+from openatlas.api.api_v04.endpoints.file import DisplayImage, EntityFiles, \
     LicensedFileOverview
-from openatlas.api.endpoints.iiif import (
+from openatlas.api.api_v04.endpoints.iiif import (
     IIIFAnnotation, IIIFAnnotationList, IIIFCanvas, IIIFImage, IIIFManifest,
     IIIFSequence)
-from openatlas.api.endpoints.special import (
+from openatlas.api.api_v04.endpoints.special import (
     ExportDatabase, GetChainedEvents, GetEgoNetworkVisualisation,
     GetGeometricEntities, GetNetworkVisualisation, GetSkolemProxy, GetSubunits)
-from openatlas.api.endpoints.type import (
+from openatlas.api.api_v04.endpoints.type import (
     GetTypeByViewClass, GetTypeOverview, GetTypeTree)
 
 entity = [

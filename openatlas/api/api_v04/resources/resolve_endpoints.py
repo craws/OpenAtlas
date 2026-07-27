@@ -6,8 +6,8 @@ from flask import Response, jsonify
 from flask_restful import marshal
 
 from openatlas import app
-from openatlas.api.formats.xml import subunit_xml
-from openatlas.api.resources.templates import subunit_template
+from openatlas.api.api_v04.formats.xml import subunit_xml
+from openatlas.api.api_v04.resources.templates import subunit_template
 
 
 def resolve_subunits(
