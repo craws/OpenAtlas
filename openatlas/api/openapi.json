@@ -4491,7 +4491,7 @@
         "schema": {
           "type": "string",
           "format": "uri",
-          "example": "https://frontend-demo-dev.openatlas.eu/"
+          "example": "https://discovery-demo.openatlas.eu/"
         }
       },
       "limit": {
