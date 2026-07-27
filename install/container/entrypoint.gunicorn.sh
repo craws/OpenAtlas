@@ -61,7 +61,15 @@ python3 /var/www/openatlas/install/upgrade/database_upgrade.py
 
 if [ "${UV_DEV:-false}" = "true" ]; then
   echo "Installing dev dependencies..."
+  cd /var/www/openatlas
   uv pip install --system ".[dev]"
+  echo "Dev dependencies installed."
+  # Verify pytest is available
+  if ! command -v pytest &> /dev/null; then
+      echo "Warning: pytest not found in PATH after installation."
+      # Try to find it
+      export PATH="$PATH:/usr/local/bin:/tmp/.local/bin"
+  fi
 fi
 
 echo ""

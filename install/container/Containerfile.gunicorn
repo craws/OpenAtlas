@@ -16,6 +16,7 @@ RUN apt-get update && \
         git \
         postgresql-client-17 \
         dos2unix \
+        curl \
         locales-all && \
     rm -rf /var/lib/apt/lists/* && \
     mkdir -p /var/www/openatlas /var/www/.cache /var/www/.local /var/www/.npm && \
@@ -44,6 +45,7 @@ USER www-data
 ENV LC_ALL=en_US.UTF-8
 ENV LANG=en_US.UTF-8
 ENV LANGUAGE=en_US.UTF-8
+ENV PATH="/usr/local/bin:$PATH"
 ENV HOME=/tmp
 
 ENTRYPOINT ["/entrypoint.sh"]

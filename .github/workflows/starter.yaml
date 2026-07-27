@@ -268,6 +268,15 @@ jobs:
       - name: Docker compose
         run: |
           docker compose -f compose-gunicorn.yaml up --detach
+          echo "Waiting for openatlas-gunicorn to be healthy..."
+          for i in {1..20}; do
+            if [ "$(docker inspect --format='{{.State.Health.Status}}' openatlas-openatlas-gunicorn-1)" == "healthy" ]; then
+              echo "Service is healthy!"
+              break
+            fi
+            echo "Waiting... ($i/20)"
+            sleep 10
+          done
 
       - name: Docker service overview
         run: |
@@ -339,8 +348,8 @@ jobs:
           detached: true
       - name: Run tests
         run: |
-          (docker exec -i openatlas-openatlas-gunicorn-1 /bin/bash -c "(cd /var/www/openatlas/tests && pytest) || (echo Tests exited with $?; exit 1)") ||\
-          (echo Retry; docker exec -i openatlas-openatlas-gunicorn-1 /bin/bash -c "(cd /var/www/openatlas/tests && pytest)")
+          docker exec -i openatlas-openatlas-gunicorn-1 /bin/bash -c "cd /var/www/openatlas/tests && python3 -m pytest" || \
+          (echo "Retry with direct pytest command"; docker exec -i openatlas-openatlas-gunicorn-1 /bin/bash -c "cd /var/www/openatlas/tests && pytest")
   _3:
     needs: [setup_workflow_env, test_openatlas]
     uses: acdh-oeaw/gl-autodevops-minimal-port/.github/workflows/deploy.yml@main
