@@ -5,7 +5,15 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class EntityPath(BaseModel):
     id: UUID = Field(..., description="Unique identifier of the entity")
-    ext: str | None = Field(None, description="Optional file extension (.json, .ttl, .xml, etc.)")
+    ext: str | None = Field(
+        None,
+        description="Optional file extension (.json, .ttl, .xml, .nt)",
+        json_schema_extra={
+            "examples": {
+                "json": {"summary": "JSON-LD Format", "value": "json"},
+                "turtle": {"summary": "Turtle Format", "value": "ttl"},
+                "xml": {"summary": "RDF/XML Format", "value": "xml"},
+                "ntriples": {"summary": "N-Triples Format", "value": "nt"}}})
 
 
 class LinkedArtResponse(BaseModel):

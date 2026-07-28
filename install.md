@@ -191,6 +191,26 @@ Run tests with coverage
 
     pytest
 
+## API Schemathesis Tests
+To test the API with schemathesis you can use the following commands:
+
+    uv sync --extra dev
+    uv run schemathesis run http://localhost:5000/api/1/docs/openapi.json \
+         --url http://localhost:5000 \
+         --phases examples,coverage,fuzzing
+
+If you don't want to install uvicorn package you can use the following command:
+
+    uvx schemathesis run http://localhost:5000/api/1/docs/openapi.json \ 
+        --url http://localhost:5000 \
+        --phases examples,coverage,fuzzing
+
+For deep testing you can use the following command:
+
+    uv run schemathesis run http://localhost:5000/api/1/docs/openapi.json \
+       --checks all \
+       --phases examples,coverage,fuzzing
+
 # Installing OpenAtlas with Podman (Experimental)
 
 A Podman setup is available for local development. Please follow the

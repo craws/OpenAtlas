@@ -23,6 +23,7 @@ from flask_openapi3 import OpenAPI, Info
 info = Info(title="OpenAtlas API V1", version="1.0.0")
 app: OpenAPI = OpenAPI(
     __name__,
+    security_schemes={},
     instance_relative_config=True,
     info=info,
     doc_prefix="/api/1/docs")
