@@ -5,6 +5,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class EntityPath(BaseModel):
     id: UUID = Field(..., description="Unique identifier of the entity")
+    ext: str | None = Field(None, description="Optional file extension (.json, .ttl, .xml, etc.)")
 
 
 class LinkedArtResponse(BaseModel):

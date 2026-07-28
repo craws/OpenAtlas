@@ -20,16 +20,11 @@ register_error_handlers(api_v1)
 
 def make_lod_response(data: dict[str, Any]) -> Response:
     accepted = request.accept_mimetypes.best_match(app.config['LOD_HEADER'])
-
+    json_str = app.json.dumps(data)
     if accepted not in ['text/turtle', 'application/rdf+xml', 'application/n-triples']:
-        return Response(
-            app.json.dumps(data),
-            mimetype='application/ld+json')
+        return Response(json_str, mimetype='application/ld+json')
 
     graph = Graph()
-
-    json_str = app.json.dumps(data)
-
     graph.parse(data=json_str, format='json-ld')
 
     match accepted:
@@ -53,6 +48,15 @@ def make_lod_response(data: dict[str, Any]) -> Response:
     tags=[lod_tag],
     responses=lod_responses)
 def get_entity(path: EntityPath) -> dict[str, str] | Response:
+    if path.ext:
+        ext_map = {
+            '.json': 'application/ld+json',
+            '.ttl': 'text/turtle',
+            '.xml': 'application/rdf+xml',
+            '.nt': 'application/n-triples'}
+        if path.ext in ext_map:
+            request.environ['HTTP_ACCEPT'] = ext_map[path.ext]
+
     entity = Entity.get_by_uuid(path.id, types=True, aliases=True)
 
     if not entity:
@@ -87,7 +91,6 @@ def custom_swagger_ui():
       <script>
         window.onload = () => {
           window.ui = SwaggerUIBundle({
-            // HIER saugt sich Swagger deine generierte OpenAPI-Spec rein:
             url: '/api/1/docs/openapi.json',
             dom_id: '#swagger-ui',
           });
