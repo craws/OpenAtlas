@@ -55,6 +55,11 @@ services:
         condition: service_healthy
       initdb:
         condition: service_completed_successfully
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.openatlas.rule=PathPrefix(`/`)
+      - traefik.http.routers.openatlas.entrypoints=web
+      - traefik.http.services.openatlas.loadbalancer.server.port=5000
 
   iiif:
     build:
@@ -68,12 +73,17 @@ services:
       openatlas-gunicorn:
         condition: service_started
 
-  openatlas-nginx:
-    image: nginx:alpine
+  openatlas-traefik:
+    image: traefik:v3.1
+    command:
+      - --api.dashboard=false
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --entrypoints.web.address=:80
     ports:
       - "8081:80"
     volumes:
-      - ./install/container/nginx.gunicorn.conf:/etc/nginx/conf.d/default.conf:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     depends_on:
       openatlas-gunicorn:
         condition: service_started
@@ -95,7 +105,7 @@ services:
       # - NUXT_PUBLIC_MATOMO_ID=
       # - NUXT_PUBLIC_REDMINE_ID=
     depends_on:
-      openatlas-nginx:
+      openatlas-traefik:
         condition: service_started
     restart: unless-stopped
 
