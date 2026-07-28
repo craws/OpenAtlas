@@ -151,6 +151,25 @@ Stop the Gunicorn and Traefik variant with:
 podman compose -f compose-gunicorn.yaml down
 ```
 
+## API Access from Discovery (CORS)
+
+Applies to both stacks. Discovery runs on `http://localhost:3000` and calls the
+OpenAtlas API directly from the browser — on `http://localhost:8080` in the
+default stack, `http://localhost:8081` in the Gunicorn variant. Because these
+are different origins, the API must send a CORS header. Without it, map and
+network views fail with a network error in the browser console.
+
+Both compose files therefore set `CORS_ALLOWANCE=http://localhost:3000` by
+default. To allow a different origin, override it in your `.env` file:
+
+```bash
+echo "CORS_ALLOWANCE=https://your-presentation-site.tld" >> .env
+```
+
+Setting `*` allows every origin. Avoid this on anything reachable from outside
+your machine: the API uses cookie-based authentication, so a wildcard allowance
+combined with write endpoints is a CSRF risk.
+
 ## Accessing the Applications
 
 Once the containers are up and running (check `podman compose ps` shows services as "running" or "healthy", you can access the applications in your web browser:
