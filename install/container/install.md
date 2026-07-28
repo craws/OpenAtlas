@@ -67,9 +67,9 @@ Before you begin, ensure you have the following installed and configured:
     podman compose logs -f discovery  # OpenAtlas Discovery frontend logs
     ```
 
-## Gunicorn and Traefik Variant (PoC)
+## Gunicorn Variant (PoC)
 
-An additional experimental stack is available for testing OpenAtlas behind Traefik with Gunicorn instead of Apache. It uses the same PostgreSQL, database initialization, and OpenAtlas Discovery services as the default setup.
+An additional experimental stack is available for testing OpenAtlas with Gunicorn instead of Apache. It uses the same PostgreSQL, database initialization, and OpenAtlas Discovery services as the default setup, and publishes the application directly on port 8081.
 
 ### Development dependencies
 
@@ -93,7 +93,7 @@ podman compose -f compose-gunicorn.yaml up --detach
 
 ### Optional IIIF service (Gunicorn stack, Cantaloupe)
 
-The Gunicorn/Traefik stack can run IIIF in a dedicated Cantaloupe container
+The Gunicorn stack can run IIIF in a dedicated Cantaloupe container
 (`iiif`). This keeps OpenAtlas and IIIF separate without changing OpenAtlas
 core code.
 
@@ -131,11 +131,10 @@ IIIF = {
     'compression': 'jpeg'}
 ```
 
-OpenAtlas is then available at [http://localhost:8081](http://localhost:8081). To follow the application and reverse-proxy logs, run:
+OpenAtlas is then available at [http://localhost:8081](http://localhost:8081). To follow the application logs, run:
 
 ```bash
 podman compose -f compose-gunicorn.yaml logs -f openatlas-gunicorn
-podman compose -f compose-gunicorn.yaml logs -f openatlas-traefik
 ```
 
 To rebuild this variant after changing its image or application code, use:
@@ -145,7 +144,7 @@ podman compose -f compose-gunicorn.yaml build
 podman compose -f compose-gunicorn.yaml up -d --force-recreate
 ```
 
-Stop the Gunicorn and Traefik variant with:
+Stop the Gunicorn variant with:
 
 ```bash
 podman compose -f compose-gunicorn.yaml down
