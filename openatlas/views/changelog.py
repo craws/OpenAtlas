@@ -27,6 +27,7 @@ versions = {
             '2613': 'ARCHE export: SQL dump',
             '2864': 'API: 0.4.15',
             '2704': 'Additional database indexes for performance',
+            '2867': 'Podman instead Docker, software agnostic configuration',
             '2780': 'Remove file table',
             '2699': 'Update manual examples',
             '2816': 'Refactor and minor improvements'},
