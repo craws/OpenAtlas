@@ -34,6 +34,10 @@ New NPM packages with security updates are available:
     cd openatlas/static
     npm install
 
+Beginning with this version it is possible to install OpenAtlas just once to
+run multiple instances on the same server, see install.md for details. But it
+can still be used like before without any need for changes.
+
 ### 9.2.0 to 9.3.0
 9.3.0.sql is needed but will be taken care of by the database upgrade script.
 
