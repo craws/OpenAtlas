@@ -179,7 +179,7 @@ def file_delete(name: str) -> Response:
     if is_authorized('admin'):  # pragma: no cover - don't test, ever
         entity_file_ids = [entity.id for entity in Entity.get_by_class('file')]
         for f in app.config['UPLOAD_PATH'].iterdir():
-            if f.name != '.gitignore' and int(f.stem) not in entity_file_ids:
+            if f.stem.isdigit() and int(f.stem) not in entity_file_ids:
                 (app.config['UPLOAD_PATH'] / f.name).unlink()
     return redirect(
         f'{url_for('check_files')}#tab-orphaned-files')  # pragma: no cover

@@ -2,7 +2,8 @@
   /**
    * OpenAtlas autocomplete
    * Documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
-   * Bootstrap version needs to be manually set d/t
+   * The plugin only supports Bootstrap 3/4; its Bootstrap 4 markup is
+   * compatible with the Bootstrap 5 styles used by OpenAtlas.
   */
   $('input[data-reference-system={{ system.id }}]').autoComplete({
     bootstrapVersion: '4',
@@ -22,7 +23,8 @@
           url: "{{ system.website_url }}/api/search/all",
           dataType: "json",
           data: {
-            term: qry
+            term: qry,
+            limit: 40
           },
           success: function(data) {
             console.log(data)

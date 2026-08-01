@@ -367,30 +367,6 @@ def link(data: dict[str, Any]) -> int:
     return g.cursor.fetchone()['id']
 
 
-def update_file_info(data: dict[str, Any]) -> None:
-    g.cursor.execute(
-        """
-        INSERT INTO model.file_info (
-            entity_id,
-            public
-        ) VALUES (
-            %(entity_id)s,
-            %(public)s
-        ) ON CONFLICT (entity_id) DO UPDATE SET
-            public = %(public)s
-        """,
-        data)
-
-
-def get_file_info() -> dict[int, dict[str, Any]]:
-    g.cursor.execute(
-        """
-        SELECT entity_id, public
-        FROM model.file_info;
-        """)
-    return {row['entity_id']: {'public': row['public']} for row in g.cursor}
-
-
 def get_entity_ids_with_links(
         property_: str,
         classes: list[str],

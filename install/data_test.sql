@@ -34,7 +34,7 @@ UPDATE web.settings SET value = 'http://localhost/iiif/tests/' WHERE name = 'iii
 UPDATE web.settings SET value = '2' WHERE name = 'iiif_version';
 UPDATE web.settings SET value = 'deflate' WHERE name = 'iiif_conversion';
 UPDATE web.settings SET value = 'True' WHERE name = 'iiif_convert_on_upload';
-UPDATE web.settings SET value = 'https://frontend-demo.openatlas.eu/entity/' WHERE name = 'frontend_resolver_url';
+UPDATE web.settings SET value = 'https://discovery-demo.openatlas.eu/entity/' WHERE name = 'frontend_resolver_url';
 
 -- Add Dimensions value type to place
 INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) VALUES

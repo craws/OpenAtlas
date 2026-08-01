@@ -1,5 +1,5 @@
 [![License: GPL v2](https://img.shields.io/badge/License-GPL_v2-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html)
-[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/release/python-3110/)
+[![Python 3.13](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/downloads/release/python-3130/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7605689.svg)](https://doi.org/10.5281/zenodo.7605689)
 ![tests](https://github.com/craws/OpenAtlas/actions/workflows/starter.yaml/badge.svg)
 
@@ -42,12 +42,10 @@ Please refer to our [contributing guidelines](CONTRIBUTING.md)
 ([nina.richards@oeaw.ac.at](mailto:nina.richards@oeaw.ac.at))
 - **Alexander Watzinger** - Lead Developer and Concept
 ([alexander.watzinger@oeaw.ac.at](mailto:alexander.watzinger@oeaw.ac.at))
-- **Bernhard Koschiček-Krombholz** - Backend Development, API
+- **Bernhard Koschiček-Krombholz** - Backend Development and API
 ([bernhard.koschicek-krombholz@oeaw.ac.at](mailto:bernhard.koschicek-krombholz@oeaw.ac.at))
 - **Olivia Reichl** - Frontend Development
 ([Olivia.Reichl@oeaw.ac.at](mailto:Olivia.Reichl@oeaw.ac.at))
-- **Katharina Wünsche** - Frontend Development
-([Katharina.Wuensche@oeaw.ac.at](mailto:Katharina.Wuensche@oeaw.ac.at))
 - **Jan Belik** - Logo Design and Design Consulting
 ([buero@janbelik.com](mailto:buero@janbelik.com))
 
