@@ -7,7 +7,7 @@ from flask import g, url_for
 from openatlas import app
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.models.export import current_date_for_filename
-from tests.base import ImportTestCase
+from tests.base import ImportTestCase, get_hierarchy
 
 
 class ImportTest(ImportTestCase):
@@ -68,6 +68,7 @@ class ImportTest(ImportTestCase):
             app.preprocess_request()
             rights_holder_ids = [rh.id for rh in g.rights_holder]
         logo_path = Path(app.root_path) / 'static' / 'images' / 'layout'
+        public_type = get_hierarchy('Public sharing allowed')
         with open(logo_path / 'logo.png', 'rb') as img:
             c.post(
                 url_for('insert', class_='file'),
@@ -76,7 +77,7 @@ class ImportTest(ImportTestCase):
                     'file': img,
                     'creator': f'{rights_holder_ids}',
                     'license_holder': f'{rights_holder_ids}',
-                    'public': True},
+                    str(public_type.id): public_type.subs[0]},
                 follow_redirects=True)
 
         c.post(

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 # pylint: disable=too-few-public-methods
-# mypy: ignore-errors, too much trouble to mypy check form elements
+# mypy: ignore-errors
 import ast
 from pathlib import Path
 from typing import Any, Optional

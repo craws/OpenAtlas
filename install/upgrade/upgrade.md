@@ -17,6 +17,15 @@ then run the database upgrade script, then restart Apache:
     sudo python3 install/upgrade/database_upgrade.py
     sudo service apache2 restart
 
+**Multiple instances**
+
+When using the multiple instances approach be aware about slightly changes at
+the upgrade process. E.g. you only need to update the application once but
+have to do the database upgrade for every instance individually by going in
+their specific directories and execute:
+
+    sudo python3 database_upgrade.py
+
 ### 9.3.x to 9.4.0
 9.4.0.sql is needed but will be taken care of by the database upgrade script.
 
@@ -24,6 +33,10 @@ New NPM packages with security updates are available:
 
     cd openatlas/static
     npm install
+
+Beginning with this version it is possible to install OpenAtlas just once to
+run multiple instances on the same server, see install.md for details. But it
+can still be used like before without any need for changes.
 
 ### 9.2.0 to 9.3.0
 9.3.0.sql is needed but will be taken care of by the database upgrade script.

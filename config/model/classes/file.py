@@ -20,8 +20,6 @@ file: dict[str, Any] = {
             'required': True},
         'file': {
             'required': True},
-        'public': {
-            'label': _('public sharing allowed')},
         'creator': {
             'label': _('creator')},
         'license_holder': {

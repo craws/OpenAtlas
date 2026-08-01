@@ -149,6 +149,45 @@ In OpenAtlas, you can link to two different types of entries:
     (e.g., ``01004/781/1``), you can link to a specific plot of land.
     OpenAtlas will use the ``/gst/{kgnr}/{gnr}`` endpoint for this.
 
+Kulturpool
+**********
+`Kulturpool <https://kulturpool.at/>`_ is the central Austrian search portal for
+digitalised cultural heritage. It aggregates metadata from Austrian museums,
+libraries, and archives to make heritage items publicly accessible.
+
+It is not bound to a specific class by default in OpenAtlas and can be configured
+for the required classes.
+
+VIAF
+****
+`VIAF <https://viaf.org/>`_ (Virtual International Authority File) is an international
+service that combines multiple national authority files into a single unified resource.
+It primary links regional identifiers for personal and corporate names to enable
+cross-institutional data retrieval.
+
+It is not bound to a specific class by default in OpenAtlas and can be configured
+for the required classes.
+
+Getty AAT
+*********
+The `Getty Art & Architecture Thesaurus <https://www.getty.edu/research/tools/vocabularies/aat/>`_
+(AAT) is a structured vocabulary containing terms, concepts, and object types related to art,
+architecture, and material culture. It provides standardized terminology used by heritage
+institutions for classification and indexing.
+
+In OpenAtlas, Getty AAT is automatically linked to **types**.
+
+ChronOntology
+*************
+`iDAI.chronontology <https://chronontology.dainst.org/>`_ is a web service
+hosted by the German Archaeological Institute (DAI) that connects chronological
+terms—such as epochs, periods, and historical events—with dating information.
+It provides standardized temporal definitions and relationships to facilitate
+interoperability across archaeological and historical research datasets.
+
+It is not bound to a specific class by default in OpenAtlas and can be configured
+for the required classes.
+
 OpenAtlas
 *********
 Although not provided by default, reference systems to other OpenAtlas
@@ -161,3 +200,4 @@ APIS
 Although not provided by default, reference systems to
 `APIS <https://www.oeaw.ac.at/acdh/tools/apis-app>`_
 instances can be added. The **API** for these should be **APIS**.
+

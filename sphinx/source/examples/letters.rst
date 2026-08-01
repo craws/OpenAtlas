@@ -3,10 +3,7 @@ Letters
 
 .. toctree::
 
-.. Note:: May need adaptions to reflect new tab navigation and menu label
-  changes.
-
-The following step by step instruction describes how to enter a letter
+The following step-by-step instruction describes how to enter a letter
 exchange event.
 The following elements are involved in the procedure:
 
@@ -26,7 +23,7 @@ begin of the date field would be the creation of the letter, etc.
   entry by using the **+ Artifact** button
 * Choose a descriptive name
 * Select an appropriate :doc:`/entity/type` from the list, such as letter
-* Add further information e.g. a date or description
+* Add further information, e.g. a date or description
 * Press **Insert** to save the entry
 
 Adding a source
@@ -39,13 +36,13 @@ example, if there are copies of the letter, they all have the same text
   the **+ Source** button
 * Choose a descriptive name
 * Select an appropriate :doc:`/entity/type` from the list
-* Click on **Artifact** and choose the before created letter from the list
+* Click on **Artifact** and choose the previously created letter from the list
 * Add more information as desired
 * Press **Insert** to save the entry
 
 **Please note**: It is important to link the artifact to the source in this way
 to reflect that it is the source written on the letter.
-If you would link it using the tab **Artifact** it means the source refers to
+If you link it using the **Artifact** tab, the source refers to
 the artifact instead.
 
 Adding the move event
@@ -67,11 +64,11 @@ one location to the other:
 
 Adding sender and recipient
 ---------------------------
-Now you can link one actor at by using the following steps:
+Now you can link one actor by using the following steps:
 
 * Open the created event by clicking on it in the event tab of the move
 * Click on the **Actor** tab
-* Either link an already exiting person from the list with **Link** or
+* Either link an existing person from the list with **Link** or
   create a new one by using the **+ Person** button
 * When entering the involvement information, choose the actor and add the
   respective type (sender/recipient)

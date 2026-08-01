@@ -171,6 +171,7 @@ VALUES
 
   ('P107', (SELECT id FROM model.entity WHERE name='Sam'), (SELECT id FROM model.entity WHERE name='The Fellowship'), NULL, (SELECT id FROM model.entity WHERE name='Bishop') ),
   ('P67', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Frodo et. al.'), '987', NULL ),
+  ('P67', (SELECT id FROM model.entity WHERE name='Home of Baggins'), (SELECT id FROM model.entity WHERE name='Frodo et. al.'), '123', NULL ),
   ('P2', (SELECT id FROM model.entity WHERE name='Radiocarbon'), (SELECT id FROM model.entity WHERE name='Bar'), '{"labId": "VERA", "specId": "23451A", "radiocarbonYear": 2040, "range": 30, "timeScale": "BP"}', NULL ),
   ('P67', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Frodo et. al.'), '234', NULL ),
   ('P67', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Translation of Silmarillion'), '234', NULL ),
@@ -206,12 +207,10 @@ ON CONFLICT (entity_id) DO UPDATE SET image_id=(SELECT id FROM model.entity WHER
 INSERT INTO web.map_overlay (image_id, bounding_box)
         VALUES ((SELECT id FROM model.entity WHERE name='Picture with a License'), '[[48.58653,15.64356],[48.58709,15.64294]]');
 
-INSERT INTO model.file_info (entity_id, public)
-VALUES
-    ((SELECT id FROM model.entity WHERE name='File without license'), TRUE),
-    ((SELECT id FROM model.entity WHERE name='File without file'), TRUE),
-    ((SELECT id FROM model.entity WHERE name='Picture with a License'), TRUE),
-    ((SELECT id FROM model.entity WHERE name='File not public'), FALSE);
+INSERT INTO model.link (domain_id, range_id, property_code) VALUES
+    ((SELECT id FROM model.entity WHERE name='File without license'), (SELECT id FROM model.entity WHERE name='Yes'), 'P2'),
+    ((SELECT id FROM model.entity WHERE name='File without file'), (SELECT id FROM model.entity WHERE name='Yes'), 'P2'),
+    ((SELECT id FROM model.entity WHERE name='Picture with a License'), (SELECT id FROM model.entity WHERE name='Yes'), 'P2');
 
 ALTER TABLE model.rights_holder
     DROP CONSTRAINT IF EXISTS uq_rights_holder_name;

@@ -74,10 +74,16 @@ class Entity:
                     setattr(self, name, value)
         if self.class_.name == 'file':
             self.public = False
+            for type_ in self.types:
+                if (type_.root and
+                        g.types[type_.root[0]].name ==
+                        'Public sharing allowed'
+                        and type_.name == 'Yes'):
+                    self.public = True
+                    break
             self.creator = []
             self.license_holder = []
             if self.id in g.file_info:
-                self.public = g.file_info[self.id]['public']
                 self.creator = g.file_info[self.id]['creator']
                 self.license_holder = g.file_info[self.id]['license_holder']
         if self.class_.name == 'reference_system' and 'website_url' in data:
@@ -216,9 +222,6 @@ class Entity:
             inverse)
 
     def save_file_info(self, data: dict[str, Any]) -> None:
-        db.update_file_info({
-            'entity_id': self.id,
-            'public': data.get('public', False)})
         RightsHolder.delete_rights_holder_links(self.id)
         if data.get('creator'):
             for creator_id in ast.literal_eval(data['creator']):
@@ -410,17 +413,18 @@ class Entity:
 
     def get_untyped(self) -> list[Entity]:
         untyped = []
-        for entity in Entity.get_by_class(self.classes, types=True):
-            linked = False
-            to_check = entity
-            if self.class_.name == 'administrative_unit':
-                to_check = entity.get_linked_entity_safe('P53', types=True)
-            for type_ in to_check.types:
-                if type_.root[0] == self.id:
-                    linked = True
-                    break
-            if not linked:
-                untyped.append(entity)
+        if self.classes:
+            for entity in Entity.get_by_class(self.classes, types=True):
+                linked = False
+                to_check = entity
+                if self.class_.name == 'administrative_unit':
+                    to_check = entity.get_linked_entity_safe('P53', types=True)
+                for type_ in to_check.types:
+                    if type_.root[0] == self.id:
+                        linked = True
+                        break
+                if not linked:
+                    untyped.append(entity)
         return untyped
 
     def update_hierarchy(
@@ -472,10 +476,6 @@ class Entity:
     def get_multiple_typed_entities(self) -> list[Entity]:
         return Entity.get_by_ids(
             db.get_multiple_linked_entities(self.get_sub_ids_recursive()))
-
-    @staticmethod
-    def get_file_info() -> dict[int, Any]:
-        return db.get_file_info()
 
     @staticmethod
     def get_by_class(

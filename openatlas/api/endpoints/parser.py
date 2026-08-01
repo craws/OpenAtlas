@@ -219,7 +219,7 @@ class Parser:
             case "public":
                 tag = "public"
                 if e.class_.name == "file" and g.file_info.get(e.id):
-                    value = display_bool(g.file_info[e.id]["public"])
+                    value = display_bool(e.public)
             case "size":
                 tag = "size"
                 if e.class_.name == "file" and e.id in g.files:

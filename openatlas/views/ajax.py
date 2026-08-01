@@ -7,11 +7,15 @@ from openatlas import app
 # pylint: disable=unused-import
 from openatlas.api.external.apis import APIS  # noqa
 from openatlas.api.external.cadaster import Cadaster  # noqa
+from openatlas.api.external.chronontology import ChronOntology  # noqa
 from openatlas.api.external.doi import DOI # noqa
+from openatlas.api.external.gettyaat import GettyAAT  # noqa
 from openatlas.api.external.geonames import GeoNames  # noqa
 from openatlas.api.external.gnd import GND  # noqa
+from openatlas.api.external.kulturpool import Kulturpool  # noqa
 from openatlas.api.external.openatlas_api import OpenAtlas  # noqa
 from openatlas.api.external.wikidata import Wikidata  # noqa
+from openatlas.api.external.viaf import VIAF  # noqa
 from openatlas.display.util import display_info, required_group
 from openatlas.display.util2 import uc_first
 from openatlas.models.entity import Entity, insert
@@ -108,3 +112,41 @@ def crossref_proxy() -> Response | tuple[Response, int]:
         return jsonify(response.json())
     except requests.exceptions.RequestException as e:
         return jsonify({'error': str(e), 'message': {'items': []}}), 502
+
+
+@app.route('/proxy/viaf', methods=['GET'])
+@required_group('readonly')
+def viaf_proxy() -> Response | tuple[Response, int]:
+    try:
+        response = requests.get(
+            'https://viaf.org/viaf/AutoSuggest',
+            params={'query': request.args.get('query', '')},
+            headers={
+                'Accept': 'application/json',
+                **app.config['USER_AGENT']},
+            proxies=app.config['PROXIES'],
+            timeout=10)
+        response.raise_for_status()
+        return jsonify(response.json())
+    except requests.exceptions.RequestException as e:  # pragma: no cover
+        return jsonify({'error': str(e), 'result': []}), 502
+
+
+@app.route('/proxy/chronontology', methods=['GET'])
+@required_group('readonly')
+def chronontology_proxy() -> Response | tuple[Response, int]:
+    try:
+        response = requests.get(
+            'https://chronontology.dainst.org/data/period/',
+            params={
+                'q': request.args.get('q', ''),
+                'size': request.args.get('size', '40')},
+            headers={
+                'Accept': 'application/json',
+                **app.config['USER_AGENT']},
+            proxies=app.config['PROXIES'],
+            timeout=10)
+        response.raise_for_status()
+        return jsonify(response.json())
+    except requests.exceptions.RequestException as e:  # pragma: no cover
+        return jsonify({'error': str(e), 'results': []}), 502
