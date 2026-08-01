@@ -15,7 +15,8 @@ def index_changelog() -> str:
 
 
 versions = {
-    '9.4.0': ['TBA', {
+    '9.5.0': ['TBA', {}],
+    '9.4.0': ['2026-08-01', {
         'feature': {
             '924': 'Multi instance capability',
             '2855': 'Scrollable lists for external reference systems',
@@ -27,6 +28,7 @@ versions = {
             '2613': 'ARCHE export: SQL dump',
             '2864': 'API: 0.4.15',
             '2704': 'Additional database indexes for performance',
+            '2867': 'Podman instead Docker, software agnostic configuration',
             '2780': 'Remove file table',
             '2699': 'Update manual examples',
             '2816': 'Refactor and minor improvements'},
