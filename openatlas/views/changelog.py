@@ -15,7 +15,7 @@ def index_changelog() -> str:
 
 
 versions = {
-    '9.4.0': ['TBA', {
+    '9.4.0': ['2026-08-01', {
         'feature': {
             '924': 'Multi instance capability',
             '2855': 'Scrollable lists for external reference systems',
