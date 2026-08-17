@@ -1,6 +1,6 @@
 from typing import Any
 
-from flask import Response, request
+from flask import Response, render_template_string, request
 from flask_openapi3 import APIBlueprint
 from rdflib import Graph
 
@@ -79,23 +79,41 @@ def get_entity(path: EntityPath) -> dict[str, str] | Response:
 
 # This is a workaround for swagger ui, because we can't use pip/uv
 # Todo: look into variants with npm
-@app.route('/api/1/docs/swagger')
-def custom_swagger_ui():
-    html = """
+
+@app.route('/api/1/docs/redoc')
+def redoc_api_reference():
+    template = """
     <!DOCTYPE html>
     <html lang="en">
     <head>
+      <title>OpenAtlas V1 - ReDoc</title>
       <meta charset="utf-8" />
       <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <style>body { margin: 0; padding: 0; }</style>
+    </head>
+    <body>
+      <redoc spec-url="/api/1/docs/openapi.json"></redoc>
+      <script src="{{ url_for('static', filename='node_modules/redoc/bundles/redoc.standalone.js', v=config.VERSION) }}"></script>
+    </body>
+    </html>
+    """
+    return render_template_string(template)
+
+
+@app.route('/api/1/docs/swagger')
+def custom_swagger_ui():
+    template = """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
       <title>OpenAtlas V1 - Swagger UI</title>
-      <link rel="stylesheet" 
-        href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/swagger-ui-dist/swagger-ui.css', v=config.VERSION) }}" />
     </head>
     <body>
       <div id="swagger-ui"></div>
-      
-      <script 
-    src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+      <script src="{{ url_for('static', filename='node_modules/swagger-ui-dist/swagger-ui-bundle.js', v=config.VERSION) }}"></script>
       <script>
         window.onload = () => {
           window.ui = SwaggerUIBundle({
@@ -107,5 +125,31 @@ def custom_swagger_ui():
     </body>
     </html>
     """
-    return html
+    return render_template_string(template)
+
+
+@app.route('/api/1/docs/scalar')
+def scalar_api_reference():
+    template = """
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <title>OpenAtlas V1 - Scalar</title>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <style>
+        body { margin: 0; padding: 0; }
+      </style>
+    </head>
+    <body>
+      <script
+        id="api-reference"
+        data-url="/api/1/docs/openapi.json">
+      </script>
+      <script src="{{ url_for('static', filename='node_modules/@scalar/api-reference/dist/browser/standalone.js', v=config.VERSION) }}"></script>
+    </body>
+    </html>
+    """
+    return render_template_string(template)
+
 
