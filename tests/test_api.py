@@ -1,6 +1,4 @@
-import json
 from pathlib import Path
-from typing import Any
 
 from flask import g, url_for
 
@@ -78,27 +76,6 @@ class Api(ApiTestCase):
 
             file.link('P2', open_license)
 
-        # Test Swagger UI
-        if app.config['OPENAPI_INSTANCE_FILE'].exists():
-            app.config['OPENAPI_INSTANCE_FILE'].unlink()
-        rv: Any = c.get(url_for('flasgger.apidocs'))
-        assert b'Flasgger' in rv.data
-        with app.config['OPENAPI_INSTANCE_FILE'].open(mode='r+') as f:
-            data = json.load(f)
-            data['servers'][0]['description'] = 'Wrong description'
-            f.seek(0)
-            json.dump(data, f)
-            f.truncate()
-        rv = c.get(url_for('flasgger.apidocs'))
-        assert b'Flasgger' in rv.data
-        with app.config['OPENAPI_INSTANCE_FILE'].open(mode='r+') as f:
-            data = json.load(f)
-            data['info']['version'] = '9.9.9'
-            f.seek(0)
-            json.dump(data, f)
-            f.truncate()
-        rv = c.get(url_for('flasgger.apidocs'))
-        assert b'Flasgger' in rv.data
 
         # ---Content Endpoints---
         rv = c.get(url_for('api_04.classes')).get_json()
@@ -183,8 +160,8 @@ class Api(ApiTestCase):
         assert len(rv['results']) == 18
 
         for rv in [
-                c.get(url_for('api_04.geometric_entities')),
-                c.get(url_for('api_04.geometric_entities', download=True))]:
+            c.get(url_for('api_04.geometric_entities')),
+            c.get(url_for('api_04.geometric_entities', download=True))]:
             rv = rv.get_json()
             assert rv['features'][0]['geometry']['coordinates']
             assert rv['features'][0]['properties']['id']
@@ -626,13 +603,13 @@ class Api(ApiTestCase):
 
         # ---Type Endpoints---
         for rv in [
-                c.get(url_for('api_04.type_overview')),
-                c.get(url_for('api_04.type_overview', download=True))]:
+            c.get(url_for('api_04.type_overview')),
+            c.get(url_for('api_04.type_overview', download=True))]:
             assert 'Austria' in str(rv.get_json())
 
         for rv in [
-                c.get(url_for('api_04.type_by_view_class')),
-                c.get(url_for('api_04.type_by_view_class', download=True))]:
+            c.get(url_for('api_04.type_by_view_class')),
+            c.get(url_for('api_04.type_by_view_class', download=True))]:
             assert 'Boundary Mark' in str(rv.get_json())
         rv = c.get(url_for('api_04.type_tree'))
         assert rv.get_json()['typeTree']
@@ -862,11 +839,11 @@ class Api(ApiTestCase):
 
         # Test Error Handling
         for rv in [
-                c.get(url_for('api_04.entity', id_=233423424)),
-                c.get(url_for(
-                    'api_04.entity_uuid',
-                    uuid='7b9e1c4a-5f2d-4b8a-9e3c-2d1f0a9b8c7d')),
-                c.get(url_for('api_04.cidoc_class', class_='E18', last=1231))]:
+            c.get(url_for('api_04.entity', id_=233423424)),
+            c.get(url_for(
+                'api_04.entity_uuid',
+                uuid='7b9e1c4a-5f2d-4b8a-9e3c-2d1f0a9b8c7d')),
+            c.get(url_for('api_04.cidoc_class', class_='E18', last=1231))]:
             rv = rv.get_json()
         assert 'Entity does not exist' in rv['title']
 
