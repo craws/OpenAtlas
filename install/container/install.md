@@ -162,12 +162,8 @@ Both compose files therefore set `CORS_ALLOWANCE=http://localhost:3000` by
 default. To allow a different origin, override it in your `.env` file:
 
 ```bash
-echo "CORS_ALLOWANCE=https://your-presentation-site.tld" >> .env
+echo "CORS_ALLOWANCE=*" >> .env
 ```
-
-Setting `*` allows every origin. Avoid this on anything reachable from outside
-your machine: the API uses cookie-based authentication, so a wildcard allowance
-combined with write endpoints is a CSRF risk.
 
 ## Accessing the Applications
 
