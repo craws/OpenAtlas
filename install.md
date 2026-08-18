@@ -25,7 +25,7 @@ that we are using to set up Debian servers for OpenAtlas installations.
 ### Python 3.13 and Flask 3.1.1
     sudo apt install python3 python3-flask python3-psycopg2 python3-flask-babel python3-flask-login
     sudo apt install python3-jwt python3-python-flask-jwt-extended python3-flaskext.wtf python3-flask-cors
-    sudo apt install python3-rdflib python3-shapely python3-flask-restful python3-pandas
+    sudo apt install python3-rdflib python3-shapely python3-flask-restful python3-pandas python3-yaml
     sudo apt install python3-validators python3-email-validator python3-wand python3-svgwrite
     sudo apt install python3-xmltodict python3-markdown exiftran python3-bcrypt python3-dateutil p7zip-full
     sudo apt install python3-requests python3-bs4 python3-unidecode python3-lxml python3-unidecode python3-numpy
