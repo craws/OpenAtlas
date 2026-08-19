@@ -39,3 +39,16 @@ def abort_not_found(uuid: UUID | str) -> NoReturn:
         'timestamp': datetime.now().isoformat(),
         'status': 404}
     abort(make_response(jsonify(error_payload), 404))
+
+
+def abort_invalid_class(class_name: str) -> NoReturn:
+    error_payload = {
+        'title': 'Invalid system class',
+        'message': f"The requested entity class '{class_name}' is not a valid system class.",
+        'details': {
+            'provided_class': str(class_name),
+            'hint': 'Check if the class name is spelled correctly and exists in the system.'},
+        'url': request.url,
+        'timestamp': datetime.now().isoformat(),
+        'status': 404}
+    abort(make_response(jsonify(error_payload), 404))

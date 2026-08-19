@@ -1,10 +1,12 @@
 from datetime import date
 from enum import Enum
-from typing import Literal
+from typing import Any, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 from pydantic.alias_generators import to_camel
+
+from openatlas.api.api_v1.date_util import pad_historical_date
 
 
 class OpenAtlasClassEnum(str, Enum):
@@ -109,50 +111,55 @@ class EntityCollectionPath(BaseModel):
                 "type": {
                     "summary": "Type (E55 Type)",
                     "value": "type"}}})
-    ext: ExtensionsType = Field(
-        'json',
-        description="Optional file extension (.json, .ttl, .xml, .nt)",
-        json_schema_extra={
-            "examples": {
-                "json": {"summary": "JSON-LD Format", "value": "json"},
-                "turtle": {"summary": "Turtle Format", "value": "ttl"},
-                "xml": {"summary": "RDF/XML Format", "value": "xml"},
-                "ntriples": {"summary": "N-Triples Format", "value": "nt"}}})
+
 
 class EntityCollectionQuery(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
     search: str | None = Field(
         None,
-        description="Free-text search across entity Name, Description, "
-                    "and Alias.")
+        description="Filter entities by name (case-insensitive substring match).")
+    sort_by: Literal['name', 'startDate', 'endDate'] = Field(
+        'name',
+        description="Field to sort by: 'name', 'startDate', or 'endDate'.")
     sort: Literal['asc', 'desc'] = Field(
         'asc',
-        description="Ordering results ascending or descending.")
+        description="Sort direction: 'asc' or 'desc'.")
     limit: int = Field(
         100,
         ge=1,
         le=1000,
         description="Number of records to return (max 1000).")
     page: int = Field(
-        0,
-        ge=0,
-        description="Page to jump to.")
-    begin_from: date | None = Field(
+        1,
+        ge=1,
+        description="Page number (starting at 1).")
+    start_date: str | None = Field(
         None,
-        description="Filter by begin date, starting from (YYYY-MM-DD).")
-    begin_to: date | None = Field(
+        description="Filter entities with begin date on or after this date (e.g. 0400-01-01, 400, -400).")
+    end_date: str | None = Field(
         None,
-        description="Filter by begin date, up to (YYYY-MM-DD).")
-    end_from: date | None = Field(
+        description="Filter entities with end date on or before this date (e.g. 0400-12-31, 400, -400).")
+    type_id: int | UUID | str | None = Field(
         None,
-        description="Filter by end date, starting from (YYYY-MM-DD).")
-    end_to: date | None = Field(
+        description="Filter entities by type ID (integer) or type UUID.")
+    case_study: int | UUID | str | None = Field(
         None,
-        description="Filter by end date, up to (YYYY-MM-DD).")
-    case_study: UUID | None = Field(
-        None,
-        description="Filter entities belonging to a specific case study UUID.")
+        description="Filter entities by case study ID (integer) or case study UUID.")
+
+    @field_validator('start_date', mode='before')
+    @classmethod
+    def validate_start_date(cls, v: Any) -> str | None:
+        if v is None:
+            return None
+        return pad_historical_date(v, is_end_date=False)
+
+    @field_validator('end_date', mode='before')
+    @classmethod
+    def validate_end_date(cls, v: Any) -> str | None:
+        if v is None:
+            return None
+        return pad_historical_date(v, is_end_date=True)
 
 
 class LinkedArtResponse(BaseModel):
@@ -164,3 +171,21 @@ class LinkedArtResponse(BaseModel):
     id: str
     type: str
     _label: str
+
+
+class LinkedArtCollectionResponse(BaseModel):
+    model_config = ConfigDict(extra='allow', populate_by_name=True)
+
+    context: list[str | dict[str, str]] = Field(
+        default=[
+            "https://linked.art/ns/v1/linked-art.json",
+            {"hydra": "http://www.w3.org/ns/hydra/core#"}],
+        alias="@context")
+    id: str
+    type: str = "hydra:PartialCollectionView"
+    total_items: int = Field(alias="hydra:totalItems")
+    first: str = Field(alias="hydra:first")
+    previous: str | None = Field(default=None, alias="hydra:previous")
+    next: str | None = Field(default=None, alias="hydra:next")
+    last: str = Field(alias="hydra:last")
+    graph: list[dict[str, Any]] = Field(alias="@graph")

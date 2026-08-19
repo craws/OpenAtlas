@@ -930,19 +930,38 @@ def format_loud_entity(entity: Entity) -> dict[str, Any]:
     return {'@context': res['@context']} | res['@graph'][0]
 
 
-def format_loud_entities(entities: list[Entity]) -> dict[str, Any]:
-    if not entities:
+def format_loud_entities(
+        entities: list[Entity],
+        pagination: dict[str, Any] | None = None) -> dict[str, Any]:
+    if not entities and pagination is None:
         return {
             '@context': app.config['API_CONTEXT']['LOUD'],
             '@graph': []}
-    links_data = get_links_for_entities(entities)
+    links_data = get_links_for_entities(entities) if entities else {}
     type_references = get_type_references()
     formatter = LoudFormatter(type_references=type_references)
+    graph = [
+        formatter.format_entity(item)
+        for item in links_data.values()]
+    if pagination is not None:
+        result: dict[str, Any] = {
+            '@context': [
+                app.config['API_CONTEXT']['LOUD'],
+                {'hydra': 'http://www.w3.org/ns/hydra/core#'}],
+            'id': pagination['id'],
+            'type': 'hydra:PartialCollectionView',
+            'hydra:totalItems': pagination['total_items'],
+            'hydra:first': pagination['first']}
+        if 'previous' in pagination:
+            result['hydra:previous'] = pagination['previous']
+        if 'next' in pagination:
+            result['hydra:next'] = pagination['next']
+        result['hydra:last'] = pagination['last']
+        result['@graph'] = graph
+        return result
     return {
         '@context': app.config['API_CONTEXT']['LOUD'],
-        '@graph': [
-            formatter.format_entity(item)
-            for item in links_data.values()]}
+        '@graph': graph}
 
 
 def get_loud_entities(

@@ -74,6 +74,145 @@ def get_by_class(
     return list(g.cursor)
 
 
+def _format_date_for_pg(d: Any) -> str | None:
+    if d is None:
+        return None
+    s = str(d).strip()
+    if s.startswith('-'):
+        return f"{s.lstrip('-')} BC"
+    return s
+
+
+def get_by_class_api(
+        class_: str,
+        types: bool = False,
+        aliases: bool = False,
+        order_by: str | None = None,
+        limit: int | None = None,
+        offset: int | None = None,
+        search: str | None = None,
+        start_date: Any = None,
+        end_date: Any = None,
+        type_ids: list[int] | None = None,
+        case_study_ids: list[int] | None = None) -> list[dict[str, Any]]:
+    sql = (
+        select_sql(types, aliases) +
+        ' WHERE e.openatlas_class_name = %(class)s')
+    params: dict[str, Any] = {'class': class_}
+
+    if search:
+        sql += ' AND e.name ILIKE %(search)s'
+        params['search'] = f'%{search}%'
+
+    if start_date:
+        sql += ' AND COALESCE(e.begin_from, e.begin_to) >= %(start_date)s'
+        params['start_date'] = _format_date_for_pg(start_date)
+
+    if end_date:
+        sql += (
+            ' AND COALESCE(e.end_to, e.end_from, e.begin_to, e.begin_from) '
+            '<= %(end_date)s')
+        params['end_date'] = _format_date_for_pg(end_date)
+
+    if type_ids is not None:
+        if not type_ids:
+            return []
+        sql += (
+            ' AND EXISTS (SELECT 1 FROM model.link l_t '
+            'WHERE l_t.domain_id = e.id AND l_t.range_id IN %(type_ids)s '
+            "AND l_t.property_code IN ('P2', 'P89'))")
+        params['type_ids'] = tuple(type_ids)
+
+    if case_study_ids is not None:
+        if not case_study_ids:
+            return []
+        sql += (
+            ' AND EXISTS (SELECT 1 FROM model.link l_cs '
+            'WHERE l_cs.domain_id = e.id AND l_cs.range_id IN %(case_study_ids)s '
+            "AND l_cs.property_code IN ('P2', 'P89'))")
+        params['case_study_ids'] = tuple(case_study_ids)
+
+    sql += ' GROUP BY e.id'
+
+    match order_by:
+        case 'name_desc':
+            sql += ' ORDER BY e.name DESC, e.id DESC'
+        case 'start_date_asc':
+            sql += ' ORDER BY e.begin_from ASC NULLS LAST, e.id ASC'
+        case 'start_date_desc':
+            sql += ' ORDER BY e.begin_from DESC NULLS LAST, e.id DESC'
+        case 'end_date_asc':
+            sql += (
+                ' ORDER BY COALESCE(e.end_to, e.end_from, e.begin_to, '
+                'e.begin_from) ASC NULLS LAST, e.id ASC')
+        case 'end_date_desc':
+            sql += (
+                ' ORDER BY COALESCE(e.end_to, e.end_from, e.begin_to, '
+                'e.begin_from) DESC NULLS LAST, e.id DESC')
+        case _:
+            sql += ' ORDER BY e.name ASC, e.id ASC'
+
+    if limit is not None:
+        sql += ' LIMIT %(limit)s'
+        params['limit'] = limit
+    if offset is not None:
+        sql += ' OFFSET %(offset)s'
+        params['offset'] = offset
+    sql += ';'
+
+    g.cursor.execute(sql, params)
+    return list(g.cursor)
+
+
+def get_count_by_class_api(
+        class_: str,
+        search: str | None = None,
+        start_date: Any = None,
+        end_date: Any = None,
+        type_ids: list[int] | None = None,
+        case_study_ids: list[int] | None = None) -> int:
+    sql = (
+        'SELECT COUNT(*) FROM model.entity e '
+        'WHERE e.openatlas_class_name = %(class)s')
+    params: dict[str, Any] = {'class': class_}
+
+    if search:
+        sql += ' AND e.name ILIKE %(search)s'
+        params['search'] = f'%{search}%'
+
+    if start_date:
+        sql += ' AND COALESCE(e.begin_from, e.begin_to) >= %(start_date)s'
+        params['start_date'] = _format_date_for_pg(start_date)
+
+    if end_date:
+        sql += (
+            ' AND COALESCE(e.end_to, e.end_from, e.begin_to, e.begin_from) '
+            '<= %(end_date)s')
+        params['end_date'] = _format_date_for_pg(end_date)
+
+    if type_ids is not None:
+        if not type_ids:
+            return 0
+        sql += (
+            ' AND EXISTS (SELECT 1 FROM model.link l_t '
+            'WHERE l_t.domain_id = e.id AND l_t.range_id IN %(type_ids)s '
+            "AND l_t.property_code IN ('P2', 'P89'))")
+        params['type_ids'] = tuple(type_ids)
+
+    if case_study_ids is not None:
+        if not case_study_ids:
+            return 0
+        sql += (
+            ' AND EXISTS (SELECT 1 FROM model.link l_cs '
+            'WHERE l_cs.domain_id = e.id AND l_cs.range_id IN %(case_study_ids)s '
+            "AND l_cs.property_code IN ('P2', 'P89'))")
+        params['case_study_ids'] = tuple(case_study_ids)
+
+    sql += ';'
+    g.cursor.execute(sql, params)
+    return g.cursor.fetchone()['count']
+
+
 def get_by_cidoc_class(
         code: str | list[str],
         types: bool = False,
