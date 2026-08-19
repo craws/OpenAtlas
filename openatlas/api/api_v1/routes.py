@@ -5,14 +5,13 @@ from flask_openapi3 import APIBlueprint
 from rdflib import Graph
 
 from openatlas import app
-from openatlas.api.api_v04.formats.loud import get_loud_entities
-from openatlas.api.api_v04.resources.resolve_endpoints import \
-    parse_loud_context
-from openatlas.api.api_v04.resources.util import get_type_references
 from openatlas.api.api_v1.error_handlers import abort_not_found, \
     register_error_handlers
-from openatlas.api.api_v1.loud_util import get_links_for_entities
-from openatlas.api.api_v1.models import EntityPath
+from openatlas.api.api_v1.loud.loud import get_loud_entities
+from openatlas.api.api_v1.loud.loud_util import get_links_for_entities, \
+    get_type_references, parse_loud_context
+from openatlas.api.api_v1.models import EntityCollectionPath, \
+    EntityCollectionQuery, EntityPath
 from openatlas.api.api_v1.openapi_responses import lod_responses
 from openatlas.api.api_v1.openapi_tags import lod_tag
 from openatlas.models.entity import Entity
@@ -20,6 +19,14 @@ from openatlas.models.entity import Entity
 api_v1 = APIBlueprint('api_v1', __name__, url_prefix='/api/1')
 register_error_handlers(api_v1)
 
+def set_accept_header(extension: str = 'json') -> None:
+    ext_map = {
+        'json': 'application/ld+json',
+        'ttl': 'text/turtle',
+        'xml': 'application/rdf+xml',
+        'nt': 'application/n-triples'}
+    if extension in ext_map:
+        request.environ['HTTP_ACCEPT'] = ext_map[extension]
 
 def make_lod_response(data: dict[str, Any]) -> Response:
     accepted = request.accept_mimetypes.best_match(app.config['LOD_HEADER'])
@@ -58,14 +65,39 @@ def make_lod_response(data: dict[str, Any]) -> Response:
     tags=[lod_tag],
     responses=lod_responses)
 def get_entity(path: EntityPath) -> dict[str, str] | Response:
-    if path.ext:
-        ext_map = {
-            'json': 'application/ld+json',
-            'ttl': 'text/turtle',
-            'xml': 'application/rdf+xml',
-            'nt': 'application/n-triples'}
-        if path.ext in ext_map:
-            request.environ['HTTP_ACCEPT'] = ext_map[path.ext]
+    set_accept_header()
+    entity = Entity.get_by_uuid(path.id, types=True, aliases=True)
+
+    if not entity:
+        abort_not_found(path.id)
+
+    parsed_context = parse_loud_context()
+    type_references = get_type_references()
+    data = [
+        get_loud_entities(item, parsed_context, type_references)
+        for item in get_links_for_entities([entity]).values()]
+    return make_lod_response(data[0])
+
+
+
+
+@api_v1.get(
+    '/entities/<string:entity_class>',
+    endpoint='entities',
+    summary='Get a polymorphic collection of entities',
+    tags=[lod_tag],
+    responses=lod_responses)
+@api_v1.get(
+    '/entities/<string:entity_class>.<ext>',
+    endpoint='entities_ext',
+    summary='Get a polymorphic collection of entities',
+    tags=[lod_tag],
+    responses=lod_responses)
+def get_entity(
+        path: EntityCollectionPath,
+        query: EntityCollectionQuery) -> dict | Response:
+    set_accept_header()
+
     entity = Entity.get_by_uuid(path.id, types=True, aliases=True)
 
     if not entity:
