@@ -83,6 +83,8 @@ class ApiV1(ApiTestCase):
         rv = c.get(url_for('api_v1.entity', id=place.uuid))
         assert 'application/ld+json' in rv.headers.get('Content-Type')
         rv_json = rv.get_json()
+        assert rv_json['@context'] == 'https://linked.art/ns/v1/linked-art.json'
+        assert '@graph' not in rv_json
         assert rv_json['type'] == 'Site'
         assert rv_json['_label'] == 'Shire'
 
@@ -98,6 +100,43 @@ class ApiV1(ApiTestCase):
         rv_nt = c.get(url_for('api_v1.entity_ext', id=place.uuid, ext='nt'))
         assert rv_nt.status_code == 200
         assert 'application/n-triples' in rv_nt.headers.get('Content-Type')
+
+        # Test multiple entities collection (@graph)
+        rv_entities = c.get(url_for('api_v1.entities', entity_class='place'))
+        assert rv_entities.status_code == 200
+        assert 'application/ld+json' in rv_entities.headers.get('Content-Type')
+        entities_json = rv_entities.get_json()
+        assert entities_json['@context'] == 'https://linked.art/ns/v1/linked-art.json'
+        assert isinstance(entities_json['@graph'], list)
+        assert len(entities_json['@graph']) > 0
+        for item in entities_json['@graph']:
+            assert '@context' not in item
+            assert 'id' in item
+            assert 'type' in item
+            assert '_label' in item
+
+        # Test multiple entities extensions
+        rv_entities_ttl = c.get(
+            url_for('api_v1.entities_ext', entity_class='place', ext='ttl'))
+        assert rv_entities_ttl.status_code == 200
+        assert 'text/turtle' in rv_entities_ttl.headers.get('Content-Type')
+
+        rv_entities_xml = c.get(
+            url_for('api_v1.entities_ext', entity_class='place', ext='xml'))
+        assert rv_entities_xml.status_code == 200
+        assert 'application/rdf+xml' in rv_entities_xml.headers.get('Content-Type')
+
+        rv_entities_nt = c.get(
+            url_for('api_v1.entities_ext', entity_class='place', ext='nt'))
+        assert rv_entities_nt.status_code == 200
+        assert 'application/n-triples' in rv_entities_nt.headers.get('Content-Type')
+
+        # Test empty format_loud_entities
+        from openatlas.api.api_v1.loud.loud import format_loud_entities
+        empty_res = format_loud_entities([])
+        assert empty_res == {
+            '@context': 'https://linked.art/ns/v1/linked-art.json',
+            '@graph': []}
 
         # Test 404
         import uuid

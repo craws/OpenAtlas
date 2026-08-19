@@ -3,9 +3,11 @@ from typing import Any
 from flask import Response
 from flask_openapi3 import APIBlueprint
 
+from openatlas.api.api_v04.resources.api_entity import ApiEntity
 from openatlas.api.api_v1.error_handlers import (
     abort_not_found, register_error_handlers)
-from openatlas.api.api_v1.loud.loud import format_loud_entity
+from openatlas.api.api_v1.loud.loud import format_loud_entities, \
+    format_loud_entity
 from openatlas.api.api_v1.loud.loud_util import (
     make_lod_response, set_accept_header)
 from openatlas.api.api_v1.models import (
@@ -56,4 +58,5 @@ def get_entities(
         path: EntityCollectionPath,
         query: EntityCollectionQuery) -> dict[str, Any] | Response:
     set_accept_header(path.ext)
-    return make_lod_response({})
+    entities = ApiEntity.get_by_system_classes([path.entity_class])
+    return make_lod_response(format_loud_entities(entities))

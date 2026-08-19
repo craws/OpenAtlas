@@ -33,11 +33,16 @@ class OpenAtlasClassEnum(str, Enum):
     TYPE = 'type'
     # TYPE_TOOLS = 'type_tools'
 
+class ExtensionsType(str, Enum):
+    JSON = 'json'
+    TTL = 'ttl'
+    XML = 'xml'
+    NTRIPLES = 'nt'
 
 class EntityPath(BaseModel):
     id: UUID = Field(..., description="Unique identifier of the entity")
-    ext: str | None = Field(
-        None,
+    ext: ExtensionsType = Field(
+        'json',
         description="Optional file extension (.json, .ttl, .xml, .nt)",
         json_schema_extra={
             "examples": {
@@ -104,8 +109,8 @@ class EntityCollectionPath(BaseModel):
                 "type": {
                     "summary": "Type (E55 Type)",
                     "value": "type"}}})
-    ext: str | None = Field(
-        None,
+    ext: ExtensionsType = Field(
+        'json',
         description="Optional file extension (.json, .ttl, .xml, .nt)",
         json_schema_extra={
             "examples": {
@@ -113,7 +118,6 @@ class EntityCollectionPath(BaseModel):
                 "turtle": {"summary": "Turtle Format", "value": "ttl"},
                 "xml": {"summary": "RDF/XML Format", "value": "xml"},
                 "ntriples": {"summary": "N-Triples Format", "value": "nt"}}})
-
 
 class EntityCollectionQuery(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
@@ -130,10 +134,10 @@ class EntityCollectionQuery(BaseModel):
         ge=1,
         le=1000,
         description="Number of records to return (max 1000).")
-    offset: int = Field(
+    page: int = Field(
         0,
         ge=0,
-        description="Number of records to skip (for pagination).")
+        description="Page to jump to.")
     begin_from: date | None = Field(
         None,
         description="Filter by begin date, starting from (YYYY-MM-DD).")

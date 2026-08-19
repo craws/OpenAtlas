@@ -57,6 +57,7 @@ class ApiTestCase(TestBaseCase):
 
     def setUp(self) -> None:
         super().setUp()
+        app.config['ALLOWED_IPS'] = ['127.0.0.1']
         with open(
                 Path(app.root_path).parent / 'install' / 'data_test_api.sql',
                 encoding='utf8') as sql_file:

@@ -899,8 +899,7 @@ class LoudFormatter:
         self.add_core_metadata(entity, properties_set)
         if entity.description:
             self.handle_description(entity, properties_set)
-        return ({'@context': app.config['API_CONTEXT']['LOUD']} |
-                self.base_entity_dict(entity) |
+        return (self.base_entity_dict(entity) |
                 self.get_loud_timespan(entity, links_data) |
                 properties_set)
 
@@ -927,18 +926,23 @@ class LoudFormatter:
 
 
 def format_loud_entity(entity: Entity) -> dict[str, Any]:
-    return format_loud_entities([entity])[0]
+    res = format_loud_entities([entity])
+    return {'@context': res['@context']} | res['@graph'][0]
 
 
-def format_loud_entities(entities: list[Entity]) -> list[dict[str, Any]]:
+def format_loud_entities(entities: list[Entity]) -> dict[str, Any]:
     if not entities:
-        return []
+        return {
+            '@context': app.config['API_CONTEXT']['LOUD'],
+            '@graph': []}
     links_data = get_links_for_entities(entities)
     type_references = get_type_references()
     formatter = LoudFormatter(type_references=type_references)
-    return [
-        formatter.format_entity(item)
-        for item in links_data.values()]
+    return {
+        '@context': app.config['API_CONTEXT']['LOUD'],
+        '@graph': [
+            formatter.format_entity(item)
+            for item in links_data.values()]}
 
 
 def get_loud_entities(
