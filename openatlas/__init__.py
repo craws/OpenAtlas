@@ -83,10 +83,10 @@ def before_request() -> Response | None:
     if request.path.startswith('/display'):
         return None  # Avoid overheads for file display
 
-    if request.path.startswith('/swagger') or \
-            request.path.startswith('/openapi.json'):
-        write_openapi_instance()
-        return None  # Avoid overheads for swagger
+    if request.path.startswith(('/swagger', '/openapi.json', '/api/1/docs')):
+        if not request.path.startswith('/api/1/docs'):
+            write_openapi_instance()
+        return None  # Avoid overheads for swagger and docs
 
     session['language'] = get_locale()
     g.admins_available = admins_available()
@@ -144,7 +144,7 @@ def setup_files() -> None:
 
 
 def setup_api() -> None:
-    if request.path.startswith('/api/'):
+    if request.path.startswith('/api/') and not request.path.startswith('/api/1/docs'):
         ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
         if not current_user.is_authenticated \
                 and not g.settings['api_public'] \

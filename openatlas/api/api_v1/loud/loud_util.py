@@ -1,13 +1,15 @@
+import functools
 import json
 import pathlib
 from collections import defaultdict
 from typing import Any
 
-from flask import g
+from flask import Response, g, request
+from rdflib import Graph
 
 from openatlas import app
 from openatlas.models.entity import Entity, Link
-from openatlas.models.gis import  get_gis_by_entities
+from openatlas.models.gis import get_gis_by_entities
 
 
 def get_links_for_entities(entities: list[Entity]) -> dict[Any, Any]:
@@ -30,7 +32,6 @@ def get_links_for_entities(entities: list[Entity]) -> dict[Any, Any]:
     return entities_with_links
 
 
-
 def get_type_references() -> dict[int, list[Link]]:
     type_links = Entity.get_links_of_entities(
         list(g.types.keys()),
@@ -44,14 +45,15 @@ def get_type_references() -> dict[int, list[Link]]:
     return out
 
 
-
+@functools.lru_cache
 def get_loud_context() -> dict[str, Any]:
     file_path = pathlib.Path(app.root_path) / 'api' / 'linked-art.json'
 
-    with file_path.open("r", encoding="utf-8") as f:
+    with file_path.open('r', encoding='utf-8') as f:
         return json.load(f)
 
 
+@functools.lru_cache
 def parse_loud_context() -> dict[str, str]:
     context = get_loud_context().get('@context', {})
     inverted: dict[str, str] = {}
@@ -63,3 +65,39 @@ def parse_loud_context() -> dict[str, str]:
             if isinstance(nested_def, dict):
                 inverted[nested_def['@id']] = nested_term
     return inverted
+
+
+def set_accept_header(extension: str | None = None) -> None:
+    if not extension:
+        return
+    ext_map = {
+        'json': 'application/ld+json',
+        'ttl': 'text/turtle',
+        'xml': 'application/rdf+xml',
+        'nt': 'application/n-triples'}
+    if extension in ext_map:
+        request.environ['HTTP_ACCEPT'] = ext_map[extension]
+
+
+def make_lod_response(data: dict[str, Any]) -> Response:
+    accepted = request.accept_mimetypes.best_match(app.config['LOD_HEADER'])
+    json_str = app.json.dumps(data)
+    if accepted not in [
+        'text/turtle', 'application/rdf+xml', 'application/n-triples']:
+        return Response(json_str, mimetype='application/ld+json')
+
+    graph = Graph()
+    graph.parse(data=json_str, format='json-ld')
+
+    match accepted:
+        case 'text/turtle':
+            turtle_output = graph.serialize(format='turtle')
+            return Response(turtle_output, mimetype='text/turtle')
+
+        case 'application/rdf+xml':
+            xml_output = graph.serialize(format='xml')
+            return Response(xml_output, mimetype='application/rdf+xml')
+
+        case 'application/n-triples':
+            nt_output = graph.serialize(format='nt')
+            return Response(nt_output, mimetype='application/n-triples')

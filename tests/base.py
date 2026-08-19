@@ -7,7 +7,7 @@ import psycopg2
 from flask import url_for
 
 from openatlas import app
-from openatlas.api.resources.api_entity import ApiEntity
+from openatlas.api.api_v04.resources.api_entity import ApiEntity
 from openatlas.models.entity import Entity, insert as entity_insert
 
 

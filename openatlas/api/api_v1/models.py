@@ -1,9 +1,37 @@
 from datetime import date
+from enum import Enum
 from typing import Literal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
+
+
+class OpenAtlasClassEnum(str, Enum):
+    ACQUISITION = 'acquisition'
+    ACTIVITY = 'activity'
+    # ADMINISTRATIVE_UNIT = 'administrative_unit'
+    # ALIAS = 'alias'
+    ARTIFACT = 'artifact'
+    BIBLIOGRAPHY = 'bibliography'
+    EDITION = 'edition'
+    EXTERNAL_REFERENCE = 'external_reference'
+    FEATURE = 'feature'
+    FILE = 'file'
+    GROUP = 'group'
+    HUMAN_REMAINS = 'human_remains'
+    MODIFICATION = 'modification'
+    MOVE = 'move'
+    # OBJECT_LOCATION = 'object_location'
+    PERSON = 'person'
+    PLACE = 'place'
+    PRODUCTION = 'production'
+    REFERENCE_SYSTEM = 'reference_system'
+    SOURCE = 'source'
+    STRATIGRAPHIC_UNIT = 'stratigraphic_unit'
+    TEXT = 'text'
+    TYPE = 'type'
+    # TYPE_TOOLS = 'type_tools'
 
 
 class EntityPath(BaseModel):
@@ -20,11 +48,62 @@ class EntityPath(BaseModel):
 
 
 class EntityCollectionPath(BaseModel):
-    entity_class: str = Field(
+    entity_class: OpenAtlasClassEnum = Field(
         ...,
-        description="CIDOC class (e.g. 'E21_Person') or System class to "
-                    "filter the entities.",
-        json_schema_extra={"example": "E21_Person"})
+        description="Choose one of the following classes: ",
+        json_schema_extra={
+            "examples": {
+                "person": {
+                    "summary": "Person (E21 Person)",
+                    "value": "person"},
+                "group": {
+                    "summary": "Group (E74 Group)",
+                    "value": "group"},
+                "artifact": {
+                    "summary": "Artifact (E22 Human-Made Object)",
+                    "value": "artifact"},
+                "place": {
+                    "summary": "Place (E18 Physical Thing)",
+                    "value": "place"},
+                "activity": {
+                    "summary": "Activity (E7 Activity)",
+                    "value": "activity"},
+                "acquisition": {
+                    "summary": "Acquisition (E8 Acquisition)",
+                    "value": "acquisition"},
+                "move": {
+                    "summary": "Move (E9 Move)",
+                    "value": "move"},
+                "modification": {
+                    "summary": "Modification (E11 Modification)",
+                    "value": "modification"},
+                "production": {
+                    "summary": "Production (E12 Production)",
+                    "value": "production"},
+                "source": {
+                    "summary": "Source (E33 Linguistic Object)",
+                    "value": "source"},
+                "bibliography": {
+                    "summary": "Bibliography (E31 Document)",
+                    "value": "bibliography"},
+                "file": {
+                    "summary": "File (E31 Document)",
+                    "value": "file"},
+                "administrative_unit": {
+                    "summary": "Admin Unit (E53 Place)",
+                    "value": "administrative_unit"},
+                "feature": {
+                    "summary": "Feature (E18 Physical Thing)",
+                    "value": "feature"},
+                "human_remains": {
+                    "summary": "Human Remains (E20 Biological Object)",
+                    "value": "human_remains"},
+                "stratigraphic_unit": {
+                    "summary": "Stratigraphic Unit (E18 Physical Thing)",
+                    "value": "stratigraphic_unit"},
+                "type": {
+                    "summary": "Type (E55 Type)",
+                    "value": "type"}}})
     ext: str | None = Field(
         None,
         description="Optional file extension (.json, .ttl, .xml, .nt)",

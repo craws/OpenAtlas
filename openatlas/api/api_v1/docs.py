@@ -2,8 +2,9 @@ from flask import render_template_string
 
 from openatlas import app
 
+
 @app.route('/api/1/docs/redoc')
-def redoc_api_reference():
+def redoc_api_reference() -> str:
     template = """
     <!DOCTYPE html>
     <html lang="en">
@@ -23,7 +24,7 @@ def redoc_api_reference():
 
 
 @app.route('/api/1/docs/swagger')
-def custom_swagger_ui():
+def custom_swagger_ui() -> str:
     template = """
     <!DOCTYPE html>
     <html lang="en">
@@ -51,7 +52,7 @@ def custom_swagger_ui():
 
 
 @app.route('/api/1/docs/scalar')
-def scalar_api_reference():
+def scalar_api_reference() -> str:
     template = """
     <!DOCTYPE html>
     <html lang="en">

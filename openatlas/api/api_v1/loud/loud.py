@@ -14,6 +14,8 @@ from openatlas.api.api_v04.formats.loud_helpers import (
 from openatlas.api.api_v04.resources.util import (
     date_to_utc_iso_str, get_iiif_manifest_and_path, get_license_type,
     is_float, remove_spaces_dashes)
+from openatlas.api.api_v1.loud.loud_util import (
+    get_links_for_entities, get_type_references, parse_loud_context)
 from openatlas.database.gis import get_wkt_by_id
 from openatlas.display.util2 import get_file_path
 from openatlas.models.annotation import AnnotationText
@@ -55,10 +57,13 @@ def close_match_attribution(
 class LoudFormatter:
     def __init__(
             self,
-            loud_context: dict[str, str],
-            type_references: dict[int, list[Link]]) -> None:
-        self.loud = loud_context
-        self.type_refs = type_references
+            type_references: dict[int, list[Link]] | None = None,
+            loud_context: dict[str, str] | None = None) -> None:
+        self.loud = (
+            loud_context if loud_context is not None else parse_loud_context())
+        self.type_refs = (
+            type_references if type_references is not None
+            else get_type_references())
         self.handlers: dict[str, Any] = {
             'P1': self._handle_p1,
             'P2': self._handle_p2,
@@ -899,31 +904,51 @@ class LoudFormatter:
                 self.get_loud_timespan(entity, links_data) |
                 properties_set)
 
+    def format_entity(self, data: dict[str, Any]) -> dict[str, Any]:
+        entity = data['entity']
+        properties_set: dict[str, Any] = defaultdict(list)
+        skipped = {'OA8', 'OA9'}
+        for link_ in data['links']:
+            if link_.property.code not in skipped:
+                self.process_link(
+                    link_, properties_set, is_inverse=False, root_entity=entity)
+        file_links = []
+        for link_ in data['links_inverse']:
+            if link_.property.code in skipped:
+                continue
+            domain = link_.domain
+            if domain.class_.name == 'file' and g.files.get(domain.id):
+                file_links.append(link_)
+                continue
+            self.process_link(
+                link_, properties_set, is_inverse=True, root_entity=entity)
+        self.process_media_links(file_links, properties_set, entity)
+        return self.finalize_output(entity, properties_set, data['links'])
+
+
+def format_loud_entity(entity: Entity) -> dict[str, Any]:
+    return format_loud_entities([entity])[0]
+
+
+def format_loud_entities(entities: list[Entity]) -> list[dict[str, Any]]:
+    if not entities:
+        return []
+    links_data = get_links_for_entities(entities)
+    type_references = get_type_references()
+    formatter = LoudFormatter(type_references=type_references)
+    return [
+        formatter.format_entity(item)
+        for item in links_data.values()]
+
 
 def get_loud_entities(
         data: dict[str, Any],
-        loud: dict[str, str],
-        type_references: dict[int, list[Link]]) -> Any:
-    entity = data['entity']
-    formatter = LoudFormatter(loud, type_references)
-    properties_set: dict[str, Any] = defaultdict(list)
-    skipped = {'OA8', 'OA9'}
-    for link_ in data['links']:
-        if link_.property.code not in skipped:
-            formatter.process_link(
-                link_, properties_set, is_inverse=False, root_entity=entity)
-    file_links = []
-    for link_ in data['links_inverse']:
-        if link_.property.code in skipped:
-            continue
-        domain = link_.domain
-        if domain.class_.name == 'file' and g.files.get(domain.id):
-            file_links.append(link_)
-            continue
-        formatter.process_link(
-            link_, properties_set, is_inverse=True, root_entity=entity)
-    formatter.process_media_links(file_links, properties_set, entity)
-    return formatter.finalize_output(entity, properties_set, data['links'])
+        loud: dict[str, str] | None = None,
+        type_references: dict[int, list[Link]] | None = None) -> Any:
+    formatter = LoudFormatter(
+        type_references=type_references,
+        loud_context=loud)
+    return formatter.format_entity(data)
 
 
 def get_loud_crm_relation(link_: Link, inverse: bool = False) -> str:

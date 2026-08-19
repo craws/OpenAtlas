@@ -82,6 +82,36 @@ class ApiV1(ApiTestCase):
 
         rv = c.get(url_for('api_v1.entity', id=place.uuid))
         assert 'application/ld+json' in rv.headers.get('Content-Type')
-        rv = rv.get_json()
-        assert rv['type'] == 'Site'
-        assert rv['_label'] == 'Shire'
+        rv_json = rv.get_json()
+        assert rv_json['type'] == 'Site'
+        assert rv_json['_label'] == 'Shire'
+
+        # Test extensions
+        rv_ttl = c.get(url_for('api_v1.entity_ext', id=place.uuid, ext='ttl'))
+        assert rv_ttl.status_code == 200
+        assert 'text/turtle' in rv_ttl.headers.get('Content-Type')
+
+        rv_xml = c.get(url_for('api_v1.entity_ext', id=place.uuid, ext='xml'))
+        assert rv_xml.status_code == 200
+        assert 'application/rdf+xml' in rv_xml.headers.get('Content-Type')
+
+        rv_nt = c.get(url_for('api_v1.entity_ext', id=place.uuid, ext='nt'))
+        assert rv_nt.status_code == 200
+        assert 'application/n-triples' in rv_nt.headers.get('Content-Type')
+
+        # Test 404
+        import uuid
+        rv_404 = c.get(url_for('api_v1.entity', id=uuid.uuid4()))
+        assert rv_404.status_code == 404
+
+    def test_docs(self) -> None:
+        c = self.client
+        for url in [
+            '/api/1/docs/swagger',
+            '/api/1/docs/redoc',
+            '/api/1/docs/scalar',
+            '/api/1/docs/openapi.json',
+            '/api/1/docs/',
+        ]:
+            rv = c.get(url)
+            assert rv.status_code == 200
