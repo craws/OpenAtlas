@@ -6,7 +6,7 @@ from flask import abort, jsonify, make_response, request
 from werkzeug.exceptions import HTTPException
 import psycopg2
 
-def handle_db_error(e):
+def handle_db_error():
     return jsonify({
         "status": 500,
         "title": "Internal Server Error",

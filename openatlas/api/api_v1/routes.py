@@ -1,8 +1,7 @@
-import math
 from typing import Any
-from urllib.parse import urlencode
+from uuid import UUID
 
-from flask import Response, request, url_for
+from flask import Response
 from flask_openapi3 import APIBlueprint
 
 from openatlas.api.api_v1.entity import (
@@ -14,14 +13,28 @@ from openatlas.api.api_v1.loud.loud import (
 from openatlas.api.api_v1.loud.loud_util import (
     make_lod_response, set_accept_header)
 from openatlas.api.api_v1.models import (
-    EntityCollectionPath, EntityCollectionQuery, EntityPath)
+    EntityCollectionPath, EntityCollectionQuery, EntityPath, EntityPathExt)
 from openatlas.api.api_v1.openapi_responses import (
     lod_collection_responses, lod_responses)
 from openatlas.api.api_v1.openapi_tags import lod_tag
+from openatlas.api.api_v1.pagination import get_pagination
 from openatlas.models.entity import Entity
 
 api_v1 = APIBlueprint('api_v1', __name__, url_prefix='/api/1')
 register_error_handlers(api_v1)
+
+
+def _get_entity_response(
+        entity_id: UUID,
+        ext: str | None = None) -> dict[str, Any] | Response:
+    if ext:
+        set_accept_header(ext)
+    entity = Entity.get_by_uuid(entity_id, types=True, aliases=True)
+
+    if not entity:
+        abort_not_found(entity_id)
+
+    return make_lod_response(format_loud_entity(entity))
 
 
 @api_v1.get(
@@ -30,20 +43,19 @@ register_error_handlers(api_v1)
     summary='Get an LOD entity by UUID',
     tags=[lod_tag],
     responses=lod_responses)
+def get_entity(path: EntityPath) -> dict[str, Any] | Response:
+    return _get_entity_response(path.id)
+
+
 @api_v1.get(
     '/entity/<uuid:id>.<ext>',
     endpoint='entity_ext',
     summary='Get an LOD entity by UUID with extension',
     tags=[lod_tag],
     responses=lod_responses)
-def get_entity(path: EntityPath) -> dict[str, Any] | Response:
-    set_accept_header(path.ext)
-    entity = Entity.get_by_uuid(path.id, types=True, aliases=True)
-
-    if not entity:
-        abort_not_found(path.id)
-
-    return make_lod_response(format_loud_entity(entity))
+def get_entity_ext(path: EntityPathExt) -> dict[str, Any] | Response:
+    ext_val = path.ext.value if hasattr(path.ext, 'value') else str(path.ext)
+    return _get_entity_response(path.id, ext=ext_val)
 
 
 @api_v1.get(
@@ -60,16 +72,8 @@ def get_entities(
         if hasattr(path.entity_class, 'value')
         else str(path.entity_class))
 
-    page = query.page
-    limit = query.limit
-    sort_dir = query.sort
-    sort_field = 'name'
-    if query.sort_by in ('startDate', 'start_date'):
-        sort_field = 'start_date'
-    elif query.sort_by in ('endDate', 'end_date'):
-        sort_field = 'end_date'
-    order_by = f'{sort_field}_{sort_dir}'
-    offset = (page - 1) * limit
+    order_by = f'{query.sort_by}_{query.sort}'
+    offset = (query.page - 1) * query.limit
 
     filter_kwargs = {
         'search': query.search,
@@ -84,32 +88,16 @@ def get_entities(
     entities = get_by_system_class(
         entity_class_name,
         order_by=order_by,
-        limit=limit,
+        limit=query.limit,
         offset=offset,
         **filter_kwargs)
 
-    base_url = url_for(
+    pagination = get_pagination(
         'api_v1.entities',
-        entity_class=entity_class_name,
-        _external=True)
-
-    query_params = dict(request.args)
-
-    def page_url(p: int) -> str:
-        params = dict(query_params)
-        params['page'] = p
-        return f'{base_url}?{urlencode(params)}'
-
-    total_pages = max(1, math.ceil(total_items / limit))
-    pagination: dict[str, Any] = {
-        'total_items': total_items,
-        'id': page_url(page),
-        'first': page_url(1),
-        'last': page_url(total_pages)}
-    if page > 1:
-        pagination['previous'] = page_url(page - 1)
-    if page < total_pages:
-        pagination['next'] = page_url(page + 1)
+        total_items=total_items,
+        page=query.page,
+        limit=query.limit,
+        entity_class=entity_class_name)
 
     return make_lod_response(
         format_loud_entities(entities, pagination=pagination))

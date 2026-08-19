@@ -90,7 +90,7 @@ def get_by_class_api(
         order_by: str | None = None,
         limit: int | None = None,
         offset: int | None = None,
-        search: str | None = None,
+        search_name: str | None = None,
         start_date: Any = None,
         end_date: Any = None,
         type_ids: list[int] | None = None,
@@ -100,9 +100,9 @@ def get_by_class_api(
         ' WHERE e.openatlas_class_name = %(class)s')
     params: dict[str, Any] = {'class': class_}
 
-    if search:
+    if search_name:
         sql += ' AND e.name ILIKE %(search)s'
-        params['search'] = f'%{search}%'
+        params['search'] = f'%{search_name}%'
 
     if start_date:
         sql += ' AND COALESCE(e.begin_from, e.begin_to) >= %(start_date)s'
@@ -166,7 +166,7 @@ def get_by_class_api(
 
 def get_count_by_class_api(
         class_: str,
-        search: str | None = None,
+        search_name: str | None = None,
         start_date: Any = None,
         end_date: Any = None,
         type_ids: list[int] | None = None,
@@ -176,9 +176,9 @@ def get_count_by_class_api(
         'WHERE e.openatlas_class_name = %(class)s')
     params: dict[str, Any] = {'class': class_}
 
-    if search:
+    if search_name:
         sql += ' AND e.name ILIKE %(search)s'
-        params['search'] = f'%{search}%'
+        params['search'] = f'%{search_name}%'
 
     if start_date:
         sql += ' AND COALESCE(e.begin_from, e.begin_to) >= %(start_date)s'

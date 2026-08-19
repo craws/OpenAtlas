@@ -3,7 +3,7 @@ from flask_cors import CORS
 from flask_restful import Api
 
 from openatlas import app
-from openatlas.api.api_v1 import docs  # noqa: F401
+from openatlas.api.api_v1 import docs  # noqa
 from openatlas.api.api_v1.routes import api_v1
 from openatlas.api.api_v04.routes import routes
 

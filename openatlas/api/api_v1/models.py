@@ -1,4 +1,3 @@
-from datetime import date
 from enum import Enum
 from typing import Any, Literal
 from uuid import UUID
@@ -41,11 +40,16 @@ class ExtensionsType(str, Enum):
     XML = 'xml'
     NTRIPLES = 'nt'
 
+
 class EntityPath(BaseModel):
     id: UUID = Field(..., description="Unique identifier of the entity")
+
+
+class EntityPathExt(BaseModel):
+    id: UUID = Field(..., description="Unique identifier of the entity")
     ext: ExtensionsType = Field(
-        'json',
-        description="Optional file extension (.json, .ttl, .xml, .nt)",
+        ...,
+        description="File extension (.json, .ttl, .xml, .nt)",
         json_schema_extra={
             "examples": {
                 "json": {"summary": "JSON-LD Format", "value": "json"},
@@ -119,7 +123,7 @@ class EntityCollectionQuery(BaseModel):
     search: str | None = Field(
         None,
         description="Filter entities by name (case-insensitive substring match).")
-    sort_by: Literal['name', 'startDate', 'endDate'] = Field(
+    sort_by: Literal['name', 'start_date', 'end_date'] = Field(
         'name',
         description="Field to sort by: 'name', 'startDate', or 'endDate'.")
     sort: Literal['asc', 'desc'] = Field(
@@ -146,6 +150,15 @@ class EntityCollectionQuery(BaseModel):
     case_study: int | UUID | str | None = Field(
         None,
         description="Filter entities by case study ID (integer) or case study UUID.")
+
+    @field_validator('sort_by', mode='before')
+    @classmethod
+    def validate_sort_by(cls, v: Any) -> str:
+        if v in ('startDate', 'start_date'):
+            return 'start_date'
+        if v in ('endDate', 'end_date'):
+            return 'end_date'
+        return v
 
     @field_validator('start_date', mode='before')
     @classmethod
