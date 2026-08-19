@@ -4,10 +4,8 @@ from openatlas.models.entity import Entity
 from openatlas.models.gis import  get_gis_by_entities
 
 
-def get_links_for_entities(entities: list[Entity]) -> dict[Any, Any] | None:
+def get_links_for_entities(entities: list[Entity]) -> dict[Any, Any]:
     entities_with_links = {}
-    if not entities:
-        return None
     for entity in entities:
         entities_with_links[entity.id] = {
             'entity': entity,

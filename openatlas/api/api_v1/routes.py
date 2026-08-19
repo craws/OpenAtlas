@@ -1,6 +1,6 @@
 from typing import Any
 
-from flask import Response, render_template_string, request
+from flask import Response, request
 from flask_openapi3 import APIBlueprint
 from rdflib import Graph
 
@@ -24,7 +24,8 @@ register_error_handlers(api_v1)
 def make_lod_response(data: dict[str, Any]) -> Response:
     accepted = request.accept_mimetypes.best_match(app.config['LOD_HEADER'])
     json_str = app.json.dumps(data)
-    if accepted not in ['text/turtle', 'application/rdf+xml', 'application/n-triples']:
+    if accepted not in [
+        'text/turtle', 'application/rdf+xml', 'application/n-triples']:
         return Response(json_str, mimetype='application/ld+json')
 
     graph = Graph()
@@ -76,80 +77,3 @@ def get_entity(path: EntityPath) -> dict[str, str] | Response:
         get_loud_entities(item, parsed_context, type_references)
         for item in get_links_for_entities([entity]).values()]
     return make_lod_response(data[0])
-
-# This is a workaround for swagger ui, because we can't use pip/uv
-# Todo: look into variants with npm
-
-@app.route('/api/1/docs/redoc')
-def redoc_api_reference():
-    template = """
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <title>OpenAtlas V1 - ReDoc</title>
-      <meta charset="utf-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <style>body { margin: 0; padding: 0; }</style>
-    </head>
-    <body>
-      <redoc spec-url="/api/1/docs/openapi.json"></redoc>
-      <script src="{{ url_for('static', filename='node_modules/redoc/bundles/redoc.standalone.js', v=config.VERSION) }}"></script>
-    </body>
-    </html>
-    """
-    return render_template_string(template)
-
-
-@app.route('/api/1/docs/swagger')
-def custom_swagger_ui():
-    template = """
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <title>OpenAtlas V1 - Swagger UI</title>
-      <meta charset="utf-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/swagger-ui-dist/swagger-ui.css', v=config.VERSION) }}" />
-    </head>
-    <body>
-      <div id="swagger-ui"></div>
-      <script src="{{ url_for('static', filename='node_modules/swagger-ui-dist/swagger-ui-bundle.js', v=config.VERSION) }}"></script>
-      <script>
-        window.onload = () => {
-          window.ui = SwaggerUIBundle({
-            url: '/api/1/docs/openapi.json',
-            dom_id: '#swagger-ui',
-          });
-        };
-      </script>
-    </body>
-    </html>
-    """
-    return render_template_string(template)
-
-
-@app.route('/api/1/docs/scalar')
-def scalar_api_reference():
-    template = """
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-      <title>OpenAtlas V1 - Scalar</title>
-      <meta charset="utf-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <style>
-        body { margin: 0; padding: 0; }
-      </style>
-    </head>
-    <body>
-      <script
-        id="api-reference"
-        data-url="/api/1/docs/openapi.json">
-      </script>
-      <script src="{{ url_for('static', filename='node_modules/@scalar/api-reference/dist/browser/standalone.js', v=config.VERSION) }}"></script>
-    </body>
-    </html>
-    """
-    return render_template_string(template)
-
-
