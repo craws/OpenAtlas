@@ -33,7 +33,7 @@ Before you begin, ensure you have the following installed and configured:
         ```bash
         printf "POSTGRES_DB=openatlas\nPOSTGRES_PASSWORD=openatlas\n" > .env
         ```
-    * **Warning:** The password `openatlas` is insecure and only suitable for local enviroment. **Do not** use this password in any shared or production-like environment.
+    * **Warning:** The password `openatlas` is insecure and only suitable for local environment. **Do not** use this password in any shared or production-like environment.
 
 3.  **Pull Latest Images (Optional but Recommended):**
     Ensure you have the latest versions of pre-built images like PostGIS and Discovery (check `compose.yaml` for exact image names/tags):

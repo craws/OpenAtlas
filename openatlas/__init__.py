@@ -1,6 +1,8 @@
 import datetime
+import json
 import locale
 import os
+import shutil
 from typing import Optional
 
 from flask import g, redirect, request, session, url_for
@@ -81,6 +83,11 @@ def before_request() -> Response | None:
     if request.path.startswith('/display'):
         return None  # Avoid overheads for file display
 
+    if request.path.startswith('/swagger') or \
+            request.path.startswith('/openapi.json'):
+        write_openapi_instance()
+        return None  # Avoid overheads for swagger
+
     session['language'] = get_locale()
     g.admins_available = admins_available()
     if not g.admins_available \
@@ -107,8 +114,8 @@ def before_request() -> Response | None:
         app.config['UPLOAD_PATH'],
         app.config['TMP_PATH']]
     g.arche_uri_rules = None
-    setup_files()
     setup_api()
+    setup_files()
     return None
 
 
@@ -137,10 +144,7 @@ def setup_files() -> None:
 
 
 def setup_api() -> None:
-    from openatlas.api.api_v04.resources.openapi_util import write_openapi_instance
-    if request.path.startswith('/swagger'):
-        write_openapi_instance()
-    elif request.path.startswith('/api/'):
+    if request.path.startswith('/api/'):
         ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
         if not current_user.is_authenticated \
                 and not g.settings['api_public'] \
@@ -193,3 +197,30 @@ def check_incoming_tokens(
             or token_['valid_until'] < datetime.datetime.now():
         return True
     return False
+
+
+def write_openapi_instance() -> None:
+    openapi = app.config['OPENAPI_FILE']
+    openapi_instance = app.config['OPENAPI_INSTANCE_FILE']
+    if not openapi_instance.exists():
+        shutil.copy(openapi, openapi_instance)
+    with openapi_instance.open(mode='r+') as i, openapi.open(mode='r') as f:
+        original = json.load(f)
+        instance = json.load(i)
+        if original['info']['version'] != instance['info']['version']:
+            shutil.copy(openapi, openapi_instance)
+        server = {
+            'url': request.host_url + 'api/{basePath}',
+            'description': f'{g.settings['site_name']} Server',
+            'variables': {'basePath': {'default': '0.4', 'enum': ['0.4']}}}
+        modified = False
+        if len(instance['servers']) == 2:
+            instance['servers'].insert(0, server)
+            modified = True
+        elif instance['servers'][0]['description'] != server['description']:
+            instance['servers'][0] = server
+            modified = True
+        if modified:
+            i.seek(0)
+            json.dump(instance, i, indent=4)
+            i.truncate()
