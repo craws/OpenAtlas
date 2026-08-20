@@ -302,6 +302,10 @@ def subunit_template(id_: str) -> dict[str, List]:
         'url': fields.String,
         'IIIFManifest': fields.String,
         'IIIFBasePath': fields.String,
+        'license': fields.String,
+        'creator': fields.String,
+        'licenseHolder': fields.String,
+        'publicShareable': fields.String,
         'source': fields.String}
     types = {
         'id': fields.Integer,
