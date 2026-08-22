@@ -260,6 +260,7 @@ def presentation_template() -> dict[str, Any]:
 
     return {
         'id': fields.Integer,
+        'uuid': fields.String,
         'systemClass': fields.String,
         'viewClass': fields.String,
         'title': fields.String,
