@@ -1,4 +1,4 @@
-from openatlas.api.api_v1.models import (
+from openatlas.api.api_v1.models.lod import (
     LinkedArtCollectionResponse, LinkedArtResponse)
 
 lod_responses = {

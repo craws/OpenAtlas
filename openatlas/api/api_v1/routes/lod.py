@@ -12,7 +12,7 @@ from openatlas.api.api_v1.loud.loud import (
     format_loud_entities, format_loud_entity)
 from openatlas.api.api_v1.loud.loud_util import (
     make_lod_response, set_accept_header)
-from openatlas.api.api_v1.models import (
+from openatlas.api.api_v1.models.lod import (
     EntityCollectionPath, EntityCollectionQuery, EntityPath, EntityPathExt)
 from openatlas.api.api_v1.openapi_responses import (
     lod_collection_responses, lod_responses)
@@ -20,6 +20,7 @@ from openatlas.api.api_v1.openapi_tags import lod_tag
 from openatlas.api.api_v1.pagination import get_pagination
 from openatlas.models.entity import Entity
 
+#todo: move to better location
 api_v1 = APIBlueprint('api_v1', __name__, url_prefix='/api/1')
 register_error_handlers(api_v1)
 
