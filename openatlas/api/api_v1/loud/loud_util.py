@@ -14,34 +14,52 @@ from openatlas.models.gis import get_gis_by_entities
 
 def get_links_for_entities(entities: list[Entity]) -> dict[Any, Any]:
     entities_with_links = {}
+    preloaded = {e.id: e for e in entities}
+    preloaded.update(g.types)
+    preloaded.update(g.reference_systems)
+        
     for entity in entities:
         entities_with_links[entity.id] = {
             'entity': entity,
             'links': [],
             'links_inverse': [],
             'geometry': []}
-    for link_ in Entity.get_links_of_entities([entity.id for entity in entities]):
-        entities_with_links[link_.domain.id]['links'].append(link_)
+            
     for link_ in Entity.get_links_of_entities(
             [entity.id for entity in entities],
-            inverse=True):
-        entities_with_links[
-            link_.range.id]['links_inverse'].append(link_)
+            preloaded_entities=preloaded):
+        entities_with_links[link_.domain.id]['links'].append(link_)
+        preloaded[link_.range.id] = link_.range
+        
+    for link_ in Entity.get_links_of_entities(
+            [entity.id for entity in entities],
+            inverse=True,
+            preloaded_entities=preloaded):
+        entities_with_links[link_.range.id]['links_inverse'].append(link_)
+        preloaded[link_.domain.id] = link_.domain
+        
     for id_, geom in get_gis_by_entities(entities).items():
         entities_with_links[id_]['geometry'].extend(geom)
     return entities_with_links
 
 
 def get_type_references() -> dict[int, list[Link]]:
+    if hasattr(g, 'type_references'):
+        return g.type_references
+        
     type_links = Entity.get_links_of_entities(
         list(g.types.keys()),
         'P67',
-        inverse=True)
+        inverse=True,
+        preloaded_entities=g.types)
+        
     out: dict[int, list[Link]] = defaultdict(list)
     for link_ in type_links:
         if link_.domain.class_.name in \
                 ['external_reference', 'reference_system']:
             out[link_.range.id].append(link_)
+            
+    g.type_references = out
     return out
 
 

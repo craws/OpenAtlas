@@ -95,69 +95,73 @@ def get_by_class_api(
         end_date: Any = None,
         type_ids: list[int] | None = None,
         case_study_ids: list[int] | None = None) -> list[dict[str, Any]]:
-    sql = (
-        select_sql(types, aliases) +
-        ' WHERE e.openatlas_class_name = %(class)s')
+    
+    inner_sql = 'SELECT e2.id FROM model.entity e2 WHERE e2.openatlas_class_name = %(class)s'
     params: dict[str, Any] = {'class': class_}
 
     if search_name:
-        sql += ' AND e.name ILIKE %(search)s'
+        inner_sql += ' AND e2.name ILIKE %(search)s'
         params['search'] = f'%{search_name}%'
 
     if start_date:
-        sql += ' AND COALESCE(e.begin_from, e.begin_to) >= %(start_date)s'
+        inner_sql += ' AND COALESCE(e2.begin_from, e2.begin_to) >= %(start_date)s'
         params['start_date'] = _format_date_for_pg(start_date)
 
     if end_date:
-        sql += (
-            ' AND COALESCE(e.end_to, e.end_from, e.begin_to, e.begin_from) '
+        inner_sql += (
+            ' AND COALESCE(e2.end_to, e2.end_from, e2.begin_to, e2.begin_from) '
             '<= %(end_date)s')
         params['end_date'] = _format_date_for_pg(end_date)
 
     if type_ids is not None:
         if not type_ids:
             return []
-        sql += (
+        inner_sql += (
             ' AND EXISTS (SELECT 1 FROM model.link l_t '
-            'WHERE l_t.domain_id = e.id AND l_t.range_id IN %(type_ids)s '
+            'WHERE l_t.domain_id = e2.id AND l_t.range_id IN %(type_ids)s '
             "AND l_t.property_code IN ('P2', 'P89'))")
         params['type_ids'] = tuple(type_ids)
 
     if case_study_ids is not None:
         if not case_study_ids:
             return []
-        sql += (
+        inner_sql += (
             ' AND EXISTS (SELECT 1 FROM model.link l_cs '
-            'WHERE l_cs.domain_id = e.id AND l_cs.range_id IN %(case_study_ids)s '
+            'WHERE l_cs.domain_id = e2.id AND l_cs.range_id IN %(case_study_ids)s '
             "AND l_cs.property_code IN ('P2', 'P89'))")
         params['case_study_ids'] = tuple(case_study_ids)
 
-    sql += ' GROUP BY e.id'
-
+    order_sql = ''
     match order_by:
         case 'name_desc':
-            sql += ' ORDER BY e.name DESC, e.id DESC'
+            order_sql = ' ORDER BY e2.name DESC, e2.id DESC'
         case 'start_date_asc':
-            sql += ' ORDER BY e.begin_from ASC NULLS LAST, e.id ASC'
+            order_sql = ' ORDER BY e2.begin_from ASC NULLS LAST, e2.id ASC'
         case 'start_date_desc':
-            sql += ' ORDER BY e.begin_from DESC NULLS LAST, e.id DESC'
+            order_sql = ' ORDER BY e2.begin_from DESC NULLS LAST, e2.id DESC'
         case 'end_date_asc':
-            sql += (
-                ' ORDER BY COALESCE(e.end_to, e.end_from, e.begin_to, '
-                'e.begin_from) ASC NULLS LAST, e.id ASC')
+            order_sql = (
+                ' ORDER BY COALESCE(e2.end_to, e2.end_from, e2.begin_to, '
+                'e2.begin_from) ASC NULLS LAST, e2.id ASC')
         case 'end_date_desc':
-            sql += (
-                ' ORDER BY COALESCE(e.end_to, e.end_from, e.begin_to, '
-                'e.begin_from) DESC NULLS LAST, e.id DESC')
+            order_sql = (
+                ' ORDER BY COALESCE(e2.end_to, e2.end_from, e2.begin_to, '
+                'e2.begin_from) DESC NULLS LAST, e2.id DESC')
         case _:
-            sql += ' ORDER BY e.name ASC, e.id ASC'
+            order_sql = ' ORDER BY e2.name ASC, e2.id ASC'
+
+    inner_sql += order_sql
 
     if limit is not None:
-        sql += ' LIMIT %(limit)s'
+        inner_sql += ' LIMIT %(limit)s'
         params['limit'] = limit
     if offset is not None:
-        sql += ' OFFSET %(offset)s'
+        inner_sql += ' OFFSET %(offset)s'
         params['offset'] = offset
+
+    sql = select_sql(types, aliases)
+    sql += f' JOIN ({inner_sql}) AS le ON e.id = le.id GROUP BY e.id'
+    sql += order_sql.replace('e2.', 'e.')
     sql += ';'
 
     g.cursor.execute(sql, params)

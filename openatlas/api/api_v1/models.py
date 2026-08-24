@@ -130,10 +130,10 @@ class EntityCollectionQuery(BaseModel):
         'asc',
         description="Sort direction: 'asc' or 'desc'.")
     limit: int = Field(
-        100,
+        50,
         ge=1,
-        le=1000,
-        description="Number of records to return (max 1000).")
+        le=100,
+        description="Number of records to return (max 100).")
     page: int = Field(
         1,
         ge=1,

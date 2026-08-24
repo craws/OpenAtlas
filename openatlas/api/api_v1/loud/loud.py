@@ -23,7 +23,11 @@ from openatlas.models.entity import Entity, Link
 
 
 def entity_uri(entity: Entity) -> str:
-    return url_for('api.entity_uuid', uuid=entity.uuid, _external=True)
+    base = getattr(g, 'entity_base_url', None)
+    if base is None:
+        base = url_for('api.entity_uuid', uuid='00000000-0000-0000-0000-000000000000', _external=True).replace('00000000-0000-0000-0000-000000000000', '')
+        g.entity_base_url = base
+    return f"{base}{entity.uuid}"
 
 
 def reference_url(type_link: Link) -> str:
@@ -469,10 +473,11 @@ class LoudFormatter:
     def generate_skolem_id(id_: int, type_name: str) -> str:
         seed = f"{id_}_{type_name}".encode('utf-8')
         identifier_hash = hashlib.sha256(seed).hexdigest()[:16]
-        return url_for(
-            "api.skolem_proxy",
-            subpath=f'{type_name.lower()}/{identifier_hash}',
-            _external=True)
+        base = getattr(g, 'skolem_base_url', None)
+        if base is None:
+            base = url_for("api.skolem_proxy", subpath='', _external=True)
+            g.skolem_base_url = base
+        return f"{base}{type_name.lower()}/{identifier_hash}"
 
     LIFE_EVENT_CONFIG: dict[str, dict[str, Any]] = {
         'person': {

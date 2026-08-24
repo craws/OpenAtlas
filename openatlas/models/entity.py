@@ -515,7 +515,7 @@ class Entity:
                 order_by=order_by,
                 limit=limit,
                 offset=offset,
-                search=search,
+                search_name=search,
                 start_date=start_date,
                 end_date=end_date,
                 type_ids=type_ids,
@@ -524,14 +524,14 @@ class Entity:
     @staticmethod
     def get_count_by_class_api(
             class_: str,
-            search: str | None = None,
+            search_name: str | None = None,
             start_date: Any = None,
             end_date: Any = None,
             type_ids: list[int] | None = None,
             case_study_ids: list[int] | None = None) -> int:
         return db.get_count_by_class_api(
             class_,
-            search=search,
+            search_name=search_name,
             start_date=start_date,
             end_date=end_date,
             type_ids=type_ids,
@@ -649,7 +649,8 @@ class Entity:
             entity_ids: int | list[int],
             codes: str | list[str] | None = None,
             classes: Optional[list[str]] = None,
-            inverse: bool = False) -> list[Link]:
+            inverse: bool = False,
+            preloaded_entities: Optional[dict[int, Entity]] = None) -> list[Link]:
         result = set()
         if codes:
             codes = codes if isinstance(codes, list) else [str(codes)]
@@ -657,8 +658,16 @@ class Entity:
         for row in rows:
             result.add(row['domain_id'])
             result.add(row['range_id'])
+            
+        if preloaded_entities:
+            result = {id_ for id_ in result if id_ not in preloaded_entities}
+            
         linked_entities = {
             e.id: e for e in Entity.get_by_ids(result, types=True)}
+            
+        if preloaded_entities:
+            linked_entities.update(preloaded_entities)
+            
         links = []
         for row in rows:
             links.append(

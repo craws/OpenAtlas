@@ -75,7 +75,7 @@ def get_count_by_system_class(
     case_study_ids = resolve_type_ids(case_study)
     return Entity.get_count_by_class_api(
         class_name,
-        search=search,
+        search_name=search,
         start_date=start_date,
         end_date=end_date,
         type_ids=type_ids,
