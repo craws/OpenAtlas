@@ -36,12 +36,16 @@ class MapConfig(BaseModel):
 class SystemInfoResponse(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
-    version: str = Field(..., description="OpenAtlas Core Version")
+    version: str = Field(
+        ...,
+        description="OpenAtlas Core Version")
     api_versions: list[str]
     site_name: str
     logo_file_id: int | None = None
     default_language: str
-    module_time: bool = Field(..., description="Whether the time module (hours, minutes, seconds) is enabled.")
+    module_time: bool = Field(
+        ...,
+        description="Whether the time module (hours, minutes, seconds) is enabled.")
     
     map_config: MapConfig
     image_processing: ImageProcessingInfo
@@ -99,9 +103,10 @@ class SystemClassItem(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
     label: str = Field(..., description="Translated label of the class.")
-    system_class: str 
-    crm_class: str | None = None
-    view: str | None = None
+    openatlas_class: str
+    crm: str | None = None
+    standard_type_id: int | None = None
+    group: str | None = None
     icon: str | None = None
 
 class SystemClassesResponse(BaseModel):
