@@ -1,6 +1,4 @@
-import json
 from pathlib import Path
-from typing import Any
 
 from flask import g, url_for
 
@@ -187,7 +185,7 @@ class ApiV1(ApiTestCase):
         assert rv_inv_date3.status_code == 422
 
         # Direct unit tests for pad_historical_date
-        from openatlas.api.api_v1.date_util import pad_historical_date
+        from openatlas.api.api_v1.util.date_util import pad_historical_date
         assert pad_historical_date(None) is None
         assert pad_historical_date('') is None
         assert pad_historical_date('400', is_end_date=False) == '0400-01-01'

@@ -4,7 +4,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from pydantic.alias_generators import to_camel
 
-from openatlas.api.api_v1.date_util import pad_historical_date
+from openatlas.api.api_v1.util.date_util import pad_historical_date
 from openatlas.api.api_v1.models.util import ExtensionsType, OpenAtlasClassEnum
 
 

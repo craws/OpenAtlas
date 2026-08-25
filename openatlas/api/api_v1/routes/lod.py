@@ -2,12 +2,11 @@ from typing import Any
 from uuid import UUID
 
 from flask import Response
-from flask_openapi3 import APIBlueprint
+
 
 from openatlas.api.api_v1.entity import (
     get_by_system_class, get_count_by_system_class)
-from openatlas.api.api_v1.error_handlers import (
-    abort_not_found, register_error_handlers)
+from openatlas.api.api_v1.error_handlers import abort_not_found
 from openatlas.api.api_v1.loud.loud import (
     format_loud_entities, format_loud_entity)
 from openatlas.api.api_v1.loud.loud_util import (
@@ -17,12 +16,13 @@ from openatlas.api.api_v1.models.lod import (
 from openatlas.api.api_v1.openapi_responses import (
     lod_collection_responses, lod_responses)
 from openatlas.api.api_v1.openapi_tags import lod_tag
-from openatlas.api.api_v1.pagination import get_pagination
+from openatlas.api.api_v1.util.pagination import get_pagination
 from openatlas.models.entity import Entity
 
-#todo: move to better location
-api_v1 = APIBlueprint('api_v1', __name__, url_prefix='/api/1')
-register_error_handlers(api_v1)
+from flask_openapi3 import APIBlueprint
+from openatlas.api.api_v1.error_handlers import register_error_handlers
+api_v1_lod = APIBlueprint('api_v1', __name__, url_prefix='/api/1')
+register_error_handlers(api_v1_lod)
 
 
 def _get_entity_response(
@@ -38,7 +38,7 @@ def _get_entity_response(
     return make_lod_response(format_loud_entity(entity))
 
 
-@api_v1.get(
+@api_v1_lod.get(
     '/entity/<uuid:id>',
     endpoint='entity',
     summary='Get an LOD entity by UUID',
@@ -48,7 +48,7 @@ def get_entity(path: EntityPath) -> dict[str, Any] | Response:
     return _get_entity_response(path.id)
 
 
-@api_v1.get(
+@api_v1_lod.get(
     '/entity/<uuid:id>.<ext>',
     endpoint='entity_ext',
     summary='Get an LOD entity by UUID with extension',
@@ -59,7 +59,7 @@ def get_entity_ext(path: EntityPathExt) -> dict[str, Any] | Response:
     return _get_entity_response(path.id, ext=ext_val)
 
 
-@api_v1.get(
+@api_v1_lod.get(
     '/entities/<string:entity_class>',
     endpoint='entities',
     summary='Get a polymorphic collection of entities',

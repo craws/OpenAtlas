@@ -144,7 +144,8 @@ def setup_files() -> None:
 
 
 def setup_api() -> None:
-    if request.path.startswith('/api/') and not request.path.startswith('/api/1/docs'):
+    if (request.path.startswith('/api/')
+            and not request.path.startswith('/api/1/docs')):
         ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
         if not current_user.is_authenticated \
                 and not g.settings['api_public'] \
