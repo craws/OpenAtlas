@@ -5,7 +5,7 @@ from urllib.parse import urlencode
 from flask import request, url_for
 
 
-def get_pagination(
+def get_pagination_lod(
         endpoint: str,
         total_items: int,
         page: int,

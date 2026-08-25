@@ -16,7 +16,7 @@ from openatlas.api.api_v1.models.lod import (
 from openatlas.api.api_v1.openapi_responses import (
     lod_collection_responses, lod_responses)
 from openatlas.api.api_v1.openapi_tags import lod_tag
-from openatlas.api.api_v1.util.pagination import get_pagination
+from openatlas.api.api_v1.util.pagination import get_pagination_lod
 from openatlas.models.entity import Entity
 
 from flask_openapi3 import APIBlueprint
@@ -45,6 +45,12 @@ def _get_entity_response(
     tags=[lod_tag],
     responses=lod_responses)
 def get_entity(path: EntityPath) -> dict[str, Any] | Response:
+    """
+    Retrieves a single entity formatted as Linked Open Data (Linked.Art).
+    
+    The response format defaults to `application/ld+json`. 
+    You can request other formats (like Turtle or RDF/XML) using the `Accept` HTTP header.
+    """
     return _get_entity_response(path.id)
 
 
@@ -55,6 +61,13 @@ def get_entity(path: EntityPath) -> dict[str, Any] | Response:
     tags=[lod_tag],
     responses=lod_responses)
 def get_entity_ext(path: EntityPathExt) -> dict[str, Any] | Response:
+    """
+    Retrieves a single LOD entity with a specific format extension.
+    
+    This is an alternative to using the HTTP `Accept` header. 
+    By appending an extension like `.json`, `.ttl`, or `.xml` to the URL, 
+    the API will automatically return the entity in the requested format.
+    """
     ext_val = path.ext.value if hasattr(path.ext, 'value') else str(path.ext)
     return _get_entity_response(path.id, ext=ext_val)
 
@@ -68,6 +81,13 @@ def get_entity_ext(path: EntityPathExt) -> dict[str, Any] | Response:
 def get_entities(
         path: EntityCollectionPath,
         query: EntityCollectionQuery) -> dict[str, Any] | Response:
+    """
+    Retrieves a paginated collection of entities formatted as Linked Open Data.
+    
+    This endpoint allows querying a specific system class (e.g. `person`, `place`).
+    Results are returned as a Hydra Collection and can be filtered by various 
+    query parameters such as search strings, dates, or case studies.
+    """
     entity_class_name = (
         path.entity_class.value
         if hasattr(path.entity_class, 'value')
@@ -93,7 +113,7 @@ def get_entities(
         offset=offset,
         **filter_kwargs)
 
-    pagination = get_pagination(
+    pagination = get_pagination_lod(
         'api_v1.entities',
         total_items=total_items,
         page=query.page,

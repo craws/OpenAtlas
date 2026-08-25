@@ -35,7 +35,7 @@ VOCABS_PASS = ''
 # API Versioning and OpenAPI Documentation
 # ---------------------------------------------------------------------
 
-API_VERSIONS = ['0.4']
+API_VERSIONS = ['0.4', '1.0']
 
 # Path to the main OpenAPI definition file
 OPENAPI_FILE = \
