@@ -135,7 +135,7 @@ class PropertyDetail(BaseModel):
     sub: list[str] | None = None
     super: list[str] | None = None
     i18n: PropertyI18n | None = None
-    i18n_inverse: str | None = None
+    i18n_inverse: PropertyI18n | None = None
 
 class SystemPropertiesResponse(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)

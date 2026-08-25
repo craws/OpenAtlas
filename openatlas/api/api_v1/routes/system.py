@@ -7,7 +7,7 @@ from openatlas.api.api_v1.error_handlers import register_error_handlers
 from openatlas.api.api_v1.models.system import EntityStatsQuery, \
     EntityStatsResponse, IiifInfo, ImageProcessingInfo, \
     LicensedFileOverviewQuery, LicensedFileOverviewResponse, MapConfig, \
-    SystemClassItem, SystemClassesResponse, SystemInfoResponse, SystemPropertiesResponse, \
+    SystemClassItem, SystemClassesResponse, SystemInfoResponse, PropertyDetail, SystemPropertiesResponse, \
     SystemTypeTreeResponse, SystemTypesResponse
 from openatlas.api.api_v1.openapi_tags import system_tag
 
@@ -96,10 +96,48 @@ def get_system_classes(query: LocaleQuery) -> dict:
         results=results
     ).model_dump(by_alias=True)
 
-@api_v1_system.get('/properties', summary="Get CIDOC properties", responses={200: SystemPropertiesResponse}, tags=[system_tag])
-def get_system_properties(query: LocaleQuery):
-    """Retrieves all OpenAtlas CIDOC properties with their domain/range classes and translations."""
-    pass
+@api_v1_system.get('/crm-properties', summary="Get CIDOC properties", responses={200: SystemPropertiesResponse}, tags=[system_tag])
+def get_system_properties() -> dict:
+    """
+    Retrieves all OpenAtlas CIDOC properties actively used by the system.
+    
+    Returns a dictionary keyed by the CIDOC property code (e.g. 'P1', 'P2') containing 
+    the domain and range class codes, inheritance structures (sub/super properties), 
+    and internationalized labels for both directions (forward and inverse).
+    """
+    # Gather used properties from OpenAtlas class relations, plus essential base properties
+    used_codes = {'P1', 'P2', 'P3'}
+    for class_ in g.classes.values():
+        for relation in class_.relations.values():
+            if relation.property:
+                used_codes.add(relation.property)
+
+    # Automatically include sub-properties of any used property
+    sub_codes = set()
+    for code in used_codes:
+        if code in g.properties and g.properties[code].sub:
+            sub_codes.update(g.properties[code].sub)
+    used_codes.update(sub_codes)
+
+    results = {}
+    for code, property_ in g.properties.items():
+        if code in used_codes:
+            results[code] = PropertyDetail(
+                name=property_.name,
+                name_inverse=property_.name_inverse,
+                code=property_.code,
+                domain_class_code=property_.domain_class_code,
+                range_class_code=property_.range_class_code,
+                count=property_.count,
+                sub=property_.sub,
+                super=property_.super,
+                i18n=property_.i18n,
+                i18n_inverse=property_.i18n_inverse
+            )
+            
+    return SystemPropertiesResponse(
+        properties=results
+    ).model_dump(by_alias=True)
 
 
 # --- 3. TYPES & VOKABULARE ---
