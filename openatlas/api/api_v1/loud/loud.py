@@ -16,7 +16,6 @@ from openatlas.api.api_v04.resources.util import (
     is_float, remove_spaces_dashes)
 from openatlas.api.api_v1.loud.loud_util import (
     get_links_for_entities, get_type_references, parse_loud_context)
-from openatlas.database.gis import get_wkt_by_id
 from openatlas.display.util2 import get_file_path
 from openatlas.models.annotation import AnnotationText
 from openatlas.models.entity import Entity, Link
@@ -744,7 +743,7 @@ class LoudFormatter:
             base_property = self.format_link(link_, is_domain=is_domain)
             key = self.get_property_key(link_, is_inverse)
             if not is_inverse:
-                if geometry := get_wkt_by_id(link_.range.id):
+                if geometry := self.geometries.get(link_.range.id):
                     base_property['defined_by'] = geometry
                 properties_set[key] = base_property
             else:
@@ -893,7 +892,7 @@ class LoudFormatter:
             id_=skolem(entity.id, 'primary_name'))
         properties_set['identified_by'].extend(identifiers)
         if entity.class_.name == 'object_location':
-            if geometry := get_wkt_by_id(entity.id):
+            if geometry := self.geometries.get(entity.id):
                 properties_set['defined_by'] = geometry
 
     def finalize_output(
@@ -909,6 +908,7 @@ class LoudFormatter:
                 properties_set)
 
     def format_entity(self, data: dict[str, Any]) -> dict[str, Any]:
+        self.geometries = data.get("geometries", {})
         entity = data['entity']
         properties_set: dict[str, Any] = defaultdict(list)
         skipped = {'OA8', 'OA9'}

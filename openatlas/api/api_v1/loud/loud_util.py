@@ -9,7 +9,7 @@ from rdflib import Graph
 
 from openatlas import app
 from openatlas.models.entity import Entity, Link
-from openatlas.models.gis import get_gis_by_entities
+from openatlas.database.gis import get_wkts_by_ids
 
 
 def get_links_for_entities(entities: list[Entity]) -> dict[Any, Any]:
@@ -23,13 +23,17 @@ def get_links_for_entities(entities: list[Entity]) -> dict[Any, Any]:
             'entity': entity,
             'links': [],
             'links_inverse': [],
-            'geometry': []}
+            'geometries': {}
+        }
             
+    geom_ids = set(e.id for e in entities)
     for link_ in Entity.get_links_of_entities(
             [entity.id for entity in entities],
             preloaded_entities=preloaded):
         entities_with_links[link_.domain.id]['links'].append(link_)
         preloaded[link_.range.id] = link_.range
+        if link_.property.code == 'P53':
+            geom_ids.add(link_.range.id)
         
     for link_ in Entity.get_links_of_entities(
             [entity.id for entity in entities],
@@ -38,10 +42,12 @@ def get_links_for_entities(entities: list[Entity]) -> dict[Any, Any]:
         entities_with_links[link_.range.id]['links_inverse'].append(link_)
         preloaded[link_.domain.id] = link_.domain
         
-    for id_, geom in get_gis_by_entities(entities).items():
-        entities_with_links[id_]['geometry'].extend(geom)
+    if geom_ids:
+        wkts = get_wkts_by_ids(list(geom_ids))
+        for id_ in entities_with_links:
+            entities_with_links[id_]['geometries'] = wkts
+            
     return entities_with_links
-
 
 def get_type_references() -> dict[int, list[Link]]:
     if hasattr(g, 'type_references'):

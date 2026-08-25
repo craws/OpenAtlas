@@ -214,3 +214,36 @@ def delete_by_entity_id(id_: int) -> None:
     g.cursor.execute(
         'DELETE FROM model.gis WHERE entity_id = %(id)s;',
         {'id': id_})
+
+def get_wkts_by_ids(ids: list[int]) -> dict[int, str]:
+    if not ids:
+        return {}
+    g.cursor.execute(
+        """
+        SELECT
+            place.id,
+            public.ST_AsText(geom_point) AS point,
+            public.ST_AsText(geom_linestring) AS linestring,
+            public.ST_AsText(ST_ForcePolygonCCW(geom_polygon)) AS polygon
+        FROM model.entity place
+        JOIN model.gis g ON place.id = g.entity_id
+        WHERE place.id IN %(ids)s;
+        """,
+        {'ids': tuple(ids)})
+    geometries = defaultdict(list)
+    for row in list(g.cursor):
+        if row['point']:
+            geometries[row['id']].append(from_wkt(row['point']))
+        if row['linestring']:
+            geometries[row['id']].append(from_wkt(row['linestring']))
+        if row['polygon']:
+            geometries[row['id']].append(from_wkt(row['polygon']))
+    result = {}
+    for id_, geoms in geometries.items():
+        if not geoms:
+            result[id_] = ""
+        elif len(geoms) == 1:
+            result[id_] = geoms[0].wkt
+        else:
+            result[id_] = GeometryCollection(geoms).wkt
+    return result
