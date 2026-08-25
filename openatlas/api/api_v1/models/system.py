@@ -185,3 +185,6 @@ class SystemTypeTreeResponse(BaseModel):
     custom: list[TypeTreeItem] = Field(default_factory=list)
     value: list[TypeTreeItem] = Field(default_factory=list)
     system: list[TypeTreeItem] = Field(default_factory=list)
+class SystemStandardTypesResponse(BaseModel):
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+    results: list[TypeTreeItem] = Field(default_factory=list)
