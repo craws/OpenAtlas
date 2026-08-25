@@ -160,6 +160,7 @@ def count_type() -> bool:
     prefixes = [
         '/index/type',
         '/orphans',
+        '/api/1/system/types',
         '/api/type_tree',
         *[f'/api/{v}/type_tree' for v in app.config['API_VERSIONS']]]
     if request.path.startswith(tuple(prefixes)):

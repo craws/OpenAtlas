@@ -4,20 +4,24 @@ from pydantic import BaseModel, Field
 
 from openatlas import app
 from openatlas.api.api_v1.error_handlers import register_error_handlers
+from openatlas.api.api_v1.models.util import OpenAtlasClassEnum
 from openatlas.api.api_v1.models.system import EntityStatsQuery, \
     EntityStatsResponse, IiifInfo, ImageProcessingInfo, \
     LicensedFileOverviewQuery, LicensedFileOverviewResponse, MapConfig, \
     SystemClassItem, SystemClassesResponse, SystemInfoResponse, PropertyDetail, SystemPropertiesResponse, \
-    SystemTypeTreeResponse, SystemTypesResponse
+    SystemTypeTreeResponse, SystemTypesResponse, TypeFlatItem, TypeTreeItem
 from openatlas.api.api_v1.openapi_tags import system_tag
 
 
 class LocaleQuery(BaseModel):
     locale: str = Field("en", description="Choose language for labels (e.g., 'en', 'de')."    )
 
-class TypeTreeQuery(BaseModel):
-    view_class: str | None = Field(None, alias="viewClass", description="Filter the tree by a specific view class.")
 
+
+class TypeTreePath(BaseModel):
+    openatlas_class: OpenAtlasClassEnum = Field(
+        ...,
+        description="Filter the tree by a specific OpenAtlas class.")
 
 api_v1_system = APIBlueprint('system', __name__, url_prefix='/api/1/system')
 register_error_handlers(api_v1_system)
@@ -96,7 +100,11 @@ def get_system_classes(query: LocaleQuery) -> dict:
         results=results
     ).model_dump(by_alias=True)
 
-@api_v1_system.get('/crm-properties', summary="Get CIDOC properties", responses={200: SystemPropertiesResponse}, tags=[system_tag])
+@api_v1_system.get(
+    '/crm-properties',
+    summary="Get CIDOC properties",
+    responses={200: SystemPropertiesResponse},
+    tags=[system_tag])
 def get_system_properties() -> dict:
     """
     Retrieves all OpenAtlas CIDOC properties actively used by the system.
@@ -132,22 +140,96 @@ def get_system_properties() -> dict:
                 sub=property_.sub,
                 super=property_.super,
                 i18n=property_.i18n,
-                i18n_inverse=property_.i18n_inverse
-            )
+                i18n_inverse=property_.i18n_inverse)
             
     return SystemPropertiesResponse(
         properties=results
-    ).model_dump(by_alias=True)
+            ).model_dump(by_alias=True)
 
 
 # --- 3. TYPES & VOKABULARE ---
 
-@api_v1_system.get('/types', summary="Get flat types list", responses={200: SystemTypesResponse}, tags=[system_tag])
-def get_system_types():
+@api_v1_system.get(
+    '/types',
+    summary="Get flat types list",
+    responses={200: SystemTypesResponse},
+    tags=[system_tag])
+def get_system_types() -> dict:
     """Retrieves a flat list of all OpenAtlas types."""
-    pass
+    types_dict = {}
+    for id_, type_ in g.types.items():
+        types_dict[str(id_)] = TypeFlatItem(
+            id=type_.id,
+            name=type_.name,
+            description=type_.description,
+            classes=type_.classes,
+            selectable=type_.selectable,
+            image_id=type_.image_id,
+            first=type_.dates.first
+                if hasattr(type_, 'dates') and type_.dates else None,
+            last=type_.dates.last
+                if hasattr(type_, 'dates') and type_.dates else None,
+            root=type_.root,
+            subs=type_.subs,
+            count=type_.count,
+            count_subs=type_.count_subs,
+            category=getattr(type_, 'category', None))
+    return SystemTypesResponse(types=types_dict).model_dump(by_alias=True)
 
-@api_v1_system.get('/types/tree', summary="Get types tree", responses={200: SystemTypeTreeResponse}, tags=[system_tag])
-def get_system_type_tree(query: TypeTreeQuery):
-    """Retrieves all OpenAtlas types sorted hierarchically into standard, place, custom, value, and system categories."""
-    pass
+def _generate_type_tree(openatlas_class: str | None = None) -> dict:
+    def walk_tree(type_ids: list[int]) -> list[TypeTreeItem]:
+        items = []
+        for id_ in type_ids:
+            item = g.types[id_]
+            items.append(TypeTreeItem(
+                id=item.id,
+                name=item.name.replace("'", "&apos;"),
+                classes=item.classes or None,
+                children=walk_tree(item.subs)))
+        return items
+
+    types_tree_dict = {
+        'standard': [],
+        'custom': [],
+        'place': [],
+        'value': [],
+        'system': [],
+        'tools': []}
+    
+    for type_ in g.types.values():
+        if type_.root:
+            continue
+
+        if type_.category in types_tree_dict:
+            if openatlas_class and openatlas_class not in type_.classes:
+                continue
+                
+            types_tree_dict[type_.category].append(TypeTreeItem(
+                id=type_.id,
+                name=type_.name.replace("'", "&apos;"),
+                classes= type_.classes or None,
+                children=walk_tree(type_.subs)))
+            
+    return SystemTypeTreeResponse(**types_tree_dict).model_dump(by_alias=True)
+
+@api_v1_system.get(
+    '/types/tree',
+    summary="Get types tree",
+    responses={200: SystemTypeTreeResponse},
+    tags=[system_tag])
+def get_system_type_tree() -> dict:
+    """Retrieves all OpenAtlas types sorted hierarchically into standard,
+    place, custom, value, and system categories."""
+    return _generate_type_tree()
+
+@api_v1_system.get(
+    '/types/tree/<string:openatlas_class>',
+    summary="Get types tree by OpenAtlas class",
+    responses={200: SystemTypeTreeResponse},
+    tags=[system_tag])
+def get_system_type_tree_by_class(path: TypeTreePath) -> dict:
+    """Retrieves all OpenAtlas types filtered by a specific OpenAtlas class."""
+    class_ = path.openatlas_class
+    if hasattr(path.openatlas_class, 'value') :
+        class_ = path.openatlas_class.value
+    return _generate_type_tree(openatlas_class=class_)

@@ -150,7 +150,9 @@ class TypeFlatItem(BaseModel):
     id: int
     name: str
     description: str | None = None
-    origin_id: int | None = None
+    image_id: int | None = None
+    selectable: bool | None = None
+    classes: list[str] | None = None
     first: int | None = None
     last: int | None = None
     root: list[int] | None = None
@@ -172,8 +174,7 @@ class TypeTreeItem(BaseModel):
 
     id: int
     name: str
-    view_class: list[str] | None = None
-    # Rekursiver Aufruf für beliebig tiefe Verschachtelung
+    classes: list[str] | None = None
     children: list['TypeTreeItem'] = Field(default_factory=list)
 
 class SystemTypeTreeResponse(BaseModel):
