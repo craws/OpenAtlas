@@ -5,6 +5,7 @@ from pydantic import BaseModel, Field
 from openatlas.api.api_v1.error_handlers import register_error_handlers
 from openatlas.api.api_v1.openapi_tags import vocabulary_tag
 from openatlas.api.api_v1.models.util import OpenAtlasClassEnum
+from openatlas.database.entity import get_type_ids_for_case_study
 from openatlas.api.api_v1.models.vocabulary import (
     TypeFlatItem, TypeTreeItem, SystemTypesResponse, 
     SystemTypeTreeResponse, SystemStandardTypesResponse, VocabularyStandardQuery
@@ -104,9 +105,6 @@ def get_system_type_tree_by_class(path: TypeTreePath) -> dict:
     if hasattr(path.openatlas_class, 'value') :
         class_ = path.openatlas_class.value
 
-    # TODO: Implement filtering by query.case_study
-    # The requirement: "he needs to build the tree if in the lowest categories entities are present from this case study."
-
     return _generate_type_tree(openatlas_class=class_)
 
 #todo: make this faster! maybe don't use g.types? Also look into other type functions
@@ -123,19 +121,26 @@ def get_system_standard_types_by_class(path: TypeTreePath, query: VocabularyStan
     if hasattr(path.openatlas_class, 'value') :
         class_ = path.openatlas_class.value
 
-    # TODO: Implement filtering by query.case_study
-    # The requirement: "he needs to build the tree if in the lowest categories entities are present from this case study."
 
+    used_type_ids = None
+    if query.case_study:
+        used_type_ids = get_type_ids_for_case_study(query.case_study)
 
     def walk_tree(type_ids: list[int]) -> list[TypeTreeItem]:
         items = []
         for id_ in type_ids:
             item = g.types[id_]
+            children = walk_tree(item.subs)
+            
+            if used_type_ids is not None:
+                if id_ not in used_type_ids and not children:
+                    continue
+                    
             items.append(TypeTreeItem(
                 id=item.id,
                 name=item.name.replace("'", "&apos;"),
                 classes=item.classes or None,
-                children=walk_tree(item.subs)))
+                children=children))
         return items
 
     standard_types = []

@@ -1,14 +1,13 @@
 from pydantic import BaseModel, Field, ConfigDict
 from pydantic.alias_generators import to_camel
 from typing import Dict
-from uuid import UUID
 
 class VocabularyStandardQuery(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
-    case_study: UUID | int | None = Field(
+    case_study: int | None = Field(
         None,
-        description="Filter types by a specific case study ID or UUID."
+        description="Filter types by a specific case study ID."
     )
 
 

@@ -989,3 +989,16 @@ def get_multiple_linked_entities(sub_ids: list[int]) -> list[int]:
         """,
         {'sub_ids': tuple(sub_ids)})
     return [row[0] for row in list(g.cursor)]
+
+
+def get_type_ids_for_case_study(case_study_id: int) -> set[int]:
+    sql = """
+        SELECT DISTINCT l_type.range_id
+        FROM model.link l_cs
+        JOIN model.link l_type ON l_cs.domain_id = l_type.domain_id
+        WHERE l_cs.range_id = %(case_study_id)s
+          AND l_cs.property_code = 'P2'
+          AND l_type.property_code IN ('P2', 'P89')
+    """
+    g.cursor.execute(sql, {'case_study_id': case_study_id})
+    return {row['range_id'] for row in g.cursor.fetchall()}
