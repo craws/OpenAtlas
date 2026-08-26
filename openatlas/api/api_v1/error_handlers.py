@@ -2,11 +2,13 @@ from datetime import datetime
 from typing import NoReturn
 from uuid import UUID
 
-from flask import abort, jsonify, make_response, request
+from flask import abort, g, jsonify, make_response, request
 from werkzeug.exceptions import HTTPException
 import psycopg2
 
-def handle_db_error():
+
+def handle_db_error(e):
+    g.logger.error(f"Database Error: {e}")
     return jsonify({
         "status": 500,
         "title": "Internal Server Error",
