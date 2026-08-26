@@ -48,39 +48,39 @@ def get_system_types() -> dict:
             category=getattr(type_, 'category', None))
     return SystemTypesResponse(types=types_dict).model_dump(by_alias=True)
 
-def _generate_type_tree(openatlas_class: str | None = None) -> dict:
-    def walk_tree(type_ids: list[int]) -> list[TypeTreeItem]:
-        items = []
-        for id_ in type_ids:
-            item = g.types[id_]
-            items.append(TypeTreeItem(
-                id=item.id,
-                name=item.name.replace("'", "&apos;"),
-                classes=item.classes or None,
-                children=walk_tree(item.subs)))
-        return items
-
-    types_tree_dict = {
-        'standard': [],
-        'custom': [],
-        'place': [],
-        'value': [],
-        'system': [],
-        'tools': []}
-    
-    for type_ in g.types.values():
-        if type_.root:
-            continue
-
-        if type_.category in types_tree_dict:
-            if openatlas_class and openatlas_class not in type_.classes:
+def _walk_tree(type_ids: list[int], used_type_ids: set[int] | None = None) -> list[TypeTreeItem]:
+    """Recursively builds the type tree from a list of type IDs. Prunes branches if used_type_ids is provided."""
+    items = []
+    for id_ in type_ids:
+        item = g.types[id_]
+        children = _walk_tree(item.subs, used_type_ids)
+        
+        if used_type_ids is not None:
+            if id_ not in used_type_ids and not children:
                 continue
                 
-            types_tree_dict[type_.category].append(TypeTreeItem(
-                id=type_.id,
-                name=type_.name.replace("'", "&apos;"),
-                classes= type_.classes or None,
-                children=walk_tree(type_.subs)))
+        items.append(TypeTreeItem(
+            id=item.id,
+            name=item.name.replace("'", "&apos;"),
+            classes=item.classes or None,
+            children=children))
+    return items
+
+def _generate_type_tree(openatlas_class: str | None = None) -> dict:
+    types_tree_dict = {
+        'standard': [], 'custom': [], 'place': [],
+        'value': [], 'system': [], 'tools': []
+    }
+    
+    for category in types_tree_dict.keys():
+        root_ids = []
+        for type_ in g.types.values():
+            if not type_.root and getattr(type_, 'category', None) == category:
+                if openatlas_class and type_.classes and openatlas_class not in type_.classes:
+                    continue
+                root_ids.append(type_.id)
+                
+        types_tree_dict[category] = _walk_tree(root_ids)
             
     return SystemTypeTreeResponse(**types_tree_dict).model_dump(by_alias=True)
 
@@ -121,43 +121,17 @@ def get_system_standard_types_by_class(path: TypeTreePath, query: VocabularyStan
     if hasattr(path.openatlas_class, 'value') :
         class_ = path.openatlas_class.value
 
-
     used_type_ids = None
     if query.case_study:
         used_type_ids = get_type_ids_for_case_study(query.case_study)
 
-    def walk_tree(type_ids: list[int]) -> list[TypeTreeItem]:
-        items = []
-        for id_ in type_ids:
-            item = g.types[id_]
-            children = walk_tree(item.subs)
-            
-            if used_type_ids is not None:
-                if id_ not in used_type_ids and not children:
-                    continue
-                    
-            items.append(TypeTreeItem(
-                id=item.id,
-                name=item.name.replace("'", "&apos;"),
-                classes=item.classes or None,
-                children=children))
-        return items
-
-    standard_types = []
-    
+    root_ids = []
     for type_ in g.types.values():
-        if type_.root:
-            continue
-            
-        cat = getattr(type_, 'category', None)
-        if cat == 'standard':
-            if class_ and hasattr(type_, 'classes') and class_ not in type_.classes:
+        if not type_.root and getattr(type_, 'category', None) == 'standard':
+            if class_ and type_.classes and class_ not in type_.classes:
                 continue
+            root_ids.append(type_.id)
                 
-            standard_types.append(TypeTreeItem(
-                id=type_.id,
-                name=type_.name.replace("'", "&apos;"),
-                classes= type_.classes or None,
-                children=walk_tree(type_.subs) ))
+    standard_types = _walk_tree(root_ids, used_type_ids)
             
     return SystemStandardTypesResponse(results=standard_types).model_dump(by_alias=True)
