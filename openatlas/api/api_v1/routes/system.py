@@ -7,66 +7,87 @@ from openatlas.api.api_v1.error_handlers import register_error_handlers
 from openatlas.api.api_v1.models.system import EntityStatsQuery, \
     EntityStatsResponse, IiifInfo, ImageProcessingInfo, \
     LicensedFileOverviewQuery, LicensedFileOverviewResponse, MapConfig, \
-    SystemClassItem, SystemClassesResponse, SystemInfoResponse,\
+    SystemClassItem, SystemClassesResponse, SystemInfoResponse, \
     PropertyDetail, SystemPropertiesResponse
 from openatlas.api.api_v1.openapi_tags import system_tag
-
-
-class LocaleQuery(BaseModel):
-    locale: str = Field("en", description="Choose language for labels (e.g., 'en', 'de')."    )
-
 
 api_v1_system = APIBlueprint('system', __name__, url_prefix='/api/1/system')
 register_error_handlers(api_v1_system)
 
 
-# --- 1. SYSTEM-STATUS & STATISTIK ---
+class LocaleQuery(BaseModel):
+    locale: str = Field(
+        "en",
+        description="Choose language for labels (e.g., 'en', 'de').")
+
 
 @api_v1_system.get(
     '/info',
     summary="Get presentation frontend configuration",
     responses={200: SystemInfoResponse},
-    tags=[system_tag])
+    tags=[system_tag]
+)
 def get_system_info() -> dict:
     """
-    Retrieves the public configuration required to initialize the presentation frontend.
-    
-    This includes global settings like map configurations (zoom, clustering), 
+    Retrieves the public configuration required to initialize the presentation
+    frontend.
+
+    This includes global settings like map configurations (zoom, clustering),
     enabled features (time module, IIIF), and localization defaults.
     Internal or sensitive backend configurations are explicitly excluded.
     """
-    return SystemInfoResponse(
+
+    logo_id = g.settings.get('logo_file_id')
+    logo_id_clean = int(logo_id) if logo_id else None
+
+    time_enabled = g.settings.get('module_time', False) in (True, 'True', '1',
+                                                            1)
+    img_enabled = bool(g.settings['image_processing'])
+    iiif_version_raw = g.settings.get('iiif_version')
+
+    map_conf = MapConfig(
+        zoom_default=int(g.settings['map_zoom_default']),
+        zoom_max=int(g.settings['map_zoom_max']),
+        cluster_max_radius=int(g.settings['map_cluster_max_radius']),
+        cluster_disable_at_zoom=int(g.settings['map_cluster_disable_at_zoom']))
+
+    img_conf = ImageProcessingInfo(
+        enabled=img_enabled,
+        available_image_sizes=app.config['IMAGE_SIZE'] if img_enabled else {})
+
+    iiif_conf = IiifInfo(
+        enabled=bool(g.settings['iiif']),
+        url=g.settings.get('iiif_url'),
+        version=str(iiif_version_raw) if iiif_version_raw else None)
+
+    response = SystemInfoResponse(
         version=app.config['VERSION'],
         api_versions=app.config['API_VERSIONS'],
         site_name=g.settings['site_name'],
-        logo_file_id=int(g.settings['logo_file_id'])
-            if g.settings.get('logo_file_id') else None,
+        logo_file_id=logo_id_clean,
         default_language=g.settings['default_language'],
-        module_time=
-            g.settings.get('module_time', False) in (True, 'True', '1', 1),
-        map_config=MapConfig(
-            zoom_default=int(g.settings['map_zoom_default']),
-            zoom_max=int(g.settings['map_zoom_max']),
-            cluster_max_radius=int(g.settings['map_cluster_max_radius']),
-            cluster_disable_at_zoom=int(g.settings['map_cluster_disable_at_zoom'])),
-        image_processing=ImageProcessingInfo(
-            enabled=bool(g.settings['image_processing']),
-            available_image_sizes=app.config['IMAGE_SIZE'] if g.settings['image_processing'] else {}
-        ),
-        iiif=IiifInfo(
-            enabled=bool(g.settings['iiif']),
-            url=g.settings.get('iiif_url'),
-            version=str(g.settings['iiif_version'])
-                if g.settings.get('iiif_version') else None)).model_dump(by_alias=True)
+        module_time=time_enabled,
+        map_config=map_conf,
+        image_processing=img_conf,
+        iiif=iiif_conf)
 
-@api_v1_system.get('/stats/entities', summary="Get entity counts", responses={200: EntityStatsResponse}, tags=[system_tag])
+    return response.model_dump(by_alias=True)
+
+
+@api_v1_system.get('/stats/entities', summary="Get entity counts",
+                   responses={200: EntityStatsResponse}, tags=[system_tag])
 def get_entity_stats(query: EntityStatsQuery):
-    """Retrieves system classes with a count of their instances, optionally filtered by case study."""
+    """Retrieves system classes with a count of their instances, optionally
+    filtered by case study."""
     pass
 
-@api_v1_system.get('/licensed-files', summary="Get licensed files", responses={200: LicensedFileOverviewResponse}, tags=[system_tag])
+
+@api_v1_system.get('/licensed-files', summary="Get licensed files",
+                   responses={200: LicensedFileOverviewResponse},
+                   tags=[system_tag])
 def get_licensed_files(query: LicensedFileOverviewQuery):
-    """Retrieves all existing files with a license, their display URLs, and metadata."""
+    """Retrieves all existing files with a license, their display URLs,
+    and metadata."""
     pass
 
 
@@ -78,6 +99,7 @@ def get_licensed_files(query: LicensedFileOverviewQuery):
 def get_system_classes(query: LocaleQuery) -> dict:
     """Retrieves all OpenAtlas classes with their labels,
     CIDOC CRM mapping, and frontend configurations."""
+    locale = query.locale if query.locale else session.get('language', 'en')
     results = []
     for class_ in g.classes.values():
         results.append(SystemClassItem(
@@ -86,12 +108,11 @@ def get_system_classes(query: LocaleQuery) -> dict:
             crm=class_.cidoc_class.code if class_.cidoc_class else None,
             standard_type_id=class_.standard_type_id,
             group=class_.group.get('name') if class_.group else None,
-            icon=class_.group.get('icon') if class_.group else None
-        ))
+            icon=class_.group.get('icon') if class_.group else None))
     return SystemClassesResponse(
-        locale=query.locale if query.locale else session.get('language', 'en'),
-        results=results
-    ).model_dump(by_alias=True)
+        locale=locale,
+        results=results).model_dump(by_alias=True)
+
 
 @api_v1_system.get(
     '/crm-properties',
@@ -102,18 +123,17 @@ def get_system_properties() -> dict:
     """
     Retrieves all OpenAtlas CIDOC properties actively used by the system.
     
-    Returns a dictionary keyed by the CIDOC property code (e.g. 'P1', 'P2') containing 
-    the domain and range class codes, inheritance structures (sub/super properties), 
-    and internationalized labels for both directions (forward and inverse).
+    Returns a dictionary keyed by the CIDOC property code (e.g. 'P1', 'P2')
+    containing the domain and range class codes, inheritance structures
+    (sub/super properties), and internationalized labels for both directions
+    (forward and inverse).
     """
-    # Gather used properties from OpenAtlas class relations, plus essential base properties
     used_codes = {'P1', 'P2', 'P3'}
     for class_ in g.classes.values():
         for relation in class_.relations.values():
             if relation.property:
                 used_codes.add(relation.property)
 
-    # Automatically include sub-properties of any used property
     sub_codes = set()
     for code in used_codes:
         if code in g.properties and g.properties[code].sub:
@@ -134,7 +154,6 @@ def get_system_properties() -> dict:
                 super=property_.super,
                 i18n=property_.i18n,
                 i18n_inverse=property_.i18n_inverse)
-            
+
     return SystemPropertiesResponse(
-        properties=results
-            ).model_dump(by_alias=True)
+        properties=results).model_dump(by_alias=True)

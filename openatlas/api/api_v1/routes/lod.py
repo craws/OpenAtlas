@@ -28,13 +28,11 @@ register_error_handlers(api_v1_lod)
 def _get_entity_response(
         entity_id: UUID,
         ext: str | None = None) -> dict[str, Any] | Response:
-    if ext:
-        set_accept_header(ext)
     entity = Entity.get_by_uuid(entity_id, types=True, aliases=True)
-
     if not entity:
         abort_not_found(entity_id)
-
+    if ext:
+        set_accept_header(ext)
     return make_lod_response(format_loud_entity(entity))
 
 
@@ -49,7 +47,8 @@ def get_entity(path: EntityPath) -> dict[str, Any] | Response:
     Retrieves a single entity formatted as Linked Open Data (Linked.Art).
     
     The response format defaults to `application/ld+json`. 
-    You can request other formats (like Turtle or RDF/XML) using the `Accept` HTTP header.
+    You can request other formats (like Turtle or RDF/XML) using the `Accept`
+    HTTP header.
     """
     return _get_entity_response(path.id)
 
@@ -90,8 +89,7 @@ def get_entities(
     """
     entity_class_name = (
         path.entity_class.value
-        if hasattr(path.entity_class, 'value')
-        else str(path.entity_class))
+        if hasattr(path.entity_class, 'value') else str(path.entity_class))
 
     order_by = f'{query.sort_by}_{query.sort}'
     offset = (query.page - 1) * query.limit

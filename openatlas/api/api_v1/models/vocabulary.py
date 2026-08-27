@@ -12,7 +12,7 @@ class VocabularyStandardQuery(BaseModel):
 
 
 # --- TYPES (FLACH) ---
-class TypeFlatItem(BaseModel):
+class VocabularyFlatItem(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
     id: int
@@ -29,30 +29,30 @@ class TypeFlatItem(BaseModel):
     count_subs: int | None = None
     category: str | None = None
 
-class SystemTypesResponse(BaseModel):
+class VocabularyFlatResponse(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
     # Key ist die Typ-ID als String, Value ist das FlatItem
-    types: Dict[str, TypeFlatItem]
+    types: Dict[str, VocabularyFlatItem]
 
     # --- TYPES (BAUM) ---
 
-class TypeTreeItem(BaseModel):
+class VocabularyTreeItem(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
     id: int
     name: str
     classes: list[str] | None = None
-    children: list['TypeTreeItem'] = Field(default_factory=list)
+    children: list['VocabularyTreeItem'] = Field(default_factory=list)
 
-class SystemTypeTreeResponse(BaseModel):
+class VocabularyTreeResponse(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
-    standard: list[TypeTreeItem] = Field(default_factory=list)
-    place: list[TypeTreeItem] = Field(default_factory=list)
-    custom: list[TypeTreeItem] = Field(default_factory=list)
-    value: list[TypeTreeItem] = Field(default_factory=list)
-    system: list[TypeTreeItem] = Field(default_factory=list)
-class SystemStandardTypesResponse(BaseModel):
+    standard: list[VocabularyTreeItem] = Field(default_factory=list)
+    place: list[VocabularyTreeItem] = Field(default_factory=list)
+    custom: list[VocabularyTreeItem] = Field(default_factory=list)
+    value: list[VocabularyTreeItem] = Field(default_factory=list)
+    system: list[VocabularyTreeItem] = Field(default_factory=list)
+class VocabularyStandardResponse(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
-    results: list[TypeTreeItem] = Field(default_factory=list)
+    results: list[VocabularyTreeItem] = Field(default_factory=list)

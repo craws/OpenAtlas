@@ -991,7 +991,7 @@ def get_multiple_linked_entities(sub_ids: list[int]) -> list[int]:
     return [row[0] for row in list(g.cursor)]
 
 
-def get_type_ids_for_case_study(case_study_id: int) -> set[int]:
+def get_vocab_ids_for_case_study(case_study_id: int) -> set[int]:
     sql = """
         SELECT DISTINCT l_type.range_id
         FROM model.link l_cs
