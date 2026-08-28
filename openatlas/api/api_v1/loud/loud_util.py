@@ -8,8 +8,8 @@ from flask import Response, g, request
 from rdflib import Graph
 
 from openatlas import app
+from openatlas.database.api import get_wkts_by_ids
 from openatlas.models.entity import Entity, Link
-from openatlas.database.gis import get_wkts_by_ids
 
 
 def get_links_for_entities(entities: list[Entity]) -> dict[Any, Any]:

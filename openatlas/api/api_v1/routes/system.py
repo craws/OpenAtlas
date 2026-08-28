@@ -10,9 +10,9 @@ from openatlas.api.api_v1.models.system import EntityCountQuery, \
     PropertyDetail, SystemPropertiesResponse
 from openatlas.api.api_v1.openapi_tags import system_tag
 from openatlas.api.api_v1.models.util import OpenAtlasClassEnum
-from openatlas.database.entity import get_overview_counts_by_case_study
 
 from openatlas.api.api_v1.responses.system import (system_info_response, entity_count_response, system_classes_response, system_properties_response)
+from openatlas.database.api import get_overview_counts_by_case_study
 
 api_v1_system = APIBlueprint('system', __name__, url_prefix='/api/1/system')
 register_error_handlers(api_v1_system)

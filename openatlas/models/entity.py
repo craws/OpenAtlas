@@ -493,51 +493,6 @@ class Entity:
             Entity(row) for row in db.get_by_class(classes, types, aliases)]
 
     @staticmethod
-    def get_by_class_api(
-            class_: str,
-            types: bool = False,
-            aliases: bool = False,
-            order_by: str | None = None,
-            limit: int | None = None,
-            offset: int | None = None,
-            search: str | None = None,
-            start_date: Any = None,
-            end_date: Any = None,
-            type_ids: list[int] | None = None,
-            case_study_ids: list[int] | None = None) -> list[Entity]:
-        if aliases and not g.classes[class_].attributes.get('alias'):
-            aliases = False
-        return [
-            Entity(row) for row in db.get_by_class_api(
-                class_,
-                types,
-                aliases,
-                order_by=order_by,
-                limit=limit,
-                offset=offset,
-                search_name=search,
-                start_date=start_date,
-                end_date=end_date,
-                type_ids=type_ids,
-                case_study_ids=case_study_ids)]
-
-    @staticmethod
-    def get_count_by_class_api(
-            class_: str,
-            search_name: str | None = None,
-            start_date: Any = None,
-            end_date: Any = None,
-            type_ids: list[int] | None = None,
-            case_study_ids: list[int] | None = None) -> int:
-        return db.get_count_by_class_api(
-            class_,
-            search_name=search_name,
-            start_date=start_date,
-            end_date=end_date,
-            type_ids=type_ids,
-            case_study_ids=case_study_ids)
-
-    @staticmethod
     def get_display_files() -> list[Entity]:
         entities = []
         for row in db.get_by_class('file', types=True):

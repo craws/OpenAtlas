@@ -7,11 +7,11 @@ from openatlas.api.api_v1.openapi_tags import vocabulary_tag
 from openatlas.api.api_v1.models.util import OpenAtlasClassEnum
 from openatlas.api.api_v1.responses.vocabulary import vocabulary_list_response, \
     vocabulary_standard_by_class_response, vocabulary_tree_response
-from openatlas.database.entity import get_vocab_ids_for_case_study
 from openatlas.api.api_v1.models.vocabulary import (
     VocabularyFlatItem, VocabularyTreeItem, VocabularyFlatResponse,
     VocabularyStandardQuery,
     VocabularyTreeResponse, VocabularyStandardResponse)
+from openatlas.database.api import get_vocab_ids_for_case_study
 
 api_v1_vocabulary = APIBlueprint(
     'vocabulary',

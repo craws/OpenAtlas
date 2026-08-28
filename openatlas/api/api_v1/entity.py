@@ -4,6 +4,7 @@ from uuid import UUID
 from flask import g
 
 from openatlas.api.api_v1.error_handlers import abort_invalid_class
+from openatlas.database.api import get_by_class_api, get_count_by_class_api
 from openatlas.models.entity import Entity
 
 
@@ -49,18 +50,22 @@ def get_by_system_class(
     class_name = _validate_class(name)
     type_ids = resolve_type_ids(type_id)
     case_study_ids = resolve_type_ids(case_study)
-    return Entity.get_by_class_api(
-        class_name,
-        types=True,
-        aliases=True,
-        order_by=order_by,
-        limit=limit,
-        offset=offset,
-        search=search,
-        start_date=start_date,
-        end_date=end_date,
-        type_ids=type_ids,
-        case_study_ids=case_study_ids)
+    aliases = True
+    if not g.classes[class_name].attributes.get('alias'):
+        aliases = False
+    return [
+        Entity(row) for row in get_by_class_api(
+            class_name,
+            types=True,
+            aliases=aliases,
+            order_by=order_by,
+            limit=limit,
+            offset=offset,
+            search_name=search,
+            start_date=start_date,
+            end_date=end_date,
+            type_ids=type_ids,
+            case_study_ids=case_study_ids)]
 
 
 def get_count_by_system_class(
@@ -73,7 +78,7 @@ def get_count_by_system_class(
     class_name = _validate_class(name)
     type_ids = resolve_type_ids(type_id)
     case_study_ids = resolve_type_ids(case_study)
-    return Entity.get_count_by_class_api(
+    return get_count_by_class_api(
         class_name,
         search_name=search,
         start_date=start_date,

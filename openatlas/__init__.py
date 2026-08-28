@@ -79,7 +79,6 @@ def before_request() -> Response | None:
     g.db.autocommit = True
     g.cursor = g.db.cursor(cursor_factory=extras.DictCursor)
     g.settings = get_settings()
-
     if request.path.startswith('/display'):
         return None  # Avoid overheads for file display
 
@@ -120,6 +119,8 @@ def before_request() -> Response | None:
 
 
 def setup_files() -> None:
+    if (request.endpoint or "") in ('get_vocabulary', 'display_file'):
+        return
     from openatlas.models.rights_holder import RightsHolder
     g.files = {}
     for file_ in app.config['UPLOAD_PATH'].iterdir():
