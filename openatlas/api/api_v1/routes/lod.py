@@ -13,7 +13,7 @@ from openatlas.api.api_v1.loud.loud_util import (
     make_lod_response, set_accept_header)
 from openatlas.api.api_v1.models.lod import (
     EntityCollectionPath, EntityCollectionQuery, EntityPath, EntityPathExt)
-from openatlas.api.api_v1.openapi_responses import (
+from openatlas.api.api_v1.responses.lod import (
     lod_collection_responses, lod_responses)
 from openatlas.api.api_v1.openapi_tags import lod_tag
 from openatlas.api.api_v1.util.pagination import get_pagination_lod

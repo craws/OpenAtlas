@@ -5,9 +5,12 @@ from pydantic import BaseModel, Field
 from openatlas.api.api_v1.error_handlers import register_error_handlers
 from openatlas.api.api_v1.openapi_tags import vocabulary_tag
 from openatlas.api.api_v1.models.util import OpenAtlasClassEnum
+from openatlas.api.api_v1.responses.vocabulary import vocabulary_list_response, \
+    vocabulary_standard_by_class_response, vocabulary_tree_response
 from openatlas.database.entity import get_vocab_ids_for_case_study
 from openatlas.api.api_v1.models.vocabulary import (
-    VocabularyFlatItem, VocabularyTreeItem, VocabularyFlatResponse, VocabularyStandardQuery,
+    VocabularyFlatItem, VocabularyTreeItem, VocabularyFlatResponse,
+    VocabularyStandardQuery,
     VocabularyTreeResponse, VocabularyStandardResponse)
 
 api_v1_vocabulary = APIBlueprint(
@@ -26,7 +29,7 @@ class VocabularyTreePath(BaseModel):
 @api_v1_vocabulary.get(
     '',
     summary="Get flat types list",
-    responses={200: VocabularyFlatResponse},
+    responses=vocabulary_list_response,
     tags=[vocabulary_tag])
 def get_vocabulary_list() -> dict:
     """Retrieves a flat list of all OpenAtlas types."""
@@ -97,7 +100,7 @@ def _generate_vocabulary_tree(openatlas_class: str | None = None) -> dict:
 @api_v1_vocabulary.get(
     '/tree',
     summary="Get types tree",
-    responses={200: VocabularyTreeResponse},
+    responses=vocabulary_tree_response,
     tags=[vocabulary_tag])
 def get_vocabulary_tree() -> dict:
     """Retrieves all OpenAtlas types sorted hierarchically into standard,
@@ -108,7 +111,7 @@ def get_vocabulary_tree() -> dict:
 @api_v1_vocabulary.get(
     '/tree/<string:openatlas_class>',
     summary="Get types tree by OpenAtlas class",
-    responses={200: VocabularyTreeResponse},
+    responses=vocabulary_tree_response,
     tags=[vocabulary_tag])
 def get_vocabulary_tree_by_class(path: VocabularyTreePath) -> dict:
     """Retrieves all OpenAtlas types filtered by a specific OpenAtlas class."""
@@ -122,7 +125,7 @@ def get_vocabulary_tree_by_class(path: VocabularyTreePath) -> dict:
 @api_v1_vocabulary.get(
     '/standard/<string:openatlas_class>',
     summary="Get standard types tree by OpenAtlas class",
-    responses={200: VocabularyStandardResponse},
+    responses=vocabulary_standard_by_class_response,
     tags=[vocabulary_tag])
 def get_vocabulary_standard_by_class(
         path: VocabularyTreePath,

@@ -1,11 +1,18 @@
 from enum import Enum
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
 
 class BaseSchema(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
+class DownloadQuery(BaseModel):
+    download: bool = Field(
+        False,
+        description="Set to true to force the browser to download the file "
+                    "instead of displaying it inline.")
+
 
 class OpenAtlasClassEnum(str, Enum):
     ACQUISITION = 'acquisition'

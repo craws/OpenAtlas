@@ -3,6 +3,7 @@ from flask_openapi3 import APIBlueprint
 
 from openatlas.api.api_v1.models.root import ApiIndexResponse
 from openatlas.api.api_v1.openapi_tags import system_tag
+from openatlas.api.api_v1.responses.root import index_response
 
 api_v1_root = APIBlueprint('api_v1_root', __name__, url_prefix='/api/1')
 
@@ -10,7 +11,7 @@ api_v1_root = APIBlueprint('api_v1_root', __name__, url_prefix='/api/1')
 @api_v1_root.get(
     '/',
     summary="API Index",
-    responses={200: ApiIndexResponse},
+    responses=index_response,
     tags=[system_tag],
     strict_slashes=False)
 def api_v1_index() -> dict:

@@ -12,6 +12,8 @@ from openatlas.api.api_v1.openapi_tags import system_tag
 from openatlas.api.api_v1.models.util import OpenAtlasClassEnum
 from openatlas.database.entity import get_overview_counts_by_case_study
 
+from openatlas.api.api_v1.responses.system import (system_info_response, entity_count_response, system_classes_response, system_properties_response)
+
 api_v1_system = APIBlueprint('system', __name__, url_prefix='/api/1/system')
 register_error_handlers(api_v1_system)
 
@@ -25,7 +27,7 @@ class LocaleQuery(BaseModel):
 @api_v1_system.get(
     '/info',
     summary="Get presentation frontend configuration",
-    responses={200: SystemInfoResponse},
+    responses=system_info_response,
     tags=[system_tag]
 )
 def get_system_info() -> dict:
@@ -78,7 +80,7 @@ def get_system_info() -> dict:
 @api_v1_system.get(
     '/count/entities',
     summary="Get entity counts",
-    responses={200: EntityCountResponse},
+    responses=entity_count_response,
     tags=[system_tag])
 def get_entity_count(query: EntityCountQuery):
     """Retrieves system classes with a count of their instances, optionally
@@ -95,7 +97,7 @@ def get_entity_count(query: EntityCountQuery):
 @api_v1_system.get(
     '/classes',
     summary="Get system classes",
-    responses={200: SystemClassesResponse},
+    responses=system_classes_response,
     tags=[system_tag])
 def get_system_classes(query: LocaleQuery) -> dict:
     """Retrieves all OpenAtlas classes with their labels,
@@ -118,7 +120,7 @@ def get_system_classes(query: LocaleQuery) -> dict:
 @api_v1_system.get(
     '/crm-properties',
     summary="Get CIDOC properties",
-    responses={200: SystemPropertiesResponse},
+    responses=system_properties_response,
     tags=[system_tag])
 def get_system_properties() -> dict:
     """
