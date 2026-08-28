@@ -143,3 +143,5 @@ class SystemPropertiesResponse(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
     properties: Dict[str, PropertyDetail]
+
+

@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field, ConfigDict
 from pydantic.alias_generators import to_camel
 from typing import Dict
 
+
 class VocabularyStandardQuery(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
@@ -11,7 +12,6 @@ class VocabularyStandardQuery(BaseModel):
     )
 
 
-# --- TYPES (FLACH) ---
 class VocabularyFlatItem(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
@@ -29,13 +29,12 @@ class VocabularyFlatItem(BaseModel):
     count_subs: int | None = None
     category: str | None = None
 
+
 class VocabularyFlatResponse(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
-    # Key ist die Typ-ID als String, Value ist das FlatItem
     types: Dict[str, VocabularyFlatItem]
 
-    # --- TYPES (BAUM) ---
 
 class VocabularyTreeItem(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
@@ -45,6 +44,7 @@ class VocabularyTreeItem(BaseModel):
     classes: list[str] | None = None
     children: list['VocabularyTreeItem'] = Field(default_factory=list)
 
+
 class VocabularyTreeResponse(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
@@ -53,6 +53,8 @@ class VocabularyTreeResponse(BaseModel):
     custom: list[VocabularyTreeItem] = Field(default_factory=list)
     value: list[VocabularyTreeItem] = Field(default_factory=list)
     system: list[VocabularyTreeItem] = Field(default_factory=list)
+
+
 class VocabularyStandardResponse(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
     results: list[VocabularyTreeItem] = Field(default_factory=list)

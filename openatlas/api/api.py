@@ -3,12 +3,13 @@ from flask_cors import CORS
 from flask_restful import Api
 
 from openatlas import app
-from openatlas.api.api_v1.routes import api_v1_system, api_v1_vocabulary, api_v1_lod
+from openatlas.api.api_v1.routes import api_v1_system, api_v1_vocabulary, api_v1_lod, api_v1_root
 from openatlas.api.api_v04.routes import routes
 
 app.config['PROPAGATE_EXCEPTIONS'] = True
 CORS(app, resources={r"/api/*": {"origins": app.config['CORS_ALLOWANCE']}})
 
+app.register_api(api_v1_root)
 app.register_api(api_v1_system)
 app.register_api(api_v1_vocabulary)
 app.register_api(api_v1_lod)
