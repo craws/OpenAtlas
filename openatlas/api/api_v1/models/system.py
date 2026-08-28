@@ -11,7 +11,8 @@ class ImageProcessingInfo(BaseModel):
     enabled: bool
     available_image_sizes: Dict[str, str] = Field(
         ...,
-        json_schema_extra={"example": {"thumbnail": "200px", "table": "100px"}}    )
+        json_schema_extra={
+            "example": {"thumbnail": "200px", "table": "100px"}})
 
 
 class IiifInfo(BaseModel):
@@ -43,11 +44,12 @@ class SystemInfoResponse(BaseModel):
     default_language: str
     module_time: bool = Field(
         ...,
-        description="Whether the time module (hours, minutes, seconds) is enabled.")
-    
+        description="Whether the time module (hours, minutes, seconds) is "
+                    "enabled.")
+
     map_config: MapConfig
     image_processing: ImageProcessingInfo
-    iiif: IiifInfo  
+    iiif: IiifInfo
 
 
 class LicensedFileItem(BaseModel):
@@ -67,36 +69,33 @@ class LicensedFileItem(BaseModel):
 class LicensedFileOverviewQuery(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
-    file_id: int | None = Field(None,
-                                description="Filter by a specific file ID.")
+    file_id: int | None = Field(
+        None,
+        description="Filter by a specific file ID.")
 
 
 class LicensedFileOverviewResponse(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
-    # Key ist die ID als String (JSON-Standard), Value ist das FileItem
     files: Dict[str, LicensedFileItem]
 
 
-class EntityStatsQuery(BaseModel):
+class EntityCountQuery(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
     case_study: int | None = Field(
         None,
-        description="Filter entity counts by a specific case study ID."
-    )
+        description="Filter entity counts by a specific case study ID.")
 
 
-class EntityStatsResponse(BaseModel):
+class EntityCountResponse(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
-    # Dictionary mit den OpenAtlas-Klassen als Keys und Integern als Values
     counts: Dict[OpenAtlasClassEnum, int] = Field(
         ...,
         description="Count of entities grouped by OpenAtlas system class.")
 
 
-# --- KLASSEN ---
 class SystemClassItem(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
@@ -107,19 +106,23 @@ class SystemClassItem(BaseModel):
     group: str | None = None
     icon: str | None = None
 
+
 class SystemClassesResponse(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
-    locale: str = Field(default="en", description="The language used for labels.")
+    locale: str = Field(
+        default="en",
+        description="The language used for labels.")
     results: list[SystemClassItem]
 
-# --- PROPERTIES ---
+
 class PropertyI18n(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
     de: str | None = None
     en: str | None = None
     fr: str | None = None
+
 
 class PropertyDetail(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
@@ -135,8 +138,8 @@ class PropertyDetail(BaseModel):
     i18n: PropertyI18n | None = None
     i18n_inverse: PropertyI18n | None = None
 
+
 class SystemPropertiesResponse(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
-    # Dictionary mit den CIDOC-Codes (z.B. 'P1', 'OA7') als Keys
     properties: Dict[str, PropertyDetail]

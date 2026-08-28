@@ -1002,3 +1002,28 @@ def get_vocab_ids_for_case_study(case_study_id: int) -> set[int]:
     """
     g.cursor.execute(sql, {'case_study_id': case_study_id})
     return {row['range_id'] for row in g.cursor.fetchall()}
+
+
+def get_overview_counts_by_case_study(
+        classes: list[str],
+        case_study_id: int | None = None) -> dict[str, int]:
+    sql = """
+        SELECT e.openatlas_class_name AS name, COUNT(e.id) AS count
+        FROM model.entity e
+    """
+    if case_study_id is not None:
+        sql += """
+            JOIN model.link l_cs ON e.id = l_cs.domain_id
+            WHERE e.openatlas_class_name IN %(classes)s
+              AND l_cs.range_id = %(case_study_id)s
+              AND l_cs.property_code = 'P2'
+        """
+    else:
+        sql += """
+            WHERE e.openatlas_class_name IN %(classes)s
+        """
+        
+    sql += " GROUP BY e.openatlas_class_name;"
+    
+    g.cursor.execute(sql, {'classes': tuple(classes), 'case_study_id': case_study_id})
+    return {row['name']: row['count'] for row in list(g.cursor)}
