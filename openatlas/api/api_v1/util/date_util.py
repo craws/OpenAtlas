@@ -23,16 +23,16 @@ def get_last_day_of_month(year: int, month: int) -> int:
 def pad_historical_date(value: Any, is_end_date: bool = False) -> str | None:
     if value is None:
         return None
-    val_str = str(value).strip()
-    if not val_str:
+    value_str = str(value).strip()
+    if not value_str:
         return None
 
     is_negative = False
-    if val_str.startswith('-'):
+    if value_str.startswith('-'):
         is_negative = True
-        val_str = val_str[1:].strip()
+        value_str = value_str[1:].strip()
 
-    parts = val_str.split('-')
+    parts = value_str.split('-')
     if not parts or not parts[0].isdigit():
         raise ValueError(f"Invalid date format: {value}")
 

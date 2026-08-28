@@ -1,9 +1,7 @@
-from pydantic import BaseModel, ConfigDict
-from pydantic.alias_generators import to_camel
+from openatlas.api.api_v1.models.util import BaseSchema
 
 
-class ApiIndexResponse(BaseModel):
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+class ApiIndexResponse(BaseSchema):
 
     name: str
     version: str

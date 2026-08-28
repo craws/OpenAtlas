@@ -1,21 +1,20 @@
-from pydantic import BaseModel, Field, ConfigDict
-from pydantic.alias_generators import to_camel
 from typing import Dict
+from uuid import UUID
+
+from pydantic import Field
+
+from openatlas.api.api_v1.models.util import BaseSchema
 
 
-class VocabularyStandardQuery(BaseModel):
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
-
+class VocabularyStandardQuery(BaseSchema):
     case_study: int | None = Field(
         None,
-        description="Filter types by a specific case study ID."
-    )
+        description="Filter types by a specific case study ID.")
 
 
-class VocabularyFlatItem(BaseModel):
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
-
+class VocabularyFlatItem(BaseSchema):
     id: int
+    uuid: UUID
     name: str
     description: str | None = None
     image_id: int | None = None
@@ -30,24 +29,19 @@ class VocabularyFlatItem(BaseModel):
     category: str | None = None
 
 
-class VocabularyFlatResponse(BaseModel):
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
-
+class VocabularyFlatResponse(BaseSchema):
     types: Dict[str, VocabularyFlatItem]
 
 
-class VocabularyTreeItem(BaseModel):
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
-
+class VocabularyTreeItem(BaseSchema):
     id: int
+    uuid: UUID
     name: str
     classes: list[str] | None = None
     children: list['VocabularyTreeItem'] = Field(default_factory=list)
 
 
-class VocabularyTreeResponse(BaseModel):
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
-
+class VocabularyTreeResponse(BaseSchema):
     standard: list[VocabularyTreeItem] = Field(default_factory=list)
     place: list[VocabularyTreeItem] = Field(default_factory=list)
     custom: list[VocabularyTreeItem] = Field(default_factory=list)
@@ -55,6 +49,5 @@ class VocabularyTreeResponse(BaseModel):
     system: list[VocabularyTreeItem] = Field(default_factory=list)
 
 
-class VocabularyStandardResponse(BaseModel):
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+class VocabularyStandardResponse(BaseSchema):
     results: list[VocabularyTreeItem] = Field(default_factory=list)

@@ -5,8 +5,7 @@ from pydantic import BaseModel, Field
 from openatlas import app
 from openatlas.api.api_v1.error_handlers import register_error_handlers
 from openatlas.api.api_v1.models.system import EntityCountQuery, \
-    EntityCountResponse, IiifInfo, ImageProcessingInfo, \
-    LicensedFileOverviewQuery, LicensedFileOverviewResponse, MapConfig, \
+    EntityCountResponse, IiifInfo, ImageProcessingInfo, MapConfig, \
     SystemClassItem, SystemClassesResponse, SystemInfoResponse, \
     PropertyDetail, SystemPropertiesResponse
 from openatlas.api.api_v1.openapi_tags import system_tag
@@ -85,23 +84,12 @@ def get_entity_count(query: EntityCountQuery):
     """Retrieves system classes with a count of their instances, optionally
     filtered by case study."""
     valid_classes = [e.value for e in OpenAtlasClassEnum]
-    
+
     counts = get_overview_counts_by_case_study(
         classes=valid_classes,
         case_study_id=query.case_study)
-    
+
     return EntityCountResponse(counts=counts).model_dump(by_alias=True)
-
-
-@api_v1_system.get(
-    '/licensed-files',
-    summary="Get licensed files",
-    responses={200: LicensedFileOverviewResponse},
-    tags=[system_tag])
-def get_licensed_files(query: LicensedFileOverviewQuery):
-    """Retrieves all existing files with a license, their display URLs,
-    and metadata."""
-    pass
 
 
 @api_v1_system.get(

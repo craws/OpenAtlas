@@ -34,6 +34,7 @@ def get_vocabulary_list() -> dict:
     for id_, type_ in g.types.items():
         vocab_dict[str(id_)] = VocabularyFlatItem(
             id=type_.id,
+            uuid=type_.uuid,
             name=type_.name,
             description=type_.description,
             classes=type_.classes,
@@ -67,6 +68,7 @@ def _walk_tree(
 
         items.append(VocabularyTreeItem(
             id=item.id,
+            uuid=item.uuid,
             name=item.name.replace("'", "&apos;"),
             classes=item.classes or None,
             children=children))

@@ -1,18 +1,18 @@
 from typing import Any, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
-from pydantic.alias_generators import to_camel
+from pydantic import ConfigDict, Field, field_validator
 
+from openatlas.api.api_v1.models.util import BaseSchema, ExtensionsType, \
+    OpenAtlasClassEnum
 from openatlas.api.api_v1.util.date_util import pad_historical_date
-from openatlas.api.api_v1.models.util import ExtensionsType, OpenAtlasClassEnum
 
 
-class EntityPath(BaseModel):
+class EntityPath(BaseSchema):
     id: UUID = Field(..., description="Unique identifier of the entity")
 
 
-class EntityPathExt(BaseModel):
+class EntityPathExt(BaseSchema):
     id: UUID = Field(..., description="Unique identifier of the entity")
     ext: ExtensionsType = Field(
         ...,
@@ -25,7 +25,7 @@ class EntityPathExt(BaseModel):
                 "ntriples": {"summary": "N-Triples Format", "value": "nt"}}})
 
 
-class EntityCollectionPath(BaseModel):
+class EntityCollectionPath(BaseSchema):
     entity_class: OpenAtlasClassEnum = Field(
         ...,
         description="Choose one of the following classes: ",
@@ -84,12 +84,11 @@ class EntityCollectionPath(BaseModel):
                     "value": "type"}}})
 
 
-class EntityCollectionQuery(BaseModel):
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
-
+class EntityCollectionQuery(BaseSchema):
     search: str | None = Field(
         None,
-        description="Filter entities by name (case-insensitive substring match).")
+        description="Filter entities by name (case-insensitive substring "
+                    "match).")
     sort_by: Literal['name', 'start_date', 'end_date'] = Field(
         'name',
         description="Field to sort by: 'name', 'startDate', or 'endDate'.")
@@ -107,43 +106,46 @@ class EntityCollectionQuery(BaseModel):
         description="Page number (starting at 1).")
     start_date: str | None = Field(
         None,
-        description="Filter entities with begin date on or after this date (e.g. 0400-01-01, 400, -400).")
+        description="Filter entities with begin date on or after this date ("
+                    "e.g. 0400-01-01, 400, -400).")
     end_date: str | None = Field(
         None,
-        description="Filter entities with end date on or before this date (e.g. 0400-12-31, 400, -400).")
+        description="Filter entities with end date on or before this date ("
+                    "e.g. 0400-12-31, 400, -400).")
     type_id: int | UUID | str | None = Field(
         None,
         description="Filter entities by type ID (integer) or type UUID.")
     case_study: int | UUID | str | None = Field(
         None,
-        description="Filter entities by case study ID (integer) or case study UUID.")
+        description="Filter entities by case study ID (integer) or case "
+                    "study UUID.")
 
     @field_validator('sort_by', mode='before')
     @classmethod
-    def validate_sort_by(cls, v: Any) -> str:
-        if v in ('startDate', 'start_date'):
+    def validate_sort_by(cls, value: Any) -> str:
+        if value in ('startDate', 'start_date'):
             return 'start_date'
-        if v in ('endDate', 'end_date'):
+        if value in ('endDate', 'end_date'):
             return 'end_date'
-        return v
+        return value
 
     @field_validator('start_date', mode='before')
     @classmethod
-    def validate_start_date(cls, v: Any) -> str | None:
-        if v is None:
+    def validate_start_date(cls, value: Any) -> str | None:
+        if value is None:
             return None
-        return pad_historical_date(v, is_end_date=False)
+        return pad_historical_date(value, is_end_date=False)
 
     @field_validator('end_date', mode='before')
     @classmethod
-    def validate_end_date(cls, v: Any) -> str | None:
-        if v is None:
+    def validate_end_date(cls, value: Any) -> str | None:
+        if value is None:
             return None
-        return pad_historical_date(v, is_end_date=True)
+        return pad_historical_date(value, is_end_date=True)
 
 
-class LinkedArtResponse(BaseModel):
-    model_config = ConfigDict(extra='allow', populate_by_name=True)
+class LinkedArtResponse(BaseSchema):
+    model_config = ConfigDict(extra='allow')
 
     context: str = Field(
         default="https://linked.art/ns/v1/linked-art.json",
@@ -153,8 +155,8 @@ class LinkedArtResponse(BaseModel):
     _label: str
 
 
-class LinkedArtCollectionResponse(BaseModel):
-    model_config = ConfigDict(extra='allow', populate_by_name=True)
+class LinkedArtCollectionResponse(BaseSchema):
+    model_config = ConfigDict(extra='allow')
 
     context: list[str | dict[str, str]] = Field(
         default=[

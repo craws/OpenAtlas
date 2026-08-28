@@ -1,13 +1,11 @@
-from pydantic import BaseModel, Field, ConfigDict
-from pydantic.alias_generators import to_camel
 from typing import Dict
 
-from openatlas.api.api_v1.models.util import OpenAtlasClassEnum
+from pydantic import Field
+
+from openatlas.api.api_v1.models.util import BaseSchema, OpenAtlasClassEnum
 
 
-class ImageProcessingInfo(BaseModel):
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
-
+class ImageProcessingInfo(BaseSchema):
     enabled: bool
     available_image_sizes: Dict[str, str] = Field(
         ...,
@@ -15,26 +13,20 @@ class ImageProcessingInfo(BaseModel):
             "example": {"thumbnail": "200px", "table": "100px"}})
 
 
-class IiifInfo(BaseModel):
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
-
+class IiifInfo(BaseSchema):
     enabled: bool
     url: str | None = None
     version: str | None = None
 
 
-class MapConfig(BaseModel):
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
-
+class MapConfig(BaseSchema):
     zoom_default: int
     zoom_max: int
     cluster_max_radius: int
     cluster_disable_at_zoom: int
 
 
-class SystemInfoResponse(BaseModel):
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
-
+class SystemInfoResponse(BaseSchema):
     version: str = Field(
         ...,
         description="OpenAtlas Core Version")
@@ -52,53 +44,19 @@ class SystemInfoResponse(BaseModel):
     iiif: IiifInfo
 
 
-class LicensedFileItem(BaseModel):
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
-
-    display: str | None = None
-    thumbnail: str | None = None
-    extension: str | None = None
-    mimetype: str | None = None
-    license: str | None = None
-    creator: str | None = None
-    license_holder: str | None = None
-    public_shareable: bool | None = None
-    iiif_manifest: str | None = None
-
-
-class LicensedFileOverviewQuery(BaseModel):
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
-
-    file_id: int | None = Field(
-        None,
-        description="Filter by a specific file ID.")
-
-
-class LicensedFileOverviewResponse(BaseModel):
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
-
-    files: Dict[str, LicensedFileItem]
-
-
-class EntityCountQuery(BaseModel):
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
-
+class EntityCountQuery(BaseSchema):
     case_study: int | None = Field(
         None,
         description="Filter entity counts by a specific case study ID.")
 
 
-class EntityCountResponse(BaseModel):
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
-
+class EntityCountResponse(BaseSchema):
     counts: Dict[OpenAtlasClassEnum, int] = Field(
         ...,
         description="Count of entities grouped by OpenAtlas system class.")
 
 
-class SystemClassItem(BaseModel):
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
-
+class SystemClassItem(BaseSchema):
     label: str = Field(..., description="Translated label of the class.")
     openatlas_class: str
     crm: str | None = None
@@ -107,26 +65,20 @@ class SystemClassItem(BaseModel):
     icon: str | None = None
 
 
-class SystemClassesResponse(BaseModel):
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
-
+class SystemClassesResponse(BaseSchema):
     locale: str = Field(
         default="en",
         description="The language used for labels.")
     results: list[SystemClassItem]
 
 
-class PropertyI18n(BaseModel):
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
-
+class PropertyI18n(BaseSchema):
     de: str | None = None
     en: str | None = None
     fr: str | None = None
 
 
-class PropertyDetail(BaseModel):
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
-
+class PropertyDetail(BaseSchema):
     name: str
     name_inverse: str | None = None
     code: str
@@ -139,9 +91,5 @@ class PropertyDetail(BaseModel):
     i18n_inverse: PropertyI18n | None = None
 
 
-class SystemPropertiesResponse(BaseModel):
-    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
-
+class SystemPropertiesResponse(BaseSchema):
     properties: Dict[str, PropertyDetail]
-
-
