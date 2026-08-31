@@ -1,5 +1,8 @@
 import datetime
+import json
 import locale
+import os
+import shutil
 from typing import Optional
 
 from flask import Flask, g, redirect, request, session, url_for
@@ -21,7 +24,12 @@ app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 app.config.from_object('config.default')
 app.config.from_object('config.api')
-app.config.from_pyfile('production.py')
+
+CONFIG_PATH = ''
+if 'INSTANCE_PATH' in os.environ:  # Used for multi instance
+    CONFIG_PATH = os.environ['INSTANCE_PATH'] + 'instance/'  # pragma: no cover
+app.config.from_pyfile(f'{CONFIG_PATH}production.py')
+
 app.config['WTF_CSRF_TIME_LIMIT'] = None  # Set CSRF token valid for session
 locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 jwt = JWTManager(app)
@@ -66,6 +74,11 @@ def before_request() -> Response | None:
     if request.path.startswith('/display'):
         return None  # Avoid overheads for file display
 
+    if request.path.startswith('/swagger') or \
+            request.path.startswith('/openapi.json'):
+        write_openapi_instance()
+        return None  # Avoid overheads for swagger
+
     session['language'] = get_locale()
     g.admins_available = admins_available()
     if not g.admins_available \
@@ -92,13 +105,12 @@ def before_request() -> Response | None:
         app.config['UPLOAD_PATH'],
         app.config['TMP_PATH']]
     g.arche_uri_rules = None
-    setup_files()
     setup_api()
+    setup_files()
     return None
 
 
 def setup_files() -> None:
-    from openatlas.models.entity import Entity
     from openatlas.models.rights_holder import RightsHolder
     g.files = {}
     for file_ in app.config['UPLOAD_PATH'].iterdir():
@@ -111,21 +123,19 @@ def setup_files() -> None:
         g.display_file_ext += app.config['PROCESSABLE_EXT']
     if g.settings['iiif'] and g.settings['iiif_path']:
         g.writable_paths.append(g.settings['iiif_path'])
-    file_info = Entity.get_file_info()
     g.rights_holder = RightsHolder.get_rights_holder()
     rights_holder_info = RightsHolder.get_rights_holder_information()
-    for file_id, info in file_info.items():
+    file_info = {}
+    for file_id in g.files:
         rights = rights_holder_info.get(file_id, {})
-        info['creator'] = rights.get('creator', [])
-        info['license_holder'] = rights.get('license_holder', [])
+        file_info[file_id] = {
+            'creator': rights.get('creator', []),
+            'license_holder': rights.get('license_holder', [])}
     g.file_info = file_info
 
 
 def setup_api() -> None:
-    from openatlas.api.resources.openapi_util import write_openapi_instance
-    if request.path.startswith('/swagger'):
-        write_openapi_instance()
-    elif request.path.startswith('/api/'):
+    if request.path.startswith('/api/'):
         ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
         if not current_user.is_authenticated \
                 and not g.settings['api_public'] \
@@ -178,3 +188,30 @@ def check_incoming_tokens(
             or token_['valid_until'] < datetime.datetime.now():
         return True
     return False
+
+
+def write_openapi_instance() -> None:
+    openapi = app.config['OPENAPI_FILE']
+    openapi_instance = app.config['OPENAPI_INSTANCE_FILE']
+    if not openapi_instance.exists():
+        shutil.copy(openapi, openapi_instance)
+    with openapi_instance.open(mode='r+') as i, openapi.open(mode='r') as f:
+        original = json.load(f)
+        instance = json.load(i)
+        if original['info']['version'] != instance['info']['version']:
+            shutil.copy(openapi, openapi_instance)
+        server = {
+            'url': request.host_url + 'api/{basePath}',
+            'description': f'{g.settings['site_name']} Server',
+            'variables': {'basePath': {'default': '0.4', 'enum': ['0.4']}}}
+        modified = False
+        if len(instance['servers']) == 2:
+            instance['servers'].insert(0, server)
+            modified = True
+        elif instance['servers'][0]['description'] != server['description']:
+            instance['servers'][0] = server
+            modified = True
+        if modified:
+            i.seek(0)
+            json.dump(instance, i, indent=4)
+            i.truncate()

@@ -7,14 +7,13 @@ from flask_babel import gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import secure_filename
 from wtforms import (
-    BooleanField, HiddenField, SelectField, SelectMultipleField, StringField,
-    widgets)
+    HiddenField, SelectField, SelectMultipleField, StringField, widgets)
 
 from openatlas import app
 from openatlas.database.connect import Transaction
-from openatlas.display.image_processing import (check_iiif_activation,
-                                                convert_image_to_iiif,
-                                                get_binary_path, resize_image)
+from openatlas.display.image_processing import (
+    check_iiif_activation, convert_image_to_iiif,
+    get_binary_path, resize_image)
 from openatlas.forms.add_fields import (
     add_buttons, add_class_types, add_date_fields, add_description,
     add_name_fields, add_reference_systems, add_relations, get_validators)
@@ -71,7 +70,7 @@ def get_entity_form(
                     key,
                     StringField(
                             value['label'],
-                            validators = get_validators(value)))
+                            validators=get_validators(value)))
             case 'file':
                 if not entity.id:
                     setattr(
@@ -84,13 +83,6 @@ def get_entity_form(
             case 'location':
                 for shape in ['points', 'polygons', 'lines']:
                     setattr(Form, f'gis_{shape}', HiddenField(default='[]'))
-            case 'public':
-                setattr(
-                    Form,
-                    'public',
-                    BooleanField(
-                        value['label'],
-                        validators=get_validators(value)))
             case 'reference_system_classes':
                 if choices := reference_system_class_choices(entity):
                     # noinspection PyTypeChecker
@@ -232,7 +224,7 @@ def process_relations(
             if entity.root:
                 ids.append(entity.root[0])
             elif origin:
-                ids.append(origin.id)
+                ids.append(origin.root[0] if origin.root else origin.id)
         if ids:
             entities = Entity.get_by_ids(ids)
             if 'object_location' in relation.classes:

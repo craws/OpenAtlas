@@ -11,10 +11,11 @@ def cidoc_classes(with_count: bool = False) -> list[dict[str, Any]]:
             c.name,
             comment
             {', COUNT(e.id) AS count' if with_count else ''}
-        FROM model.cidoc_class c
-        {''' LEFT JOIN model.entity e ON c.code = e.cidoc_class_code
-        GROUP BY (c.code, c.name, c.comment)''' if with_count else ''}
-        ;
+        FROM model.cidoc_class c {"""
+            LEFT JOIN model.openatlas_class oa ON c.code = oa.cidoc_class_code
+            LEFT JOIN model.entity e ON oa.name = e.openatlas_class_name
+            GROUP BY (c.code, c.name, c.comment)
+            """ if with_count else ''};
         """)
     return list(g.cursor)
 

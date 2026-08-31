@@ -21,6 +21,7 @@ class ImageTest(TestBaseCase):
             app.preprocess_request()
             place = insert('place', 'Nostromos')
 
+        public_type = get_hierarchy('Public sharing allowed')
         with open(logo_path, 'rb') as img:
             rv: Any = c.post(
                 url_for(
@@ -28,7 +29,10 @@ class ImageTest(TestBaseCase):
                     class_='file',
                     origin_id=place.id,
                     relation='file'),
-                data={'name': 'OpenAtlas logo', 'file': img},
+                data={
+                    'name': 'OpenAtlas logo',
+                    'file': img,
+                    str(public_type.id): public_type.subs[0]},
                 follow_redirects=True)
         assert b'An entry has been created' in rv.data
 
@@ -39,7 +43,10 @@ class ImageTest(TestBaseCase):
                     class_='file',
                     origin_id=place.id,
                     relation='file'),
-                data={'name': 'OpenAtlas logo2', 'file': img},
+                data={
+                    'name': 'OpenAtlas logo2',
+                    'file': img,
+                    str(public_type.id): public_type.subs[0]},
                 follow_redirects=True)
         assert b'An entry has been created' in rv.data
 

@@ -215,13 +215,14 @@ def get_place_and_actor_relations(
             file_to_related_entity_ids[link.domain.id].append(
                 link.range.id)
 
-    inverse_links = Entity.get_links_of_entities(
-        list(places_and_actors.keys()),
-        'P67',
-        inverse=True)
+    if places_and_actors.keys():
+        inverse_links = Entity.get_links_of_entities(
+            list(places_and_actors.keys()),
+            'P67',
+            inverse=True)
 
-    for link_ in inverse_links:
-        places_and_actors[link_.range.id]['links_inverse'].append(link_)
+        for link_ in inverse_links:
+            places_and_actors[link_.range.id]['links_inverse'].append(link_)
 
     for entity_dict in places_and_actors.values():
         places_and_actors[
@@ -390,6 +391,10 @@ def open_tmp_sql_file() -> str:
             mode='w+',
             suffix='.sql',
             delete=False) as tmp_sql:
+
+        tmp_sql.write("CREATE EXTENSION IF NOT EXISTS postgis;\n\n")
+        tmp_sql.flush()
+
         command = [
             pg_dump_bin,
             '-h', app.config['DATABASE_HOST'],
@@ -397,7 +402,6 @@ def open_tmp_sql_file() -> str:
             '-U', app.config['DATABASE_USER'],
             '-p', str(app.config['DATABASE_PORT']),
             '--schema=model',
-            '--schema=public',
             '--schema=import']
         try:
             subprocess.run(

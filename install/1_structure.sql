@@ -2,8 +2,9 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 17.9 (Debian 17.9-0+deb13u1)
--- Dumped by pg_dump version 17.9 (Debian 17.9-0+deb13u1)
+
+-- Dumped from database version 17.10 (Debian 17.10-0+deb13u1)
+-- Dumped by pg_dump version 17.10 (Debian 17.10-0+deb13u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -16,8 +17,6 @@ SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
-
-CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
 
 ALTER TABLE IF EXISTS ONLY web.user_tokens DROP CONSTRAINT IF EXISTS user_tokens_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_tokens DROP CONSTRAINT IF EXISTS user_tokens_creator_id_fkey;
@@ -52,9 +51,7 @@ ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_domain_id_f
 ALTER TABLE IF EXISTS ONLY model.gis DROP CONSTRAINT IF EXISTS gis_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.rights_holder_file DROP CONSTRAINT IF EXISTS fk_rights_holder;
 ALTER TABLE IF EXISTS ONLY model.rights_holder_file DROP CONSTRAINT IF EXISTS fk_entity;
-ALTER TABLE IF EXISTS ONLY model.file_info DROP CONSTRAINT IF EXISTS file_info_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_openatlas_class_name_fkey;
-ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_class_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_sub_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_fkey;
@@ -80,12 +77,23 @@ DROP TRIGGER IF EXISTS update_modified ON model.rights_holder_file;
 DROP TRIGGER IF EXISTS update_modified ON model.rights_holder;
 DROP TRIGGER IF EXISTS update_modified ON model.link;
 DROP TRIGGER IF EXISTS update_modified ON model.gis;
-DROP TRIGGER IF EXISTS update_modified ON model.file_info;
 DROP TRIGGER IF EXISTS update_modified ON model.entity;
 DROP TRIGGER IF EXISTS update_modified ON model.annotation_text;
 DROP TRIGGER IF EXISTS update_modified ON model.annotation_image;
 DROP TRIGGER IF EXISTS on_delete_entity ON model.entity;
 DROP TRIGGER IF EXISTS update_modified ON import.project;
+DROP INDEX IF EXISTS web.user_log_user_idx;
+DROP INDEX IF EXISTS web.user_log_entity_idx;
+DROP INDEX IF EXISTS model.property_range_class_code_idx;
+DROP INDEX IF EXISTS model.property_domain_class_code_idx;
+DROP INDEX IF EXISTS model.property_code_idx;
+DROP INDEX IF EXISTS model.link_type_id_idx;
+DROP INDEX IF EXISTS model.link_range_id_idx;
+DROP INDEX IF EXISTS model.link_property_code_idx;
+DROP INDEX IF EXISTS model.link_domain_id_idx;
+DROP INDEX IF EXISTS model.gis_entity_id_idx;
+DROP INDEX IF EXISTS model.entity_openatlas_class_name_idx;
+DROP INDEX IF EXISTS model.cidoc_class_code_idx;
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_username_key;
 ALTER TABLE IF EXISTS ONLY web.user_tokens DROP CONSTRAINT IF EXISTS user_tokens_pkey;
 ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_user_id_name_key;
@@ -129,9 +137,8 @@ ALTER TABLE IF EXISTS ONLY model.openatlas_class DROP CONSTRAINT IF EXISTS opena
 ALTER TABLE IF EXISTS ONLY model.openatlas_class DROP CONSTRAINT IF EXISTS openatlas_class_name_key;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_pkey;
 ALTER TABLE IF EXISTS ONLY model.gis DROP CONSTRAINT IF EXISTS gis_pkey;
-ALTER TABLE IF EXISTS ONLY model.file_info DROP CONSTRAINT IF EXISTS file_info_pkey;
+ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_uuid_unique;
 ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_pkey;
-ALTER TABLE IF EXISTS ONLY model.file_info DROP CONSTRAINT IF EXISTS entity_id_key;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class DROP CONSTRAINT IF EXISTS class_pkey;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class DROP CONSTRAINT IF EXISTS class_name_key;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_id_sub_id_key;
@@ -221,7 +228,6 @@ DROP SEQUENCE IF EXISTS model.link_id_seq;
 DROP TABLE IF EXISTS model.link;
 DROP SEQUENCE IF EXISTS model.gis_id_seq;
 DROP TABLE IF EXISTS model.gis;
-DROP TABLE IF EXISTS model.file_info;
 DROP SEQUENCE IF EXISTS model.file_info_id_seq;
 DROP SEQUENCE IF EXISTS model.entity_id_seq;
 DROP TABLE IF EXISTS model.entity;
@@ -300,18 +306,18 @@ CREATE FUNCTION model.delete_entity_related() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
         BEGIN
-            -- Delete aliases (P1, P131)
-            IF OLD.cidoc_class_code IN ('E18', 'E21', 'E40', 'E74') THEN
+            -- Delete aliases
+            IF OLD.openatlas_class_name IN ('place', 'person', 'group') THEN
                 DELETE FROM model.entity WHERE id IN (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code IN ('P1', 'P131'));
             END IF;
 
-            -- Delete location (E53) if it was an artifact, human remains or place
-            IF OLD.cidoc_class_code IN ('E18', 'E20', 'E22') THEN
+            -- Delete location if it was an artifact, human remains or place
+            IF OLD.openatlas_class_name IN ('place', 'human_remains', 'artifact') THEN
                 DELETE FROM model.entity WHERE id = (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code = 'P53');
             END IF;
 
-            -- Delete translations (E33) if it was a document
-            IF OLD.cidoc_class_code = 'E33' THEN
+            -- Delete text if it was a document not attached to a source anymore
+            IF OLD.openatlas_class_name = 'text' THEN
                 DELETE FROM model.entity WHERE id IN (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code = 'P73');
             END IF;
 
@@ -614,7 +620,6 @@ ALTER SEQUENCE model.cidoc_class_inheritance_id_seq OWNED BY model.cidoc_class_i
 
 CREATE TABLE model.entity (
     id integer NOT NULL,
-    cidoc_class_code text NOT NULL,
     name text NOT NULL,
     description text,
     created timestamp without time zone DEFAULT now() NOT NULL,
@@ -626,7 +631,7 @@ CREATE TABLE model.entity (
     end_to timestamp without time zone,
     end_comment text,
     openatlas_class_name text NOT NULL,
-    uuid uuid DEFAULT public.gen_random_uuid() NOT NULL,
+    uuid uuid DEFAULT gen_random_uuid() NOT NULL,
     CONSTRAINT no_empty_name CHECK ((name <> ''::text))
 );
 
@@ -667,28 +672,6 @@ CREATE SEQUENCE model.file_info_id_seq
 
 
 ALTER SEQUENCE model.file_info_id_seq OWNER TO openatlas;
-
---
--- Name: file_info; Type: TABLE; Schema: model; Owner: openatlas
---
-
-CREATE TABLE model.file_info (
-    id integer DEFAULT nextval('model.file_info_id_seq'::regclass) NOT NULL,
-    entity_id integer,
-    public boolean DEFAULT false,
-    created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
-);
-
-
-ALTER TABLE model.file_info OWNER TO openatlas;
-
---
--- Name: TABLE file_info; Type: COMMENT; Schema: model; Owner: openatlas
---
-
-COMMENT ON TABLE model.file_info IS 'Indicates if public sharing of corresponding file is allowed.';
-
 
 --
 -- Name: gis; Type: TABLE; Schema: model; Owner: openatlas
@@ -1942,14 +1925,6 @@ ALTER TABLE ONLY model.cidoc_class
 
 
 --
--- Name: file_info entity_id_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
---
-
-ALTER TABLE ONLY model.file_info
-    ADD CONSTRAINT entity_id_key UNIQUE (entity_id);
-
-
---
 -- Name: entity entity_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
@@ -1963,14 +1938,6 @@ ALTER TABLE ONLY model.entity
 
 ALTER TABLE ONLY model.entity
     ADD CONSTRAINT entity_uuid_unique UNIQUE (uuid);
-
-
---
--- Name: file_info file_info_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
---
-
-ALTER TABLE ONLY model.file_info
-    ADD CONSTRAINT file_info_pkey PRIMARY KEY (id);
 
 
 --
@@ -2318,6 +2285,90 @@ ALTER TABLE ONLY web."user"
 
 
 --
+-- Name: cidoc_class_code_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX cidoc_class_code_idx ON model.cidoc_class USING btree (code);
+
+
+--
+-- Name: entity_openatlas_class_name_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX entity_openatlas_class_name_idx ON model.entity USING btree (openatlas_class_name);
+
+
+--
+-- Name: gis_entity_id_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX gis_entity_id_idx ON model.gis USING btree (entity_id);
+
+
+--
+-- Name: link_domain_id_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX link_domain_id_idx ON model.link USING btree (domain_id);
+
+
+--
+-- Name: link_property_code_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX link_property_code_idx ON model.link USING btree (property_code);
+
+
+--
+-- Name: link_range_id_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX link_range_id_idx ON model.link USING btree (range_id);
+
+
+--
+-- Name: link_type_id_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX link_type_id_idx ON model.link USING btree (type_id);
+
+
+--
+-- Name: property_code_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX property_code_idx ON model.property USING btree (code);
+
+
+--
+-- Name: property_domain_class_code_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX property_domain_class_code_idx ON model.property USING btree (domain_class_code);
+
+
+--
+-- Name: property_range_class_code_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX property_range_class_code_idx ON model.property USING btree (range_class_code);
+
+
+--
+-- Name: user_log_entity_idx; Type: INDEX; Schema: web; Owner: openatlas
+--
+
+CREATE INDEX user_log_entity_idx ON web.user_log USING btree (entity_id);
+
+
+--
+-- Name: user_log_user_idx; Type: INDEX; Schema: web; Owner: openatlas
+--
+
+CREATE INDEX user_log_user_idx ON web.user_log USING btree (user_id);
+
+
+--
 -- Name: project update_modified; Type: TRIGGER; Schema: import; Owner: openatlas
 --
 
@@ -2350,13 +2401,6 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON model.annotation_text FOR EACH R
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON model.entity FOR EACH ROW EXECUTE FUNCTION model.update_modified();
-
-
---
--- Name: file_info update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
---
-
-CREATE TRIGGER update_modified BEFORE UPDATE ON model.file_info FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 
 
 --
@@ -2545,27 +2589,11 @@ ALTER TABLE ONLY model.cidoc_class_inheritance
 
 
 --
--- Name: entity entity_class_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
---
-
-ALTER TABLE ONLY model.entity
-    ADD CONSTRAINT entity_class_code_fkey FOREIGN KEY (cidoc_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
 -- Name: entity entity_openatlas_class_name_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY model.entity
     ADD CONSTRAINT entity_openatlas_class_name_fkey FOREIGN KEY (openatlas_class_name) REFERENCES model.openatlas_class(name) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: file_info file_info_entity_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
---
-
-ALTER TABLE ONLY model.file_info
-    ADD CONSTRAINT file_info_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -2835,3 +2863,4 @@ ALTER TABLE ONLY web.user_tokens
 --
 -- PostgreSQL database dump complete
 --
+

@@ -3,7 +3,7 @@
   "info": {
     "title": "OpenAtlas API",
     "description": "An API that allows user to access data from an OpenAtlas instance.",
-    "version": "0.4.14",
+    "version": "0.4.16a",
     "contact": {
       "name": "OpenAtlas",
       "url": "https://openatlas.eu",
@@ -4491,7 +4491,7 @@
         "schema": {
           "type": "string",
           "format": "uri",
-          "example": "https://frontend-demo-dev.openatlas.eu/"
+          "example": "https://discovery-demo.openatlas.eu/"
         }
       },
       "limit": {
@@ -5073,7 +5073,7 @@
               "acquisition",
               "activity",
               "administrative_unit",
-              "appellation",
+              "alias",
               "artifact",
               "bibliography",
               "creation",
@@ -5091,7 +5091,7 @@
               "production",
               "reference_system",
               "source",
-              "source_translation",
+              "text",
               "stratigraphic_unit",
               "type",
               "type_tools"
@@ -7338,8 +7338,44 @@
                 }
               },
               "files": {
-                "type": "string",
-                "nullable": true
+                "type": "array",
+                "nullable": true,
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "fileName",
+                    "mimeType",
+                    "url",
+                    "IIIFManifest",
+                    "IIIFBasePath",
+                    "source"
+                  ],
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "fileName": {
+                      "type": "string"
+                    },
+                    "mimeType": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "IIIFManifest": {
+                      "type": "string"
+                    },
+                    "IIIFBasePath": {
+                      "type": "string"
+                    },
+                    "source": {
+                      "type": "string"
+                    }
+                  }
+                }
               },
               "types": {
                 "type": "array",
@@ -7349,6 +7385,7 @@
                     "id",
                     "rootId",
                     "name",
+                    "description",
                     "path",
                     "value",
                     "unit",
@@ -7364,6 +7401,9 @@
                       "format": "int32"
                     },
                     "name": {
+                      "type": "string"
+                    },
+                    "description": {
                       "type": "string"
                     },
                     "path": {
@@ -7584,6 +7624,7 @@
         "type": "object",
         "required": [
           "id",
+          "uuid",
           "systemClass",
           "viewClass",
           "title",
@@ -7593,6 +7634,9 @@
         "properties": {
           "id": {
             "type": "integer"
+          },
+          "uuid": {
+            "type": "string"
           },
           "systemClass": {
             "type": "string"

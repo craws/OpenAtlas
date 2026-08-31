@@ -8,118 +8,16 @@ import validators
 from flask import g, url_for
 
 from openatlas import app
+from openatlas.api.formats.loud_helpers import (
+    ARCHAEOLOGY_AAT, BIBLIOGRAPHY_AAT, MIME_CLASSIFICATIONS, TYPE_OVERWRITES,
+    UNIT_MAP, aat_type, category_aat, get_language, primary_name)
 from openatlas.api.resources.util import (
-    date_to_utc_iso_str,
-    get_iiif_manifest_and_path,
-    get_license_type, is_float, remove_spaces_dashes)
+    date_to_utc_iso_str, get_iiif_manifest_and_path, get_license_type,
+    is_float, remove_spaces_dashes)
 from openatlas.database.gis import get_wkt_by_id
 from openatlas.display.util2 import get_file_path
 from openatlas.models.annotation import AnnotationText
 from openatlas.models.entity import Entity, Link
-
-LANGUAGES: dict[str, dict[str, Any]] = {
-    'en': {
-        'id': 'https://vocab.getty.edu/aat/300388277',
-        'type': 'Language',
-        '_label': 'English'},
-    'de': {
-        'id': 'https://vocab.getty.edu/aat/300388344',
-        'type': 'Language',
-        '_label': 'German'},
-    'fr': {
-        'id': 'https://vocab.getty.edu/aat/300388306',
-        'type': 'Language',
-        '_label': 'French'},
-    'it': {
-        'id': 'https://vocab.getty.edu/aat/300388474',
-        'type': 'Language',
-        '_label': 'Italian'},
-    'es': {
-        'id': 'https://vocab.getty.edu/aat/300389311',
-        'type': 'Language',
-        '_label': 'Spanish'},
-    'sr': {
-        'id': 'https://vocab.getty.edu/aat/300389248',
-        'type': 'Language',
-        '_label': 'Serbian'},
-    'sl': {
-        'id': 'https://vocab.getty.edu/aat/300389291',
-        'type': 'Language',
-        '_label': 'Slovenian'},
-    'cs': {
-        'id': 'https://vocab.getty.edu/aat/300388191',
-        'type': 'Language',
-        '_label': 'Czech'},
-    'sk': {
-        'id': 'https://vocab.getty.edu/aat/300389290',
-        'type': 'Language',
-        '_label': 'Slovak'}}
-
-UNIT_MAP = {
-    'B': 'bytes',
-    'KB': 'kilobytes',
-    'MB': 'megabytes',
-    'GB': 'gigabytes',
-    'TB': 'terabytes'}
-
-TYPE_OVERWRITES = {
-    'file': 'DigitalObject',
-    'human_remains': 'BiologicalObject',
-    'place': 'Site',
-    'feature': 'HumanMadeFeature',
-    'stratigraphic_unit':
-        'https://www.cidoc-crm.org/extensions/crmarchaeo/'
-        'A8_Stratigraphic_Unit'}
-
-
-def aat_type(id_: str, label: str) -> dict[str, str]:
-    return {
-        'id': f'https://vocab.getty.edu/aat/{id_}',
-        'type': 'Type',
-        '_label': label}
-
-
-ARCHAEOLOGY_AAT: dict[str, dict[str, str]] = {
-    'artifact': aat_type('300117127', 'artifacts'),
-    'human_remains': aat_type('300379896', 'human remains')}
-
-MIME_CLASSIFICATIONS: dict[str, list[dict[str, str]]] = {
-    'image/': [aat_type('300215302', 'Digital image')],
-    'application/pdf': [aat_type('300424602', 'Digital documents')],
-    'model/': [
-        aat_type('300266011', 'Digital File Format'), {
-            'id': 'https://www.wikidata.org/wiki/Q3859833',
-            'type': 'Type',
-            '_label': '3D Model'}]}
-
-BIBLIOGRAPHY_AAT: dict[str, dict[str, str]] = {
-    'bibliography': aat_type('300026497', 'bibliography'),
-    'edition': aat_type('300121294', 'edition')}
-
-
-def get_language() -> dict[str, Any]:
-    code = app.config.get('ARCHE_METADATA', {}).get('language', 'en')
-    return LANGUAGES.get(code, LANGUAGES['en'])
-
-
-def category_aat(id_: str, label: str) -> dict[str, Any]:
-    return aat_type(id_, label) \
-        | {'classified_as': [aat_type('300137954', 'documents (by form)')]}
-
-
-def primary_name(
-        content: str,
-        label: str | None = None,
-        id_: str | None = None) -> dict[str, Any]:
-    name: dict[str, Any] = {
-        'type': 'Name',
-        '_label': label or content,
-        'content': content,
-        'classified_as': [aat_type('300404670', 'primary name')],
-        'language': [get_language()]}
-    if id_:
-        name = {'id': id_} | name
-    return name
 
 
 def entity_uri(entity: Entity) -> str:
@@ -277,23 +175,32 @@ class LoudFormatter:
                     'api.display', filename=file_.stem, _external=True),
                 "type": "DigitalObject",
                 "_label": file_.stem}]
+        digital_object['right_held_by'] = []
         for license_holder in entity.license_holder or []:
-            digital_object['right_held_by'] = [{
-                'id': self.generate_skolem_id(
-                    license_holder.id, 'rights_holder'),
+            license_holder.uuid = self.generate_skolem_id(
+                license_holder.id,
+                'rights_holder')
+            digital_object['right_held_by'].append({
+                'id': license_holder.uuid,
                 '_label': license_holder.name,
-                'type': (license_holder.class_ or 'Actor').capitalize()}]
+                'type': (license_holder.class_ or 'Actor').capitalize(),
+                'identified_by': self._inline_identifiers(license_holder)})
+        carried_out_by = []
         for creator in entity.creator or []:
-            digital_object['created_by'] = {
-                'id': self.generate_skolem_id(
-                    creator.id, f'{entity.id}_creation_{creator.id}'),
-                '_label': f'Creation of {entity.name}',
-                'type': 'Creation',
-                'carried_out_by': [{
-                    'id': self.generate_skolem_id(
-                        creator.id, 'rights_holder'),
-                    '_label': creator.name,
-                    'type': (creator.class_ or 'Actor').capitalize()}]}
+            creator.uuid = self.generate_skolem_id(
+                creator.id,
+                'rights_holder')
+            carried_out_by.append({
+                'id': creator.uuid,
+                '_label': creator.name,
+                'type': (creator.class_ or 'Actor').capitalize(),
+                'identified_by': self._inline_identifiers(creator)})
+        digital_object['created_by'] = {
+            'id': self.generate_skolem_id(
+                entity.id, f'{entity.id}_creation'),
+            '_label': f'Creation of {entity.name}',
+            'type': 'Creation',
+            'carried_out_by': carried_out_by}
         if license_ := get_license_type(entity):
             digital_object['referred_to_by'] = [
                 self._build_license(license_, entity.name)]
@@ -385,8 +292,8 @@ class LoudFormatter:
         property_['content'] = target.name
         return property_
 
-    @staticmethod
     def _handle_p2(
+            self,
             property_: dict[str, Any],
             link_: Link,
             is_domain: bool) -> dict[str, Any]:
@@ -405,7 +312,34 @@ class LoudFormatter:
                 "id": "https://vocab.getty.edu/aat/300379096",
                 'type': "Type",
                 '_label': target.description}]
+            return property_
+        self._append_type_references(property_, target)
         return property_
+
+    def _append_type_references(
+            self,
+            property_: dict[str, Any],
+            type_entity: Entity) -> None:
+        equivalents: list[dict[str, Any]] = []
+        attributed_by: list[dict[str, Any]] = []
+        for type_link in self.type_refs.get(type_entity.id, []):
+            url = reference_url(type_link)
+            if not validators.url(url):  # pragma: no cover
+                continue
+            ref = {
+                'id': url,
+                'type': 'Type',
+                '_label': type_entity.name}
+            if is_close_match(type_link):  # pragma: no cover
+                attributed_by.append(close_match_attribution(
+                    self.generate_skolem_id(type_link.id, 'close_match'),
+                    ref))
+            else:
+                equivalents.append(ref)
+        if equivalents:
+            property_['equivalent'] = equivalents
+        if attributed_by:  # pragma: no cover
+            property_['attributed_by'] = attributed_by
 
     def _handle_p73(
             self,
@@ -918,19 +852,15 @@ class LoudFormatter:
     @staticmethod
     def _inline_identifiers(entity: Entity) -> list[dict[str, Any]]:
         skolem = LoudFormatter.generate_skolem_id
-        internal_id = url_for(
-            'api.entity',
-            id_=entity.id,
-            _external=True,
-            format='loud')
         return [
             primary_name(
                 entity.name, id_=skolem(entity.id, 'appellation')), {
-                'id': internal_id,
+                'id': skolem(entity.id, 'internal_id'),
                 "type": "Identifier",
                 "_label": "Internal Database ID",
-                "content": internal_id,
-                "classified_as": [aat_type('300404629', 'local URI')]}, {
+                "content": str(entity.id),
+                "classified_as": [
+                    aat_type('300417447', 'internal identification')]}, {
                 'id': skolem(entity.id, 'unique_identifier'),
                 "type": "Identifier",
                 "_label": "Unique Identifier",

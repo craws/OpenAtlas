@@ -23,7 +23,7 @@ ingress:
   enabled: false
   path: "/"
   annotations:
-    kubernetes.io/ingress.class: "nginx"
+    spec.ingressClassName: "nginx"
     nginx.ingress.kubernetes.io/proxy-body-size: 1m
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "30"
@@ -49,7 +49,7 @@ cronjobs:
   backup:
     schedule: "0 3 * * *"
     command: ["/bin/bash"]
-    args: ["-c", "/var/www/openatlas/install/docker/backup_script.sh /backup"]
+    args: ["-c", "/var/www/openatlas/install/container/backup_script.sh /backup"]
     livenessProbe:
       command: ["/bin/true"]
       probeType: "exec"

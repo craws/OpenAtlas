@@ -1,45 +1,44 @@
-INSERT INTO model.entity (
-  cidoc_class_code, openatlas_class_name, name, description, begin_from, begin_to, begin_comment, end_from, end_to, end_comment, created, modified)
+INSERT INTO model.entity (openatlas_class_name, name, description, begin_from, begin_to, begin_comment, end_from, end_to, end_comment, created, modified)
 VALUES
-    ('E18', 'place', 'Shire','The Shire was the homeland of the hobbits.','2018-01-31', '2018-03-01', 'Begin of the shire', '2019-01-31',  '2019-03-01','Descent of Shire', '2022-09-21 16:38:01.923431','2022-09-21 16:38:05.923431'),
-    ('E21', 'person', 'Sam', 'That is Sam','200-01-31', '200-03-01', 'Begin of the shire', '700-01-31', '800-03-01','Descent of Shire', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('E74', 'group', 'The Fellowship', '','215-01-31', NULL, '', '700-01-31', NULL,'', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+    ('place', 'Shire','The Shire was the homeland of the hobbits.','2018-01-31', '2018-03-01', 'Begin of the shire', '2019-01-31',  '2019-03-01','Descent of Shire', '2022-09-21 16:38:01.923431','2022-09-21 16:38:05.923431'),
+    ('person', 'Sam', 'That is Sam','200-01-31', '200-03-01', 'Begin of the shire', '700-01-31', '800-03-01','Descent of Shire', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('group', 'The Fellowship', '','215-01-31', NULL, '', '700-01-31', NULL,'', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
-INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, description, modified)
+INSERT INTO model.entity (openatlas_class_name, name, description, modified)
 VALUES
-  ('E53', 'object_location', 'Location of Shire', NULL, CURRENT_TIMESTAMP),
-  ('E18', 'place', 'Mordor', 'The heart of evil.', CURRENT_TIMESTAMP),
-  ('E53', 'object_location', 'Location of Mordor', NULL, CURRENT_TIMESTAMP),
-  ('E22', 'artifact', 'The One Ring', 'The one ring', CURRENT_TIMESTAMP),
-  ('E53', 'object_location', 'Location of The One Ring', NULL, CURRENT_TIMESTAMP),
-  ('E20', 'human_remains', 'Dragon bones', 'Bones of an ancient dragon', CURRENT_TIMESTAMP),
-  ('E53', 'object_location', 'Location of Dragon bones', NULL, CURRENT_TIMESTAMP),
-  ('E18', 'feature', 'Home of Baggins', 'Home of Baggins', CURRENT_TIMESTAMP),
-  ('E53', 'object_location', 'Location of Home of Baggins', NULL, CURRENT_TIMESTAMP),
-  ('E18', 'stratigraphic_unit', 'Bar', NULL, CURRENT_TIMESTAMP),
-  ('E53', 'object_location', 'Location of Bar', NULL, CURRENT_TIMESTAMP),
-  ('E31', 'file', 'Picture with a License', 'With a license', CURRENT_TIMESTAMP),
-  ('E31', 'file', 'File without license', 'No license', CURRENT_TIMESTAMP),
-  ('E31', 'file', 'File without file', 'No file', CURRENT_TIMESTAMP),
-  ('E31', 'file', 'File not public', 'Not public', CURRENT_TIMESTAMP),
-  ('E33', 'source', 'Silmarillion', 'The Silmarillion', CURRENT_TIMESTAMP),
-  ('E33', 'source', 'Silmarillion text', 'Nice text', CURRENT_TIMESTAMP),
-  ('E21', 'person', 'Frodo', 'That is Frodo', CURRENT_TIMESTAMP),
-  ('E21', 'person', 'https://viaf.org/viaf/95218067', 'John Ronald Reuel Tolkien', CURRENT_TIMESTAMP),
-  ('E31', 'external_reference', 'https://lotr.fandom.com/', NULL, CURRENT_TIMESTAMP),
-  ('E31', 'bibliography', 'Frodo et. al.', 'Book of Frodo and his friends', CURRENT_TIMESTAMP),
-  ('E31', 'edition', 'Translation of Silmarillion', 'Book of Frodo and his friends', CURRENT_TIMESTAMP),
-  ('E41', 'alias', 'Sûza', NULL, CURRENT_TIMESTAMP),
-  ('E41', 'alias', 'The ring bearer', NULL, CURRENT_TIMESTAMP),
-  ('E7', 'activity', 'Travel to Mordor', NULL, CURRENT_TIMESTAMP),
-  ('E7', 'activity', 'Exchange of the one ring', NULL, CURRENT_TIMESTAMP),
-  ('E55', 'type', 'Lord of the rings', NULL, CURRENT_TIMESTAMP),
-  ('E55', 'type', 'Case Study', NULL, CURRENT_TIMESTAMP),
-  ('E55', 'type', 'Tavern', NULL, CURRENT_TIMESTAMP),
-  ('E55', 'type', 'Hills', NULL, CURRENT_TIMESTAMP),
-  ('E55', 'type', 'Ring', NULL, CURRENT_TIMESTAMP),
-  ('E31', 'external_reference', 'https://en.wikipedia.org/wiki/Public_domain', NULL, CURRENT_TIMESTAMP),
-  ('E31', 'external_reference', 'https://doi.org/10.2307/j.ctv1vtz8mq.3', NULL, CURRENT_TIMESTAMP);
+  ('object_location', 'Location of Shire', NULL, CURRENT_TIMESTAMP),
+  ('place', 'Mordor', 'The heart of evil.', CURRENT_TIMESTAMP),
+  ('object_location', 'Location of Mordor', NULL, CURRENT_TIMESTAMP),
+  ('artifact', 'The One Ring', 'The one ring', CURRENT_TIMESTAMP),
+  ('object_location', 'Location of The One Ring', NULL, CURRENT_TIMESTAMP),
+  ('human_remains', 'Dragon bones', 'Bones of an ancient dragon', CURRENT_TIMESTAMP),
+  ('object_location', 'Location of Dragon bones', NULL, CURRENT_TIMESTAMP),
+  ('feature', 'Home of Baggins', 'Home of Baggins', CURRENT_TIMESTAMP),
+  ('object_location', 'Location of Home of Baggins', NULL, CURRENT_TIMESTAMP),
+  ('stratigraphic_unit', 'Bar', NULL, CURRENT_TIMESTAMP),
+  ('object_location', 'Location of Bar', NULL, CURRENT_TIMESTAMP),
+  ('file', 'Picture with a License', 'With a license', CURRENT_TIMESTAMP),
+  ('file', 'File without license', 'No license', CURRENT_TIMESTAMP),
+  ('file', 'File without file', 'No file', CURRENT_TIMESTAMP),
+  ('file', 'File not public', 'Not public', CURRENT_TIMESTAMP),
+  ('source', 'Silmarillion', 'The Silmarillion', CURRENT_TIMESTAMP),
+  ('source', 'Silmarillion text', 'Nice text', CURRENT_TIMESTAMP),
+  ('person', 'Frodo', 'That is Frodo', CURRENT_TIMESTAMP),
+  ('person', 'https://viaf.org/viaf/95218067', 'John Ronald Reuel Tolkien', CURRENT_TIMESTAMP),
+  ('external_reference', 'https://lotr.fandom.com/', NULL, CURRENT_TIMESTAMP),
+  ('bibliography', 'Frodo et. al.', 'Book of Frodo and his friends', CURRENT_TIMESTAMP),
+  ('edition', 'Translation of Silmarillion', 'Book of Frodo and his friends', CURRENT_TIMESTAMP),
+  ('alias', 'Sûza', NULL, CURRENT_TIMESTAMP),
+  ('alias', 'The ring bearer', NULL, CURRENT_TIMESTAMP),
+  ('activity', 'Travel to Mordor', NULL, CURRENT_TIMESTAMP),
+  ('activity', 'Exchange of the one ring', NULL, CURRENT_TIMESTAMP),
+  ('type', 'Lord of the rings', NULL, CURRENT_TIMESTAMP),
+  ('type', 'Case Study', NULL, CURRENT_TIMESTAMP),
+  ('type', 'Tavern', NULL, CURRENT_TIMESTAMP),
+  ('type', 'Hills', NULL, CURRENT_TIMESTAMP),
+  ('type', 'Ring', NULL, CURRENT_TIMESTAMP),
+  ('external_reference', 'https://en.wikipedia.org/wiki/Public_domain', NULL, CURRENT_TIMESTAMP),
+  ('external_reference', 'https://doi.org/10.2307/j.ctv1vtz8mq.3', NULL, CURRENT_TIMESTAMP);
 
 
 INSERT INTO model.gis (entity_id, name, description, type, geom_point, geom_polygon, geom_linestring)
@@ -171,6 +170,7 @@ VALUES
 
   ('P107', (SELECT id FROM model.entity WHERE name='Sam'), (SELECT id FROM model.entity WHERE name='The Fellowship'), NULL, (SELECT id FROM model.entity WHERE name='Bishop') ),
   ('P67', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Frodo et. al.'), '987', NULL ),
+  ('P67', (SELECT id FROM model.entity WHERE name='Home of Baggins'), (SELECT id FROM model.entity WHERE name='Frodo et. al.'), '123', NULL ),
   ('P2', (SELECT id FROM model.entity WHERE name='Radiocarbon'), (SELECT id FROM model.entity WHERE name='Bar'), '{"labId": "VERA", "specId": "23451A", "radiocarbonYear": 2040, "range": 30, "timeScale": "BP"}', NULL ),
   ('P67', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Frodo et. al.'), '234', NULL ),
   ('P67', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Translation of Silmarillion'), '234', NULL ),
@@ -206,12 +206,10 @@ ON CONFLICT (entity_id) DO UPDATE SET image_id=(SELECT id FROM model.entity WHER
 INSERT INTO web.map_overlay (image_id, bounding_box)
         VALUES ((SELECT id FROM model.entity WHERE name='Picture with a License'), '[[48.58653,15.64356],[48.58709,15.64294]]');
 
-INSERT INTO model.file_info (entity_id, public)
-VALUES
-    ((SELECT id FROM model.entity WHERE name='File without license'), TRUE),
-    ((SELECT id FROM model.entity WHERE name='File without file'), TRUE),
-    ((SELECT id FROM model.entity WHERE name='Picture with a License'), TRUE),
-    ((SELECT id FROM model.entity WHERE name='File not public'), FALSE);
+INSERT INTO model.link (domain_id, range_id, property_code) VALUES
+    ((SELECT id FROM model.entity WHERE name='File without license'), (SELECT id FROM model.entity WHERE name='Yes'), 'P2'),
+    ((SELECT id FROM model.entity WHERE name='File without file'), (SELECT id FROM model.entity WHERE name='Yes'), 'P2'),
+    ((SELECT id FROM model.entity WHERE name='Picture with a License'), (SELECT id FROM model.entity WHERE name='Yes'), 'P2');
 
 ALTER TABLE model.rights_holder
     DROP CONSTRAINT IF EXISTS uq_rights_holder_name;

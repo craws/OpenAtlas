@@ -261,6 +261,8 @@ img.schema_image {
 /* Reference Field Autocomplete (Wikidata & Co) */
 [data-reference-system] + .bootstrap-autocomplete {
   min-width: 12.25rem;
+  max-height: 500px;
+  overflow-y: auto;
 }
 
 .active > span > .tab-counter.badge {

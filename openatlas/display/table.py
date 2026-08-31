@@ -8,11 +8,10 @@ from flask_babel import LazyString, format_number, gettext as _
 from flask_login import current_user
 
 from openatlas import app
-from openatlas.display.image_processing import (check_iiif_file_exist,
-                                                check_processed_image)
+from openatlas.display.image_processing import (
+    check_iiif_file_exist, check_processed_image)
 from openatlas.display.util import (
-    edit_link, get_user_setting, link,
-    remove_link)
+    edit_link, get_user_setting, link, remove_link)
 from openatlas.display.util2 import (
     display_bool, get_file_path, is_authorized, sanitize, uc_first)
 from openatlas.models.dates import format_date
@@ -230,9 +229,9 @@ def get_table_cell_content(
         case 'property' if isinstance(item, Link):
             html = item.property.code
         case 'public':
-            html = ''
-            if g.file_info.get(e.id):
-                html = display_bool(g.file_info[e.id]['public'], False)
+            html = display_bool(False)
+            if hasattr(e, 'public'):
+                html = display_bool(e.public, False)
         case 'range' | 'sub' | 'succeeding':
             html = link(range_)
         case 'remove' if origin and isinstance(item, Link):

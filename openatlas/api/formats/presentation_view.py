@@ -28,6 +28,7 @@ def get_presentation_types(
     location_types = {}
     if entity.class_.group.get('name') == 'place':
         location_types = get_location_link(links).range.types
+    entity_links = [link_ for link_ in links if link_.domain.id == entity.id]
     for type_ in entity.types | location_types:
         is_standard = False
         if entity.standard_type:
@@ -43,7 +44,7 @@ def get_presentation_types(
                 'identifier': url_for(
                     'api.entity', id_=g.types[root].id, _external=True)}
                 for root in type_.root]}
-        type_dict.update(get_value_for_types(type_, links))
+        type_dict.update(get_value_for_types(type_, entity_links))
         types.append(type_dict)
     return types
 
@@ -142,12 +143,13 @@ def get_relation_types_dict_for_locations(
 def get_presentation_references(
         links_inverse: list[Link],
         entity_ids: list[int]) -> list[dict[str, Any]]:
-    references = []
-    check_for_duplicates: dict[int, str] = defaultdict(str)
+    references: dict[int, Any] = {}
     for link in links_inverse:
         if link.domain.class_.group.get('name') != 'reference' \
-                or link.range.id not in entity_ids \
-                or check_for_duplicates[link.domain.id] == link.description:
+                or link.range.id not in entity_ids:
+            continue
+        if references.get(link.domain.id):
+            references[link.domain.id]['pages'] += f', {link.description}'
             continue
         ref = {
             'id': link.domain.id,
@@ -159,9 +161,8 @@ def get_presentation_references(
             ref.update({
                 'type': link.domain.standard_type.name,
                 'typeId': link.domain.standard_type.id})
-        check_for_duplicates[link.domain.id] = link.description
-        references.append(ref)
-    return references
+        references[link.domain.id] = ref
+    return list(references.values())
 
 
 def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
@@ -278,6 +279,7 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
 
     data = {
         'id': entity.id,
+        'uuid': entity.uuid,
         'systemClass': entity.class_.name,
         'viewClass': entity.class_.group.get('name'),
         'title': entity.name,

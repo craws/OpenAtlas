@@ -3,9 +3,6 @@ References Systems
 
 .. toctree::
 
-.. Note:: May need adaptions to reflect new tab navigation and menu label
-  changes.
-
 To create **Linked Open Data** (LOD) it is possible to connect entered
 information with a :doc:`/entity/reference_system`. Online available
 **controlled vocabularies** and **gazetteers** are particularly suitable for
@@ -18,9 +15,9 @@ added by the users. To see which reference systems are already available on
 your OpenAtlas instance, click the **Reference system** button on the start
 page.
 
-**Please note**: As for types, different user groups have different
+**Please note**: As with types, different user groups have different
 permissions regarding the creation and modification of external
-reference systems. To add or edit an external reference you have to have the
+reference systems. To add or edit an external reference, you have to have the
 role of admin or manager. Further information can be found in the manual entry
 regarding :doc:`/entity/reference_system` and under :doc:`/admin/user`.
 

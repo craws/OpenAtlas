@@ -3,9 +3,6 @@ Places
 
 .. toctree::
 
-.. Note:: May need adaptions to reflect new tab navigation and menu label
-  changes.
-
 Below, you can find out how to enter new places and how to use the map.
 
 Create a new place
@@ -57,7 +54,7 @@ The :doc:`/tools/map` has multiple functionalities:
   * **Linestring**: A line can be drawn to show the location of e.g. a
     border, a street, or an old river bed. Double-click on the last drawn
     point to end the drawing mode
-  * **Shape** (rectangular symbol): You can use the this to draw any shape
+  * **Shape** (rectangular symbol): You can use this to draw any shape
     that represents the location - use this if the exact location of a
     physical thing is known such as the outline of a certain building with
     or the exact shape of a grave in a georeferenced burial ground plot. To
@@ -82,9 +79,9 @@ Reference Systems - GeoNames
 ****************************
 You can also link your data to GeoNames without using the map. To do so,
 add the respective GeoNames identifier in the dedicated field and choose if
-it is an exact match or close match. **Please note**: As for all references
-systems, information can not be saved without stating which kind of match
+it is an exact match or close match. **Please note**: As with all reference
+systems, information cannot be saved without stating which kind of match
 it is.
 
-By clicking the **Insert** or **Insert and continue** button you can save
-the information
+By clicking the **Insert** or **Insert and continue** button, you can save
+the information.

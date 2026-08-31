@@ -3,9 +3,6 @@ Artifacts
 
 .. toctree::
 
-.. Note:: May need adaptions to reflect new tab navigation and menu label
-  changes.
-
 This tutorial describes how to create a new artifact and add information to it.
 The following elements are involved:
 
@@ -43,8 +40,9 @@ link a creator by adding a creation event (see below).
 
 Add a reference to the artifact
 -------------------------------
-To link a reference to a newly created artifact, choose
-:doc:`/entity/reference` from the tabs
+To link a reference to an artifact, select the artifact you wish to reference
+and click the **+ Add** button. Then scroll down to the
+:doc:`/entity/reference` section.
 
 .. image:: reference_tab.png
     :width: 400px
@@ -60,8 +58,9 @@ Then choose from the following options:
 
 Add a file to the artifact
 --------------------------
-To add an image file (or any other sort of file, really) to the artifact,
-choose **File** from the tabs. Then choose from the following options:
+To add an image file (or any other sort of file, really) to the artifact, select
+the artifact to which you wish to add a file and click the **+ Add** button.
+Then scroll down to the **File** section and choose from the following options:
 
 * Link the artifact to an already uploaded file
 * Upload a new file by using the **+ File** button, you can add information and
@@ -69,11 +68,18 @@ choose **File** from the tabs. Then choose from the following options:
 
 Link a creation event
 ---------------------
-To do so, click the **Event** tab. Here click the **+ Production button**.
+To link a creation event to an artifact, select the artifact to which you want
+to assign a creation event, and click the **+ Add** button. Then scroll down to
+the **Production** section.
 
+Then choose from the following options:
+
+* Link the artifact to an already existing creation event by using the
+  **Link** button
+* Create a new creation event by using the **+ Production** button
 * Choose a descriptive **name** for the creation event
 * Select an appropriate :doc:`/entity/type` from the list
-* Add other information as needed such as a date or add free text in the
+* Add other information as needed, such as a date, or add free text in the
   description field
 * Press **Insert** to save the entry
 
@@ -83,19 +89,23 @@ To do so, click the **Event** tab. Here click the **+ Production button**.
 Add a creator to the creation event
 -----------------------------------
 If the creator of an artifact is known, you can add the person after saving the
-creation event by clicking **Event** in the artifact’s view. On the event’s
-landing page, click the **Actor** tab to link a creator (or other kind of actor
-involved).
+creation event.
 
-Here you can:
+To do this, first go to the event overview. Then select the creation event
+(which belongs to the **Production** class) to which you want to add a creator.
+Next, click the **+ Add** button.
 
-* Link the creation event to an already existing :doc:`/entity/actor`
-* Create a new person as actor connected to the :doc:`/entity/event`
-* Create a new group as actor connected to the event
+In the **Performer** section, choose from the following options:
 
-Please use **Link** here to be able to choose an actor as creator (or add a new
-actor, go back to the event page, choose actor - link again and follow the steps
-below). You can now add the following information:
+* Link the creation event to an already existing creator by using the
+  **Link** button
+* Create a creator by using the **+ Person** button
+* Create a new group as actor connected to the creation event by using the
+  **+ Group** button
+
+Please use **Link** here to choose an actor as creator. If you want to add a
+new actor, go back to the event page, choose **Actor**, link again, and follow
+the steps below. You can now add the following information:
 
 * Type of actor, in this case choose creator
 * Actor: choose the creator of the artifact from a list of already added actors
@@ -111,7 +121,7 @@ First of all, adding an artifact to more than one :doc:`/entity/place` or
 :doc:`/entity/feature` is not possible. If an artifact has a link to multiple
 locations, it is possible to keep track of that in the following way:
 
-* Choose the :doc:`/entity/place` the artifact has it's first occurrence at,
+* Choose the :doc:`/entity/place` the artifact has its first occurrence at,
   for example its production site or a place an artifact was found at during
   archaeological excavation.
 * link any other place by adding a move event - for example when an artifact

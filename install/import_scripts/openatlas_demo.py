@@ -110,7 +110,6 @@ cursor.execute(
     """
     SELECT
         id,
-        cidoc_class_code,
         name,
         description,
         created,

@@ -1,11 +1,12 @@
 # Don't edit this file. To override settings please use instance/production.py
+import os
 from pathlib import Path
 
 from rdflib import Namespace
 
 from config.database_versions import DATABASE_VERSIONS
 
-VERSION = '9.4.0'
+VERSION = '9.5.0'
 DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 DEBUG = False
@@ -29,15 +30,22 @@ LANGUAGES = {
 EXTERNAL_API = [
     'APIS',
     'Cadaster',
+    'ChronOntology',
+    'DOI',
     'GeoNames',
+    'GettyAAT',
     'GND',
+    'Kulturpool',
     'OpenAtlas',
+    'VIAF',
     'Wikidata']
 
 # Paths are implemented operating system independent using pathlib.
 # To override them (in instance/production.py) either use them like here
 # or use absolute paths like e.g. pathlib.Path('/some/location/somewhere')
 FILES_PATH = Path(__file__).parent.parent / 'files'
+if 'INSTANCE_PATH' in os.environ:  # Used for multi instance
+    FILES_PATH = Path(os.environ['INSTANCE_PATH']) / 'files'
 EXPORT_PATH = Path(FILES_PATH) / 'export'
 SQL_PATH = Path(EXPORT_PATH) / 'sql'
 ARCHE_PATH = Path(EXPORT_PATH) / 'arche'

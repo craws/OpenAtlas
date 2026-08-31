@@ -1,0 +1,100 @@
+<script>
+  /**
+   * iDAI.chronontology autocomplete
+   * Documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
+   * API Documentation: https://chronontology.dainst.org/info/api
+   */
+  (function () {
+    const $input = $('input[data-reference-system={{ system.id }}]');
+
+    function getId(item, resource) {
+      return resource.id ? resource.id.split('/').pop() : '';
+    }
+
+    function getLabel(resource, id) {
+      if (resource.names?.en?.length) return resource.names.en[0];
+      if (resource.names?.de?.length) return resource.names.de[0];
+      return id;
+    }
+
+    function getTimeInfo(resource) {
+      const ts = resource.hasTimespan?.[0];
+      if (!ts) return '';
+      const begin = ts.begin?.at || '?';
+      const end = ts.end?.at || '?';
+      return (begin !== '?' || end !== '?') ? `${begin} — ${end}` : '';
+    }
+
+    function getDescription(resource) {
+      if (!resource.description) return '';
+      return resource.description.length > 150
+        ? resource.description.substring(0, 150) + '...'
+        : resource.description;
+    }
+
+    function getGazetteerName(item, resource) {
+      const related = item.related || resource.related;
+      if (!related) return '';
+
+      for (const key in related) {
+        if (!key.includes('gazetteer.dainst.org')) continue;
+        const place = related[key];
+        const engName = Array.isArray(place.names)
+          ? place.names.find(name => name.language === 'eng' && name.title)
+          : null;
+        if (engName) return engName.title;
+        if (place.prefName?.title) return place.prefName.title;
+      }
+      return '';
+    }
+
+    $input.autoComplete({
+      bootstrapVersion: '4',
+      minLength: 3,
+      resolver: 'custom',
+      formatResult: function (item) {
+        const resource = item.resource || {};
+        const id = getId(item, resource);
+        const label = getLabel(resource, id);
+        const timeInfo = getTimeInfo(resource);
+        const description = getDescription(resource);
+        const gazetteerName = getGazetteerName(item, resource);
+
+        const firstLine = `<strong>${label}</strong>${gazetteerName ? ' - ' + gazetteerName : ''} - ${id}`;
+        const secondLine = `<small class="text-muted">${timeInfo}${timeInfo && description ? ' - ' : ''}${description}</small>`;
+
+        return {
+          value: id,
+          text: `${firstLine}<br>${secondLine}`,
+          id: id
+        };
+      },
+      events: {
+        search: (function () {
+          let timeout;
+          return function (qry, callback) {
+            clearTimeout(timeout);
+            timeout = setTimeout(function () {
+              $.ajax({
+                url: "/proxy/chronontology",
+                data: {
+                  q: qry + "*",
+                  size: 40
+                },
+                dataType: "json"
+              }).done(function (data) {
+                callback(data?.results || []);
+              }).fail(function () {
+                callback([]);
+              });
+            }, 400);
+          };
+        })()
+      }
+    }).on('autocomplete.select', function (evt, item) {
+      if (item) {
+        $input.val(item.id || item.value || getId(item, item.resource || {}));
+      }
+    });
+  })();
+</script>
