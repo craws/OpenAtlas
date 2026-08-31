@@ -339,20 +339,6 @@ wheels = [
 ]
 
 [[package]]
-name = "flasgger"
-version = "0.9.7.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "flask" },
-    { name = "jsonschema" },
-    { name = "mistune" },
-    { name = "packaging" },
-    { name = "pyyaml" },
-    { name = "six" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/8a/e4/05e80adeadc39f171b51bd29b24a6d9838127f3aaa1b07c1501e662a8cee/flasgger-0.9.7.1.tar.gz", hash = "sha256:ca098e10bfbb12f047acc6299cc70a33851943a746e550d86e65e60d4df245fb", size = 3979409, upload-time = "2023-05-18T17:15:21.328Z" }
-
-[[package]]
 name = "flask"
 version = "3.1.1"
 source = { registry = "https://pypi.org/simple" }
@@ -646,14 +632,13 @@ wheels = [
 
 [[package]]
 name = "openatlas"
-version = "9.3.0"
+version = "9.4.0"
 source = { virtual = "." }
 dependencies = [
     { name = "bcrypt" },
     { name = "beautifulsoup4" },
     { name = "email-validator" },
     { name = "fiona" },
-    { name = "flasgger" },
     { name = "flask" },
     { name = "flask-babel" },
     { name = "flask-bcrypt" },
@@ -707,7 +692,6 @@ requires-dist = [
     { name = "coverage", marker = "extra == 'dev'", specifier = ">=7.6.0" },
     { name = "email-validator", specifier = "==2.2.0" },
     { name = "fiona", specifier = ">=1.10.0" },
-    { name = "flasgger", specifier = "==0.9.7.1" },
     { name = "flask", specifier = "==3.1.1" },
     { name = "flask-babel", specifier = "==4.0.0" },
     { name = "flask-bcrypt", specifier = "==1.0.1" },

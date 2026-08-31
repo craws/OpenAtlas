@@ -26,6 +26,16 @@ their specific directories and execute:
 
     sudo python3 database_upgrade.py
 
+### 9.4.x to 9.5.0
+New NPM packages and security updates are available:
+
+    cd openatlas/static
+    npm install
+
+One Python library is not needed by OpenAtlas anymore and may be removed:
+
+    apt purge python3-flasgger
+
 ### 9.3.x to 9.4.0
 9.4.0.sql is needed but will be taken care of by the database upgrade script.
 
@@ -33,6 +43,10 @@ New NPM packages with security updates are available:
 
     cd openatlas/static
     npm install
+
+Beginning with this version it is possible to install OpenAtlas just once to
+run multiple instances on the same server, see install.md for details. But it
+can still be used like before without any need for changes.
 
 ### 9.2.0 to 9.3.0
 9.3.0.sql is needed but will be taken care of by the database upgrade script.

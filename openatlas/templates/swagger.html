@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>OpenAtlas API V0.4 - Swagger UI</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <link rel="stylesheet"
+        href="{{ url_for('static', filename='node_modules/swagger-ui-dist/swagger-ui.css', v=config.VERSION) }}"/>
+</head>
+<body>
+<div id="swagger-ui"></div>
+<script
+  src="{{ url_for('static', filename='node_modules/swagger-ui-dist/swagger-ui-bundle.js', v=config.VERSION) }}"></script>
+<script>
+  window.onload = () => {
+    window.ui = SwaggerUIBundle({
+      url: '/openapi.json',
+      dom_id: '#swagger-ui',
+    });
+  };
+</script>
+</body>
+</html>
