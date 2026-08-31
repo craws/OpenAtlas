@@ -852,19 +852,15 @@ class LoudFormatter:
     @staticmethod
     def _inline_identifiers(entity: Entity) -> list[dict[str, Any]]:
         skolem = LoudFormatter.generate_skolem_id
-        internal_id = url_for(
-            'api.entity',
-            id_=entity.id,
-            _external=True,
-            format='loud')
         return [
             primary_name(
                 entity.name, id_=skolem(entity.id, 'appellation')), {
-                'id': internal_id,
+                'id': skolem(entity.id, 'internal_id'),
                 "type": "Identifier",
                 "_label": "Internal Database ID",
-                "content": internal_id,
-                "classified_as": [aat_type('300404629', 'local URI')]}, {
+                "content": str(entity.id),
+                "classified_as": [
+                    aat_type('300417447', 'internal identification')]}, {
                 'id': skolem(entity.id, 'unique_identifier'),
                 "type": "Identifier",
                 "_label": "Unique Identifier",

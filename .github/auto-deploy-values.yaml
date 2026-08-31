@@ -5,7 +5,7 @@ postgis:
   name: "${POSTGRES_DB}"
   # ${POSTGRES_PASSWORD} is ignored, it has to be openatlas
   password: "${POSTGRES_PASSWORD}"
-  version: "15-3.4"
+  version: "17-3.5"
 
 service:
   name: "web"
@@ -21,7 +21,7 @@ ingress:
   enabled: true
   path: "/"
   annotations:
-    kubernetes.io/ingress.class: "nginx"
+    spec.ingressClassName: "nginx"
     nginx.ingress.kubernetes.io/proxy-body-size: 1m
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "30"

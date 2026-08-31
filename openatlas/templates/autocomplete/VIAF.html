@@ -1,0 +1,35 @@
+  <script>
+  /**
+   * VIAF autocomplete
+   * Documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
+  */
+  $('input[data-reference-system="{{ system.id }}"]').autoComplete({
+    bootstrapVersion: '4',
+    resolver: 'custom',
+    formatResult: function (item) {
+      return {
+         value: item.viafid,
+         text: `${item.term}<br><small>${item.viafid}</small>`
+      };
+    },
+    events: {
+      search: function (qry, callback) {
+        $.ajax({
+          url: "/proxy/viaf",
+          data: {
+            query: qry
+          },
+          success: function(data) {
+            if (data && data.result) {
+              callback(data.result);
+            } else {
+              callback([]);
+            }
+          }
+        })
+      }
+    }
+  }).on('autocomplete.select', function(evt, item) {
+    $('input[data-reference-system="{{ system.id }}"]').val(item.viafid);
+  });
+</script>

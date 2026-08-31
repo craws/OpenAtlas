@@ -43,6 +43,13 @@ class ReferenceSystemTest(TestBaseCase):
         rv = c.post(
             url_for(
                 'ajax_external_api',
+                system_id=get_reference_system_by_name_safe('Kulturpool').id),
+            data={'id_': 'dfc50104-275f-44b7-aa9f-00975528a671'})
+        assert b'Thanatos' in rv.data
+
+        rv = c.post(
+            url_for(
+                'ajax_external_api',
                 system_id=get_reference_system_by_name_safe('DOI').id),
             data={'id_': '10.1163/9789004712126_015'})
         assert b'OpenAtlas: An Open-Source Application' in rv.data
@@ -53,6 +60,21 @@ class ReferenceSystemTest(TestBaseCase):
                 system_id=get_reference_system_by_name_safe('DOI').id),
             data={'id_': '10.5194/ica-proc-4-14-2021'})
         assert b'Beyond East and West' in rv.data
+
+        rv = c.post(
+            url_for(
+                'ajax_external_api',
+                system_id=get_reference_system_by_name_safe('VIAF').id),
+            data={'id_': '95218067'})
+        assert b'Tolkien, J.R.R. (John Ronald Reuel), 1892-1973' in rv.data
+
+        rv = c.post(
+            url_for(
+                'ajax_external_api',
+                system_id=get_reference_system_by_name_safe('ChronOntology').id
+            ),
+            data={'id_': '4qH80NOs7z4u'})
+        assert b'El Adam phase' in rv.data
 
         rv = c.post(
             url_for(
@@ -113,6 +135,9 @@ class ReferenceSystemTest(TestBaseCase):
         rv = c.get(url_for('apis_proxy', system_url=apis_url, search='Carr'))
         assert b'Carrot' in rv.data
 
+        rv = c.get(url_for('viaf_proxy', query='Tolkien'))
+        assert b'Tolkien' in rv.data
+
         rv = c.get(url_for('apis_proxy', system_url='wrong', search='Carr'))
         assert b'error' in rv.data
 
@@ -120,6 +145,12 @@ class ReferenceSystemTest(TestBaseCase):
         assert b'OpenAtlas' in rv.data
 
         rv = c.get(url_for('crossref_proxy', rows='wrong', query='Open'))
+        assert b'error' in rv.data
+
+        rv = c.get(url_for('chronontology_proxy', size='10', q='Wien*'))
+        assert b'Wien' in rv.data or b'results' in rv.data
+
+        rv = c.get(url_for('chronontology_proxy', size='wrong', q='Wien*'))
         assert b'error' in rv.data
 
         data['reference_system_classes'] = ['place']

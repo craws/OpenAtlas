@@ -6,7 +6,7 @@ from rdflib import Namespace
 
 from config.database_versions import DATABASE_VERSIONS
 
-VERSION = '9.4.0'
+VERSION = '9.5.0'
 DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 DEBUG = False
@@ -30,11 +30,14 @@ LANGUAGES = {
 EXTERNAL_API = [
     'APIS',
     'Cadaster',
+    'ChronOntology',
     'DOI',
     'GeoNames',
     'GettyAAT',
     'GND',
+    'Kulturpool',
     'OpenAtlas',
+    'VIAF',
     'Wikidata']
 
 # Paths are implemented operating system independent using pathlib.

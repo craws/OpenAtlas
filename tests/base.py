@@ -1,11 +1,13 @@
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any, Optional
 
 import psycopg2
 from flask import url_for
 
 from openatlas import app
+from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.models.entity import Entity, insert as entity_insert
 
 
@@ -78,6 +80,55 @@ class ApiTestCase(TestBaseCase):
             and data['results'][0]['view']
             and data['results'][0]['icon']
             and data['results'][0]['label'])
+
+    @staticmethod
+    def get_api_entities() -> Any:
+        entities = SimpleNamespace()
+        with app.test_request_context():
+            app.preprocess_request()
+            for entity in ApiEntity.get_by_cidoc_classes(['all']):
+                match entity.name:
+                    case 'Location of Shire':
+                        entities.location = entity
+                    case 'Shire':
+                        entities.place = entity
+                    case 'Boundary Mark':
+                        entities.boundary_mark = entity
+                    case 'Travel to Mordor':
+                        entities.event = entity
+                    case 'Exchange of the one ring':
+                        entities.event2 = entity
+                    case 'Economical':
+                        entities.relation_sub = entity
+                    case 'Austria':
+                        entities.unit_node = entity
+                    case 'Frodo':
+                        entities.actor = entity
+                    case 'Sam':
+                        entities.actor2 = entity
+                    case 'Home of Baggins':
+                        entities.feature = entity
+                    case 'The One Ring':
+                        entities.artifact = entity
+                    case 'Sûza':
+                        entities.alias = entity
+                    case 'Height':
+                        entities.height = entity
+                    case 'Weight':
+                        entities.weight = entity
+                    case 'Change of Property':
+                        entities.change_of_property = entity
+                    case 'File not public':
+                        entities.file_not_public = entity
+                    case 'File without license':
+                        entities.file_without_licences = entity
+                    case 'File without file':
+                        entities.file_without_file = entity
+                    case 'OpenAtlas logo':
+                        entities.file = entity
+                    case 'Public domain':
+                        entities.open_license = entity
+        return entities
 
 
 class ImportTestCase(TestBaseCase):

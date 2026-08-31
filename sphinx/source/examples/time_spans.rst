@@ -3,9 +3,6 @@ Time Spans
 
 .. toctree::
 
-.. Note:: May need adaptions to reflect new tab navigation and menu label
-  changes.
-
 This section is focused on how the :doc:`Date</ui/date>` input fields work
 and how to enter time spans correctly.
 
@@ -57,7 +54,7 @@ years before the year 4713 BC (spelling -4713) cannot be entered at the moment
 due to software restrictions by `PostgreSQL <https://www.postgresql.org/>`_.
 Furthermore, as PostgreSQL uses the
 `Proleptic Gregorian calendar <https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar>`_,
-the year 0 can not be entered either.
+the year 0 cannot be entered either.
 
 Precise dates
 ^^^^^^^^^^^^^
