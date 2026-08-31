@@ -67,6 +67,7 @@ class LoudFormatter:
         self.type_refs = (
             type_references if type_references is not None
             else get_type_references())
+        self.geometries: dict[int, Any] = {}
         self.handlers: dict[str, Any] = {
             'P1': self._handle_p1,
             'P2': self._handle_p2,
@@ -881,8 +882,8 @@ class LoudFormatter:
                 "classified_as": [
                     aat_type('300404012', 'unique identifier')]}]
 
-    @staticmethod
     def add_core_metadata(
+            self,
             entity: Entity,
             properties_set: dict[str, Any]) -> None:
         skolem = LoudFormatter.generate_skolem_id
