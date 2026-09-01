@@ -6,6 +6,7 @@ from openatlas import app
 from openatlas.api.api_v04.resources.api_entity import ApiEntity
 from tests.base import ApiTestCase, get_hierarchy
 
+from openatlas.api.api_v1.util.date_util import pad_historical_date
 
 class ApiV1(ApiTestCase):
 
@@ -87,23 +88,23 @@ class ApiV1(ApiTestCase):
         assert rv_json['_label'] == 'Shire'
 
         # Test extensions
-        rv_ttl = c.get(url_for('api_v1.entity_ext', id=place.uuid, ext='ttl'))
-        assert rv_ttl.status_code == 200
-        assert 'text/turtle' in rv_ttl.headers.get('Content-Type')
+        rv = c.get(url_for('api_v1.entity_ext', id=place.uuid, ext='ttl'))
+        assert rv.status_code == 200
+        assert 'text/turtle' in rv.headers.get('Content-Type')
 
-        rv_xml = c.get(url_for('api_v1.entity_ext', id=place.uuid, ext='xml'))
-        assert rv_xml.status_code == 200
-        assert 'application/rdf+xml' in rv_xml.headers.get('Content-Type')
+        rv = c.get(url_for('api_v1.entity_ext', id=place.uuid, ext='xml'))
+        assert rv.status_code == 200
+        assert 'application/rdf+xml' in rv.headers.get('Content-Type')
 
-        rv_nt = c.get(url_for('api_v1.entity_ext', id=place.uuid, ext='nt'))
-        assert rv_nt.status_code == 200
-        assert 'application/n-triples' in rv_nt.headers.get('Content-Type')
+        rv = c.get(url_for('api_v1.entity_ext', id=place.uuid, ext='nt'))
+        assert rv.status_code == 200
+        assert 'application/n-triples' in rv.headers.get('Content-Type')
 
         # Test multiple entities collection (Hydra pagination & @graph)
-        rv_entities = c.get(url_for('api_v1.entities', entity_class='place'))
-        assert rv_entities.status_code == 200
-        assert 'application/ld+json' in rv_entities.headers.get('Content-Type')
-        entities_json = rv_entities.get_json()
+        rv = c.get(url_for('api_v1.entities', entity_class='place'))
+        assert rv.status_code == 200
+        assert 'application/ld+json' in rv.headers.get('Content-Type')
+        entities_json = rv.get_json()
         assert entities_json['@context'] == [
             'https://linked.art/ns/v1/linked-art.json',
             {'hydra': 'http://www.w3.org/ns/hydra/core#'}]
@@ -120,9 +121,9 @@ class ApiV1(ApiTestCase):
             assert '_label' in item
 
         # Test pagination with limit and sorting (asc & desc by name)
-        rv_p1 = c.get('/api/1/entities/place?limit=1&page=1&sort=asc')
-        assert rv_p1.status_code == 200
-        p1_json = rv_p1.get_json()
+        rv = c.get(url_for('api_v1.entities', entity_class='place', limit=1, page=1, sort='asc'))
+        assert rv.status_code == 200
+        p1_json = rv.get_json()
         assert len(p1_json['@graph']) == 1
         assert p1_json['hydra:totalItems'] >= 2
         assert 'hydra:previous' not in p1_json
@@ -131,61 +132,60 @@ class ApiV1(ApiTestCase):
         assert 'sort=asc' in p1_json['hydra:next']
         first_asc_label = p1_json['@graph'][0]['_label']
 
-        rv_p2 = c.get('/api/1/entities/place?limit=1&page=2&sort=asc')
-        assert rv_p2.status_code == 200
-        p2_json = rv_p2.get_json()
+        rv = c.get(url_for('api_v1.entities', entity_class='place', limit=1, page=2, sort='asc'))
+        assert rv.status_code == 200
+        p2_json = rv.get_json()
         assert len(p2_json['@graph']) == 1
         assert 'hydra:previous' in p2_json
         assert 'page=1' in p2_json['hydra:previous']
         second_asc_label = p2_json['@graph'][0]['_label']
         assert first_asc_label <= second_asc_label
 
-        rv_desc = c.get('/api/1/entities/place?limit=1&page=1&sort=desc')
-        assert rv_desc.status_code == 200
-        desc_json = rv_desc.get_json()
+        rv = c.get(url_for('api_v1.entities', entity_class='place', limit=1, page=1, sort='desc'))
+        assert rv.status_code == 200
+        desc_json = rv.get_json()
         assert len(desc_json['@graph']) == 1
         first_desc_label = desc_json['@graph'][0]['_label']
         assert first_desc_label >= first_asc_label
 
         # Test sorting by startDate and endDate
-        rv_sort_start = c.get('/api/1/entities/place?sortBy=startDate&sort=asc')
-        assert rv_sort_start.status_code == 200
-        rv_sort_end = c.get('/api/1/entities/place?sortBy=endDate&sort=desc')
-        assert rv_sort_end.status_code == 200
+        rv = c.get(url_for('api_v1.entities', entity_class='place', sortBy='startDate', sort='asc'))
+        assert rv.status_code == 200
+        rv = c.get(url_for('api_v1.entities', entity_class='place', sortBy='endDate', sort='desc'))
+        assert rv.status_code == 200
 
         # Test search filter
-        rv_search = c.get('/api/1/entities/place?search=Shire')
-        assert rv_search.status_code == 200
-        search_json = rv_search.get_json()
+        rv = c.get(url_for('api_v1.entities', entity_class='place', search='Shire'))
+        assert rv.status_code == 200
+        search_json = rv.get_json()
         assert len(search_json['@graph']) >= 1
         assert any('Shire' in item['_label'] for item in search_json['@graph'])
 
         # Test date filters (startDate, endDate with historical and incomplete formats)
-        rv_date = c.get('/api/1/entities/place?startDate=0100-01-01&endDate=2000-01-01')
-        assert rv_date.status_code == 200
+        rv = c.get(url_for('api_v1.entities', entity_class='place', startDate='0100-01-01', endDate='2000-01-01'))
+        assert rv.status_code == 200
 
         # Test historical dates (year-only, year-month, negative BCE years)
-        rv_hist1 = c.get('/api/1/entities/place?startDate=400&endDate=400')
-        assert rv_hist1.status_code == 200
-        rv_hist2 = c.get('/api/1/entities/place?startDate=400-05&endDate=400-05')
-        assert rv_hist2.status_code == 200
-        rv_hist3 = c.get('/api/1/entities/place?startDate=400-02&endDate=400-02')
-        assert rv_hist3.status_code == 200
-        rv_hist4 = c.get('/api/1/entities/place?startDate=-400&endDate=-400')
-        assert rv_hist4.status_code == 200
-        rv_hist5 = c.get('/api/1/entities/place?startDate=-400-05&endDate=-400-05')
-        assert rv_hist5.status_code == 200
+        rv = c.get(url_for('api_v1.entities', entity_class='place', startDate='400', endDate='400'))
+        assert rv.status_code == 200
+        rv = c.get(url_for('api_v1.entities', entity_class='place', startDate='400-05', endDate='400-05'))
+        assert rv.status_code == 200
+        rv = c.get(url_for('api_v1.entities', entity_class='place', startDate='400-02', endDate='400-02'))
+        assert rv.status_code == 200
+        rv = c.get(url_for('api_v1.entities', entity_class='place', startDate='-400', endDate='-400'))
+        assert rv.status_code == 200
+        rv = c.get(url_for('api_v1.entities', entity_class='place', startDate='-400-05', endDate='-400-05'))
+        assert rv.status_code == 200
 
         # Test invalid date formats return 422
-        rv_inv_date1 = c.get('/api/1/entities/place?startDate=invalid')
-        assert rv_inv_date1.status_code == 422
-        rv_inv_date2 = c.get('/api/1/entities/place?startDate=400-13')
-        assert rv_inv_date2.status_code == 422
-        rv_inv_date3 = c.get('/api/1/entities/place?startDate=400-02-31')
-        assert rv_inv_date3.status_code == 422
+        rv = c.get(url_for('api_v1.entities', entity_class='place', startDate='invalid'))
+        assert rv.status_code == 422
+        rv = c.get(url_for('api_v1.entities', entity_class='place', startDate='400-13'))
+        assert rv.status_code == 422
+        rv = c.get(url_for('api_v1.entities', entity_class='place', startDate='400-02-31'))
+        assert rv.status_code == 422
 
         # Direct unit tests for pad_historical_date
-        from openatlas.api.api_v1.util.date_util import pad_historical_date
         assert pad_historical_date(None) is None
         assert pad_historical_date('') is None
         assert pad_historical_date('400', is_end_date=False) == '0400-01-01'
@@ -202,45 +202,46 @@ class ApiV1(ApiTestCase):
         assert pad_historical_date('1900-01-01', is_end_date=True) == '1900-01-01'
 
         # Test type filter with ID and UUID
-        rv_type_id = c.get(f'/api/1/entities/file?typeId={open_license.id}')
-        assert rv_type_id.status_code == 200
-        rv_type_uuid = c.get(f'/api/1/entities/file?typeId={open_license.uuid}')
-        assert rv_type_uuid.status_code == 200
-        assert rv_type_id.get_json()['hydra:totalItems'] == rv_type_uuid.get_json()['hydra:totalItems']
+        rv = c.get(url_for('api_v1.entities', entity_class='file', typeId=open_license.id))
+        assert rv.status_code == 200
+        total_items_id = rv.get_json()['hydra:totalItems']
+        rv = c.get(url_for('api_v1.entities', entity_class='file', typeId=open_license.uuid))
+        assert rv.status_code == 200
+        assert total_items_id == rv.get_json()['hydra:totalItems']
 
         # Test case study filter with ID and UUID
-        rv_cs_id = c.get(f'/api/1/entities/file?caseStudy={open_license.id}')
-        assert rv_cs_id.status_code == 200
-        rv_cs_uuid = c.get(f'/api/1/entities/file?caseStudy={open_license.uuid}')
-        assert rv_cs_uuid.status_code == 200
+        rv = c.get(url_for('api_v1.entities', entity_class='file', caseStudy=open_license.id))
+        assert rv.status_code == 200
+        rv = c.get(url_for('api_v1.entities', entity_class='file', caseStudy=open_license.uuid))
+        assert rv.status_code == 200
 
         # Test nonexistent type or UUID returns empty graph
-        rv_nonexistent = c.get('/api/1/entities/place?typeId=99999999-9999-9999-9999-999999999999')
-        assert rv_nonexistent.status_code == 200
-        assert rv_nonexistent.get_json()['hydra:totalItems'] == 0
+        rv = c.get(url_for('api_v1.entities', entity_class='place', typeId='99999999-9999-9999-9999-999999999999'))
+        assert rv.status_code == 200
+        assert rv.get_json()['hydra:totalItems'] == 0
 
         # Test invalid entity class returns 422 or 404
-        rv_invalid_class = c.get('/api/1/entities/nonexistent_class')
-        assert rv_invalid_class.status_code in (404, 422)
+        rv = c.get(url_for('api_v1.entities', entity_class='nonexistent_class'))
+        assert rv.status_code in (404, 422)
 
         # Test multiple entities with Accept header content negotiation
-        rv_entities_ttl = c.get(
+        rv = c.get(
             url_for('api_v1.entities', entity_class='place'),
             headers={'Accept': 'text/turtle'})
-        assert rv_entities_ttl.status_code == 200
-        assert 'text/turtle' in rv_entities_ttl.headers.get('Content-Type')
+        assert rv.status_code == 200
+        assert 'text/turtle' in rv.headers.get('Content-Type')
 
-        rv_entities_xml = c.get(
+        rv = c.get(
             url_for('api_v1.entities', entity_class='place'),
             headers={'Accept': 'application/rdf+xml'})
-        assert rv_entities_xml.status_code == 200
-        assert 'application/rdf+xml' in rv_entities_xml.headers.get('Content-Type')
+        assert rv.status_code == 200
+        assert 'application/rdf+xml' in rv.headers.get('Content-Type')
 
-        rv_entities_nt = c.get(
+        rv = c.get(
             url_for('api_v1.entities', entity_class='place'),
             headers={'Accept': 'application/n-triples'})
-        assert rv_entities_nt.status_code == 200
-        assert 'application/n-triples' in rv_entities_nt.headers.get('Content-Type')
+        assert rv.status_code == 200
+        assert 'application/n-triples' in rv.headers.get('Content-Type')
 
         # Test empty format_loud_entities
         from openatlas.api.api_v1.loud.loud import format_loud_entities
@@ -251,8 +252,8 @@ class ApiV1(ApiTestCase):
 
         # Test 404
         import uuid
-        rv_404 = c.get(url_for('api_v1.entity', id=uuid.uuid4()))
-        assert rv_404.status_code == 404
+        rv = c.get(url_for('api_v1.entity', id=uuid.uuid4()))
+        assert rv.status_code == 404
 
     def test_docs(self) -> None:
         c = self.client
