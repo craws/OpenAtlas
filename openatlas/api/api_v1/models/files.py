@@ -1,23 +1,14 @@
-from typing import Literal
 from uuid import UUID
 
 from pydantic import Field
 
+from openatlas.api.api_v1.models.agent import AgentItem
 from openatlas.api.api_v1.models.util import BaseSchema
 
 
 class LicenseItem(BaseSchema):
     name: str
     url: str | None = None
-
-
-class AgentItem(BaseSchema):
-    name: str
-    type: Literal['person', 'group'] = Field(
-        ...,
-        description="If agent is a person or a group")
-    description: str | None = None
-    # external_url: list[ExtRefSystem] | None
 
 
 class FileItem(BaseSchema):

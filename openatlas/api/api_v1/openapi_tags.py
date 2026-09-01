@@ -1,7 +1,9 @@
 from flask_openapi3 import Tag
 
 lod_tag = Tag(name="LOD", description="Linked Open Data Endpoints")
-system_tag = Tag(name="System", description="Configuration and Types")
+system_tag = Tag(
+    name="System",
+    description="System information and configuration")
 vocabulary_tag = Tag(name="Vocabulary", description="Types and Vocabularies")
 
 # Files
@@ -20,3 +22,7 @@ frontend_tag = Tag(name="Frontend", description="Frontend endpoints")
 # Network analysis
 # Network, ego network, SNA with special person connections
 network_tag = Tag(name="Network", description="Network analysis endpoints")
+
+metadata_tag = Tag(
+    name="Metadata",
+    description="Project metadata and case studies")
