@@ -7,21 +7,27 @@ from flask_openapi3 import APIBlueprint
 
 from openatlas import app
 from openatlas.api.api_v1.error_handlers import abort_file_not_found, \
-    abort_file_not_public, \
-    abort_file_without_license, \
-    abort_id_does_not_exist, \
-    abort_id_not_a_file
+    abort_file_not_public, abort_file_without_license, \
+    abort_id_does_not_exist, abort_id_not_a_file, \
+    abort_unsupported_iiif_version
+from openatlas.api.api_v1.util.iiif_manifest import build_manifest_v2, \
+    build_manifest_v3
 from openatlas.api.api_v1.models.files import FileIdPath, FileIiifPath
 from openatlas.api.api_v1.models.util import DownloadQuery
 from openatlas.api.api_v1.openapi_tags import file_tag
 from openatlas.api.api_v1.responses.files import (
-    licensed_files_response, display_file_response, iiif_manifest_response,
+    display_file_response,
+    iiif_manifest_response,
+    licensed_files_response,
     thumbnail_response)
 from openatlas.database.api import check_file
+from openatlas.models.entity import Entity
 
 api_v1_files = APIBlueprint('files', __name__, url_prefix='/api/1/files')
 
 
+# Todo: check if really faster than with normal and many images
+#   if not, delete this function
 def _check_file_access(file_id: int) -> bool:
     checked_file = check_file(file_id)
 
@@ -62,10 +68,12 @@ def _check_file_access(file_id: int) -> bool:
 
 
 def _get_file_path(file_id: int, upload_path: Path) -> Path | Any:
-    extensions = g.settings.get(
-        'file_upload_allowed_extension',
-        ['.jpg', '.png', '.jpeg', '.pdf', '.tif', '.tiff', '.bmp', '.gif',
-         '.svg', '.mp4', '.avi', '.mov', '.wmv', '.mp3'])
+    safe_extensions = {
+        '.jpg', '.png', '.jpeg', '.pdf', '.tif', '.tiff', '.bmp', '.gif',
+        '.svg', '.mp4', '.avi', '.mov', '.wmv', '.mp3'}
+
+    configured_exts = g.settings.get('file_upload_allowed_extension', [])
+    extensions = safe_extensions | set(configured_exts)
 
     for ext in extensions:
         candidate = upload_path / f"{file_id}{ext}"
@@ -114,6 +122,27 @@ def display_thumbnail(path: FileIdPath, query: DownloadQuery):
 
 
 @api_v1_files.get(
+    '/<int:id>/iiif-manifest/<string:version>',
+    summary="Get IIIF Manifest",
+    tags=[file_tag],
+    responses=iiif_manifest_response)
+def get_iiif_manifest(path: FileIiifPath):
+    """Returns the IIIF manifest for a specific file and IIIF version."""
+    if path.version not in ['2', '3']:
+        abort_unsupported_iiif_version(path.version)
+
+    _check_file_access(path.id)
+
+    entity = Entity.get_by_id(path.id, types=True)
+    if not entity:
+        abort_file_not_found(path.id)
+
+    if path.version == '3':
+        return build_manifest_v3(entity)
+    return build_manifest_v2(entity)
+
+
+@api_v1_files.get(
     '/licensed',
     summary="Get licensed files overview",
     tags=[file_tag],
@@ -121,14 +150,4 @@ def display_thumbnail(path: FileIdPath, query: DownloadQuery):
 def get_licensed_files():
     """Retrieves all existing files with a license, their display URLs,
     and metadata."""
-    return {}
-
-
-@api_v1_files.get(
-    '/<int:id>/iiif-manifest/<string:version>',
-    summary="Get IIIF Manifest",
-    tags=[file_tag],
-    responses=iiif_manifest_response)
-def get_iiif_manifest(path: FileIiifPath):
-    """Returns the IIIF manifest for a specific file and IIIF version."""
     return {}

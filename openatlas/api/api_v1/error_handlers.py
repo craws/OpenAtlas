@@ -125,3 +125,16 @@ def abort_file_not_found(id_: int) -> NoReturn:
         'timestamp': datetime.now().isoformat(),
         'status': 404}
     abort(make_response(jsonify(error_payload), 404))
+
+
+def abort_unsupported_iiif_version(version: str) -> NoReturn:
+    error_payload = {
+        'title': 'Unsupported IIIF version',
+        'message': f"The requested IIIF version '{version}' is not supported.",
+        'details': {
+            'provided_version': str(version),
+            'hint': 'Only IIIF versions 2 and 3 are supported.'},
+        'url': request.url,
+        'timestamp': datetime.now().isoformat(),
+        'status': 400}
+    abort(make_response(jsonify(error_payload), 400))
