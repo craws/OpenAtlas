@@ -243,16 +243,40 @@ class ApiV1(ApiTestCase):
         assert rv.status_code == 200
         assert 'application/n-triples' in rv.headers.get('Content-Type')
 
-        # Test empty format_loud_entities
-        from openatlas.api.api_v1.loud.loud import format_loud_entities
-        empty_res = format_loud_entities([])
+        # Test empty format_lod_entities
+        from openatlas.api.api_v1.formatters.lod import format_lod_entities
+        from openatlas.api.api_v1.formatters.loud import format_loud_entities
+        empty_res = format_lod_entities([])
         assert empty_res == {
             '@context': 'https://linked.art/ns/v1/linked-art.json',
             '@graph': []}
+        empty_loud_res = format_loud_entities([])
+        assert empty_loud_res == {
+            '@context': 'https://linked.art/ns/v1/linked-art.json',
+            '@graph': []}
+
+        # Test LOUD routes
+        rv = c.get(url_for('api_v1_loud.loud_entity', id=place.uuid))
+        assert rv.status_code == 200
+        assert 'application/ld+json' in rv.headers.get('Content-Type')
+        loud_json = rv.get_json()
+        assert loud_json['type'] == 'Site'
+        assert loud_json['_label'] == 'Shire'
+
+        rv = c.get(url_for('api_v1_loud.loud_entity_ext', id=place.uuid, ext='ttl'))
+        assert rv.status_code == 200
+        assert 'text/turtle' in rv.headers.get('Content-Type')
+
+        rv = c.get(url_for('api_v1_loud.loud_entities', entity_class='place'))
+        assert rv.status_code == 200
+        loud_entities_json = rv.get_json()
+        assert isinstance(loud_entities_json['@graph'], list)
 
         # Test 404
         import uuid
         rv = c.get(url_for('api_v1.entity', id=uuid.uuid4()))
+        assert rv.status_code == 404
+        rv = c.get(url_for('api_v1_loud.loud_entity', id=uuid.uuid4()))
         assert rv.status_code == 404
 
     def test_docs(self) -> None:

@@ -1,39 +1,21 @@
 from typing import Any
-from uuid import UUID
 
 from flask import Response
+from flask_openapi3 import APIBlueprint
 
-
-from openatlas.api.api_v1.entity import (
-    get_by_system_class, get_count_by_system_class)
-from openatlas.api.api_v1.error_handlers import abort_not_found
-from openatlas.api.api_v1.loud.loud import (
-    format_loud_entities, format_loud_entity)
-from openatlas.api.api_v1.loud.loud_util import (
-    make_lod_response, set_accept_header)
+from openatlas.api.api_v1.error_handlers import register_error_handlers
+from openatlas.api.api_v1.formatters.lod import (
+    format_lod_entities, format_lod_entity)
+from openatlas.api.api_v1.formatters.lod_util import (
+    get_entities_response, get_entity_response)
 from openatlas.api.api_v1.models.lod import (
     EntityCollectionPath, EntityCollectionQuery, EntityPath, EntityPathExt)
+from openatlas.api.api_v1.openapi_tags import lod_tag
 from openatlas.api.api_v1.responses.lod import (
     lod_collection_responses, lod_responses)
-from openatlas.api.api_v1.openapi_tags import lod_tag
-from openatlas.api.api_v1.util.pagination import get_pagination_lod
-from openatlas.models.entity import Entity
 
-from flask_openapi3 import APIBlueprint
-from openatlas.api.api_v1.error_handlers import register_error_handlers
 api_v1_lod = APIBlueprint('api_v1', __name__, url_prefix='/api/1')
 register_error_handlers(api_v1_lod)
-
-
-def _get_entity_response(
-        entity_id: UUID,
-        ext: str | None = None) -> dict[str, Any] | Response:
-    entity = Entity.get_by_uuid(entity_id, types=True, aliases=True)
-    if not entity:
-        abort_not_found(entity_id)
-    if ext:
-        set_accept_header(ext)
-    return make_lod_response(format_loud_entity(entity))
 
 
 @api_v1_lod.get(
@@ -44,13 +26,13 @@ def _get_entity_response(
     responses=lod_responses)
 def get_entity(path: EntityPath) -> dict[str, Any] | Response:
     """
-    Retrieves a single entity formatted as Linked Open Data (Linked.Art).
+    Retrieves a single entity formatted as Linked Open Data (OpenAtlas CIDOC-CRM graph).
     
     The response format defaults to `application/ld+json`. 
     You can request other formats (like Turtle or RDF/XML) using the `Accept`
     HTTP header.
     """
-    return _get_entity_response(path.id)
+    return get_entity_response(path.id, formatter=format_lod_entity)
 
 
 @api_v1_lod.get(
@@ -68,7 +50,8 @@ def get_entity_ext(path: EntityPathExt) -> dict[str, Any] | Response:
     the API will automatically return the entity in the requested format.
     """
     ext_val = path.ext.value if hasattr(path.ext, 'value') else str(path.ext)
-    return _get_entity_response(path.id, ext=ext_val)
+    return get_entity_response(
+        path.id, ext=ext_val, formatter=format_lod_entity)
 
 
 @api_v1_lod.get(
@@ -87,36 +70,8 @@ def get_entities(
     Results are returned as a Hydra Collection and can be filtered by various 
     query parameters such as search strings, dates, or case studies.
     """
-    entity_class_name = (
-        path.entity_class.value
-        if hasattr(path.entity_class, 'value') else str(path.entity_class))
-
-    order_by = f'{query.sort_by}_{query.sort}'
-    offset = (query.page - 1) * query.limit
-
-    filter_kwargs = {
-        'search': query.search,
-        'start_date': query.start_date,
-        'end_date': query.end_date,
-        'type_id': query.type_id,
-        'case_study': query.case_study}
-
-    total_items = get_count_by_system_class(
-        entity_class_name,
-        **filter_kwargs)
-    entities = get_by_system_class(
-        entity_class_name,
-        order_by=order_by,
-        limit=query.limit,
-        offset=offset,
-        **filter_kwargs)
-
-    pagination = get_pagination_lod(
-        'api_v1.entities',
-        total_items=total_items,
-        page=query.page,
-        limit=query.limit,
-        entity_class=entity_class_name)
-
-    return make_lod_response(
-        format_loud_entities(entities, pagination=pagination))
+    return get_entities_response(
+        path,
+        query,
+        endpoint='api_v1.entities',
+        formatter=format_lod_entities)

@@ -8,14 +8,14 @@ import validators
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.api_v04.formats.loud_helpers import (
+from openatlas.api.api_v1.formatters.lod_helpers import (
     ARCHAEOLOGY_AAT, BIBLIOGRAPHY_AAT, MIME_CLASSIFICATIONS, TYPE_OVERWRITES,
     UNIT_MAP, aat_type, category_aat, get_language, primary_name)
-from openatlas.api.api_v04.resources.util import (
+from openatlas.api.api_v1.formatters.lod_util import (
     date_to_utc_iso_str, get_iiif_manifest_and_path, get_license_type,
     is_float, remove_spaces_dashes)
-from openatlas.api.api_v1.loud.loud_util import (
-    get_links_for_entities, get_type_references, parse_loud_context)
+from openatlas.api.api_v1.formatters.lod_util import (
+    get_links_for_entities, get_type_references, parse_lod_context)
 from openatlas.display.util2 import get_file_path
 from openatlas.models.annotation import AnnotationText
 from openatlas.models.entity import Entity, Link
@@ -57,13 +57,13 @@ def close_match_attribution(
         'assigned': assigned}
 
 
-class LoudFormatter:
+class LodFormatter:
     def __init__(
             self,
             type_references: dict[int, list[Link]] | None = None,
-            loud_context: dict[str, str] | None = None) -> None:
-        self.loud = (
-            loud_context if loud_context is not None else parse_loud_context())
+            lod_context: dict[str, str] | None = None) -> None:
+        self.lod = (
+            lod_context if lod_context is not None else parse_lod_context())
         self.type_refs = (
             type_references if type_references is not None
             else get_type_references())
@@ -75,9 +75,9 @@ class LoudFormatter:
             'P73': self._handle_p73,
             'OA7': self._handle_oa7}
 
-    def _loud_relation(self, link_: Link, is_inverse: bool) -> str:
-        return self.loud[
-            get_loud_crm_relation(link_, is_inverse).replace(' ', '_')]
+    def _lod_relation(self, link_: Link, is_inverse: bool) -> str:
+        return self.lod[
+            get_lod_crm_relation(link_, is_inverse).replace(' ', '_')]
 
     def get_property_key(self, link_: Link, is_inverse: bool) -> str:
         code = link_.property.code
@@ -103,7 +103,7 @@ class LoudFormatter:
                 link_.range.class_.name}
             if classes & {'artifact', 'human_remains'}:
                 return 'occupies' if is_inverse else 'occupied_by'
-        return self._loud_relation(link_, is_inverse)
+        return self._lod_relation(link_, is_inverse)
 
     def format_link(self, link_: Link, is_domain: bool) -> dict[str, Any]:
         target = link_.domain if is_domain else link_.range
@@ -113,7 +113,7 @@ class LoudFormatter:
             '_label': target.name,
             'identified_by': self._inline_identifiers(target)}
         if link_.dates.begin_from or link_.dates.end_from:
-            property_ = property_ | self.get_loud_timespan(link_)
+            property_ = property_ | self.get_lod_timespan(link_)
         code_ = link_.property.code
         if code_ != 'P2' and link_.type:
             property_['classified_as'] = [
@@ -141,9 +141,9 @@ class LoudFormatter:
     def base_entity_dict(entity: Entity) -> dict[str, Any]:
         result: dict[str, Any] = {
             'id': entity_uri(entity),
-            'type': LoudFormatter._resolve_type(entity),
+            'type': LodFormatter._resolve_type(entity),
             '_label': entity.name}
-        LoudFormatter._prepend_archaeology_classification(entity, result)
+        LodFormatter._prepend_archaeology_classification(entity, result)
         return result
 
     @staticmethod
@@ -157,7 +157,7 @@ class LoudFormatter:
         file_size = entity.get_file_size()
         value, unit = file_size.split()
         return {'dimension': [{
-            'id': LoudFormatter.generate_skolem_id(entity.id, 'file_size'),
+            'id': LodFormatter.generate_skolem_id(entity.id, 'file_size'),
             "type": "Dimension",
             "_label": file_size,
             "classified_as": [aat_type('300265863', 'File Size')],
@@ -243,7 +243,7 @@ class LoudFormatter:
         scale = data['timeScale']
         lab_id = data['labId']
         spec_id = data['specId']
-        skolem = LoudFormatter.generate_skolem_id
+        skolem = LodFormatter.generate_skolem_id
         dating = aat_type('300054717', 'Radiocarbon Dating')
         properties_set['attributed_by'].append({
             'id': skolem(link_.id, 'radiocarbon'),
@@ -296,7 +296,7 @@ class LoudFormatter:
             link_: Link,
             is_domain: bool) -> dict[str, Any]:
         target = link_.domain if is_domain else link_.range
-        property_['id'] = LoudFormatter.generate_skolem_id(
+        property_['id'] = LodFormatter.generate_skolem_id(
             link_.id, 'appellation')
         property_['content'] = target.name
         return property_
@@ -308,7 +308,7 @@ class LoudFormatter:
             is_domain: bool) -> dict[str, Any]:
         target = link_.domain if is_domain else link_.range
         if link_.description and is_float(link_.description):
-            property_['id'] = LoudFormatter.generate_skolem_id(
+            property_['id'] = LodFormatter.generate_skolem_id(
                 link_.id,
                 'dimension')
             property_['type'] = 'Dimension'
@@ -446,7 +446,7 @@ class LoudFormatter:
             'type': self._resolve_type(type_),
             '_label': type_.name}
         if type_.dates.begin_from or type_.dates.end_from:
-            property_ = property_ | self.get_loud_timespan(type_)
+            property_ = property_ | self.get_lod_timespan(type_)
         equivalents: list[dict[str, Any]] = []
         attributed_by: list[dict[str, Any]] = []
         for type_link in self.type_refs.get(type_.id, []):
@@ -493,7 +493,7 @@ class LoudFormatter:
             'end_type': 'Dissolution',
             'inner_ts_id': True}}
 
-    def get_loud_timespan(
+    def get_lod_timespan(
             self,
             entity: Entity | Link,
             links_: list[Link] | None = None) -> dict[str, Any]:
@@ -508,8 +508,8 @@ class LoudFormatter:
                     {'id': self.generate_skolem_id(entity.id, 'timespan'),
                      'type': 'TimeSpan',
                      '_label': f'Timespan of {name}'}
-                    | self._get_loud_begin_dates(entity)
-                    | self._get_loud_end_dates(entity)}
+                    | self._get_lod_begin_dates(entity)
+                    | self._get_lod_end_dates(entity)}
 
     def _make_life_event(
             self,
@@ -539,7 +539,7 @@ class LoudFormatter:
         config = self.LIFE_EVENT_CONFIG[entity.class_.name]
         has_begin = bool(entity.dates.begin_from or entity.dates.begin_to)
         has_end = bool(entity.dates.end_from or entity.dates.end_to)
-        begin_dates = self._get_loud_begin_dates(entity)
+        begin_dates = self._get_lod_begin_dates(entity)
         if 'end_of_the_begin' in begin_dates:
             begin_dates['end_of_the_end'] = begin_dates.pop('end_of_the_begin')
         elif 'begin_of_the_begin' in begin_dates:
@@ -548,7 +548,7 @@ class LoudFormatter:
             entity, config['begin_type'],
             begin_dates,
             has_begin)
-        end_dates = self._get_loud_end_dates(entity)
+        end_dates = self._get_lod_end_dates(entity)
         if 'begin_of_the_end' in end_dates:
             end_dates['begin_of_the_begin'] = end_dates.pop('begin_of_the_end')
         elif 'end_of_the_end' in end_dates:  # pragma: no cover
@@ -577,7 +577,7 @@ class LoudFormatter:
         return result
 
     @staticmethod
-    def _get_loud_begin_dates(entity: Entity | Link) -> dict[str, Any]:
+    def _get_lod_begin_dates(entity: Entity | Link) -> dict[str, Any]:
         data = {
             'begin_of_the_begin':
                 date_to_utc_iso_str(entity.dates.begin_from),
@@ -586,7 +586,7 @@ class LoudFormatter:
         return {k: v for k, v in data.items() if v is not None}
 
     @staticmethod
-    def _get_loud_end_dates(entity: Entity | Link) -> dict[str, Any]:
+    def _get_lod_end_dates(entity: Entity | Link) -> dict[str, Any]:
         begin_of_the_end = date_to_utc_iso_str(entity.dates.end_from)
         end_of_the_end = date_to_utc_iso_str(entity.dates.end_to)
         if end_of_the_end is None:
@@ -599,7 +599,7 @@ class LoudFormatter:
             'end_is_qualified_by': entity.dates.end_comment}
         return {k: v for k, v in data.items() if v is not None}
 
-    def get_loud_representations(
+    def get_lod_representations(
             self,
             image_links: list[Link],
             properties_set: dict[str, Any]) -> None:
@@ -635,7 +635,7 @@ class LoudFormatter:
     @staticmethod
     def get_iiif_subject_of(image_links: list[Link]) -> list[dict[str, Any]]:
         subject_of = []
-        skolem = LoudFormatter.generate_skolem_id
+        skolem = LodFormatter.generate_skolem_id
         for link_ in image_links:
             manifest_path = get_iiif_manifest_and_path(link_.domain.id)
             if not (manifest_path.get('IIIFManifest')
@@ -672,10 +672,10 @@ class LoudFormatter:
             properties_set: dict[str, Any],
             entity: Entity) -> None:
         system = g.reference_systems[link_.domain.id]
-        skolem = LoudFormatter.generate_skolem_id
+        skolem = LodFormatter.generate_skolem_id
         match_reference = {
             "id": f'{system.resolver_url or ''}{link_.description}',
-            "type": LoudFormatter._resolve_type(entity),
+            "type": LodFormatter._resolve_type(entity),
             "_label": entity.name}
         if is_close_match(link_):
             properties_set['attributed_by'].append(
@@ -702,7 +702,7 @@ class LoudFormatter:
                     "type": "Group",
                     "_label": link_.domain.name,
                     "identified_by":
-                        LoudFormatter._inline_identifiers(link_.domain)}]}]})
+                        LodFormatter._inline_identifiers(link_.domain)}]}]})
 
     def handle_membership(
             self,
@@ -729,7 +729,7 @@ class LoudFormatter:
                 carried_out['classified_as'] = [
                     self._format_type_property(type_)]
         if link_.dates.dates_available():
-            carried_out = carried_out | self.get_loud_timespan(link_)
+            carried_out = carried_out | self.get_lod_timespan(link_)
         properties_set['carried_out'].append(carried_out)
 
     def process_link(
@@ -770,7 +770,7 @@ class LoudFormatter:
             properties_set: dict[str, Any],
             entity: Entity) -> None:
         if file_links:
-            self.get_loud_representations(file_links, properties_set)
+            self.get_lod_representations(file_links, properties_set)
             if iiif := self.get_iiif_subject_of(file_links):
                 properties_set['subject_of'].extend(iiif)
         if entity.class_.name == 'file' and g.files.get(entity.id):
@@ -785,7 +785,7 @@ class LoudFormatter:
             entity: Entity,
             properties_set: dict[str, Any]) -> None:
         description: dict[str, Any] = {
-            'id': LoudFormatter.generate_skolem_id(entity.id, 'description'),
+            'id': LodFormatter.generate_skolem_id(entity.id, 'description'),
             "type": "LinguisticObject",
             "_label": "Description",
             "content": entity.description,
@@ -793,7 +793,7 @@ class LoudFormatter:
             "classified_as": [category_aat('300435416', 'description')]}
         annotations = AnnotationText.get_by_source_id(entity.id) or []
         part = [
-            LoudFormatter._build_annotation(annotation, entity)
+            LodFormatter._build_annotation(annotation, entity)
             for annotation in annotations]
         if part:  # pragma: no cover
             description['part'] = part
@@ -803,7 +803,7 @@ class LoudFormatter:
     def _build_annotation(
             annotation: AnnotationText,
             entity: Entity) -> dict[str, Any]:  # pragma: no cover
-        skolem = LoudFormatter.generate_skolem_id
+        skolem = LodFormatter.generate_skolem_id
         text = entity.description or ''
         inner_text = text[annotation.link_start:annotation.link_end]
         selector = aat_type('300055590', 'Selectors')
@@ -840,11 +840,11 @@ class LoudFormatter:
             linked = Entity.get_by_id(annotation.entity_id)
             annotation_dict['about'] = [{
                 'id': entity_uri(linked),
-                'type': LoudFormatter._resolve_type(linked),
+                'type': LodFormatter._resolve_type(linked),
                 '_label': linked.name,
                 'identified_by': [
                     primary_name(linked.name), {
-                        'id': LoudFormatter.generate_skolem_id(
+                        'id': LodFormatter.generate_skolem_id(
                             linked.id, 'system_identifier'),
                         "type": "Identifier",
                         "_label": "System Identifier",
@@ -861,7 +861,7 @@ class LoudFormatter:
 
     @staticmethod
     def _inline_identifiers(entity: Entity) -> list[dict[str, Any]]:
-        skolem = LoudFormatter.generate_skolem_id
+        skolem = LodFormatter.generate_skolem_id
         internal_id = url_for(
             'api.entity',
             id_=entity.id,
@@ -886,8 +886,8 @@ class LoudFormatter:
             self,
             entity: Entity,
             properties_set: dict[str, Any]) -> None:
-        skolem = LoudFormatter.generate_skolem_id
-        identifiers = LoudFormatter._inline_identifiers(entity)
+        skolem = LodFormatter.generate_skolem_id
+        identifiers = LodFormatter._inline_identifiers(entity)
         identifiers[0] = primary_name(
             entity.name,
             id_=skolem(entity.id, 'primary_name'))
@@ -905,7 +905,7 @@ class LoudFormatter:
         if entity.description:
             self.handle_description(entity, properties_set)
         return (self.base_entity_dict(entity) |
-                self.get_loud_timespan(entity, links_data) |
+                self.get_lod_timespan(entity, links_data) |
                 properties_set)
 
     def format_entity(self, data: dict[str, Any]) -> dict[str, Any]:
@@ -931,12 +931,12 @@ class LoudFormatter:
         return self.finalize_output(entity, properties_set, data['links'])
 
 
-def format_loud_entity(entity: Entity) -> dict[str, Any]:
-    res = format_loud_entities([entity])
+def format_lod_entity(entity: Entity) -> dict[str, Any]:
+    res = format_lod_entities([entity])
     return {'@context': res['@context']} | res['@graph'][0]
 
 
-def format_loud_entities(
+def format_lod_entities(
         entities: list[Entity],
         pagination: dict[str, Any] | None = None) -> dict[str, Any]:
     if not entities and pagination is None:
@@ -945,7 +945,7 @@ def format_loud_entities(
             '@graph': []}
     links_data = get_links_for_entities(entities) if entities else {}
     type_references = get_type_references()
-    formatter = LoudFormatter(type_references=type_references)
+    formatter = LodFormatter(type_references=type_references)
     graph = [
         formatter.format_entity(item)
         for item in links_data.values()]
@@ -970,17 +970,17 @@ def format_loud_entities(
         '@graph': graph}
 
 
-def get_loud_entities(
+def get_lod_entities(
         data: dict[str, Any],
-        loud: dict[str, str] | None = None,
+        lod: dict[str, str] | None = None,
         type_references: dict[int, list[Link]] | None = None) -> Any:
-    formatter = LoudFormatter(
+    formatter = LodFormatter(
         type_references=type_references,
-        loud_context=loud)
+        lod_context=lod)
     return formatter.format_entity(data)
 
 
-def get_loud_crm_relation(link_: Link, inverse: bool = False) -> str:
+def get_lod_crm_relation(link_: Link, inverse: bool = False) -> str:
     property_ = f' {link_.property.i18n['en']}'
     if inverse and link_.property.i18n_inverse['en']:
         property_ = f'i {link_.property.i18n_inverse['en']}'

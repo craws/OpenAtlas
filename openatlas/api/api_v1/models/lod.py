@@ -28,6 +28,7 @@ class EntityPathExt(BaseSchema):
 class EntityCollectionPath(BaseSchema):
     entity_class: OpenAtlasClassEnum = Field(
         ...,
+        alias="entity_class",
         description="Choose one of the following classes: ",
         json_schema_extra={
             "examples": {
