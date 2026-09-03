@@ -6,15 +6,20 @@ from openatlas import app
 from openatlas.api.api_v1.error_handlers import register_error_handlers
 from openatlas.api.api_v1.models.system import EntityCountQuery, \
     EntityCountResponse, IiifInfo, ImageProcessingInfo, MapConfig, \
-    SystemClassItem, SystemClassesResponse, SystemInfoResponse, \
-    PropertyDetail, SystemPropertiesResponse
-from openatlas.api.api_v1.openapi_tags import system_tag
+    PropertyDetail, SystemClassItem, SystemClassesResponse, SystemInfoResponse, \
+    SystemPropertiesResponse
 from openatlas.api.api_v1.models.util import OpenAtlasClassEnum
-
-from openatlas.api.api_v1.responses.system import (system_info_response, entity_count_response, system_classes_response, system_properties_response)
+from openatlas.api.api_v1.openapi_tags import system_tag
+from openatlas.api.api_v1.responses.system import (entity_count_response,
+                                                   system_classes_response,
+                                                   system_info_response,
+                                                   system_properties_response)
 from openatlas.database.api import get_overview_counts_by_case_study
 
-api_v1_system = APIBlueprint('system', __name__, url_prefix='/api/1/system')
+api_v1_system = APIBlueprint(
+    'api_v1_system',
+    __name__,
+    url_prefix='/api/1/system')
 register_error_handlers(api_v1_system)
 
 
@@ -26,6 +31,7 @@ class LocaleQuery(BaseModel):
 
 @api_v1_system.get(
     '/info',
+    endpoint='system_info',
     summary="Get presentation frontend configuration",
     responses=system_info_response,
     tags=[system_tag]
@@ -42,9 +48,6 @@ def get_system_info() -> dict:
 
     logo_id = g.settings.get('logo_file_id')
     logo_id_clean = int(logo_id) if logo_id else None
-
-    time_enabled = g.settings.get('module_time', False) in (True, 'True', '1',
-                                                            1)
     img_enabled = bool(g.settings['image_processing'])
     iiif_version_raw = g.settings.get('iiif_version')
 
@@ -69,7 +72,7 @@ def get_system_info() -> dict:
         site_name=g.settings['site_name'],
         logo_file_id=logo_id_clean,
         default_language=g.settings['default_language'],
-        module_time=time_enabled,
+        module_time=bool(g.settings['module_time']),
         map_config=map_conf,
         image_processing=img_conf,
         iiif=iiif_conf)
@@ -79,6 +82,7 @@ def get_system_info() -> dict:
 
 @api_v1_system.get(
     '/count/entities',
+    endpoint='entity_count',
     summary="Get entity counts",
     responses=entity_count_response,
     tags=[system_tag])
@@ -96,6 +100,7 @@ def get_entity_count(query: EntityCountQuery):
 
 @api_v1_system.get(
     '/classes',
+    endpoint='system_classes',
     summary="Get system classes",
     responses=system_classes_response,
     tags=[system_tag])
@@ -119,6 +124,7 @@ def get_system_classes(query: LocaleQuery) -> dict:
 
 @api_v1_system.get(
     '/crm-properties',
+    endpoint='system_crm_properties',
     summary="Get CIDOC properties",
     responses=system_properties_response,
     tags=[system_tag])

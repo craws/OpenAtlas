@@ -4,6 +4,7 @@ from typing import Any
 from flask import g
 from shapely import GeometryCollection, from_wkt
 
+from openatlas.api.api_v1.models.util import OpenAtlasClassEnum
 from openatlas.database.entity import select_sql
 
 ### Files (Entity) ###
@@ -187,7 +188,7 @@ def get_vocab_ids_for_case_study(case_study_id: int) -> set[int]:
 
 def get_overview_counts_by_case_study(
         classes: list[str],
-        case_study_id: int | None = None) -> dict[str, int]:
+        case_study_id: int | None = None) -> dict[OpenAtlasClassEnum, int]:
     sql = """
           SELECT e.openatlas_class_name AS name, COUNT(e.id) AS count
           FROM model.entity e \

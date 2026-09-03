@@ -64,5 +64,5 @@ def get_entities(
     return get_entities_response(
         path,
         query,
-        endpoint='api_v1.loud_entities',
+        endpoint='api_v1_loud.loud_entities',
         formatter=format_loud_entities)

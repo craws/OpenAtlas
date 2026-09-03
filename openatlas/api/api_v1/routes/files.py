@@ -32,7 +32,10 @@ from openatlas.database.api import check_file
 from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
 
-api_v1_files = APIBlueprint('files', __name__, url_prefix='/api/1/files')
+api_v1_files = APIBlueprint(
+    'api_v1_files',
+    __name__,
+    url_prefix='/api/1/files')
 
 
 # Todo: check if really faster than with normal and many images

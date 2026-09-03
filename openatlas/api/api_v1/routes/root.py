@@ -10,6 +10,7 @@ api_v1_root = APIBlueprint('api_v1_root', __name__, url_prefix='/api/1')
 
 @api_v1_root.get(
     '/',
+    endpoint='index',
     summary="API Index",
     responses=index_response,
     tags=[system_tag],

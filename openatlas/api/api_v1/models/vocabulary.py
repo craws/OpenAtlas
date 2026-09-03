@@ -47,6 +47,7 @@ class VocabularyTreeResponse(BaseSchema):
     custom: list[VocabularyTreeItem] = Field(default_factory=list)
     value: list[VocabularyTreeItem] = Field(default_factory=list)
     system: list[VocabularyTreeItem] = Field(default_factory=list)
+    tools: list[VocabularyTreeItem] = Field(default_factory=list)
 
 
 class VocabularyStandardResponse(BaseSchema):

@@ -14,7 +14,7 @@ from openatlas.api.api_v1.models.vocabulary import (
 from openatlas.database.api import get_vocab_ids_for_case_study
 
 api_v1_vocabulary = APIBlueprint(
-    'vocabulary',
+    'api_v1_vocabulary',
     __name__,
     url_prefix='/api/1/vocabulary')
 register_error_handlers(api_v1_vocabulary)

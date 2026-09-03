@@ -129,6 +129,8 @@ class ApiTestCase(TestBaseCase):
                         entities.file = entity
                     case 'Public domain':
                         entities.open_license = entity
+                    case 'Lord of the rings':
+                        entities.case_study = entity
         return entities
 
 

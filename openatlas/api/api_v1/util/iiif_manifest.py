@@ -33,7 +33,7 @@ def get_url(entity_id: int) -> str:
     if resolver := g.settings.get('frontend_resolver_url'):
         return f"{resolver}{entity_id}"
     try:
-        return url_for('api_v1.get_entity', id=entity_id, _external=True)
+        return url_for('api_v1_lod.get_entity', id=entity_id, _external=True)
     except Exception:
         return f"{request.url_root}api/1/entity/{entity_id}"
 
@@ -81,22 +81,22 @@ class IIIFBuilder:
         self.entity = entity
         self.version = version
         self.manifest_url = url_for(
-            'files.get_iiif_manifest',
+            'api_v1_files.get_iiif_manifest',
             id=entity.id,
             version=version,
             _external=True)
         self.canvas_url = url_for(
-            'files.get_iiif_canvas',
+            'api_v1_files.get_iiif_canvas',
             id=entity.id,
             version=version,
             _external=True)
         self.image_resource_url = url_for(
-            'files.get_iiif_image',
+            'api_v1_files.get_iiif_image',
             id=entity.id,
             version=version,
             _external=True)
         self.annotation_list_url = url_for(
-            'files.get_iiif_annotation_list',
+            'api_v1_files.get_iiif_annotation_list',
             id=entity.id,
             version=version,
             _external=True)
