@@ -6,7 +6,7 @@ from openatlas import app
 from openatlas.api.api_v04.resources.api_entity import ApiEntity
 from tests.base import ApiTestCase, get_hierarchy
 
-from openatlas.api.api_v1.util.date_util import pad_historical_date
+from openatlas.api.api_v1.util.date_util import handle_date
 
 class ApiV1(ApiTestCase):
 
@@ -186,20 +186,20 @@ class ApiV1(ApiTestCase):
         assert rv.status_code == 422
 
         # Direct unit tests for pad_historical_date
-        assert pad_historical_date(None) is None
-        assert pad_historical_date('') is None
-        assert pad_historical_date('400', is_end_date=False) == '0400-01-01'
-        assert pad_historical_date('400', is_end_date=True) == '0400-12-31'
-        assert pad_historical_date('400-05', is_end_date=False) == '0400-05-01'
-        assert pad_historical_date('400-05', is_end_date=True) == '0400-05-31'
-        assert pad_historical_date('400-02', is_end_date=True) == '0400-02-29'
-        assert pad_historical_date('500-02', is_end_date=True) == '0500-02-28'
-        assert pad_historical_date('-400', is_end_date=False) == '-0400-01-01'
-        assert pad_historical_date('-400', is_end_date=True) == '-0400-12-31'
-        assert pad_historical_date('-400-05', is_end_date=False) == '-0400-05-01'
-        assert pad_historical_date('-400-05', is_end_date=True) == '-0400-05-31'
-        assert pad_historical_date('1900-01-01', is_end_date=False) == '1900-01-01'
-        assert pad_historical_date('1900-01-01', is_end_date=True) == '1900-01-01'
+        assert handle_date(None) is None
+        assert handle_date('') is None
+        assert handle_date('400', is_end_date=False) == '0400-01-01'
+        assert handle_date('400', is_end_date=True) == '0400-12-31'
+        assert handle_date('400-05', is_end_date=False) == '0400-05-01'
+        assert handle_date('400-05', is_end_date=True) == '0400-05-31'
+        assert handle_date('400-02', is_end_date=True) == '0400-02-29'
+        assert handle_date('500-02', is_end_date=True) == '0500-02-28'
+        assert handle_date('-400', is_end_date=False) == '-0400-01-01'
+        assert handle_date('-400', is_end_date=True) == '-0400-12-31'
+        assert handle_date('-400-05', is_end_date=False) == '-0400-05-01'
+        assert handle_date('-400-05', is_end_date=True) == '-0400-05-31'
+        assert handle_date('1900-01-01', is_end_date=False) == '1900-01-01'
+        assert handle_date('1900-01-01', is_end_date=True) == '1900-01-01'
 
         # Test type filter with ID and UUID
         rv = c.get(url_for('api_v1.entities', entity_class='file', typeId=open_license.id))

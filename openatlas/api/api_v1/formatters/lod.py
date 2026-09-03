@@ -24,7 +24,10 @@ from openatlas.models.entity import Entity, Link
 def entity_uri(entity: Entity) -> str:
     base = getattr(g, 'entity_base_url', None)
     if base is None:
-        base = url_for('api.entity_uuid', uuid='00000000-0000-0000-0000-000000000000', _external=True).replace('00000000-0000-0000-0000-000000000000', '')
+        base = url_for(
+            'api.entity_uuid',
+            uuid='00000000-0000-0000-0000-000000000000',
+            _external=True).replace('00000000-0000-0000-0000-000000000000', '')
         g.entity_base_url = base
     return f"{base}{entity.uuid}"
 

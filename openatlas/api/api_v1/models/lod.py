@@ -5,7 +5,7 @@ from pydantic import ConfigDict, Field, field_validator
 
 from openatlas.api.api_v1.models.util import BaseSchema, ExtensionsType, \
     OpenAtlasClassEnum
-from openatlas.api.api_v1.util.date_util import pad_historical_date
+from openatlas.api.api_v1.util.date_util import handle_date
 
 
 class EntityPath(BaseSchema):
@@ -135,14 +135,14 @@ class EntityCollectionQuery(BaseSchema):
     def validate_start_date(cls, value: Any) -> str | None:
         if value is None:
             return None
-        return pad_historical_date(value, is_end_date=False)
+        return handle_date(value, is_end_date=False)
 
     @field_validator('end_date', mode='before')
     @classmethod
     def validate_end_date(cls, value: Any) -> str | None:
         if value is None:
             return None
-        return pad_historical_date(value, is_end_date=True)
+        return handle_date(value, is_end_date=True)
 
 
 class LinkedArtResponse(BaseSchema):

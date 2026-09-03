@@ -20,7 +20,7 @@ def get_last_day_of_month(year: int, month: int) -> int:
     return 31
 
 
-def pad_historical_date(value: Any, is_end_date: bool = False) -> str | None:
+def handle_date(value: Any, is_end_date: bool = False) -> str | None:
     if value is None:
         return None
     value_str = str(value).strip()
