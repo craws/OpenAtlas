@@ -82,9 +82,8 @@ def before_request() -> Response | None:
     if request.path.startswith('/display'):
         return None  # Avoid overheads for file display
 
-    if request.path.startswith(('/swagger', '/openapi.json', '/api/1/docs')):
-        if not request.path.startswith('/api/1/docs'):
-            write_openapi_instance()
+    if request.path.startswith(('/swagger', '/openapi.json')):
+        write_openapi_instance()
         return None  # Avoid overheads for swagger and docs
 
     session['language'] = get_locale()
