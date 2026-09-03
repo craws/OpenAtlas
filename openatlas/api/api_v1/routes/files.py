@@ -10,9 +10,17 @@ from openatlas.api.api_v1.error_handlers import abort_file_not_found, \
     abort_file_not_public, abort_file_without_license, \
     abort_id_does_not_exist, abort_id_not_a_file, \
     abort_unsupported_iiif_version
-from openatlas.api.api_v1.util.iiif_manifest import build_manifest_v2, \
-    build_manifest_v3
-from openatlas.api.api_v1.models.files import FileIdPath, FileIiifPath
+from openatlas.api.api_v1.util.iiif_manifest import (
+    build_annotation,
+    build_annotation_list,
+    build_canvas,
+    build_image,
+    build_manifest_v2,
+    build_manifest_v3)
+from openatlas.api.api_v1.models.files import (
+    AnnotationIiifPath,
+    FileIdPath,
+    FileIiifPath)
 from openatlas.api.api_v1.models.util import DownloadQuery
 from openatlas.api.api_v1.openapi_tags import file_tag
 from openatlas.api.api_v1.responses.files import (
@@ -21,6 +29,7 @@ from openatlas.api.api_v1.responses.files import (
     licensed_files_response,
     thumbnail_response)
 from openatlas.database.api import check_file
+from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
 
 api_v1_files = APIBlueprint('files', __name__, url_prefix='/api/1/files')
@@ -140,6 +149,70 @@ def get_iiif_manifest(path: FileIiifPath):
     if path.version == '3':
         return build_manifest_v3(entity)
     return build_manifest_v2(entity)
+
+
+@api_v1_files.get(
+    '/<int:id>/iiif-canvas/<string:version>',
+    summary="Get IIIF Canvas",
+    tags=[file_tag],
+    responses=iiif_manifest_response)
+def get_iiif_canvas(path: FileIiifPath):
+    """Returns the IIIF canvas for a specific file and IIIF version."""
+    if path.version not in ['2', '3']:
+        abort_unsupported_iiif_version(path.version)
+    _check_file_access(path.id)
+    entity = Entity.get_by_id(path.id, types=True)
+    if not entity:
+        abort_file_not_found(path.id)
+    return build_canvas(entity, version=int(path.version))
+
+
+@api_v1_files.get(
+    '/<int:id>/iiif-image/<string:version>',
+    summary="Get IIIF Image",
+    tags=[file_tag],
+    responses=iiif_manifest_response)
+def get_iiif_image(path: FileIiifPath):
+    """Returns the IIIF image (annotation) for a specific file and version."""
+    if path.version not in ['2', '3']:
+        abort_unsupported_iiif_version(path.version)
+    _check_file_access(path.id)
+    entity = Entity.get_by_id(path.id, types=True)
+    if not entity:
+        abort_file_not_found(path.id)
+    return build_image(entity, version=int(path.version))
+
+
+@api_v1_files.get(
+    '/<int:id>/iiif-annotation-list/<string:version>',
+    summary="Get IIIF Annotation List/Page",
+    tags=[file_tag],
+    responses=iiif_manifest_response)
+def get_iiif_annotation_list(path: FileIiifPath):
+    """Returns the IIIF annotation list (v2) or page (v3)."""
+    if path.version not in ['2', '3']:
+        abort_unsupported_iiif_version(path.version)
+    _check_file_access(path.id)
+    entity = Entity.get_by_id(path.id, types=True)
+    if not entity:
+        abort_file_not_found(path.id)
+    return build_annotation_list(entity, version=int(path.version))
+
+
+@api_v1_files.get(
+    '/annotation/<int:id>/iiif/<string:version>',
+    summary="Get IIIF Annotation",
+    tags=[file_tag],
+    responses=iiif_manifest_response)
+def get_iiif_annotation(path: AnnotationIiifPath):
+    """Returns a specific IIIF annotation."""
+    if path.version not in ['2', '3']:
+        abort_unsupported_iiif_version(path.version)
+    annotation = AnnotationImage.get_by_id(path.id)
+    if not annotation:
+        abort_id_does_not_exist(path.id)
+    _check_file_access(annotation.image_id)
+    return build_annotation(annotation, version=int(path.version))
 
 
 @api_v1_files.get(
