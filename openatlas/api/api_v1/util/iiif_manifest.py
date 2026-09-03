@@ -271,7 +271,7 @@ class V2Builder(IIIFBuilder):
                 entity_link = f'<a href={url} target=_blank>{entity.name}</a>'
 
         annotation_url = url_for(
-            'files.get_iiif_annotation',
+            'api_v1_files.get_iiif_annotation',
             id=annotation.id,
             version=self.version,
             _external=True)
@@ -296,12 +296,15 @@ class V2Builder(IIIFBuilder):
                     "@type": "sc:Manifest"}}}
 
     def get_logo(self) -> dict[str, Any]:
-        logo_id = url_for(
-            'files.display_file',
-            id=g.settings.get('logo_file_id', 0),
+        logo_id = g.settings.get('logo_file_id')
+        if not logo_id or not str(logo_id).isdigit():
+            return {}
+        logo_url = url_for(
+            'api_v1_files.display_file',
+            id=int(logo_id),
             _external=True)
         return {
-            "@id": logo_id,
+            "@id": logo_url,
             "service": {
                 "@context": "http://iiif.io/api/image/2/context.json",
                 "@id": url_for('overview', _external=True),
@@ -403,7 +406,7 @@ class V3Builder(IIIFBuilder):
                 entity_link = f'<a href={url} target=_blank>{entity.name}</a>'
 
         annotation_url = url_for(
-            'files.get_iiif_annotation',
+            'api_v1_files.get_iiif_annotation',
             id=annotation.id,
             version=self.version,
             _external=True)
@@ -424,12 +427,15 @@ class V3Builder(IIIFBuilder):
                 "selector": self.get_selector(annotation.coordinates)}}
 
     def get_logo(self) -> dict[str, Any]:
-        logo_id = url_for(
-            'files.display_file',
-            id=g.settings.get('logo_file_id', 0),
+        logo_id = g.settings.get('logo_file_id')
+        if not logo_id or not str(logo_id).isdigit():
+            return {}
+        logo_url = url_for(
+            'api_v1_files.display_file',
+            id=int(logo_id),
             _external=True)
         return {
-            "id": logo_id,
+            "id": logo_url,
             "type": "Image",
             "format": "image/jpeg",
             "service": [{

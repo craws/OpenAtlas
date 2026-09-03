@@ -20,7 +20,8 @@ from openatlas.api.api_v1.util.iiif_manifest import (
 from openatlas.api.api_v1.models.files import (
     AnnotationIiifPath,
     FileIdPath,
-    FileIiifPath)
+    FileIiifPath,
+    LicensedFileOverviewResponse)
 from openatlas.api.api_v1.models.util import DownloadQuery
 from openatlas.api.api_v1.openapi_tags import file_tag
 from openatlas.api.api_v1.responses.files import (
@@ -226,4 +227,4 @@ def get_iiif_annotation(path: AnnotationIiifPath):
 def get_licensed_files():
     """Retrieves all existing files with a license, their display URLs,
     and metadata."""
-    return {}
+    return LicensedFileOverviewResponse(files={}).model_dump(by_alias=True)

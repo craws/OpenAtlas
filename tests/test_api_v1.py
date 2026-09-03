@@ -386,6 +386,71 @@ class ApiV1(ApiTestCase):
         assert 'name' in rv_json
         assert 'type' in rv_json
 
+
+    def test_files(self) -> None:
+        c = self.client
+        with app.test_request_context():
+            app.preprocess_request()
+            rights_holder_ids = [rh.id for rh in g.rights_holder]
+
+        logo_path = Path(app.root_path) / 'static' / 'images' / 'layout'
+        public_type = get_hierarchy('Public sharing allowed')
+        with open(logo_path / 'logo.png', 'rb') as img:
+            c.post(
+                url_for('insert', class_='file'),
+                data={
+                    'name': 'OpenAtlas logo',
+                    'file': img,
+                    'creator': f'{rights_holder_ids}',
+                    'license_holder': f'{rights_holder_ids}',
+                    str(public_type.id): public_type.subs[1]},
+                follow_redirects=True)
+
+        e = self.get_api_entities()
+        with app.test_request_context():
+            app.preprocess_request()
+            e.file.link('P2', e.open_license)
+
+        rv = c.get(url_for('api_v1_files.display_file', id=e.file.id))
+        assert rv.status_code in (200, 404)
+
+        rv = c.get(
+            url_for(
+                'api_v1_files.get_iiif_manifest',
+                id=e.file.id,
+                version='2'))
+        assert rv.status_code == 200
+        assert rv.get_json()['@type'] == 'sc:Manifest'
+
+        rv = c.get(
+            url_for(
+                'api_v1_files.get_iiif_manifest',
+                id=e.file.id,
+                version='3'))
+        assert rv.status_code == 200
+        assert rv.get_json()['type'] == 'Manifest'
+
+        rv = c.get(
+            url_for('api_v1_files.get_iiif_canvas', id=e.file.id, version='2'))
+        assert rv.status_code == 200
+
+        rv = c.get(
+            url_for('api_v1_files.get_iiif_image', id=e.file.id, version='2'))
+        assert rv.status_code == 200
+
+        rv = c.get(
+            url_for(
+                'api_v1_files.get_iiif_annotation_list',
+                id=e.file.id,
+                version='2'))
+        assert rv.status_code == 200
+
+        rv = c.get(url_for('api_v1_files.get_licensed_files'))
+        assert rv.status_code == 200
+        assert 'files' in rv.get_json()
+
+
+
     def test_docs(self) -> None:
         c = self.client
         for url in [
