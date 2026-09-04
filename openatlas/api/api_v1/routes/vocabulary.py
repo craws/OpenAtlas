@@ -1,3 +1,5 @@
+from typing import Any
+
 from flask import g
 from flask_openapi3 import APIBlueprint
 from pydantic import BaseModel, Field
@@ -5,7 +7,8 @@ from pydantic import BaseModel, Field
 from openatlas.api.api_v1.error_handlers import register_error_handlers
 from openatlas.api.api_v1.openapi_tags import vocabulary_tag
 from openatlas.api.api_v1.models.util import OpenAtlasClassEnum
-from openatlas.api.api_v1.responses.vocabulary import vocabulary_list_response, \
+from openatlas.api.api_v1.responses.vocabulary import \
+    vocabulary_list_response, \
     vocabulary_standard_by_class_response, vocabulary_tree_response
 from openatlas.api.api_v1.models.vocabulary import (
     VocabularyFlatItem, VocabularyTreeItem, VocabularyFlatResponse,
@@ -31,9 +34,9 @@ class VocabularyTreePath(BaseModel):
     summary="Get flat types list",
     responses=vocabulary_list_response,
     tags=[vocabulary_tag])
-def get_vocabulary_list() -> dict:
+def get_vocabulary_list() -> dict[str, Any]:
     """Retrieves a flat list of all OpenAtlas types."""
-    vocab_dict = {}
+    vocab_dict: dict[str, VocabularyFlatItem] = {}
     for id_, type_ in g.types.items():
         vocab_dict[str(id_)] = VocabularyFlatItem(
             id=type_.id,
@@ -78,12 +81,13 @@ def _walk_tree(
     return items
 
 
-def _generate_vocabulary_tree(openatlas_class: str | None = None) -> dict:
-    vocab_tree_dict = {
+def _generate_vocabulary_tree(
+        openatlas_class: str | None = None) -> dict[str, Any]:
+    vocab_tree_dict: dict[str, list[VocabularyTreeItem]] = {
         'standard': [], 'custom': [], 'place': [],
         'value': [], 'system': [], 'tools': []}
 
-    for category in vocab_tree_dict.keys():
+    for category in vocab_tree_dict:
         root_ids = []
         for type_ in g.types.values():
             if not type_.root and getattr(type_, 'category', None) == category:
@@ -102,7 +106,7 @@ def _generate_vocabulary_tree(openatlas_class: str | None = None) -> dict:
     summary="Get types tree",
     responses=vocabulary_tree_response,
     tags=[vocabulary_tag])
-def get_vocabulary_tree() -> dict:
+def get_vocabulary_tree() -> dict[str, Any]:
     """Retrieves all OpenAtlas types sorted hierarchically into standard,
     place, custom, value, and system categories."""
     return _generate_vocabulary_tree()
@@ -113,7 +117,7 @@ def get_vocabulary_tree() -> dict:
     summary="Get types tree by OpenAtlas class",
     responses=vocabulary_tree_response,
     tags=[vocabulary_tag])
-def get_vocabulary_tree_by_class(path: VocabularyTreePath) -> dict:
+def get_vocabulary_tree_by_class(path: VocabularyTreePath) -> dict[str, Any]:
     """Retrieves all OpenAtlas types filtered by a specific OpenAtlas class."""
     class_ = path.openatlas_class
     if hasattr(path.openatlas_class, 'value'):
@@ -129,7 +133,7 @@ def get_vocabulary_tree_by_class(path: VocabularyTreePath) -> dict:
     tags=[vocabulary_tag])
 def get_vocabulary_standard_by_class(
         path: VocabularyTreePath,
-        query: VocabularyStandardQuery) -> dict:
+        query: VocabularyStandardQuery) -> dict[str, Any]:
     """Retrieves standard OpenAtlas types filtered by a specific
     OpenAtlas class, formatted for hierarchical UI components."""
 

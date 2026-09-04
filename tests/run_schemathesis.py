@@ -1,12 +1,13 @@
 import os
 import sys
+from typing import Any
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import sys
 import schemathesis
 from schemathesis.cli import schemathesis as schemathesis_cli
 
 from openatlas import app
-from openatlas.api.api_v1.routes.files import check_file_access
+from openatlas.api.api_v1.util.files import check_file_access
 from openatlas.display.image_processing import check_iiif_file_exist
 from openatlas.models.entity import Entity
 
@@ -78,7 +79,7 @@ def get_image_id() -> int:
 def before_generate_path_parameters(context, strategy):
     path = context.operation.path
 
-    def inject_valid_ids(params: dict) -> dict:
+    def inject_valid_ids(params: dict[str, Any]) -> dict[str, Any]:
         if "id" in params:
             if path.startswith("/api/1/files/"):
                 params["id"] = get_image_id()

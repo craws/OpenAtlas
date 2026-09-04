@@ -19,7 +19,7 @@ register_error_handlers(api_v1_loud)
 
 
 @api_v1_loud.get(
-    '/entity/<uuid:id>',
+    '/entity/<uuid:uuid>',
     endpoint='loud_entity',
     summary='Get a strictly compliant Linked.Art LOUD entity by UUID',
     tags=[lod_tag],
@@ -31,11 +31,11 @@ def get_entity(path: EntityPath) -> dict[str, Any] | Response:
     This endpoint applies strict profile cleaning to ensure additionalProperties: false
     compliance with the Linked.Art standard.
     """
-    return get_entity_response(path.id, formatter=format_loud_entity)
+    return get_entity_response(path.uuid, formatter=format_loud_entity)
 
 
 @api_v1_loud.get(
-    '/entity/<uuid:id>.<ext>',
+    '/entity/<uuid:uuid>.<ext>',
     endpoint='loud_entity_ext',
     summary='Get a strictly compliant Linked.Art LOUD entity by UUID with extension',
     tags=[lod_tag],
@@ -46,7 +46,7 @@ def get_entity_ext(path: EntityPathExt) -> dict[str, Any] | Response:
     """
     ext_val = path.ext.value if hasattr(path.ext, 'value') else str(path.ext)
     return get_entity_response(
-        path.id, ext=ext_val, formatter=format_loud_entity)
+        path.uuid, ext=ext_val, formatter=format_loud_entity)
 
 
 @api_v1_loud.get(

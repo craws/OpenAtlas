@@ -1,10 +1,10 @@
 from flask import g
 from flask_openapi3 import APIBlueprint
 
-from openatlas.api.api_v1.entity import get_by_system_class
 from openatlas.api.api_v1.error_handlers import abort_not_found, \
     register_error_handlers
-from openatlas.api.api_v1.models.agent import AgentItem, AgentListResponse, AgentPath
+from openatlas.api.api_v1.models.agent import AgentItem, AgentListResponse, \
+    AgentPath
 from openatlas.api.api_v1.models.metadata import CaseStudyItem, \
     CaseStudyListResponse, \
     CaseStudyPath
@@ -17,13 +17,28 @@ api_v1_metadata = APIBlueprint(
     url_prefix='/api/1')
 register_error_handlers(api_v1_metadata)
 
+def _walk_case_studies(ids: list[int]) -> list[CaseStudyItem]:
+    items = []
+    for id_ in ids:
+        item = g.types[id_]
+        items.append(CaseStudyItem(
+            id=item.id,
+            uuid=item.uuid,
+            name=item.name,
+            description=item.description,
+            sub_case_studies=_walk_case_studies(item.subs)))
+    return items
+
 @api_v1_metadata.get(
     '/case-studies',
     summary="Get case studies metadata",
     tags=[metadata_tag],
     responses={200: CaseStudyListResponse})
 def get_case_studies():
-    return CaseStudyListResponse(case_studies=[]).model_dump(by_alias=True)
+    case_study_ids = g.types[g.case_study_type.id].subs
+    case_studies = _walk_case_studies(case_study_ids)
+    return CaseStudyListResponse(case_studies=case_studies).model_dump(
+        by_alias=True)
 
 @api_v1_metadata.get(
     '/case-studies/<int:id>',
@@ -31,14 +46,16 @@ def get_case_studies():
     tags=[metadata_tag],
     responses={200: CaseStudyItem})
 def get_case_study_by_id(path: CaseStudyPath):
-    entity = Entity.get_by_id(path.id)
-    if not entity:
+    case_study = g.types[path.id]
+    if not case_study:
         abort_not_found(path.id)
     return CaseStudyItem(
-        id=entity.id,
-        uuid=entity.uuid,
-        name=entity.name,
-        description=entity.description).model_dump(by_alias=True)
+        id=case_study.id,
+        uuid=case_study.uuid,
+        name=case_study.name,
+        description=case_study.description,
+        sub_case_studies=_walk_case_studies(case_study.subs)
+    ).model_dump(by_alias=True)
 
 @api_v1_metadata.get(
     '/agents/',

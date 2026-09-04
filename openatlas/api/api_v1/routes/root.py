@@ -1,3 +1,5 @@
+from typing import Any
+
 from flask import url_for
 from flask_openapi3 import APIBlueprint
 
@@ -15,9 +17,10 @@ api_v1_root = APIBlueprint('api_v1_root', __name__, url_prefix='/api/1')
     responses=index_response,
     tags=[system_tag],
     strict_slashes=False)
-def api_v1_index() -> dict:
+def api_v1_index() -> dict[str, Any]:
     """
-    Returns the OpenAtlas API V1 root index pointing to documentation and schemas.
+    Returns the OpenAtlas API V1 root index pointing to documentation and
+    schemas.
     """
     response = ApiIndexResponse(
         name="OpenAtlas API V1",

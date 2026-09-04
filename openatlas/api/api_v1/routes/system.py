@@ -1,3 +1,5 @@
+from typing import Any
+
 from flask import g, session
 from flask_openapi3 import APIBlueprint
 from pydantic import BaseModel, Field
@@ -6,8 +8,8 @@ from openatlas import app
 from openatlas.api.api_v1.error_handlers import register_error_handlers
 from openatlas.api.api_v1.models.system import EntityCountQuery, \
     EntityCountResponse, IiifInfo, ImageProcessingInfo, MapConfig, \
-    PropertyDetail, SystemClassItem, SystemClassesResponse, SystemInfoResponse, \
-    SystemPropertiesResponse
+    PropertyDetail, SystemClassItem, SystemClassesResponse, \
+    SystemInfoResponse, SystemPropertiesResponse
 from openatlas.api.api_v1.models.util import OpenAtlasClassEnum
 from openatlas.api.api_v1.openapi_tags import system_tag
 from openatlas.api.api_v1.responses.system import (entity_count_response,
@@ -34,9 +36,8 @@ class LocaleQuery(BaseModel):
     endpoint='system_info',
     summary="Get presentation frontend configuration",
     responses=system_info_response,
-    tags=[system_tag]
-)
-def get_system_info() -> dict:
+    tags=[system_tag])
+def get_system_info() -> dict[str, Any]:
     """
     Retrieves the public configuration required to initialize the presentation
     frontend.
@@ -104,7 +105,7 @@ def get_entity_count(query: EntityCountQuery):
     summary="Get system classes",
     responses=system_classes_response,
     tags=[system_tag])
-def get_system_classes(query: LocaleQuery) -> dict:
+def get_system_classes(query: LocaleQuery) -> dict[str, Any]:
     """Retrieves all OpenAtlas classes with their labels,
     CIDOC CRM mapping, and frontend configurations."""
     locale = query.locale if query.locale else session.get('language', 'en')
@@ -128,7 +129,7 @@ def get_system_classes(query: LocaleQuery) -> dict:
     summary="Get CIDOC properties",
     responses=system_properties_response,
     tags=[system_tag])
-def get_system_properties() -> dict:
+def get_system_properties() -> dict[str, Any]:
     """
     Retrieves all OpenAtlas CIDOC properties actively used by the system.
     
@@ -149,7 +150,7 @@ def get_system_properties() -> dict:
             sub_codes.update(g.properties[code].sub)
     used_codes.update(sub_codes)
 
-    results = {}
+    results: dict[str, PropertyDetail] = {}
     for code, property_ in g.properties.items():
         if code in used_codes:
             results[code] = PropertyDetail(

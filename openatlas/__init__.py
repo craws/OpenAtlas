@@ -9,6 +9,8 @@ from flask import g, redirect, request, session, url_for
 from flask_babel import Babel
 from flask_jwt_extended import JWTManager, verify_jwt_in_request
 from flask_login import current_user
+from flask_openapi3.models.info import Info
+from flask_openapi3.openapi import OpenAPI
 from flask_wtf.csrf import CSRFProtect
 from psycopg2 import extras
 from werkzeug.wrappers import Response
@@ -19,8 +21,6 @@ from openatlas.database.connect import close_connection, open_connection
 from openatlas.database.token import check_token_revoked
 from openatlas.database.user import admins_available
 from openatlas.models.openatlas_class import get_classes
-
-from flask_openapi3 import OpenAPI, Info
 
 info = Info(title="OpenAtlas API V1", version="1.0.0")
 app: OpenAPI = OpenAPI(
@@ -99,6 +99,7 @@ def before_request() -> Response | None:
         (request.path.startswith('/overview/model/property')))
     get_classes()  # Sets g.classes
     g.types = Entity.get_all_types(count_type())
+    g.case_study_type = Entity.get_hierarchy('Case study')
     g.radiocarbon_type = Entity.get_hierarchy('Radiocarbon')
     g.sex_type = Entity.get_hierarchy('Features for sexing')
     g.reference_match_type = Entity.get_hierarchy('External reference match')

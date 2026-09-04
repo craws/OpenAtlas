@@ -16,7 +16,7 @@ class ApiV1(ApiTestCase):
         c = self.client
         e = self.get_api_entities()
 
-        rv = c.get(url_for('api_v1_lod.entity', id=e.place.uuid))
+        rv = c.get(url_for('api_v1_lod.entity', uuid=e.place.uuid))
         assert 'application/ld+json' in rv.headers.get('Content-Type')
         rv_json = rv.get_json()
         assert rv_json[

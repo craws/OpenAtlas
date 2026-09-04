@@ -36,7 +36,7 @@ def register_error_handlers(api_v1) -> None:
     api_v1.register_error_handler(HTTPException, handle_http_exception)
 
 
-def abort_not_found(uuid: UUID | str) -> NoReturn:
+def abort_not_found(uuid: UUID | str | int) -> NoReturn:
     error_payload = {
         'title': 'Entity does not exist',
         'message': 'The requested entity could not be found in the database.',

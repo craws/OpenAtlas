@@ -85,8 +85,8 @@ def clean_linked_art(data: Any) -> Any:
             if 'former_or_current_location' in data:
                 del data['former_or_current_location']
 
-        for k, v in list(data.items()):
-            clean_linked_art(v)
+        for key, value in list(data.items()):
+            clean_linked_art(value)
     elif isinstance(data, list):
         for item in data:
             clean_linked_art(item)

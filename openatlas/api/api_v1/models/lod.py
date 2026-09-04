@@ -9,11 +9,11 @@ from openatlas.api.api_v1.util.date_util import handle_date
 
 
 class EntityPath(BaseSchema):
-    id: UUID = Field(..., description="Unique identifier of the entity")
+    uuid: UUID = Field(..., description="Unique identifier of the entity")
 
 
 class EntityPathExt(BaseSchema):
-    id: UUID = Field(..., description="Unique identifier of the entity")
+    uuid: UUID = Field(..., description="Unique identifier of the entity")
     ext: ExtensionsType = Field(
         ...,
         description="File extension (.json, .ttl, .xml, .nt)",
@@ -113,10 +113,10 @@ class EntityCollectionQuery(BaseSchema):
         None,
         description="Filter entities with end date on or before this date ("
                     "e.g. 0400-12-31, 400, -400).")
-    type_id: int | UUID | str | None = Field(
+    type_id: int | UUID | None = Field(
         None,
         description="Filter entities by type ID (integer) or type UUID.")
-    case_study: int | UUID | str | None = Field(
+    case_study: int | UUID | None = Field(
         None,
         description="Filter entities by case study ID (integer) or case "
                     "study UUID.")
