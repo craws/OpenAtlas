@@ -8,7 +8,8 @@ from flask_restful import Resource, marshal
 
 from openatlas import app
 from openatlas.api.api_v04.resources.api_entity import ApiEntity
-from openatlas.api.api_v04.resources.database_mapper import get_links_by_id_network
+from openatlas.api.api_v04.resources.database_mapper import \
+    get_links_by_id_network
 from openatlas.api.api_v04.resources.error import (
     DisplayFileNotFoundError, EntityNotAFileError, FileIdNotInteger,
     NoLicenseError, NotPublicError)

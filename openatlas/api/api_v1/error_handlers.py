@@ -53,10 +53,12 @@ def abort_not_found(uuid: UUID | str | int) -> NoReturn:
 def abort_invalid_class(class_name: str) -> NoReturn:
     error_payload = {
         'title': 'Invalid system class',
-        'message': f"The requested entity class '{class_name}' is not a valid system class.",
+        'message': f"The requested entity class '{class_name}' "
+                   f"is not a valid system class.",
         'details': {
             'provided_class': str(class_name),
-            'hint': 'Check if the class name is spelled correctly and exists in the system.'},
+            'hint': 'Check if the class name is spelled '
+                    'correctly and exists in the system.'},
         'url': request.url,
         'timestamp': datetime.now().isoformat(),
         'status': 404}
@@ -91,7 +93,7 @@ def abort_id_does_not_exist(id_: int) -> NoReturn:
 def abort_file_without_license(id_: int) -> NoReturn:
     error_payload = {
         'title': 'No Licenser',
-        'message': f"The requested file has no license and cannot be displayed.",
+        'message': "The requested file has no license and can't be displayed.",
         'details': {
             'provided_id': str(id_),
             'hint': ''}, # Todo
@@ -104,7 +106,7 @@ def abort_file_without_license(id_: int) -> NoReturn:
 def abort_file_not_public(id_: int) -> NoReturn:
     error_payload = {
         'title': 'Not shareable',
-        'message': f"This file is not public shareable.",
+        'message': "This file is not public shareable.",
         'details': {
             'provided_id': str(id_),
             'hint': ''}, # Todo

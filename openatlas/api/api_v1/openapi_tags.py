@@ -13,7 +13,8 @@ file_tag = Tag(name="Files", description="IIIF, display and licenses")
 # Thanados, PFP, CSV, and other
 export_tag = Tag(name="Export", description="Different export formats")
 
-# All geographic entites, filter with bbox, search nearest entities, gpkg export, etc.
+# All geographic entites, filter with bbox, search nearest entities, g
+# pkg export, etc.
 geographic_tag = Tag(name="Geographic", description="Geographic endpoints")
 
 # presentation view, table, search

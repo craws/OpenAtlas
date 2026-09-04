@@ -919,7 +919,10 @@ class LodFormatter:
         for link_ in data['links']:
             if link_.property.code not in skipped:
                 self.process_link(
-                    link_, properties_set, is_inverse=False, root_entity=entity)
+                    link_,
+                    properties_set,
+                    is_inverse=False,
+                    root_entity=entity)
         file_links = []
         for link_ in data['links_inverse']:
             if link_.property.code in skipped:

@@ -605,7 +605,8 @@ class Entity:
             codes: str | list[str] | None = None,
             classes: Optional[list[str]] = None,
             inverse: bool = False,
-            preloaded_entities: Optional[dict[int, Entity]] = None) -> list[Link]:
+            preloaded_entities: Optional[dict[int, Entity]] = None) \
+            -> list[Link]:
         result = set()
         if codes:
             codes = codes if isinstance(codes, list) else [str(codes)]
@@ -613,16 +614,16 @@ class Entity:
         for row in rows:
             result.add(row['domain_id'])
             result.add(row['range_id'])
-            
+
         if preloaded_entities:
             result = {id_ for id_ in result if id_ not in preloaded_entities}
-            
+
         linked_entities = {
             e.id: e for e in Entity.get_by_ids(result, types=True)}
-            
+
         if preloaded_entities:
             linked_entities.update(preloaded_entities)
-            
+
         links = []
         for row in rows:
             links.append(
@@ -847,8 +848,8 @@ def insert(data: dict[str, Any]) -> Entity:
         data['description'] = result['text']
         annotation_data = result['data']
     for item in [
-            'begin_from', 'begin_to', 'begin_comment',
-            'end_from', 'end_to', 'end_comment', 'description']:
+        'begin_from', 'begin_to', 'begin_comment',
+        'end_from', 'end_to', 'end_comment', 'description']:
         data[item] = data.get(item)
     for item in ['name', 'description']:
         data[item] = sanitize(data[item])

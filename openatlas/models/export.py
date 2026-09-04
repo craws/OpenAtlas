@@ -21,7 +21,8 @@ from openatlas.api.external.arche import add_arche_file_metadata_to_graph
 from openatlas.api.external.arche_class import ArcheFileMetadata
 from openatlas.api.api_v04.formats.rdf import rdf_export_to_file
 from openatlas.api.api_v04.resources.api_entity import ApiEntity
-from openatlas.api.api_v04.resources.util import filter_by_type, get_reference_systems
+from openatlas.api.api_v04.resources.util import \
+    filter_by_type, get_reference_systems
 from openatlas.display.image_processing import get_binary_path
 from openatlas.models.entity import Entity
 

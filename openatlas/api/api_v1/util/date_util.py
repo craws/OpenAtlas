@@ -64,7 +64,8 @@ def handle_date(value: Any, is_end_date: bool = False) -> str | None:
         last_day = get_last_day_of_month(year_int, month_int)
         if not (1 <= day_int <= last_day):
             raise ValueError(
-                f"Invalid day: {day_int} for month {month_int} in date {value}")
+                f"Invalid day: {day_int} "
+                f"for month {month_int} in date {value}")
         return f"{year_str}-{month_int:02d}-{day_int:02d}"
 
     raise ValueError(f"Invalid date format: {value}")

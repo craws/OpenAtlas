@@ -8,89 +8,109 @@ from openatlas.models.entity import Entity
 
 def clean_linked_art(data: Any) -> Any:
     if isinstance(data, dict):
-        type_ = data.get('type')
-        if type_ in [
-                'Name',
-                'Identifier',
-                'Dimension',
-                'TimeSpan'] and 'id' in data:
-            del data['id']
-
-        if 'referred_to_by' in data \
-                and isinstance(data['referred_to_by'], list):
-            new_refs = []
-            for item in data['referred_to_by']:
-                if isinstance(item, dict):
-                    if 'id' in item:
-                        del item['id']
-                    if 'content' in item:
-                        new_refs.append(item)
-            if new_refs:
-                data['referred_to_by'] = new_refs
-            else:
-                del data['referred_to_by']
-
-        if 'part_of' in data and isinstance(data['part_of'], list):
-            if type_ == 'Type':
-                del data['part_of']
-            else:
-                for item in data['part_of']:
-                    if isinstance(item, dict) and 'identified_by' in item:
-                        del item['identified_by']
-
-        if 'classified_as' in data and isinstance(data['classified_as'], list):
-            for item in data['classified_as']:
-                if isinstance(item, dict) and 'attributed_by' in item:
-                    del item['attributed_by']
-
-        if 'refers_to' in data:
-            del data['refers_to']
-
-        if 'right_held_by' in data and type_ == 'DigitalObject':
-            del data['right_held_by']
-
-        if 'created_by' in data and isinstance(data['created_by'], dict):
-            cb = data['created_by']
-            if 'carried_out_by' in cb and isinstance(cb['carried_out_by'], list):
-                for actor in cb['carried_out_by']:
-                    if isinstance(actor, dict) \
-                            and actor.get('type') not in ['Person', 'Group']:
-                        actor['type'] = 'Group'
-
-        if 'digitally_carries' in data \
-                and isinstance(data['digitally_carries'], list):
-            new_carries = []
-            new_shows = []
-            for item in data['digitally_carries']:
-                if isinstance(item, dict):
-                    if item.get('type') == 'VisualItem':
-                        if 'represents' in item:
-                            del item['represents']
-                        new_shows.append(item)
-                    else:
-                        new_carries.append(item)
-
-            if new_shows:
-                data['digitally_shows'] = data.get('digitally_shows', []) \
-                                          + new_shows
-
-            if new_carries:
-                data['digitally_carries'] = new_carries
-            else:
-                del data['digitally_carries']
-
-        if type_ in ['Place', 'Site']:
-            if 'timespan' in data:
-                del data['timespan']
-            if 'former_or_current_location' in data:
-                del data['former_or_current_location']
-
-        for key, value in list(data.items()):
+        _clean_object(data)
+        for value in data.values():
             clean_linked_art(value)
     elif isinstance(data, list):
         for item in data:
             clean_linked_art(item)
     return data
+
+
+def _clean_object(data: dict[str, Any]) -> None:
+    type_ = data.get('type')
+    if type_ in {'Name', 'Identifier', 'Dimension', 'TimeSpan'}:
+        data.pop('id', None)
+
+    _clean_references(data)
+    _clean_part_of(data, type_)
+    _remove_nested_property(data, 'classified_as', 'attributed_by')
+    data.pop('refers_to', None)
+
+    if type_ == 'DigitalObject':
+        data.pop('right_held_by', None)
+    _clean_actors(data)
+    _move_visual_items(data)
+
+    if type_ in {'Place', 'Site'}:
+        data.pop('timespan', None)
+        data.pop('former_or_current_location', None)
+
+
+def _clean_references(data: dict[str, Any]) -> None:
+    references = data.get('referred_to_by')
+    if not isinstance(references, list):
+        return
+
+    references_with_content = []
+    for reference in references:
+        if isinstance(reference, dict):
+            reference.pop('id', None)
+            if 'content' in reference:
+                references_with_content.append(reference)
+
+    if references_with_content:
+        data['referred_to_by'] = references_with_content
+    else:
+        data.pop('referred_to_by')
+
+
+def _clean_part_of(data: dict[str, Any], type_: Any) -> None:
+    parts = data.get('part_of')
+    if not isinstance(parts, list):
+        return
+    if type_ == 'Type':
+        data.pop('part_of')
+        return
+    _remove_nested_property(data, 'part_of', 'identified_by')
+
+
+def _remove_nested_property(
+        data: dict[str, Any], property_: str, nested_property: str) -> None:
+    items = data.get(property_)
+    if not isinstance(items, list):
+        return
+    for item in items:
+        if isinstance(item, dict):
+            item.pop(nested_property, None)
+
+
+def _clean_actors(data: dict[str, Any]) -> None:
+    creation = data.get('created_by')
+    if not isinstance(creation, dict):
+        return
+    actors = creation.get('carried_out_by')
+    if not isinstance(actors, list):
+        return
+    for actor in actors:
+        if isinstance(actor, dict) and actor.get('type') not in {
+                'Person', 'Group'}:
+            actor['type'] = 'Group'
+
+
+def _move_visual_items(data: dict[str, Any]) -> None:
+    carried_items = data.get('digitally_carries')
+    if not isinstance(carried_items, list):
+        return
+
+    digital_objects = []
+    visual_items = []
+    for item in carried_items:
+        if not isinstance(item, dict):
+            continue
+        if item.get('type') == 'VisualItem':
+            item.pop('represents', None)
+            visual_items.append(item)
+        else:
+            digital_objects.append(item)
+
+    if visual_items:
+        data['digitally_shows'] = (
+            data.get('digitally_shows', []) + visual_items)
+    if digital_objects:
+        data['digitally_carries'] = digital_objects
+    else:
+        data.pop('digitally_carries')
 
 
 def format_loud_entity(entity: Entity) -> dict[str, Any]:

@@ -26,7 +26,8 @@ register_error_handlers(api_v1_lod)
     responses=lod_responses)
 def get_entity(path: EntityPath) -> dict[str, Any] | Response:
     """
-    Retrieves a single entity formatted as Linked Open Data (OpenAtlas CIDOC-CRM graph).
+    Retrieves a single entity formatted as Linked Open Data
+    (OpenAtlas CIDOC-CRM graph).
     
     The response format defaults to `application/ld+json`. 
     You can request other formats (like Turtle or RDF/XML) using the `Accept`
@@ -66,7 +67,8 @@ def get_entities(
     """
     Retrieves a paginated collection of entities formatted as Linked Open Data.
     
-    This endpoint allows querying a specific system class (e.g. `person`, `place`).
+    This endpoint allows querying a specific system class
+    (e.g. `person`, `place`).
     Results are returned as a Hydra Collection and can be filtered by various 
     query parameters such as search strings, dates, or case studies.
     """

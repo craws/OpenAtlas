@@ -78,4 +78,3 @@ def get_agent_by_id(path: AgentPath):
         name=entity.name,
         type='person' if entity.class_.name == 'person' else 'group',
         description=entity.description).model_dump(by_alias=True)
-

@@ -7,21 +7,22 @@ from shapely import GeometryCollection, from_wkt
 from openatlas.api.api_v1.models.util import OpenAtlasClassEnum
 from openatlas.database.entity import select_sql
 
+
 ### Files (Entity) ###
 
 def check_file(file_id: int) -> dict[str, str | list[int]]:
-    sql = """                                                                                                                                                                                                                          
-        SELECT                                                                                                                                                                                                                         
-            e.openatlas_class_name,                                                                                                                                                                                                    
-            array_agg(t.range_id) FILTER (WHERE t.range_id IS NOT NULL) AS type_ids                                                                                                                                                    
-        FROM model.entity e                                                                                                                                                                                                            
-        LEFT JOIN model.link t ON e.id = t.domain_id AND t.property_code = 'P2'                                                                                                                                                        
-        WHERE e.id = %(id)s
-        GROUP BY e.openatlas_class_name;
-    """
+    sql = """
+          SELECT e.openatlas_class_name,
+                 array_agg(t.range_id) FILTER (WHERE t.range_id IS NOT NULL) 
+                 AS type_ids
+          FROM model.entity e
+                   LEFT JOIN model.link t
+                             ON e.id = t.domain_id AND t.property_code = 'P2'
+          WHERE e.id = %(id)s
+          GROUP BY e.openatlas_class_name; \
+          """
     g.cursor.execute(sql, {'id': file_id})
     return g.cursor.fetchone()
-
 
 
 ### Entity ###
@@ -221,9 +222,9 @@ def get_wkts_by_ids(ids: list[int]) -> dict[int, str]:
     g.cursor.execute(
         """
         SELECT place.id,
-               public.ST_AsText(geom_point)                       AS point,
-               public.ST_AsText(geom_linestring)                  AS linestring,
-               public.ST_AsText(ST_ForcePolygonCCW(geom_polygon)) AS polygon
+           public.ST_AsText(geom_point)                       AS point,
+           public.ST_AsText(geom_linestring)                  AS linestring,
+           public.ST_AsText(ST_ForcePolygonCCW(geom_polygon)) AS polygon
         FROM model.entity place
                  JOIN model.gis g ON place.id = g.entity_id
         WHERE place.id IN %(ids)s;

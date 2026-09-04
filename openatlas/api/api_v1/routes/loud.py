@@ -26,10 +26,11 @@ register_error_handlers(api_v1_loud)
     responses=lod_responses)
 def get_entity(path: EntityPath) -> dict[str, Any] | Response:
     """
-    Retrieves a single entity formatted as Linked Open Usable Data (Linked.Art).
+    Retrieves a single entity formatted as Linked Open Usable Data
+    (Linked.Art).
 
-    This endpoint applies strict profile cleaning to ensure additionalProperties: false
-    compliance with the Linked.Art standard.
+    This endpoint applies strict profile cleaning to ensure
+    additionalProperties: false compliance with the Linked.Art standard.
     """
     return get_entity_response(path.uuid, formatter=format_loud_entity)
 
@@ -37,7 +38,8 @@ def get_entity(path: EntityPath) -> dict[str, Any] | Response:
 @api_v1_loud.get(
     '/entity/<uuid:uuid>.<ext>',
     endpoint='loud_entity_ext',
-    summary='Get a strictly compliant Linked.Art LOUD entity by UUID with extension',
+    summary='Get a strictly compliant Linked.Art LOUD entity by UUID '
+            'with extension',
     tags=[lod_tag],
     responses=lod_responses)
 def get_entity_ext(path: EntityPathExt) -> dict[str, Any] | Response:
@@ -59,7 +61,8 @@ def get_entities(
         path: EntityCollectionPath,
         query: EntityCollectionQuery) -> dict[str, Any] | Response:
     """
-    Retrieves a paginated collection of entities formatted as strict Linked.Art LOUD.
+    Retrieves a paginated collection of entities formatted as strict
+    Linked.Art LOUD.
     """
     return get_entities_response(
         path,
