@@ -41,7 +41,7 @@ api_v1_files = APIBlueprint(
 
 # Todo: check if really faster than with normal and many images
 #   if not, delete this function
-def _check_file_access(file_id: int) -> bool:
+def check_file_access(file_id: int) -> bool:
     checked_file = check_file(file_id)
 
     if not checked_file:
@@ -144,7 +144,7 @@ def get_iiif_manifest(path: FileIiifPath):
     if path.version not in ['2', '3']:
         abort_unsupported_iiif_version(path.version)
 
-    _check_file_access(path.id)
+    check_file_access(path.id)
 
     entity = Entity.get_by_id(path.id, types=True)
     if not entity:
@@ -164,7 +164,7 @@ def get_iiif_canvas(path: FileIiifPath):
     """Returns the IIIF canvas for a specific file and IIIF version."""
     if path.version not in ['2', '3']:
         abort_unsupported_iiif_version(path.version)
-    _check_file_access(path.id)
+    check_file_access(path.id)
     entity = Entity.get_by_id(path.id, types=True)
     if not entity:
         abort_file_not_found(path.id)
@@ -180,7 +180,7 @@ def get_iiif_image(path: FileIiifPath):
     """Returns the IIIF image (annotation) for a specific file and version."""
     if path.version not in ['2', '3']:
         abort_unsupported_iiif_version(path.version)
-    _check_file_access(path.id)
+    check_file_access(path.id)
     entity = Entity.get_by_id(path.id, types=True)
     if not entity:
         abort_file_not_found(path.id)
@@ -196,7 +196,7 @@ def get_iiif_annotation_list(path: FileIiifPath):
     """Returns the IIIF annotation list (v2) or page (v3)."""
     if path.version not in ['2', '3']:
         abort_unsupported_iiif_version(path.version)
-    _check_file_access(path.id)
+    check_file_access(path.id)
     entity = Entity.get_by_id(path.id, types=True)
     if not entity:
         abort_file_not_found(path.id)
@@ -215,7 +215,7 @@ def get_iiif_annotation(path: AnnotationIiifPath):
     annotation = AnnotationImage.get_by_id(path.id)
     if not annotation:
         abort_id_does_not_exist(path.id)
-    _check_file_access(annotation.image_id)
+    check_file_access(annotation.image_id)
     return build_annotation(annotation, version=int(path.version))
 
 

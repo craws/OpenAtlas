@@ -1,11 +1,30 @@
 from enum import Enum
+from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from pydantic.alias_generators import to_camel
 
 
 class BaseSchema(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
+    @model_validator(mode="before")
+    @classmethod
+    def convert_string_nulls_to_none(cls, data: Any) -> Any:
+        """
+        Convert string representations of "null" to None in a given input.
+        Needed for Schemathesis to work properly.
+        """
+
+        if isinstance(data, dict):
+            return {
+                key: (
+                    None
+                    if (isinstance(value, str)
+                        and value.strip().lower() == "null")
+                    else value) for key, value in data.items()}
+        return data
+
 
 class DownloadQuery(BaseModel):
     download: bool = Field(
@@ -46,3 +65,8 @@ class ExtensionsType(str, Enum):
     TTL = 'ttl'
     XML = 'xml'
     NTRIPLES = 'nt'
+
+
+class IiifVersion(str, Enum):
+    V2 = "2"
+    V3 = "3"

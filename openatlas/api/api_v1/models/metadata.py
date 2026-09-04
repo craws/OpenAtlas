@@ -10,7 +10,7 @@ from openatlas.api.api_v1.models.util import BaseSchema
 
 class CaseStudyItem(BaseSchema):
     id: int
-    uuid: UUID
+    uuid: UUID | str
     name: str
     description: str | None = None
     files: list[FileItem] = Field(default_factory=list)

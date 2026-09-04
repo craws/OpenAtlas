@@ -1,9 +1,10 @@
+from typing import Literal
 from uuid import UUID
 
 from pydantic import Field
 
 from openatlas.api.api_v1.models.agent import AgentItem
-from openatlas.api.api_v1.models.util import BaseSchema
+from openatlas.api.api_v1.models.util import BaseSchema, IiifVersion
 
 
 class LicenseItem(BaseSchema):
@@ -55,7 +56,7 @@ class FileIdPath(BaseSchema):
 
 class FileIiifPath(BaseSchema):
     id: int = Field(..., description="The ID of the file.")
-    version: str = Field(..., description="The IIIF version.")
+    version: IiifVersion = Field(..., description="The IIIF version.")
 
 
 class AnnotationIiifPath(BaseSchema):
