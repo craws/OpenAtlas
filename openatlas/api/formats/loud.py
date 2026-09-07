@@ -72,29 +72,33 @@ class LoudFormatter:
 
     def get_property_key(self, link_: Link, is_inverse: bool) -> str:
         code = link_.property.code
+        key = None
         if code == 'OA7':
-            return 'participated_in'
-        if is_inverse and link_.domain.class_.name == 'external_reference':
-            return 'subject_of'
-        if not is_inverse and code == 'P67':
-            if link_.domain.class_.name == 'file':
-                return 'digitally_carries'
-            return 'refers_to'
-        if not is_inverse and code == 'P73':
-            return 'referred_to_by'
-        if code == 'P53' and link_.domain.class_.name == 'artifact':
-            return 'current_location'
-        if code == 'P2' and link_.description:
-            return 'dimension'
-        if code == 'P127':
-            return 'part' if is_inverse else 'part_of'
-        if code == 'P46':
+            key = 'participated_in'
+        elif is_inverse and link_.domain.class_.name == 'external_reference':
+            key = 'subject_of'
+        elif not is_inverse and code == 'P67':
+            key = (
+                'digitally_carries'
+                if link_.domain.class_.name == 'file'
+                else 'refers_to')
+        elif not is_inverse and code == 'P73':
+            key = 'referred_to_by'
+        elif code == 'P53' and link_.domain.class_.name == 'artifact':
+            key = 'current_location'
+        elif code == 'P2' and link_.description:
+            key = 'dimension'
+        elif code == 'P127':
+            key = 'part' if is_inverse else 'part_of'
+        elif code == 'P46':
             classes = {
                 link_.domain.class_.name,
                 link_.range.class_.name}
             if classes & {'artifact', 'human_remains'}:
-                return 'occupies' if is_inverse else 'occupied_by'
-        return self._loud_relation(link_, is_inverse)
+                key = 'occupies' if is_inverse else 'occupied_by'
+        if key is None:
+            key = self._loud_relation(link_, is_inverse)
+        return key
 
     def format_link(self, link_: Link, is_domain: bool) -> dict[str, Any]:
         target = link_.domain if is_domain else link_.range
