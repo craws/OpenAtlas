@@ -9,8 +9,6 @@ from openatlas.api.api_v1.models.metadata import CaseStudyItem, \
     CaseStudyListResponse, \
     CaseStudyPath
 from openatlas.api.api_v1.openapi_tags import metadata_tag
-from openatlas.api.api_v1.responses.metadata import case_studies_responses, \
-    case_study_responses
 from openatlas.models.entity import Entity
 
 api_v1_metadata = APIBlueprint(
@@ -36,7 +34,7 @@ def _walk_case_studies(ids: list[int]) -> list[CaseStudyItem]:
     '/case-studies',
     summary="Get case studies metadata",
     tags=[metadata_tag],
-    responses=case_studies_responses)
+    responses={200: CaseStudyListResponse})
 def get_case_studies():
     case_study_ids = g.types[g.case_study_type.id].subs
     case_studies = _walk_case_studies(case_study_ids)
@@ -47,7 +45,9 @@ def get_case_studies():
     '/case-studies/<int:id>',
     summary="Get case study metadata",
     tags=[metadata_tag],
-    responses=case_study_responses)
+    responses={
+        200: CaseStudyItem,
+        404: {"description": "Case study not found"}})
 def get_case_study_by_id(path: CaseStudyPath):
     case_study = g.types.get(path.id)
     if not case_study:

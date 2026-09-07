@@ -51,7 +51,7 @@ class EntityCountQuery(BaseSchema):
 
 
 class EntityCountResponse(BaseSchema):
-    counts: Dict[OpenAtlasClassEnum, int] = Field(
+    counts: Dict[OpenAtlasClassEnum, str] = Field(
         ...,
         description="Count of entities grouped by OpenAtlas system class.")
 

@@ -19,7 +19,7 @@ def check_file(file_id: int) -> dict[str, str | list[int]]:
                    LEFT JOIN model.link t
                              ON e.id = t.domain_id AND t.property_code = 'P2'
           WHERE e.id = %(id)s
-          GROUP BY e.openatlas_class_name; \
+          GROUP BY e.openatlas_class_name;
           """
     g.cursor.execute(sql, {'id': file_id})
     return g.cursor.fetchone()
