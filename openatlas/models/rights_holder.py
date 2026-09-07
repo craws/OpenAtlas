@@ -82,5 +82,5 @@ class RightsHolder:
         db.delete_rights_holder_links(entity_id)
 
     @staticmethod
-    def get_rights_holder_file_count() -> dict[int, int]:
+    def get_rights_holder_file_count() -> dict[int, Any]:
         return db.get_rights_holder_file_count()

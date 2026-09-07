@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, send_file
+from flask import Blueprint, Response, render_template, send_file
 from flask_cors import CORS
 from flask_restful import Api
 
@@ -33,7 +33,7 @@ app.register_blueprint(blueprint_04)
 
 
 @app.route('/openapi.json')
-def get_openapi_json():
+def get_openapi_json() -> Response:
     openapi_file = app.config['OPENAPI_FILE']
     if app.config['OPENAPI_INSTANCE_FILE'].exists():
         openapi_file = app.config['OPENAPI_INSTANCE_FILE']
@@ -41,5 +41,5 @@ def get_openapi_json():
 
 
 @app.route('/swagger')
-def get_swagger_ui():
+def get_swagger_ui() -> str:
     return render_template("swagger.html")

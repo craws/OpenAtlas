@@ -12,7 +12,8 @@ from wtforms.validators import InputRequired
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import entity_table
-from openatlas.display.util import button, link, required_group
+from openatlas.display.util import (
+    button, description, display_info, link, required_group)
 from openatlas.display.util2 import is_authorized, manual, sanitize, uc_first
 from openatlas.forms.display import display_form
 from openatlas.forms.field import SubmitField
@@ -57,21 +58,24 @@ def rights_holder_view(id_: int) -> str | Response:
                     uc_first(_(
                         'delete %(name)s?',
                         name=rights_holder.name.replace("'", "")))}?')"))
-
-    linked_files = Entity.get_files_by_rights_holder_id(id_)
-    columns = [
-        'created', 'icon', 'name', 'license', 'public', 'creator',
-        'license_holder', 'size', 'extension', 'description']
-    files_table = entity_table(linked_files, columns=columns)
+    content = \
+        f'<h1>{rights_holder.name}</h1>' + \
+        display_info({_('class'): uc_first(rights_holder.class_)}) + \
+        description(rights_holder.description)
+    table = entity_table(
+        Entity.get_files_by_rights_holder_id(id_),
+        columns=[
+            'created', 'icon', 'name', 'license', 'public', 'creator',
+            'license_holder', 'size', 'extension', 'description'])
+    crumbs = [
+        [_('rights holder'), f'{url_for("admin_index")}#tab-rights-holder'],
+        rights_holder.name]
     return render_template(
-        'util/rights_holder.html',
-        rights_holder=rights_holder,
-        files_table=files_table,
-        buttons=buttons,
-        crumbs=[
-            [_('rights holder'),
-             f'{url_for("admin_index")}#tab-rights-holder'],
-            rights_holder.name])
+        'tabs.html',
+        tabs={
+            'info': Tab('info', buttons=buttons, content=content),
+            'files': Tab('files', table=table)},
+        crumbs=crumbs)
 
 
 @app.route('/rights_holder_insert', methods=['GET', 'POST'])
