@@ -25,8 +25,7 @@ SCHEMATHESIS_ARGUMENTS = (
     "--url",
     "http://localhost:5000",
     "--phases",
-    "examples,coverage,fuzzing",
-)
+    "examples,coverage,fuzzing")
 
 
 @cache

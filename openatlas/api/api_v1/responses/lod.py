@@ -11,7 +11,7 @@ lod_responses = {
             'application/n-triples': {'schema': {'type': 'string'}},
             'application/rdf+xml': {'schema': {'type': 'string'}}}},
     404: {
-        'description': 'Entität mit dieser UUID wurde nicht gefunden',
+        'description': 'Entity not found.',
         'content': {
             'application/json': {
                 'schema': {
