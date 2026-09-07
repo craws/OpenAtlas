@@ -20,13 +20,14 @@ register_error_handlers(api_v1_metadata)
 def _walk_case_studies(ids: list[int]) -> list[CaseStudyItem]:
     items = []
     for id_ in ids:
-        item = g.types[id_]
-        items.append(CaseStudyItem(
-            id=item.id,
-            uuid=item.uuid,
-            name=item.name,
-            description=item.description,
-            sub_case_studies=_walk_case_studies(item.subs)))
+        item = g.types.get(id_)
+        if item:
+            items.append(CaseStudyItem(
+                id=item.id,
+                uuid=item.uuid,
+                name=item.name,
+                description=item.description,
+                sub_case_studies=_walk_case_studies(item.subs)))
     return items
 
 @api_v1_metadata.get(
@@ -44,9 +45,9 @@ def get_case_studies():
     '/case-studies/<int:id>',
     summary="Get case study metadata",
     tags=[metadata_tag],
-    responses={200: CaseStudyItem})
+    responses={200: CaseStudyItem, 404: {"description": "Case study not found"}})
 def get_case_study_by_id(path: CaseStudyPath):
-    case_study = g.types[path.id]
+    case_study = g.types.get(path.id)
     if not case_study:
         abort_not_found(path.id)
     return CaseStudyItem(
@@ -57,14 +58,16 @@ def get_case_study_by_id(path: CaseStudyPath):
         sub_case_studies=_walk_case_studies(case_study.subs)
     ).model_dump(by_alias=True)
 
+# todo
 @api_v1_metadata.get(
-    '/agents/',
+    '/agents',
     summary="Get agents information",
     tags=[metadata_tag],
     responses={200: AgentListResponse})
 def get_agents():
     return AgentListResponse(agents=[]).model_dump(by_alias=True)
 
+# todo
 @api_v1_metadata.get(
     '/agents/<int:id>',
     summary="Get information about an agent",

@@ -22,4 +22,7 @@ iiif_manifest_response = {
     200: {
         "description": "IIIF Manifest JSON",
         "content": {
-            "application/json": {}}}}
+            "application/json": {}}},
+    400: {"description": "Unsupported IIIF version"},
+    403: {"description": "File without license or not shareable"},
+    404: {"description": "File or annotation not found"}}

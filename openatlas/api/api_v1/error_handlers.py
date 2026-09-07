@@ -7,11 +7,11 @@ from werkzeug.exceptions import HTTPException
 import psycopg2
 
 
-def handle_db_error():
+def handle_db_error(e: object = None):
     return jsonify({
         "status": 500,
         "title": "Internal Server Error",
-        "message": "Unsuspected database error occurred."
+        "message": "Unexpected database error occurred."
     }), 500
 
 

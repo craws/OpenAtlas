@@ -2,8 +2,11 @@ from flask import send_file
 from flask_openapi3 import APIBlueprint
 
 from openatlas import app
-from openatlas.api.api_v1.error_handlers import abort_file_not_found, \
-    abort_id_does_not_exist, abort_unsupported_iiif_version
+from openatlas.api.api_v1.error_handlers import (
+    abort_file_not_found,
+    abort_id_does_not_exist,
+    abort_unsupported_iiif_version,
+    register_error_handlers)
 from openatlas.api.api_v1.util.files import check_file_access, get_file_path
 from openatlas.api.api_v1.util.iiif_manifest import (
     build_annotation,
@@ -31,6 +34,7 @@ api_v1_files = APIBlueprint(
     'api_v1_files',
     __name__,
     url_prefix='/api/1/files')
+register_error_handlers(api_v1_files)
 
 
 # Todo: check if really faster than with normal and many images

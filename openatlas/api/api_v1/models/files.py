@@ -60,4 +60,4 @@ class FileIiifPath(BaseSchema):
 
 class AnnotationIiifPath(BaseSchema):
     id: int = Field(..., description="The ID of the annotation.")
-    version: str = Field(..., description="The IIIF version.")
+    version: IiifVersion = Field(..., description="The IIIF version.")

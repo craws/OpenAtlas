@@ -11,10 +11,13 @@ from schemathesis.cli import schemathesis as schemathesis_cli
 from openatlas import app
 from openatlas.api.api_v1.util.files import check_file_access
 from openatlas.display.image_processing import check_iiif_file_exist
+from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
 
 DEFAULT_IMAGE_ID = 1
 DEFAULT_CASE_STUDY_ID = 1
+DEFAULT_AGENT_ID = 1
+DEFAULT_ANNOTATION_ID = 1
 DEFAULT_PLACE_UUID = "00000000-0000-0000-0000-000000000001"
 SCHEMATHESIS_ARGUMENTS = (
     "run",
@@ -55,6 +58,37 @@ def get_case_study_id() -> int:
 
 
 @cache
+def get_agent_id() -> int:
+    try:
+        with app.test_request_context():
+            app.preprocess_request()
+            persons = Entity.get_by_class('person')
+            if persons:
+                return persons[0].id
+            groups = Entity.get_by_class('group')
+            if groups:
+                return groups[0].id
+    except Exception:
+        return DEFAULT_AGENT_ID
+
+    return DEFAULT_AGENT_ID
+
+
+@cache
+def get_annotation_id() -> int:
+    try:
+        with app.test_request_context():
+            app.preprocess_request()
+            annotations = AnnotationImage.get_orphaned_annotations()
+            if annotations:
+                return annotations[0].id
+    except Exception:
+        return DEFAULT_ANNOTATION_ID
+
+    return DEFAULT_ANNOTATION_ID
+
+
+@cache
 def get_image_id() -> int:
     try:
         with app.test_request_context():
@@ -77,14 +111,20 @@ def before_generate_path_parameters(
         context: Any, strategy: Any) -> Any:
     path = context.operation.path
 
-    def inject_valid_ids(params: dict[str, Any]) -> dict[str, Any]:
+    def inject_valid_ids(params: Any) -> Any:
+        if not isinstance(params, dict):
+            return params
         if "id" in params:
-            if path.startswith("/api/1/files/"):
+            if path.startswith("/api/1/files/annotation/"):
+                params["id"] = get_annotation_id()
+            elif path.startswith("/api/1/files/"):
                 params["id"] = get_image_id()
             elif path.startswith("/api/1/case-studies/"):
                 params["id"] = get_case_study_id()
-            elif "/entity/" in path:
-                params["id"] = get_place_uuid()
+            elif path.startswith("/api/1/agents/"):
+                params["id"] = get_agent_id()
+        if "uuid" in params and "/entity/" in path:
+            params["uuid"] = get_place_uuid()
         return params
 
     return strategy.map(inject_valid_ids)
