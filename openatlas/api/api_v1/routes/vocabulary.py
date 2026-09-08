@@ -1,14 +1,21 @@
+import mimetypes
 from typing import Any
 
-from flask import g
+from flask import g, url_for
 from flask_openapi3 import APIBlueprint
 from pydantic import BaseModel, Field
 
+from openatlas.api.api_v04.resources.util import to_camel_case
 from openatlas.api.api_v1.error_handlers import abort_not_found, \
     register_error_handlers
-from openatlas.api.api_v1.formatters.lod_util import get_links_for_entities
+from openatlas.api.api_v1.formatters.lod_util import (
+    EntityLinks, get_iiif_manifest_and_path, get_license_type,
+    get_links_for_entities)
+from openatlas.api.api_v1.models.files import FileItem, LicenseItem
 from openatlas.api.api_v1.openapi_tags import vocabulary_tag
-from openatlas.api.api_v1.models.util import OpenAtlasClassEnum
+from openatlas.api.api_v1.models.util import ExternalReferenceSystemModel, \
+    OpenAtlasClassEnum
+from openatlas.api.api_v1.models.util import ReferenceModel
 from openatlas.api.api_v1.responses.vocabulary import \
     vocabulary_flat_response, vocabulary_list_response, \
     vocabulary_standard_by_class_response, vocabulary_tree_response
@@ -17,7 +24,7 @@ from openatlas.api.api_v1.models.vocabulary import (
     VocabularyStandardQuery,
     VocabularyTreeResponse, VocabularyStandardResponse)
 from openatlas.database.api import get_vocab_ids_for_case_study
-from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity, Link
 
 api_v1_vocabulary = APIBlueprint(
     'api_v1_vocabulary',
@@ -31,33 +38,97 @@ class VocabularyTreePath(BaseModel):
         ...,
         description="Filter the tree by a specific OpenAtlas class.")
 
+
 class VocabularyId(BaseModel):
     id: int = Field(
         ...,
         description="ID of a type")
 
-def _get_vocab_flat_item(type_: Entity, links: dict[str, Any]) -> VocabularyFlatItem:
+
+def _get_file_item(entity: Entity) -> FileItem:
+    file_ = g.files.get(entity.id)
+    mimetype, _ = mimetypes.guess_type(file_) if file_ else (None, None)
+    iiif = get_iiif_manifest_and_path(entity.id)
+    license_ = get_license_type(entity)
+    return FileItem(
+        id=entity.id,
+        uuid=entity.uuid,
+        public_shareable=entity.public,
+        license=LicenseItem(name=license_.name) if license_ else None,
+        mimetype=mimetype,
+        extension=file_.suffix if file_ else None,
+        file_url=url_for(
+            'api_v1_files.display_file', id=entity.id, _external=True),
+        thumbnail_url=url_for(
+            'api_v1_files.display_thumbnail', id=entity.id, _external=True),
+        iiif_manifest_url=iiif['IIIFManifest'] or None,
+        iiif_base_url=iiif['IIIFBasePath'] or None)
+
+
+def _get_reference_item(link_: Link) -> ReferenceModel:
+    entity = link_.domain
+    return ReferenceModel(
+        id=entity.id,
+        name=entity.name,
+        class_=entity.class_.name,
+        type=entity.standard_type.name if entity.standard_type else None,
+        pages=link_.description or None,
+        citation=entity.description)
+
+
+def _get_external_reference_item(
+        link_: Link,
+        entity: Entity) -> ExternalReferenceSystemModel:
+    return ExternalReferenceSystemModel(
+        id=entity.id,
+        name=entity.name,
+        match=to_camel_case(g.types[link_.type.id].name),
+        identifier=f'{entity.resolver_url or ''}{link_.description}',
+        description=entity.description,
+        reference_url=entity.website_url,
+        resolver_url=entity.resolver_url)
+
+
+def _get_vocab_flat_item(
+        type_: Entity,
+        links: dict[int, EntityLinks]) -> VocabularyFlatItem:
     root_entity = None
     if type_.root:
         root_entity = g.types[type_.root[0]]
     type_classes = root_entity.classes if root_entity else type_.classes
+    inverse_links = links[type_.id].links_inverse
+    image = next(
+        (_get_file_item(link_.domain) for link_ in inverse_links
+         if link_.domain.class_.name == 'file'),
+        None)
+    external_references = []
+    for link_ in inverse_links:
+        if link_.type and \
+                (entity := g.reference_systems.get(link_.domain.id)):
+            external_references.append(
+                _get_external_reference_item(link_, entity))
+    references = [
+        _get_reference_item(link_) for link_ in inverse_links
+        if link_.domain.class_.group.get('name') == 'reference'
+        and not g.reference_systems.get(link_.domain.id)]
     return VocabularyFlatItem(
-            id=type_.id,
-            uuid=type_.uuid,
-            name=type_.name,
-            description=type_.description,
-            classes=type_classes,
-            selectable=type_.selectable,
-            image=None,
-            external_references=None,
-            references=None,
-            begin=type_.dates.first if type_.dates else None,
-            end=type_.dates.last if type_.dates else None,
-            root=type_.root,
-            subs=type_.subs,
-            count=type_.count,
-            count_subs=type_.count_subs,
-            category=getattr(type_, 'category', None))
+        id=type_.id,
+        uuid=type_.uuid,
+        name=type_.name,
+        description=type_.description,
+        classes=type_classes,
+        selectable=type_.selectable,
+        image=image,
+        external_references=external_references or None,
+        references=references or None,
+        begin=type_.dates.first if type_.dates else None,
+        end=type_.dates.last if type_.dates else None,
+        root=type_.root,
+        subs=type_.subs,
+        count=type_.count,
+        count_subs=type_.count_subs,
+        category=getattr(type_, 'category', None))
+
 
 @api_v1_vocabulary.get(
     '',
@@ -67,10 +138,11 @@ def _get_vocab_flat_item(type_: Entity, links: dict[str, Any]) -> VocabularyFlat
 def get_vocabulary_list() -> dict[str, Any]:
     """Retrieves a flat list of all OpenAtlas types."""
     vocab_dict: dict[str, VocabularyFlatItem] = {}
-    links = get_links_for_entities(g.types)
+    links = get_links_for_entities(list(g.types.values()))
     for id_, type_ in g.types.items():
         vocab_dict[str(id_)] = _get_vocab_flat_item(type_, links)
     return VocabularyFlatResponse(types=vocab_dict).model_dump(by_alias=True)
+
 
 @api_v1_vocabulary.get(
     '<int:id>',
@@ -80,9 +152,9 @@ def get_vocabulary_list() -> dict[str, Any]:
 def get_vocabulary_item(path: VocabularyId) -> dict[str, Any]:
     """Retrieves information of one types."""
     type_ = g.types.get(path.id)
-    links = get_links_for_entities([type_])
     if not type_:
         abort_not_found(path.id)
+    links = get_links_for_entities([type_])
     return _get_vocab_flat_item(type_, links).model_dump(by_alias=True)
 
 

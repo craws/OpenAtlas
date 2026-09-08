@@ -4,7 +4,8 @@ from uuid import UUID
 from pydantic import Field
 
 from openatlas.api.api_v1.models.files import FileItem
-from openatlas.api.api_v1.models.util import BaseSchema, ReferenceModel
+from openatlas.api.api_v1.models.util import BaseSchema, \
+    ExternalReferenceSystemModel, ReferenceModel
 
 
 class VocabularyStandardQuery(BaseSchema):
@@ -28,7 +29,7 @@ class VocabularyFlatItem(BaseSchema):
     count: int | None = None
     count_subs: int | None = None
     category: str | None = None
-    external_references: list[ReferenceModel] | None = None
+    external_references: list[ExternalReferenceSystemModel] | None = None
     references: list[ReferenceModel] | None = None
 
 

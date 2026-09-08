@@ -71,7 +71,7 @@ class IiifVersion(str, Enum):
     V3 = "3"
 
 
-class ExternalReferenceSystemModel(BaseModel):
+class ExternalReferenceSystemModel(BaseSchema):
     id: int
     name: str
     match: str

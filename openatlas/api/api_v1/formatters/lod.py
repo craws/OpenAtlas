@@ -12,8 +12,8 @@ from openatlas.api.api_v1.formatters.lod_helpers import (
     ARCHAEOLOGY_AAT, BIBLIOGRAPHY_AAT, MIME_CLASSIFICATIONS, TYPE_OVERWRITES,
     UNIT_MAP, aat_type, category_aat, get_language, primary_name)
 from openatlas.api.api_v1.formatters.lod_util import (
-    date_to_utc_iso_str, get_iiif_manifest_and_path, get_license_type,
-    is_float, remove_spaces_dashes)
+    EntityLinks, date_to_utc_iso_str, get_iiif_manifest_and_path,
+    get_license_type, is_float, remove_spaces_dashes)
 from openatlas.api.api_v1.formatters.lod_util import (
     get_links_for_entities, get_type_references, parse_lod_context)
 from openatlas.display.util2 import get_file_path
@@ -911,12 +911,12 @@ class LodFormatter:
                 self.get_lod_timespan(entity, links_data) |
                 properties_set)
 
-    def format_entity(self, data: dict[str, Any]) -> dict[str, Any]:
-        self.geometries = data.get("geometries", {})
-        entity = data['entity']
+    def format_entity(self, data: EntityLinks) -> dict[str, Any]:
+        self.geometries = data.geometries
+        entity = data.entity
         properties_set: dict[str, Any] = defaultdict(list)
         skipped = {'OA8', 'OA9'}
-        for link_ in data['links']:
+        for link_ in data.links:
             if link_.property.code not in skipped:
                 self.process_link(
                     link_,
@@ -924,7 +924,7 @@ class LodFormatter:
                     is_inverse=False,
                     root_entity=entity)
         file_links = []
-        for link_ in data['links_inverse']:
+        for link_ in data.links_inverse:
             if link_.property.code in skipped:
                 continue
             domain = link_.domain
@@ -934,7 +934,7 @@ class LodFormatter:
             self.process_link(
                 link_, properties_set, is_inverse=True, root_entity=entity)
         self.process_media_links(file_links, properties_set, entity)
-        return self.finalize_output(entity, properties_set, data['links'])
+        return self.finalize_output(entity, properties_set, data.links)
 
 
 def format_lod_entity(entity: Entity) -> dict[str, Any]:

@@ -3,7 +3,8 @@ from pathlib import Path
 from flask import g, url_for
 
 from openatlas import app
-from tests.base import ApiTestCase, get_hierarchy
+from openatlas.models.entity import Entity
+from tests.base import ApiTestCase, get_hierarchy, insert
 
 
 
@@ -79,11 +80,42 @@ class ApiV1(ApiTestCase):
 
     def test_vocabulary(self) -> None:
         c = self.client
+        with app.test_request_context():
+            app.preprocess_request()
+            vocabulary_type = next(iter(g.types.values()))
+            file = Entity.get_by_class('file')[0]
+            file.link('P67', vocabulary_type)
+            reference_system = next(iter(g.reference_systems.values()))
+            reference_system.link(
+                'P67',
+                vocabulary_type,
+                'vocabulary-id',
+                type_id=self.precision_type.subs[0])
+            reference = insert('bibliography', 'Vocabulary reference')
+            reference.link('P67', vocabulary_type, '12-13')
         rv = c.get(url_for('api_v1_vocabulary.get_vocabulary_list'))
         assert rv.status_code == 200
         rv_json = rv.get_json()
         assert 'types' in rv_json
         assert isinstance(rv_json['types'], dict)
+        vocabulary = rv_json['types'][str(vocabulary_type.id)]
+        assert vocabulary['image']['id'] == file.id
+        assert vocabulary['externalReferences'] == [{
+            'id': reference_system.id,
+            'name': reference_system.name,
+            'match': 'closeMatch',
+            'identifier':
+                f'{reference_system.resolver_url or ''}vocabulary-id',
+            'description': reference_system.description,
+            'referenceUrl': reference_system.website_url,
+            'resolverUrl': reference_system.resolver_url}]
+        assert vocabulary['references'] == [{
+            'id': reference.id,
+            'name': reference.name,
+            'class_': 'bibliography',
+            'type': None,
+            'pages': '12-13',
+            'citation': None}]
 
         rv = c.get(url_for('api_v1_vocabulary.get_vocabulary_tree'))
         assert rv.status_code == 200

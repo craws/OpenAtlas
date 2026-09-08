@@ -4,6 +4,7 @@ import pathlib
 import re
 from collections import defaultdict
 from collections.abc import Callable
+from dataclasses import dataclass, field
 from typing import Any, Optional
 from uuid import UUID
 
@@ -24,6 +25,14 @@ from openatlas.models.entity import Entity, Link
 _DATE_PARTS_RE = re.compile(
     r'^(-?\d{4,})-(\d{2})-(\d{2})'
     r'(?:[T ](\d{2}):(\d{2}):(\d{2})(?:\.\d+)?)?Z?$')
+
+
+@dataclass
+class EntityLinks:
+    entity: Entity
+    links: list[Link] = field(default_factory=list)
+    links_inverse: list[Link] = field(default_factory=list)
+    geometries: dict[int, Any] = field(default_factory=dict)
 
 
 def date_to_utc_iso_str(date: Any) -> str | None:
@@ -74,24 +83,20 @@ def remove_spaces_dashes(string: str) -> str:
     return string.replace(' ', '').replace('-', '')
 
 
-def get_links_for_entities(entities: list[Entity]) -> dict[Any, Any]:
-    entities_with_links = {}
+def get_links_for_entities(entities: list[Entity]) -> dict[int, EntityLinks]:
+    entities_with_links: dict[int, EntityLinks] = {}
     preloaded = {e.id: e for e in entities}
     preloaded.update(g.types)
     preloaded.update(g.reference_systems)
 
     for entity in entities:
-        entities_with_links[entity.id] = {
-            'entity': entity,
-            'links': [],
-            'links_inverse': [],
-            'geometries': {}}
+        entities_with_links[entity.id] = EntityLinks(entity=entity)
 
     geom_ids = set(e.id for e in entities)
     for link_ in Entity.get_links_of_entities(
             [entity.id for entity in entities],
             preloaded_entities=preloaded):
-        entities_with_links[link_.domain.id]['links'].append(link_)
+        entities_with_links[link_.domain.id].links.append(link_)
         preloaded[link_.range.id] = link_.range
         if link_.property.code == 'P53':
             geom_ids.add(link_.range.id)
@@ -100,13 +105,13 @@ def get_links_for_entities(entities: list[Entity]) -> dict[Any, Any]:
             [entity.id for entity in entities],
             inverse=True,
             preloaded_entities=preloaded):
-        entities_with_links[link_.range.id]['links_inverse'].append(link_)
+        entities_with_links[link_.range.id].links_inverse.append(link_)
         preloaded[link_.domain.id] = link_.domain
 
     if geom_ids:
         wkts = get_wkts_by_ids(list(geom_ids))
         for id_ in entities_with_links:
-            entities_with_links[id_]['geometries'] = wkts
+            entities_with_links[id_].geometries = wkts
 
     return entities_with_links
 
