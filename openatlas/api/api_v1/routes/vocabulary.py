@@ -4,17 +4,20 @@ from flask import g
 from flask_openapi3 import APIBlueprint
 from pydantic import BaseModel, Field
 
-from openatlas.api.api_v1.error_handlers import register_error_handlers
+from openatlas.api.api_v1.error_handlers import abort_not_found, \
+    register_error_handlers
+from openatlas.api.api_v1.formatters.lod_util import get_links_for_entities
 from openatlas.api.api_v1.openapi_tags import vocabulary_tag
 from openatlas.api.api_v1.models.util import OpenAtlasClassEnum
 from openatlas.api.api_v1.responses.vocabulary import \
-    vocabulary_list_response, \
+    vocabulary_flat_response, vocabulary_list_response, \
     vocabulary_standard_by_class_response, vocabulary_tree_response
 from openatlas.api.api_v1.models.vocabulary import (
     VocabularyFlatItem, VocabularyTreeItem, VocabularyFlatResponse,
     VocabularyStandardQuery,
     VocabularyTreeResponse, VocabularyStandardResponse)
 from openatlas.database.api import get_vocab_ids_for_case_study
+from openatlas.models.entity import Entity
 
 api_v1_vocabulary = APIBlueprint(
     'api_v1_vocabulary',
@@ -28,6 +31,33 @@ class VocabularyTreePath(BaseModel):
         ...,
         description="Filter the tree by a specific OpenAtlas class.")
 
+class VocabularyId(BaseModel):
+    id: int = Field(
+        ...,
+        description="ID of a type")
+
+def _get_vocab_flat_item(type_: Entity, links: dict[str, Any]) -> VocabularyFlatItem:
+    root_entity = None
+    if type_.root:
+        root_entity = g.types[type_.root[0]]
+    type_classes = root_entity.classes if root_entity else type_.classes
+    return VocabularyFlatItem(
+            id=type_.id,
+            uuid=type_.uuid,
+            name=type_.name,
+            description=type_.description,
+            classes=type_classes,
+            selectable=type_.selectable,
+            image=None,
+            external_references=None,
+            references=None,
+            begin=type_.dates.first if type_.dates else None,
+            end=type_.dates.last if type_.dates else None,
+            root=type_.root,
+            subs=type_.subs,
+            count=type_.count,
+            count_subs=type_.count_subs,
+            category=getattr(type_, 'category', None))
 
 @api_v1_vocabulary.get(
     '',
@@ -37,25 +67,23 @@ class VocabularyTreePath(BaseModel):
 def get_vocabulary_list() -> dict[str, Any]:
     """Retrieves a flat list of all OpenAtlas types."""
     vocab_dict: dict[str, VocabularyFlatItem] = {}
+    links = get_links_for_entities(g.types)
     for id_, type_ in g.types.items():
-        vocab_dict[str(id_)] = VocabularyFlatItem(
-            id=type_.id,
-            uuid=type_.uuid,
-            name=type_.name,
-            description=type_.description,
-            classes=type_.classes,
-            selectable=type_.selectable,
-            image_id=type_.image_id,
-            first=type_.dates.first
-            if hasattr(type_, 'dates') and type_.dates else None,
-            last=type_.dates.last
-            if hasattr(type_, 'dates') and type_.dates else None,
-            root=type_.root,
-            subs=type_.subs,
-            count=type_.count,
-            count_subs=type_.count_subs,
-            category=getattr(type_, 'category', None))
+        vocab_dict[str(id_)] = _get_vocab_flat_item(type_, links)
     return VocabularyFlatResponse(types=vocab_dict).model_dump(by_alias=True)
+
+@api_v1_vocabulary.get(
+    '<int:id>',
+    summary="Get information of one type",
+    responses=vocabulary_flat_response,
+    tags=[vocabulary_tag])
+def get_vocabulary_item(path: VocabularyId) -> dict[str, Any]:
+    """Retrieves information of one types."""
+    type_ = g.types.get(path.id)
+    links = get_links_for_entities([type_])
+    if not type_:
+        abort_not_found(path.id)
+    return _get_vocab_flat_item(type_, links).model_dump(by_alias=True)
 
 
 def _walk_tree(

@@ -3,7 +3,8 @@ from uuid import UUID
 
 from pydantic import Field
 
-from openatlas.api.api_v1.models.util import BaseSchema
+from openatlas.api.api_v1.models.files import FileItem
+from openatlas.api.api_v1.models.util import BaseSchema, ReferenceModel
 
 
 class VocabularyStandardQuery(BaseSchema):
@@ -17,16 +18,18 @@ class VocabularyFlatItem(BaseSchema):
     uuid: UUID
     name: str
     description: str | None = None
-    image_id: int | None = None
+    image: FileItem | None = None
     selectable: bool | None = None
     classes: list[str] | None = None
-    first: int | None = None
-    last: int | None = None
+    begin: int | None = None
+    end: int | None = None
     root: list[int] | None = None
     subs: list[int] | None = None
     count: int | None = None
     count_subs: int | None = None
     category: str | None = None
+    external_references: list[ReferenceModel] | None = None
+    references: list[ReferenceModel] | None = None
 
 
 class VocabularyFlatResponse(BaseSchema):

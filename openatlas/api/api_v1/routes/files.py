@@ -155,7 +155,7 @@ def get_iiif_annotation(path: AnnotationIiifPath):
     check_file_access(annotation.image_id)
     return build_annotation(annotation, version=int(path.version))
 
-
+# todo
 @api_v1_files.get(
     '/licensed',
     summary="Get licensed files overview",

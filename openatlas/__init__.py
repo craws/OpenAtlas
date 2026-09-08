@@ -119,7 +119,7 @@ def before_request() -> Response | None:
 
 
 def setup_files() -> None:
-    if (request.endpoint or "") in ('get_vocabulary', 'display_file'):
+    if (request.endpoint or "") in 'display_file':
         return
     from openatlas.models.rights_holder import RightsHolder
     g.files = {}
@@ -161,7 +161,7 @@ def count_type() -> bool:
     prefixes = [
         '/index/type',
         '/orphans',
-        '/api/1/system/types',
+        '/api/1/vocabulary',
         '/api/type_tree',
         *[f'/api/{v}/type_tree' for v in app.config['API_VERSIONS']]]
     if request.path.startswith(tuple(prefixes)):

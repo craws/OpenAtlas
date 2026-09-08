@@ -4,7 +4,6 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 from pydantic.alias_generators import to_camel
 
-
 class BaseSchema(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
@@ -70,3 +69,22 @@ class ExtensionsType(str, Enum):
 class IiifVersion(str, Enum):
     V2 = "2"
     V3 = "3"
+
+
+class ExternalReferenceSystemModel(BaseModel):
+    id: int
+    name: str
+    match: str
+    identifier: str | None = None
+    description: str | None = None
+    reference_url: str | None = None
+    resolver_url: str | None = None
+
+
+class ReferenceModel(BaseModel):
+    id: int
+    name: str
+    class_: str
+    type: str | None = None
+    pages: str | None = None
+    citation: str | None = None
