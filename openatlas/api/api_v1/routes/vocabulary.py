@@ -107,6 +107,7 @@ def _get_vocab_flat_item(
                 (entity := g.reference_systems.get(link_.domain.id)):
             external_references.append(
                 _get_external_reference_item(link_, entity))
+    # todo: fix references, it now receives all refenrencen, which has this type, not all references FOR this type
     references = [
         _get_reference_item(link_) for link_ in inverse_links
         if link_.domain.class_.group.get('name') == 'reference'
