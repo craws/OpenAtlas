@@ -1,8 +1,9 @@
-# Used to join data from OpenAtlas projects to the demo version
+# Used to join data from OpenAtlas projects
 # Before running the script make sure you have configured the db to write to in
 # instance/production.py
 
-# This is work in progress: to do
+# Work in progress, to do:
+# * Add case studies (if available)
 # * Import new hierarchies and subs
 # * What about place locations?
 # * Link everything
@@ -19,8 +20,11 @@ from openatlas import app
 from openatlas.models.entity import Entity
 
 DATABASE_NAME = 'openatlas_demo'  # The database to fetch data from
-PROJECT_ID = 1
-IMPORT_USER_ID = 2
+PROJECT_NAME = 'MEDCON'  # Will also be added as case study
+PROJECT_DESCRIPTION = \
+    'Mapping Medieval Conflicts (MEDCON). A digital approach towards ' \
+    'political dynamics in the pre-modern period.'
+IMPORT_USER_ID = 1
 
 
 def connect() -> Any:
@@ -37,10 +41,7 @@ connection = connect()
 cursor = connection.cursor(cursor_factory=extras.DictCursor)
 id_map: dict[int, int] = {}  # Map imported entity ids to existing ones
 
-
-def cleanup() -> None:
-    with app.test_request_context():
-        app.preprocess_request()
+def cleanup(project_id: int) -> None:
         g.cursor.execute(
             """
             DELETE FROM model.entity
@@ -48,11 +49,22 @@ def cleanup() -> None:
                 SELECT entity_id
                 FROM import.entity
                 WHERE project_id = %(project_id)s);
-            """, {'project_id': PROJECT_ID})
+            """, {'project_id': project_id})
         g.cursor.execute(
             'DELETE FROM import.entity WHERE project_id = %(project_id)s;',
-            {'project_id': PROJECT_ID})
+            {'project_id': project_id})
 
+def insert_project() -> int:
+    g.cursor.execute(
+        """
+        INSERT INTO import.project (name, description)
+        VALUES (%(name)s, %(description)s)
+        ON CONFLICT (name)
+            DO UPDATE SET description = %(description)s
+        RETURNING id;
+        """,
+        {'name': PROJECT_NAME, 'description': PROJECT_DESCRIPTION})
+    return g.cursor.fetchone()['id']
 
 def hierarchies() -> None:
     cursor.execute(
@@ -66,20 +78,19 @@ def hierarchies() -> None:
             modified,
             category,
             required
-        FROM web.hierarchy;
+        FROM
+            web.hierarchy;
         """)
-    with app.test_request_context():
-        app.preprocess_request()
-        for item in list(cursor):
-            exists = False
-            try:
-                if existing := Entity.get_hierarchy(item['name']):
-                    exists = True
-                    print(f'Hierarchy exists: {existing.name}')
-            except IndexError:
-                pass
-            if not exists:
-                insert_hierarchy(item)
+    for item in list(cursor):
+        exists = False
+        try:
+            if existing := Entity.get_hierarchy(item['name']):
+                exists = True
+                print(f'Hierarchy exists: {existing.name}')
+        except IndexError:
+            pass
+        if not exists:
+            insert_hierarchy(item)
 
 
 def insert_hierarchy(item: dict[str, Any]) -> None:
@@ -102,9 +113,11 @@ def insert_hierarchy(item: dict[str, Any]) -> None:
     #    [x[0] for x in list(cursor)],
     #   item['multiple'])
 
-
-cleanup()
-hierarchies()
+with app.test_request_context():
+    app.preprocess_request()
+    project_id = insert_project()
+    cleanup(project_id)
+    hierarchies()
 
 cursor.execute(
     """
@@ -121,13 +134,13 @@ cursor.execute(
         end_to,
         end_comment,
         openatlas_class_name
-    FROM model.entity;
+    FROM
+        model.entity;
     """)
 with app.test_request_context():
     app.preprocess_request()
     # for row in list(cursor):
     #     if row['openatlas_class_name'] not in [
-    #             'administrative_unit',
     #             'type',
     #             'type_tools']:
     #         entity = insert(
