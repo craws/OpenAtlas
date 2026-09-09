@@ -360,9 +360,9 @@ class Display:
     def add_button_delete(self) -> None:
         if not deletion_possible(self.entity):
             return
-        msg = _(
+        msg = uc_first(_(
             'delete %(name)s?',
-            name=escape(self.entity.name.replace('\'', '')))
+            name=escape(self.entity.name.replace('\'', ''))))
         self.buttons.append(
             button(
                 _('delete'),
@@ -384,7 +384,7 @@ class Display:
     def add_button_sibling_pager(self) -> None:
         prev_id = None
         next_id = None
-        position = None
+        position = 0
         self.structure['siblings'].sort(key=lambda x: x.id)
         for counter, sibling in enumerate(self.structure['siblings']):
             position = counter + 1

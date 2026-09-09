@@ -132,6 +132,98 @@ def transliterate_url(url: str) -> str:
         parsed.fragment))
 
 
+def add_person_role(
+        graph: Graph,
+        subject_uri: URIRef,
+        names: str | list[str] | None,
+        predicate: Any) -> None:
+    if not names:
+        return
+    ensure_person_exist(graph, names)
+    for uri in create_uri(names):
+        graph.add((subject_uri, predicate, uri))
+
+
+def add_entity_role(
+        graph: Graph,
+        subject_uri: URIRef,
+        entities: list[Entity] | None,
+        predicate: Any) -> None:
+    if not entities:
+        return
+    for entity in entities:
+        ensure_person_exist(graph, entity.name, entity)
+        graph.add((subject_uri, predicate, create_single_uri(entity.name)))
+
+
+def add_scalar_metadata(
+        graph: Graph,
+        subject_uri: URIRef,
+        metadata: ArcheFileMetadata) -> None:
+    scalar_metadata = (
+        ('license', ACDH.hasLicense, URIRef),
+        ('is_part_of', ACDH.isPartOf, URIRef),
+        ('accepted_date', ACDH.hasAcceptedDate,
+         lambda value: Literal(value, datatype=XSD.date)),
+        ('language', ACDH.hasLanguage, URIRef),
+        ('transfer_date', ACDH.hasTransferDate,
+         lambda value: Literal(value, datatype=XSD.date)),
+        ('binary_size', ACDH.hasBinarySize,
+         lambda value: Literal(value, datatype=XSD.integer)))
+    for attribute, predicate, value_factory in scalar_metadata:
+        if value := getattr(metadata, attribute):
+            graph.add((subject_uri, predicate, value_factory(value)))
+
+
+def add_language_literals(
+        graph: Graph,
+        subject_uri: URIRef,
+        values: list[tuple[Any, str]] | None,
+        predicate: Any) -> None:
+    if not values:
+        return
+    for text, language in values:
+        graph.add((subject_uri, predicate, Literal(text, lang=language)))
+
+
+def add_related_disciplines(
+        graph: Graph,
+        subject_uri: URIRef,
+        disciplines: str | list[str] | None) -> None:
+    if not disciplines:
+        return
+    for discipline in create_uri(disciplines):
+        graph.add((subject_uri, ACDH.hasRelatedDiscipline, discipline))
+
+
+def add_related_entities(
+        graph: Graph,
+        subject_uri: URIRef,
+        entities: list[dict[str, str | list[str]]] | None,
+        entity_type: Any,
+        predicate: Any) -> None:
+    if not entities:
+        return
+    for entity in entities:
+        ensure_entity_exist(graph, entity_type, entity)
+        for uri in create_uri(entity['id']):
+            graph.add((subject_uri, predicate, uri))
+
+
+def add_publications(
+        graph: Graph,
+        subject_uri: URIRef,
+        publications: list[tuple[Entity, str]] | None) -> None:
+    if not publications:
+        return
+    for publication, pages in publications:
+        ensure_publication_exist(graph, publication, pages)
+        graph.add((
+            subject_uri,
+            ACDH.isSourceOf,
+            create_single_uri(str(publication.id))))
+
+
 def add_arche_file_metadata_to_graph(
         graph: Graph,
         metadata: ArcheFileMetadata) -> None:
@@ -142,101 +234,30 @@ def add_arche_file_metadata_to_graph(
     for title_text, lang in metadata.titles:
         graph.add((subject_uri, ACDH.hasTitle, Literal(title_text, lang=lang)))
 
-    if metadata.depositors:
-        ensure_person_exist(graph, metadata.depositors)
-        for uri in create_uri(metadata.depositors):
-            graph.add((subject_uri, ACDH.hasDepositor, uri))
+    add_scalar_metadata(graph, subject_uri, metadata)
+    for attribute, predicate in (
+            ('depositors', ACDH.hasDepositor),
+            ('curators', ACDH.hasCurator),
+            ('principal_investigators', ACDH.hasPrincipalInvestigator),
+            ('metadata_creators', ACDH.hasMetadataCreator)):
+        add_person_role(
+            graph, subject_uri, getattr(metadata, attribute), predicate)
+    for attribute, predicate in (
+            ('licensors', ACDH.hasLicensor),
+            ('rights_holders', ACDH.hasRightsHolder),
+            ('creators', ACDH.hasCreator)):
+        add_entity_role(
+            graph, subject_uri, getattr(metadata, attribute), predicate)
 
-    if metadata.license:
-        graph.add((subject_uri, ACDH.hasLicense, URIRef(metadata.license)))
-
-    if metadata.licensors:
-        for e in metadata.licensors:
-            ensure_person_exist(graph, e.name, e)
-        for uri in create_uri([e.name for e in metadata.licensors]):
-            graph.add((subject_uri, ACDH.hasLicensor, uri))
-
-    if metadata.rights_holders:
-        for e in metadata.rights_holders:
-            ensure_person_exist(graph, e.name, e)
-        for uri in create_uri([e.name for e in metadata.rights_holders]):
-            graph.add((subject_uri, ACDH.hasRightsHolder, uri))
-
-    if metadata.creators:
-        for e in metadata.creators:
-            ensure_person_exist(graph, e.name, e)
-        for uri in create_uri([e.name for e in metadata.creators]):
-            graph.add((subject_uri, ACDH.hasCreator, uri))
-
-    if metadata.is_part_of:
-        graph.add((subject_uri, ACDH.isPartOf, URIRef(metadata.is_part_of)))
-
-    if metadata.accepted_date:
-        graph.add((
-            subject_uri,
-            ACDH.hasAcceptedDate,
-            Literal(metadata.accepted_date, datatype=XSD.date)))
-
-    if metadata.curators:
-        ensure_person_exist(graph, metadata.curators)
-        for uri in create_uri(metadata.curators):
-            graph.add((subject_uri, ACDH.hasCurator, uri))
-
-    if metadata.descriptions:
-        for desc_text, lang in metadata.descriptions:
-            graph.add((
-                subject_uri,
-                ACDH.hasDescription,
-                Literal(desc_text, lang=lang)))
-
-    if metadata.language:
-        graph.add((subject_uri, ACDH.hasLanguage, URIRef(metadata.language)))
-
-    if metadata.principal_investigators:
-        ensure_person_exist(graph, metadata.principal_investigators)
-        for uri in create_uri(metadata.principal_investigators):
-            graph.add((subject_uri, ACDH.hasPrincipalInvestigator, uri))
-
-    if metadata.related_disciplines:
-        for related_discipline in metadata.related_disciplines:
-            graph.add((
-                subject_uri,
-                ACDH.hasRelatedDiscipline,
-                URIRef(related_discipline)))
-
-    if metadata.transfer_date:
-        graph.add((
-            subject_uri,
-            ACDH.hasTransferDate,
-            Literal(metadata.transfer_date, datatype=XSD.date)))
-
-    if metadata.binary_size:
-        graph.add((
-            subject_uri,
-            ACDH.hasBinarySize,
-            Literal(metadata.binary_size, datatype=XSD.integer)))
-
-    if metadata.metadata_creators:
-        ensure_person_exist(graph, metadata.metadata_creators)
-        for uri in create_uri(metadata.metadata_creators):
-            graph.add((subject_uri, ACDH.hasMetadataCreator, uri))
-
-    if metadata.actors:
-        for actor in metadata.actors:
-            ensure_entity_exist(graph, ACDH.Person, actor)
-            for uri in create_uri(actor['id']):
-                graph.add((subject_uri, ACDH.hasActor, uri))
-
-    if metadata.spatial_coverages:
-        for place in metadata.spatial_coverages:
-            ensure_entity_exist(graph, ACDH.Place, place)
-            for uri in create_uri(place['id']):
-                graph.add((subject_uri, ACDH.hasSpatialCoverage, uri))
-
-    if metadata.has_publications:
-        for publication in metadata.has_publications:
-            ensure_publication_exist(graph, publication[0], publication[1])
-            graph.add((
-                subject_uri,
-                ACDH.isSourceOf,
-                create_single_uri(str(publication[0].id))))
+    add_language_literals(
+        graph, subject_uri, metadata.descriptions, ACDH.hasDescription)
+    add_related_disciplines(graph, subject_uri, metadata.related_disciplines)
+    add_related_entities(
+        graph, subject_uri, metadata.actors, ACDH.Person, ACDH.hasActor)
+    add_related_entities(
+        graph,
+        subject_uri,
+        metadata.spatial_coverages,
+        ACDH.Place,
+        ACDH.hasSpatialCoverage)
+    add_publications(graph, subject_uri, metadata.has_publications)
