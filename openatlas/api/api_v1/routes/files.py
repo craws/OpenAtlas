@@ -1,4 +1,6 @@
-from flask import send_file
+from pathlib import Path
+
+from flask import send_file, redirect, g
 from flask_openapi3 import APIBlueprint
 
 from openatlas import app
@@ -8,6 +10,9 @@ from openatlas.api.api_v1.error_handlers import (
     abort_unsupported_iiif_version,
     register_error_handlers)
 from openatlas.api.api_v1.util.files import check_file_access, get_file_path
+from openatlas.display.image_processing import (
+    check_iiif_activation,
+    check_iiif_file_exist)
 from openatlas.api.api_v1.util.iiif_manifest import (
     build_annotation,
     build_annotation_list,
@@ -37,8 +42,28 @@ api_v1_files = APIBlueprint(
 register_error_handlers(api_v1_files)
 
 
-# Todo: check if really faster than with normal and many images
-#   if not, delete this function
+def get_iiif_redirect_url(
+        file_id: int,
+        file_path: Path,
+        is_thumbnail: bool = False) -> str | None:
+    if not g.settings.get('iiif') or not check_iiif_activation():
+        return None
+
+    if file_path.suffix.lower() not in g.display_file_ext:
+        return None
+
+    if not check_iiif_file_exist(file_id):
+        return None
+
+    iiif_ext = '.tiff' if g.settings.get('iiif_conversion') \
+        else file_path.suffix
+    iiif_base = f"{g.settings.get('iiif_url', '')}{file_id}{iiif_ext}"
+
+    if is_thumbnail:
+        size = app.config['IMAGE_SIZE']['thumbnail']
+        return f"{iiif_base}/full/!{size},{size}/0/default.jpg"
+
+    return f"{iiif_base}/full/max/0/default.jpg"
 
 
 @api_v1_files.get(
@@ -49,10 +74,19 @@ register_error_handlers(api_v1_files)
 def display_file(path: FileIdPath, query: DownloadQuery):
     """Serves the binary image file."""
     file_id = path.id
-    path = get_file_path(file_id, app.config['UPLOAD_PATH'])
-    if not path:
+    actual_path = get_file_path(file_id, app.config['UPLOAD_PATH'])
+    if not actual_path:
         abort_file_not_found(file_id)
-    return send_file(path, as_attachment=bool(query.download))
+
+    if not query.download:
+        iiif_url = get_iiif_redirect_url(
+            file_id,
+            actual_path,
+            is_thumbnail=False)
+        if iiif_url:
+            return redirect(iiif_url)
+
+    return send_file(actual_path, as_attachment=bool(query.download))
 
 
 @api_v1_files.get(
@@ -63,12 +97,25 @@ def display_file(path: FileIdPath, query: DownloadQuery):
 def display_thumbnail(path: FileIdPath, query: DownloadQuery):
     """Serves the static, pre-calculated thumbnail image."""
     file_id = path.id
-    path = get_file_path(
+    original_path = get_file_path(file_id, app.config['UPLOAD_PATH'])
+    if not original_path:
+        abort_file_not_found(file_id)
+
+    if not query.download:
+        iiif_url = get_iiif_redirect_url(
+            file_id,
+            original_path,
+            is_thumbnail=True)
+        if iiif_url:
+            return redirect(iiif_url)
+
+    thumbnail_path = get_file_path(
         file_id,
         app.config['RESIZED_IMAGES'] / app.config['IMAGE_SIZE']['thumbnail'])
-    if not path:
+    if not thumbnail_path:
         abort_file_not_found(file_id)
-    return send_file(path, as_attachment=bool(query.download))
+
+    return send_file(thumbnail_path, as_attachment=bool(query.download))
 
 
 @api_v1_files.get(
