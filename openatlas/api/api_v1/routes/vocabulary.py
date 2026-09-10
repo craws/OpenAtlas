@@ -189,7 +189,10 @@ def _walk_tree(
             id=item.id,
             uuid=item.uuid,
             name=item.name.replace("'", "&apos;"),
-            classes=item.classes or None,
+            selectable=item.selectable,
+            classes=item.classes,
+            entity_count=item.count,
+            entity_count_subs=item.count_subs,
             children=children))
     return items
 

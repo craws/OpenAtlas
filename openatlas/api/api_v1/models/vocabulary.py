@@ -57,8 +57,7 @@ class VocabularyFlatItem(BaseSchema):
         description="Number of entities directly linked to this exact type.")
     entity_count_subs: int = Field(
         default=0,
-        description="Number of entities linked to this type or any of its "
-                    "descendants.")
+        description="Number of entities linked to any of its descendants.")
     external_references: list[ExternalReferenceSystemModel] = Field(
         default_factory=list,
         description="Links to external authority systems "
@@ -76,8 +75,22 @@ class VocabularyTreeItem(BaseSchema):
     id: int
     uuid: UUID
     name: str
-    classes: list[str] | None = None
-    children: list['VocabularyTreeItem'] = Field(default_factory=list)
+    selectable: bool = Field(
+        default=True,
+        description="Whether this node can be selected/assigned or serves "
+                    "only as a category folder.")
+    classes: list[str] = Field(
+        default_factory=list,
+        description="Entity classes this type is valid for.")
+    entity_count: int = Field(
+        default=0,
+        description="Number of entities directly linked to this exact type.")
+    entity_count_subs: int = Field(
+        default=0,
+        description="Number of entities linked to any of its descendants.")
+    children: list["VocabularyTreeItem"] = Field(
+            default_factory=list,
+            description="Nested child nodes.")
 
 
 class VocabularyTreeResponse(BaseSchema):
