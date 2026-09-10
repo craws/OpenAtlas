@@ -113,7 +113,8 @@ def _get_vocab_flat_item(
     inverse_links = links[type_.id].links_inverse
     image = next(
         (_get_file_item(link_.domain) for link_ in inverse_links
-         if link_.domain.class_.name == 'file'),
+         if link_.domain.class_.name == 'file'
+         and link_.property.code == 'P67'),
         None)
     external_references = []
     for link_ in inverse_links:
