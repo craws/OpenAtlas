@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from pydantic import Field, HttpUrl
+from pydantic import Field
 
 from openatlas.api.api_v1.models.agent import AgentItem
 from openatlas.api.api_v1.models.util import BaseSchema, IiifVersion
@@ -11,7 +11,7 @@ class LicenseItem(BaseSchema):
     name: str = Field(
         description="Display name of the license.",
         examples=["CC BY 4.0", "Public Domain Mark 1.0"])
-    # url: HttpUrl | None = Field(
+    # url: str | None = Field(
     #     description="Official link to the legal deed or license text.",
     #     examples=["https://creativecommons.org/licenses/by/4.0/"])
 
@@ -38,19 +38,19 @@ class FileItem(BaseSchema):
         default=None,
         description="File extension without leading dot.",
         examples=["jpg", "pdf"])
-    file_url: HttpUrl | None = Field(
+    file_url: str | None = Field(
         default=None,
         description="Direct URL to the original binary file.",
         examples=["https://example.org/files/original/123.jpg"])
-    thumbnail_url: HttpUrl | None = Field(
+    thumbnail_url: str | None = Field(
         default=None,
         description="URL to a static, pre-calculated preview image.",
         examples=["https://example.org/files/thumbs/123.jpg"], )
-    iiif_manifest_url: HttpUrl | None = Field(
+    iiif_manifest_url: str | None = Field(
         default=None,
         description="URL to the IIIF Presentation API Manifest.",
         examples=["https://example.org/iiif/123/manifest.json"])
-    iiif_base_url: HttpUrl | None = Field(
+    iiif_base_url: str | None = Field(
         default=None,
         description="Base URL for IIIF Image API operations (without "
                     "trailing slash).",

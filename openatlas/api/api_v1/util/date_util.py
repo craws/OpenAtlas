@@ -96,4 +96,3 @@ def get_timespan_dict(dates: Dates | None) -> TimeSpan | None:
         time['end'] = {k: v for k, v in end.items() if v}
 
     return TimeSpan.model_validate(time) if time else None
-

@@ -8,7 +8,6 @@ from openatlas.api.api_v1.models.util import BaseSchema, OpenAtlasClassEnum
 class ImageProcessingInfo(BaseSchema):
     enabled: bool
     available_image_sizes: Dict[str, str] = Field(
-        ...,
         json_schema_extra={
             "example": {"thumbnail": "200px", "table": "100px"}})
 
@@ -28,14 +27,12 @@ class MapConfig(BaseSchema):
 
 class SystemInfoResponse(BaseSchema):
     version: str = Field(
-        ...,
         description="OpenAtlas Core Version")
     api_versions: list[str]
     site_name: str
     logo_file_id: int | None = None
     default_language: str
     module_time: bool = Field(
-        ...,
         description="Whether the time module (hours, minutes, seconds) is "
                     "enabled.")
 
@@ -51,8 +48,7 @@ class EntityCountQuery(BaseSchema):
 
 
 class EntityCountResponse(BaseSchema):
-    counts: Dict[OpenAtlasClassEnum, str] = Field(
-        ...,
+    counts: dict[OpenAtlasClassEnum, int] = Field(
         description="Count of entities grouped by OpenAtlas system class.")
 
 

@@ -5,7 +5,7 @@ from pydantic import Field
 
 from openatlas.api.api_v1.models.files import FileItem
 from openatlas.api.api_v1.models.util import BaseSchema, \
-    TimeSpan, ExternalReferenceSystemModel, ReferenceModel
+    TimeSpan, ExternalReferenceSystemModel, ReferenceModel, TypeCategoryEnum
 
 
 class VocabularyStandardQuery(BaseSchema):
@@ -14,22 +14,58 @@ class VocabularyStandardQuery(BaseSchema):
         description="Filter types by a specific case study ID.")
 
 
+class LinkedTypeItem(BaseSchema):
+    id: int
+    name: str
+
+
 class VocabularyFlatItem(BaseSchema):
     id: int
     uuid: UUID
     name: str
+    class_name: str = Field(
+        default="type",
+        serialization_alias="class",
+        description="The OpenAtlas class.")
+    category: TypeCategoryEnum | None = Field(
+        default=None,
+        description="Categorization of the type.")
     description: str | None = None
-    image: FileItem | None = None
-    selectable: bool | None = None
-    classes: list[str] | None = None
-    timespan: TimeSpan | None = None
-    root: list[int] | None = None
-    sub_types: list[int] | None = None
-    entity_count: int | None = None
-    entity_count_subs: int | None = None
-    category: str | None = None
-    external_references: list[ExternalReferenceSystemModel] | None = None
-    references: list[ReferenceModel] | None = None
+    image: FileItem | None = Field(
+        default=None,
+        description="Primary representative image for the type.")
+    selectable: bool = Field(
+        default=True,
+        description="Whether this type can be directly assigned to an "
+                    "entity or serves only as a structural grouping node.")
+    classes: list[str] = Field(
+        default_factory=list,
+        description="Entity classes this type can be assigned to "
+                    "(e.g. 'artifact', 'place').",
+        examples=[["artifact", "source"]])
+    timespan: TimeSpan | None = Field(
+        default=None,
+        description="Temporal validity or usage period.")
+    parents: list[LinkedTypeItem] = Field(
+        default_factory=list,
+        description="Immediate parent types for breadcrumbs.")
+    sub_types: list[LinkedTypeItem] = Field(
+        default_factory=list,
+        description="Direct sub-types under this node.")
+    entity_count: int = Field(
+        default=0,
+        description="Number of entities directly linked to this exact type.")
+    entity_count_subs: int = Field(
+        default=0,
+        description="Number of entities linked to this type or any of its "
+                    "descendants.")
+    external_references: list[ExternalReferenceSystemModel] = Field(
+        default_factory=list,
+        description="Links to external authority systems "
+                    "(Wikidata, Getty AAT, etc.).")
+    references: list[ReferenceModel] = Field(
+        default_factory=list,
+        description="Bibliographic references and literature citations.")
 
 
 class VocabularyFlatResponse(BaseSchema):

@@ -80,6 +80,7 @@ def get_agent_by_id(path: AgentPath):
     if not entity:
         abort_not_found(path.id)
     return AgentItem(
+        id=entity.id,
         name=entity.name,
-        class_name='person' if entity.class_.name == 'person' else 'group',
+        class_name=entity.class_.name,
         description=entity.description).model_dump(by_alias=True)

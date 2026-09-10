@@ -1,7 +1,7 @@
 from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, HttpUrl, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from pydantic.alias_generators import to_camel
 
 
@@ -104,6 +104,16 @@ class MatchTypeEnum(str, Enum):
     CLOSE_MATCH = "closeMatch"
 
 
+class TypeCategoryEnum(str, Enum):
+    STANDARD = "standard"
+    CUSTOM = "custom"
+    PLACE = "place"
+    VALUE = "value"
+    SYSTEM = "system"
+    TOOL = "tool"
+    TOOLS = "tools"
+
+
 class ExternalReferenceSystemModel(BaseModel):
     id: int
     name: str = Field(examples=["Wikidata", "Getty AAT"])
@@ -113,7 +123,7 @@ class ExternalReferenceSystemModel(BaseModel):
         examples=["A free and open knowledge base and common source of open "
                   "data providing persistent identifier and links to other "
                   "sources."])
-    url: HttpUrl | None = Field(
+    url: str | None = Field(
         None,
         description="Direct link to the external entity.",
         examples=["https://www.wikidata.org/wiki/Q513532"])
@@ -125,7 +135,7 @@ class ExternalReferenceSystemModel(BaseModel):
     match_type: MatchTypeEnum = Field(
         default=MatchTypeEnum.EXACT_MATCH,
         description="SKOS matching property.")
-    system_url: HttpUrl | None = Field(
+    system_url: str | None = Field(
         None,
         description="Main homepage URL of the authority file provider.",
         examples=["https://www.wikidata.org"])

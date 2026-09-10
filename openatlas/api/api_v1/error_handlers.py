@@ -11,7 +11,7 @@ def handle_db_error(e):
     return jsonify({
         "status": 500,
         "title": "Internal Server Error",
-        "message": f"Unexpected database error occurred"
+        "message": "Unexpected database error occurred"
     }), e.code
 
 

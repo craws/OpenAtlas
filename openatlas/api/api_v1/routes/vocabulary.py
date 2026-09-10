@@ -16,12 +16,13 @@ from openatlas.api.api_v1.models.files import FileItem, LicenseItem
 from openatlas.api.api_v1.openapi_tags import vocabulary_tag
 from openatlas.api.api_v1.models.util import (
     ExternalReferenceSystemModel, MatchTypeEnum, OpenAtlasClassEnum,
-    ReferenceModel)
+    ReferenceModel, TypeCategoryEnum)
 from openatlas.api.api_v1.responses.vocabulary import \
     vocabulary_flat_response, vocabulary_list_response, \
     vocabulary_standard_by_class_response, vocabulary_tree_response
 from openatlas.api.api_v1.models.vocabulary import (
-    VocabularyFlatItem, VocabularyTreeItem, VocabularyFlatResponse,
+    LinkedTypeItem, VocabularyFlatItem, VocabularyTreeItem,
+    VocabularyFlatResponse,
     VocabularyStandardQuery,
     VocabularyTreeResponse, VocabularyStandardResponse)
 from openatlas.api.api_v1.util.date_util import get_timespan_dict
@@ -46,6 +47,7 @@ class VocabularyId(BaseModel):
         ...,
         description="ID of a type")
 
+
 # todo: add license url
 def _get_license_item(entity: Entity) -> LicenseItem:
     return LicenseItem(id=entity.id, name=entity.name)
@@ -58,6 +60,7 @@ def _get_file_item(entity: Entity) -> FileItem:
     license_ = get_license_type(entity)
     return FileItem(
         id=entity.id,
+        name=entity.name,
         uuid=cast(UUID, entity.uuid),
         public_shareable=entity.public,
         license=_get_license_item(license_) if license_ else None,
@@ -81,8 +84,11 @@ def _get_reference_item(link_: Link) -> ReferenceModel:
         pages=link_.description or None,
         citation=entity.description)
 
+
 def _get_match_type(link_: Link) -> MatchTypeEnum:
+    assert link_.type
     return MatchTypeEnum(to_camel_case(g.types[link_.type.id].name))
+
 
 def _get_external_reference_item(
         link_: Link,
@@ -100,10 +106,10 @@ def _get_external_reference_item(
 def _get_vocab_flat_item(
         type_: Entity,
         links: dict[int, EntityLinks]) -> VocabularyFlatItem:
-    root_entity = None
-    if type_.root:
-        root_entity = g.types[type_.root[0]]
+    root_enntities = [g.types[id_] for id_ in type_.root] if type_.root else []
+    root_entity = g.types[type_.root[0]] if type_.root else None
     type_classes = root_entity.classes if root_entity else type_.classes
+    sub_entities = [g.types[id_] for id_ in type_.subs] if type_.subs else []
     inverse_links = links[type_.id].links_inverse
     image = next(
         (_get_file_item(link_.domain) for link_ in inverse_links
@@ -127,14 +133,14 @@ def _get_vocab_flat_item(
         classes=type_classes,
         selectable=type_.selectable,
         image=image,
-        external_references=external_references or None,
-        references=references or None,
+        external_references=external_references,
+        references=references,
         timespan=get_timespan_dict(type_.dates),
-        root=type_.root,
-        sub_types=type_.subs,
+        parents=[LinkedTypeItem(id=e.id, name=e.name) for e in root_enntities],
+        sub_types=[LinkedTypeItem(id=e.id, name=e.name) for e in sub_entities],
         entity_count=type_.count,
         entity_count_subs=type_.count_subs,
-        category=getattr(type_, 'category', None))
+        category=TypeCategoryEnum(type_.category))
 
 
 @api_v1_vocabulary.get(

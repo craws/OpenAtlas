@@ -132,7 +132,7 @@ def get_system_classes(query: LocaleQuery) -> dict[str, Any]:
 def get_system_properties() -> dict[str, Any]:
     """
     Retrieves all OpenAtlas CIDOC properties actively used by the system.
-    
+
     Returns a dictionary keyed by the CIDOC property code (e.g. 'P1', 'P2')
     containing the domain and range class codes, inheritance structures
     (sub/super properties), and internationalized labels for both directions
