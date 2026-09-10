@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Literal
-
 from pydantic import BaseModel, Field
 
 from openatlas.api.api_v1.models.util import BaseSchema
@@ -13,13 +11,15 @@ class AgentPath(BaseModel):
         description="Filter by a specific Agent ID")
 
 
-class AgentItem(BaseSchema):
+class AgentItem(BaseModel):
+    id: int
     name: str
-    type: Literal['person', 'group'] = Field(
-        ...,
-        description="If agent is a person or a group")
-    description: str | None = None
-    # external_url: list[ExtRefSystem] | None
+    class_name: str = Field(
+        serialization_alias="class",
+        description="The OpenAtlas entity class.")
+    description: str | None = Field(
+        description="Short description or biographical note.")
+    # todo: external_url: list[ExtRefSystem] | None
 
 
 class AgentListResponse(BaseSchema):

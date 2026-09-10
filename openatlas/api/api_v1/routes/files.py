@@ -65,7 +65,7 @@ def get_iiif_redirect_url(
 
     return f"{iiif_base}/full/max/0/default.jpg"
 
-
+# todo: add file name at files download!
 @api_v1_files.get(
     '/<int:id>/display',
     summary="Get image file",

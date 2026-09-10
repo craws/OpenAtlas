@@ -1,5 +1,6 @@
 import mimetypes
-from typing import Any
+from typing import Any, cast
+from uuid import UUID
 
 from flask import g, url_for
 from flask_openapi3 import APIBlueprint
@@ -13,9 +14,9 @@ from openatlas.api.api_v1.formatters.lod_util import (
     get_links_for_entities)
 from openatlas.api.api_v1.models.files import FileItem, LicenseItem
 from openatlas.api.api_v1.openapi_tags import vocabulary_tag
-from openatlas.api.api_v1.models.util import ExternalReferenceSystemModel, \
-    OpenAtlasClassEnum
-from openatlas.api.api_v1.models.util import ReferenceModel
+from openatlas.api.api_v1.models.util import (
+    ExternalReferenceSystemModel, MatchTypeEnum, OpenAtlasClassEnum,
+    ReferenceModel)
 from openatlas.api.api_v1.responses.vocabulary import \
     vocabulary_flat_response, vocabulary_list_response, \
     vocabulary_standard_by_class_response, vocabulary_tree_response
@@ -23,6 +24,7 @@ from openatlas.api.api_v1.models.vocabulary import (
     VocabularyFlatItem, VocabularyTreeItem, VocabularyFlatResponse,
     VocabularyStandardQuery,
     VocabularyTreeResponse, VocabularyStandardResponse)
+from openatlas.api.api_v1.util.date_util import get_timespan_dict
 from openatlas.database.api import get_vocab_ids_for_case_study
 from openatlas.models.entity import Entity, Link
 
@@ -44,6 +46,10 @@ class VocabularyId(BaseModel):
         ...,
         description="ID of a type")
 
+# todo: add license url
+def _get_license_item(entity: Entity) -> LicenseItem:
+    return LicenseItem(id=entity.id, name=entity.name)
+
 
 def _get_file_item(entity: Entity) -> FileItem:
     file_ = g.files.get(entity.id)
@@ -52,9 +58,9 @@ def _get_file_item(entity: Entity) -> FileItem:
     license_ = get_license_type(entity)
     return FileItem(
         id=entity.id,
-        uuid=entity.uuid,
+        uuid=cast(UUID, entity.uuid),
         public_shareable=entity.public,
-        license=LicenseItem(name=license_.name) if license_ else None,
+        license=_get_license_item(license_) if license_ else None,
         mimetype=mimetype,
         extension=file_.suffix if file_ else None,
         file_url=url_for(
@@ -70,11 +76,13 @@ def _get_reference_item(link_: Link) -> ReferenceModel:
     return ReferenceModel(
         id=entity.id,
         name=entity.name,
-        class_=entity.class_.name,
+        class_name=entity.class_.name,
         type=entity.standard_type.name if entity.standard_type else None,
         pages=link_.description or None,
         citation=entity.description)
 
+def _get_match_type(link_: Link) -> MatchTypeEnum:
+    return MatchTypeEnum(to_camel_case(g.types[link_.type.id].name))
 
 def _get_external_reference_item(
         link_: Link,
@@ -82,11 +90,11 @@ def _get_external_reference_item(
     return ExternalReferenceSystemModel(
         id=entity.id,
         name=entity.name,
-        match=to_camel_case(g.types[link_.type.id].name),
+        match_type=_get_match_type(link_),
         identifier=f'{entity.resolver_url or ''}{link_.description}',
         description=entity.description,
-        reference_url=entity.website_url,
-        resolver_url=entity.resolver_url)
+        system_url=entity.website_url,
+        url=entity.resolver_url)
 
 
 def _get_vocab_flat_item(
@@ -107,14 +115,13 @@ def _get_vocab_flat_item(
                 (entity := g.reference_systems.get(link_.domain.id)):
             external_references.append(
                 _get_external_reference_item(link_, entity))
-    # todo: fix references, it now receives all refenrencen, which has this type, not all references FOR this type
     references = [
         _get_reference_item(link_) for link_ in inverse_links
         if link_.domain.class_.group.get('name') == 'reference'
-        and not g.reference_systems.get(link_.domain.id)]
+           and link_.property.code == 'P67']
     return VocabularyFlatItem(
         id=type_.id,
-        uuid=type_.uuid,
+        uuid=cast(UUID, type_.uuid),
         name=type_.name,
         description=type_.description,
         classes=type_classes,
@@ -122,12 +129,11 @@ def _get_vocab_flat_item(
         image=image,
         external_references=external_references or None,
         references=references or None,
-        begin=type_.dates.first if type_.dates else None,
-        end=type_.dates.last if type_.dates else None,
+        timespan=get_timespan_dict(type_.dates),
         root=type_.root,
-        subs=type_.subs,
-        count=type_.count,
-        count_subs=type_.count_subs,
+        sub_types=type_.subs,
+        entity_count=type_.count,
+        entity_count_subs=type_.count_subs,
         category=getattr(type_, 'category', None))
 
 

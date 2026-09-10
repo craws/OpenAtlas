@@ -36,7 +36,7 @@ class Entity:
         self.class_ = g.classes[data['openatlas_class_name']]
         self.cidoc_class = self.class_.cidoc_class
         self.id = 0
-        self.uuid = ''
+        self.uuid: UUID | None = None
         self.name = ''
         self.aliases = {}
         self.description = None

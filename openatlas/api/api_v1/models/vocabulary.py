@@ -5,7 +5,7 @@ from pydantic import Field
 
 from openatlas.api.api_v1.models.files import FileItem
 from openatlas.api.api_v1.models.util import BaseSchema, \
-    ExternalReferenceSystemModel, ReferenceModel
+    TimeSpan, ExternalReferenceSystemModel, ReferenceModel
 
 
 class VocabularyStandardQuery(BaseSchema):
@@ -22,12 +22,11 @@ class VocabularyFlatItem(BaseSchema):
     image: FileItem | None = None
     selectable: bool | None = None
     classes: list[str] | None = None
-    begin: int | None = None
-    end: int | None = None
+    timespan: TimeSpan | None = None
     root: list[int] | None = None
-    subs: list[int] | None = None
-    count: int | None = None
-    count_subs: int | None = None
+    sub_types: list[int] | None = None
+    entity_count: int | None = None
+    entity_count_subs: int | None = None
     category: str | None = None
     external_references: list[ExternalReferenceSystemModel] | None = None
     references: list[ReferenceModel] | None = None

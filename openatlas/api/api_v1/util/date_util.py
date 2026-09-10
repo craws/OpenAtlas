@@ -1,5 +1,8 @@
 from typing import Any
 
+from openatlas.api.api_v1.models.util import TimeSpan
+from openatlas.models.dates import Dates
+
 
 def is_leap_year(year: int) -> bool:
     abs_year = abs(year)
@@ -69,3 +72,28 @@ def handle_date(value: Any, is_end_date: bool = False) -> str | None:
         return f"{year_str}-{month_int:02d}-{day_int:02d}"
 
     raise ValueError(f"Invalid date format: {value}")
+
+
+def date_to_str(date: Any) -> str | None:
+    return str(date) if date else None
+
+
+def get_timespan_dict(dates: Dates | None) -> TimeSpan | None:
+    if not dates:
+        return None
+    time = {}
+    if dates.begin_from or dates.begin_to or dates.begin_comment:
+        begin = {
+            'not_before': date_to_str(dates.begin_from),
+            'not_after': date_to_str(dates.begin_to),
+            'comment': dates.begin_comment}
+        time['start'] = {k: v for k, v in begin.items() if v}
+    if dates.end_from or dates.end_to or dates.end_comment:
+        end = {
+            'not_before': date_to_str(dates.end_from),
+            'not_after': date_to_str(dates.end_to),
+            'comment': dates.end_comment}
+        time['end'] = {k: v for k, v in end.items() if v}
+
+    return TimeSpan.model_validate(time) if time else None
+
