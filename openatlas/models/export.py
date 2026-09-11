@@ -250,7 +250,7 @@ def get_publications(
 
 def sort_files_by_types(
         entities: list[Entity],
-        type_ids: set[int],
+        type_ids: set[int] | list[int] | None,
         top_collection: str) -> dict[str, set[Path]]:
     files_by_types = defaultdict(set)
     for entity in entities:
@@ -298,7 +298,7 @@ def check_files_for_arche(
 
 def get_arche_file_turtle_graph(
         entities: list[Entity],
-        type_ids: set[int],
+        type_ids: set[int] | list[int] | None,
         top_collection: str) -> str:
     graph = Graph()
     graph.bind("acdh", ACDH)
@@ -308,28 +308,37 @@ def get_arche_file_turtle_graph(
     return graph.serialize(format="turtle")
 
 
+def _get_license_url_mapping() -> dict[int, str]:
+    license_hierarchy = next(
+        type_ for type_ in g.types.values() if type_.name == "License")
+    links_for_license_types = Entity.get_links_of_entities(
+        license_hierarchy.get_sub_ids_recursive(),
+        'P67',
+        ['external_reference'],
+        inverse=True)
+    license_mapping: dict[int, str] = {}
+    for link_ in links_for_license_types:
+        license_mapping[link_.range.id] =  link_.domain.name
+    return license_mapping
+
 def get_arche_file_metadata(
         entities: list[Entity],
-        type_ids: set[int],
+        type_ids: set[int] | list[int] | None,
         top_collection: str) -> list[ArcheFileMetadata]:
     publications = get_publications(entities)
     relations = get_place_and_actor_relations(entities)
-    license_urls = {}
+    license_urls =_get_license_url_mapping()
     arche_metadata_list = []
     for entity in entities:
+        if not g.files.get(entity.id):
+            continue
         standard_type = entity.standard_type
-        if not g.files.get(entity.id) or not standard_type:
+        if not standard_type:
             continue
-        if standard_type.id in license_urls:
+        license_url = license_urls.get(standard_type.id)
+        if not license_url:  #pragma: no cover
             continue
-        url = None
-        for link_ in standard_type.get_links('P67', inverse=True):
-            if link_.domain.class_.name == "external_reference":
-                url = link_.domain.name
-                break
-        if url is None:  # pragma: no cover
-            continue
-        license_urls[standard_type.id] = url
+
         if type_ids:
             for type_ in entity.types:
                 if type_.id in type_ids:
@@ -340,7 +349,7 @@ def get_arche_file_metadata(
                             type_name,
                             relations.get(entity.id, []),
                             publications.get(entity.id, []),
-                            license_urls[standard_type.id]))
+                            license_url))
         else:
             arche_metadata_list.append(
                 ArcheFileMetadata.construct(
@@ -348,7 +357,7 @@ def get_arche_file_metadata(
                     top_collection,
                     relations.get(entity.id, []),
                     publications.get(entity.id, []),
-                    license_urls[standard_type.id]))
+                    license_url))
     return arche_metadata_list
 
 

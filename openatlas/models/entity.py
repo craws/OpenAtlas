@@ -41,11 +41,11 @@ class Entity:
         self.description = None
         self.created = None
         self.modified = None
-        self.origin_id: Optional[int] = None  # When coming from another entity
-        self.image_id: Optional[int] = None  # Profile image
-        self.location: Optional[Entity] = None  # Respective location if place
+        self.origin_id: int | None = None  # When coming from another entity
+        self.image_id: int | None = None  # Profile image
+        self.location: Entity | None = None  # Respective location if place
         self.types = {}
-        self.standard_type = None
+        self.standard_type: Entity | None = None
         self.root: list[int] = []
         self.subs: list[int] = []
         self.classes: list[str] = []

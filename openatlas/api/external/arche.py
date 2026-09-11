@@ -137,7 +137,7 @@ def add_person_role(
         subject_uri: URIRef,
         names: str | list[str] | None,
         predicate: Any) -> None:
-    if not names:
+    if not names:  # pragma: no cover
         return
     ensure_person_exist(graph, names)
     for uri in create_uri(names):
@@ -190,7 +190,7 @@ def add_related_disciplines(
         graph: Graph,
         subject_uri: URIRef,
         disciplines: str | list[str] | None) -> None:
-    if not disciplines:
+    if not disciplines:  # pragma: no cover
         return
     for discipline in create_uri(disciplines):
         graph.add((subject_uri, ACDH.hasRelatedDiscipline, discipline))

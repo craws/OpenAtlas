@@ -44,7 +44,7 @@ class ReferenceSystemTest(TestBaseCase):
                 assert b'bone and bone components materials' in rv.data
                 assert b'wikidata.org/entity/Q814769' in rv.data
                 assert b'forms the skeleton' in rv.data
-            except AssertionError:
+            except AssertionError:  # pragma: no cover
                 assert b'<table class="table table-no-style">' in rv.data
 
         rv = c.post(
