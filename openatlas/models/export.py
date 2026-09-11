@@ -104,13 +104,12 @@ def arche_export() -> bool:
         f'{current_date_for_filename()}_'
         f'{external_metadata['topCollection'].replace(' ', '_')}.zip')
 
-    tempfile.tempdir = str(app.config['TMP_PATH'])
-
     arche_dir = app.config['ARCHE_PATH']
     arche_dir.mkdir(parents=True, exist_ok=True)
     final_archive_path = arche_dir / archive_name
 
-    with tempfile.TemporaryDirectory() as temp_dir:
+    Path(app.config['TMP_PATH']).mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=app.config['TMP_PATH']) as temp_dir:
         temp_path = Path(temp_dir)
         tmp_archive_path = temp_path / archive_name
         failed_files_md = "\n".join(
@@ -387,9 +386,11 @@ def open_tmp_sql_file() -> str:
     pg_dump_bin = get_binary_path('pg_dump', required=True)
     if not pg_dump_bin:  # pragma: no cover
         raise FileNotFoundError("pg_dump binary not found")
+    Path(app.config['TMP_PATH']).mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(
             mode='w+',
             suffix='.sql',
+            dir=app.config['TMP_PATH'],
             delete=False) as tmp_sql:
 
         tmp_sql.write("CREATE EXTENSION IF NOT EXISTS postgis;\n\n")
