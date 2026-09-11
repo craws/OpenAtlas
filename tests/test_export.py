@@ -3,11 +3,19 @@ from pathlib import Path
 from typing import Any
 
 from flask import g, url_for
+from rdflib import Graph, URIRef
 
 from openatlas import app
+from openatlas.api.external.arche import add_licenses
+from openatlas.api.external.arche_class import ArcheFileMetadata
 from openatlas.api.resources.api_entity import ApiEntity
-from openatlas.models.export import current_date_for_filename
-from tests.base import ImportTestCase, get_hierarchy
+from openatlas.models.entity import Entity
+from openatlas.models.export import (
+    _get_license_url_mapping,
+    current_date_for_filename,
+    get_arche_file_metadata,
+    get_arche_file_turtle_graph)
+from tests.base import ImportTestCase, get_hierarchy, insert
 
 
 class ImportTest(ImportTestCase):
@@ -176,3 +184,84 @@ class ImportTest(ImportTestCase):
         file_without_license_path.unlink()
         file_with_license_path.unlink()
         file_not_public_path.unlink()
+
+    def test_arche_license_multiple_urls(self) -> None:
+        c = self.client
+        with app.test_request_context():
+            app.preprocess_request()
+            rights_holder_ids = [rh.id for rh in g.rights_holder]
+        logo_path = Path(app.root_path) / 'static' / 'images' / 'layout'
+        public_type = get_hierarchy('Public sharing allowed')
+        with open(logo_path / 'logo.png', 'rb') as img:
+            rv = c.post(
+                url_for('insert', class_='file'),
+                data={
+                    'name': 'OpenAtlas logo multi',
+                    'file': img,
+                    'creator': f'{rights_holder_ids}',
+                    'license_holder': f'{rights_holder_ids}',
+                    str(public_type.id): public_type.subs[0]})
+        file_id = int(rv.location.split('/')[-1])
+
+        with app.test_request_context():
+            app.preprocess_request()
+            mapping = _get_license_url_mapping()
+            assert isinstance(mapping, dict)
+            for urls in mapping.values():
+                assert isinstance(urls, list)
+
+            cc_by_license = next(
+                type_ for type_ in g.types.values() if type_.name == 'CC BY 4.0')
+            initial_count = len(mapping.get(cc_by_license.id, []))
+
+            new_url = 'https://creativecommons.org/licenses/by/4.0/'
+            ref_entity = insert('external_reference', new_url)
+            ref_entity.link('P67', cc_by_license)
+
+            updated_mapping = _get_license_url_mapping()
+            assert cc_by_license.id in updated_mapping
+            assert len(updated_mapping[cc_by_license.id]) == initial_count + 1
+            assert new_url in updated_mapping[cc_by_license.id]
+
+            # Duplicate link should not add duplicate URL
+            ref_entity.link('P67', cc_by_license)
+            duplicate_mapping = _get_license_url_mapping()
+            assert len(duplicate_mapping[cc_by_license.id]) == initial_count + 1
+
+            file_entity = Entity.get_by_id(file_id)
+            file_entity.link('P2', cc_by_license)
+            file_entity = Entity.get_by_id(file_id, types=True)
+
+            metadata_list = get_arche_file_metadata(
+                [file_entity],
+                None,
+                'TopCollection')
+            assert len(metadata_list) == 1
+            assert isinstance(metadata_list[0].license, list)
+            assert len(metadata_list[0].license) >= 2
+            assert new_url in metadata_list[0].license
+
+            turtle = get_arche_file_turtle_graph(
+                [file_entity],
+                None,
+                'TopCollection')
+            for lic_url in metadata_list[0].license:
+                assert lic_url in turtle
+
+            # Test construct with single string
+            meta_str = ArcheFileMetadata.construct(
+                file_entity,
+                'type_name',
+                [],
+                [],
+                new_url)
+            assert meta_str.license == [new_url]
+
+            # Test add_licenses with None
+            test_graph = Graph()
+            add_licenses(test_graph, URIRef('https://example.org/res'), None)
+            assert len(test_graph) == 0
+
+        file_path = app.config['UPLOAD_PATH'] / f'{file_entity.id}.png'
+        if file_path.exists():
+            file_path.unlink()

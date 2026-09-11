@@ -156,12 +156,21 @@ def add_entity_role(
         graph.add((subject_uri, predicate, create_single_uri(entity.name)))
 
 
+def add_licenses(
+        graph: Graph,
+        subject_uri: URIRef,
+        licenses: str | list[str] | None) -> None:
+    if not licenses:
+        return
+    for uri in create_uri(licenses):
+        graph.add((subject_uri, ACDH.hasLicense, uri))
+
+
 def add_scalar_metadata(
         graph: Graph,
         subject_uri: URIRef,
         metadata: ArcheFileMetadata) -> None:
     scalar_metadata = (
-        ('license', ACDH.hasLicense, URIRef),
         ('is_part_of', ACDH.isPartOf, URIRef),
         ('accepted_date', ACDH.hasAcceptedDate,
          lambda value: Literal(value, datatype=XSD.date)),
@@ -235,6 +244,7 @@ def add_arche_file_metadata_to_graph(
         graph.add((subject_uri, ACDH.hasTitle, Literal(title_text, lang=lang)))
 
     add_scalar_metadata(graph, subject_uri, metadata)
+    add_licenses(graph, subject_uri, metadata.license)
     for attribute, predicate in (
             ('depositors', ACDH.hasDepositor),
             ('curators', ACDH.hasCurator),

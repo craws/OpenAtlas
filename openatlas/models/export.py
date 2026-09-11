@@ -308,18 +308,25 @@ def get_arche_file_turtle_graph(
     return graph.serialize(format="turtle")
 
 
-def _get_license_url_mapping() -> dict[int, str]:
+def _get_license_url_mapping() -> dict[int, list[str]]:
     license_hierarchy = next(
         type_ for type_ in g.types.values() if type_.name == "License")
     links_for_license_types = Entity.get_links_of_entities(
         license_hierarchy.get_sub_ids_recursive(),
         'P67',
-        ['external_reference'],
+        ['external_reference', 'reference_system'],
         inverse=True)
-    license_mapping: dict[int, str] = {}
+    license_mapping: dict[int, list[str]] = defaultdict(list)
     for link_ in links_for_license_types:
-        license_mapping[link_.range.id] =  link_.domain.name
-    return license_mapping
+        if link_.domain.name not in license_mapping[link_.range.id]:
+            if link_.domain.class_.name == 'reference_system':
+                system = g.reference_systems[link_.domain.id]
+                url = f'{system.resolver_url or ''}{link_.description}'
+                license_mapping[link_.range.id].append(url)
+            else:
+                license_mapping[link_.range.id].append(link_.domain.name)
+    return dict(license_mapping)
+
 
 def get_arche_file_metadata(
         entities: list[Entity],
@@ -327,7 +334,7 @@ def get_arche_file_metadata(
         top_collection: str) -> list[ArcheFileMetadata]:
     publications = get_publications(entities)
     relations = get_place_and_actor_relations(entities)
-    license_urls =_get_license_url_mapping()
+    license_urls = _get_license_url_mapping()
     arche_metadata_list = []
     for entity in entities:
         if not g.files.get(entity.id):
@@ -335,8 +342,8 @@ def get_arche_file_metadata(
         standard_type = entity.standard_type
         if not standard_type:
             continue
-        license_url = license_urls.get(standard_type.id)
-        if not license_url:  #pragma: no cover
+        license_url_list = license_urls.get(standard_type.id)
+        if not license_url_list:  # pragma: no cover
             continue
 
         if type_ids:
@@ -349,7 +356,7 @@ def get_arche_file_metadata(
                             type_name,
                             relations.get(entity.id, []),
                             publications.get(entity.id, []),
-                            license_url))
+                            license_url_list))
         else:
             arche_metadata_list.append(
                 ArcheFileMetadata.construct(
@@ -357,7 +364,7 @@ def get_arche_file_metadata(
                     top_collection,
                     relations.get(entity.id, []),
                     publications.get(entity.id, []),
-                    license_url))
+                    license_url_list))
     return arche_metadata_list
 
 
