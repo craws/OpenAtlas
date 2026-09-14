@@ -21,10 +21,8 @@ class CaseStudyItem(BaseSchema):
 
 
 class CaseStudyListResponse(BaseSchema):
-    case_studies: list[CaseStudyItem]
+    data: list[CaseStudyItem]
 
 
 class CaseStudyPath(BaseModel):
-    id: int = Field(
-        ...,
-        description="Filter by a specific Case Study ID")
+    id: int = Field(description="Filter by a specific Case Study ID")

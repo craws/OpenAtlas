@@ -68,7 +68,7 @@ class VocabularyFlatItem(BaseSchema):
 
 
 class VocabularyFlatResponse(BaseSchema):
-    types: Dict[str, VocabularyFlatItem]
+    data: Dict[str, VocabularyFlatItem]
 
 
 class VocabularyTreeItem(BaseSchema):
@@ -103,4 +103,4 @@ class VocabularyTreeResponse(BaseSchema):
 
 
 class VocabularyStandardResponse(BaseSchema):
-    results: list[VocabularyTreeItem] = Field(default_factory=list)
+    data: list[VocabularyTreeItem] = Field(default_factory=list)

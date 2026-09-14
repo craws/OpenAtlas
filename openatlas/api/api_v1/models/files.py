@@ -56,6 +56,16 @@ class FileItem(BaseSchema):
         description="Base URL for IIIF Image API operations (without "
                     "trailing slash).",
         examples=["https://example.org/iiif/image/123"])
+    bounds: list[list[float]] | None = Field(
+        default=None,
+        description="Leaflet image bounds in the form "
+                    "[[lat_sw, lon_sw], [lat_ne, lon_ne]].",
+        examples=[[[48.58653, 15.64356], [48.58709, 15.64294]]])
+    inherited_from: int | None = Field(
+        default=None,
+        description="The ID of the parent entity in the archaeological "
+                    "hierarchy from which this image is inherited.",
+        examples=[12345])
     #width: int | None = Field(
     #    default=None,
     #    description="Image or media width in pixels (null for non-raster "

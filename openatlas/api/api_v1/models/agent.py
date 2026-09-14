@@ -23,4 +23,4 @@ class AgentItem(BaseModel):
 
 
 class AgentListResponse(BaseSchema):
-    agents: list[AgentItem]
+    data: list[AgentItem]
