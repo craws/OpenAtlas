@@ -42,19 +42,19 @@ start = time.time()
 connection = connect()
 cursor = connection.cursor(cursor_factory=extras.DictCursor)
 id_map: dict[int, int] = {}  # Map imported entity ids to existing ones
+id_added: list[int] = []  # Track already inserted entities
 
-def cleanup(project_id: int) -> None:
+def cleanup(id_: int) -> None:
         g.cursor.execute(
             """
             DELETE FROM model.entity
             WHERE id IN (
                 SELECT entity_id
-                FROM import.entity
-                WHERE project_id = %(project_id)s);
-            """, {'project_id': project_id})
+                FROM import.entity WHERE project_id = %(project_id)s);
+            """, {'project_id': id_})
         g.cursor.execute(
             'DELETE FROM import.entity WHERE project_id = %(project_id)s;',
-            {'project_id': project_id})
+            {'project_id': id_})
         g.types = Entity.get_all_types(False)  # Reload type hierarchies
 
 def insert_project() -> int:
@@ -103,12 +103,14 @@ def insert_hierarchy(item: dict[str, Any]) -> None:
         SELECT
             name, openatlas_class_name, description,
             begin_from, begin_to, begin_comment, end_from, end_to, end_comment
-        FROM model.entity WHERE id = %(id)s;
+        FROM model.entity
+        WHERE id = %(id)s;
         """,
         {'id': item['id']})
     entity_ = insert(cursor.fetchone())
     import_data(project_id, entity_.id, IMPORT_USER_ID, item['id'])
     id_map[item['id']] = entity_.id
+    id_added.append(entity_.id)
     cursor.execute(
        """
        SELECT openatlas_class_name
@@ -123,32 +125,25 @@ def insert_hierarchy(item: dict[str, Any]) -> None:
     if item['required']:
         set_required(entity_.id)
 
-with app.test_request_context():
-    app.preprocess_request()
-    project_id = insert_project()
-    cleanup(project_id)
-    hierarchies()
-
-cursor.execute(
-    """
-    SELECT
-        id,
-        name,
-        description,
-        created,
-        modified,
-        begin_from,
-        begin_to,
-        begin_comment,
-        end_from,
-        end_to,
-        end_comment,
-        openatlas_class_name
-    FROM
-        model.entity;
-    """)
-with app.test_request_context():
-    app.preprocess_request()
+def insert_entities() -> None:
+    cursor.execute(
+        """
+        SELECT
+            id,
+            name,
+            description,
+            created,
+            modified,
+            begin_from,
+            begin_to,
+            begin_comment,
+            end_from,
+            end_to,
+            end_comment,
+            openatlas_class_name
+        FROM
+            model.entity;
+        """)
     # for row in list(cursor):
     #     if row['openatlas_class_name'] not in [
     #             'type',
@@ -162,4 +157,12 @@ with app.test_request_context():
     #             entity.id,
     #             IMPORT_USER_ID,
     #             origin_id=row['id'])
+
+with app.test_request_context():
+    app.preprocess_request()
+    project_id = insert_project()
+    cleanup(project_id)
+    hierarchies()
+    insert_entities()
+
 print(f'Execution time: {int(time.time() - start)} seconds')
