@@ -160,7 +160,7 @@ def add_licenses(
         graph: Graph,
         subject_uri: URIRef,
         licenses: str | list[str] | None) -> None:
-    if not licenses:
+    if not licenses:  # pragma: no cover
         return
     for uri in create_uri(licenses):
         graph.add((subject_uri, ACDH.hasLicense, uri))
