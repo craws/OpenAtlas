@@ -55,7 +55,7 @@ def get_license_type(entity: Entity) -> Optional[Entity]:
             break
     return license_
 
-
+# todo: rewrite without using g.files!
 def get_iiif_manifest_and_path(img_id: int) -> dict[str, str]:
     iiif_manifest = ''
     iiif_base_path = ''

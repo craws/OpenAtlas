@@ -1,8 +1,7 @@
-import mimetypes
 from typing import Any, cast
 from uuid import UUID
 
-from flask import g, url_for
+from flask import g
 from flask_openapi3 import APIBlueprint
 from pydantic import BaseModel, Field
 
@@ -10,9 +9,7 @@ from openatlas.api.api_v04.resources.util import to_camel_case
 from openatlas.api.api_v1.error_handlers import abort_not_found, \
     register_error_handlers
 from openatlas.api.api_v1.formatters.lod_util import (
-    EntityLinks, get_iiif_manifest_and_path, get_license_type,
-    get_links_for_entities)
-from openatlas.api.api_v1.models.files import FileItem, LicenseItem
+    EntityLinks, get_links_for_entities)
 from openatlas.api.api_v1.openapi_tags import vocabulary_tag
 from openatlas.api.api_v1.models.util import (
     ExternalReferenceSystemModel, MatchTypeEnum, OpenAtlasClassEnum,
@@ -26,6 +23,7 @@ from openatlas.api.api_v1.models.vocabulary import (
     VocabularyStandardQuery,
     VocabularyTreeResponse, VocabularyStandardResponse)
 from openatlas.api.api_v1.util.date_util import get_timespan_dict
+from openatlas.api.api_v1.util.files import get_file_item
 from openatlas.database.api import get_vocab_ids_for_case_study
 from openatlas.models.entity import Entity, Link
 
@@ -46,32 +44,6 @@ class VocabularyId(BaseModel):
     id: int = Field(
         ...,
         description="ID of a type")
-
-
-# todo: add license url
-def _get_license_item(entity: Entity) -> LicenseItem:
-    return LicenseItem(id=entity.id, name=entity.name)
-
-
-def _get_file_item(entity: Entity) -> FileItem:
-    file_ = g.files.get(entity.id)
-    mimetype, _ = mimetypes.guess_type(file_) if file_ else (None, None)
-    iiif = get_iiif_manifest_and_path(entity.id)
-    license_ = get_license_type(entity)
-    return FileItem(
-        id=entity.id,
-        name=entity.name,
-        uuid=cast(UUID, entity.uuid),
-        public_shareable=entity.public,
-        license=_get_license_item(license_) if license_ else None,
-        mimetype=mimetype,
-        extension=file_.suffix if file_ else None,
-        file_url=url_for(
-            'api_v1_files.display_file', id=entity.id, _external=True),
-        thumbnail_url=url_for(
-            'api_v1_files.display_thumbnail', id=entity.id, _external=True),
-        iiif_manifest_url=iiif['IIIFManifest'] or None,
-        iiif_base_url=iiif['IIIFBasePath'] or None)
 
 
 def _get_reference_item(link_: Link) -> ReferenceModel:
@@ -112,7 +84,7 @@ def _get_vocab_flat_item(
     sub_entities = [g.types[id_] for id_ in type_.subs] if type_.subs else []
     inverse_links = links[type_.id].links_inverse
     image = next(
-        (_get_file_item(link_.domain) for link_ in inverse_links
+        (get_file_item(link_.domain) for link_ in inverse_links
          if link_.domain.class_.name == 'file'
          and link_.property.code == 'P67'),
         None)

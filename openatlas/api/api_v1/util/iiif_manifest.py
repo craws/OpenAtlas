@@ -8,6 +8,8 @@ from flask_babel import gettext as _
 
 from openatlas.api.api_v1.error_handlers import abort_file_not_found
 from openatlas.api.api_v1.formatters.lod_util import get_license_type
+from openatlas.api.api_v1.models.files import LicenseItem
+from openatlas.api.api_v1.util.files import get_license_item
 from openatlas.display.image_processing import check_iiif_file_exist, \
     get_actual_mime
 from openatlas.display.util2 import get_file_path
@@ -16,16 +18,10 @@ from openatlas.models.entity import Entity
 
 
 @dataclass
-class LicenseInfo:
-    name: str = ''
-    url: str = ''
-
-
-@dataclass
 class ManifestMetadata:
     items: list[dict[str, Any]] = field(default_factory=list)
     see_also: list[dict[str, Any]] = field(default_factory=list)
-    license: LicenseInfo = field(default_factory=LicenseInfo)
+    license: LicenseItem | None = None
     attribution: str = ''
 
 
@@ -38,16 +34,10 @@ def get_url(entity_id: int) -> str:
         return f"{request.url_root}api/1/entity/{entity_id}"
 
 
-def get_license_info(entity: Entity) -> LicenseInfo:
+def get_license_info(entity: Entity) -> LicenseItem | None:
     if type_ := get_license_type(entity):
-        license_name = type_.name
-        license_url = ''
-        for link_ in type_.get_links('P67', inverse=True):
-            if link_.domain.class_.name == "external_reference":
-                license_url = link_.domain.name
-                break
-        return LicenseInfo(name=license_name, url=license_url)
-    return LicenseInfo()
+        return get_license_item(type_)
+    return None
 
 
 def convert_coordinates(coordinates_str: str) -> list[list[int]]:
@@ -121,10 +111,11 @@ class IIIFBuilder:
     def _get_common_metadata(self) -> ManifestMetadata:
         items = []
         lic = get_license_info(self.entity)
-        attribution = lic.name
+        attribution = lic.name if lic else ''
         if self.entity.license_holder:
-            attribution = f"{attribution}, {', '.join([
-                lh.name for lh in self.entity.license_holder])}"
+            holders = ', '.join([lh.name for lh in self.entity.license_holder])
+            attribution = (
+                f"{attribution}, {holders}" if attribution else holders)
 
         if references := self.entity.get_links('P67', inverse=True):
             for reference in references:
@@ -213,7 +204,10 @@ class V2Builder(IIIFBuilder):
             "metadata": self.common_meta.items,
             "seeAlso": v2_see_also,
             "attribution": self.common_meta.attribution,
-            "license": self.common_meta.license.url,
+            "license": (
+                self.common_meta.license.url
+                if self.common_meta.license and self.common_meta.license.url
+                else ""),
             "logo": self.get_logo(),
             "sequences": [{
                 "@id": f"{self.manifest_url}/sequence/normal",
@@ -339,7 +333,7 @@ class V3Builder(IIIFBuilder):
             manifest["requiredStatement"] = {
                 "label": {"en": ["Attribution"]},
                 "value": {"en": [self.common_meta.attribution]}}
-        if self.common_meta.license.url:
+        if self.common_meta.license and self.common_meta.license.url:
             manifest["rights"] = self.common_meta.license.url
         if g.settings.get('logo_file_id'):
             manifest["provider"] = [{

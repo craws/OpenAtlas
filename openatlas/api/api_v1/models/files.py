@@ -11,9 +11,10 @@ class LicenseItem(BaseSchema):
     name: str = Field(
         description="Display name of the license.",
         examples=["CC BY 4.0", "Public Domain Mark 1.0"])
-    # url: str | None = Field(
-    #     description="Official link to the legal deed or license text.",
-    #     examples=["https://creativecommons.org/licenses/by/4.0/"])
+    url: str | None = Field(
+        default=None,
+        description="Official link to the legal deed or license text.",
+        examples=["https://creativecommons.org/licenses/by/4.0/"])
 
 
 # todo: do we need width, height, size?
@@ -54,7 +55,7 @@ class FileItem(BaseSchema):
         default=None,
         description="Base URL for IIIF Image API operations (without "
                     "trailing slash).",
-        examples=["https://example.org/iiif/image/123"], )
+        examples=["https://example.org/iiif/image/123"])
     #width: int | None = Field(
     #    default=None,
     #    description="Image or media width in pixels (null for non-raster "

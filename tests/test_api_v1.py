@@ -178,12 +178,25 @@ class ApiV1(ApiTestCase):
                 follow_redirects=True)
 
         e = self.get_api_entities()
+        lic_url = 'https://creativecommons.org/licenses/by/4.0/'
         with app.test_request_context():
             app.preprocess_request()
+            lic_ext_ref = insert('external_reference', lic_url)
+            lic_ext_ref.link('P67', e.open_license)
             e.file.link('P2', e.open_license)
 
-        rv = c.get(url_for('api_v1_files.display_file', id=e.file.id))
-        assert rv.status_code in (200, 302, 404)
+        with c.get(
+                url_for('api_v1_files.display_file', id=e.file.id)) as rv:
+            assert rv.status_code in (200, 302, 404)
+
+        with c.get(
+                url_for(
+                    'api_v1_files.display_file',
+                    id=e.file.id,
+                    download=True)) as rv:
+            assert rv.status_code == 200
+            assert f'filename={e.file.id}.png' in rv.headers.get(
+                'Content-Disposition', '')
 
         rv = c.get(
             url_for(
@@ -191,7 +204,10 @@ class ApiV1(ApiTestCase):
                 id=e.file.id,
                 version='2'))
         assert rv.status_code == 200
-        assert rv.get_json()['@type'] == 'sc:Manifest'
+        manifest_v2 = rv.get_json()
+        assert manifest_v2['@type'] == 'sc:Manifest'
+        assert manifest_v2['license'] == lic_url
+        assert 'Public domain' in manifest_v2['attribution']
 
         rv = c.get(
             url_for(
@@ -199,7 +215,11 @@ class ApiV1(ApiTestCase):
                 id=e.file.id,
                 version='3'))
         assert rv.status_code == 200
-        assert rv.get_json()['type'] == 'Manifest'
+        manifest_v3 = rv.get_json()
+        assert manifest_v3['type'] == 'Manifest'
+        assert manifest_v3['rights'] == lic_url
+        statement = manifest_v3['requiredStatement']['value']['en'][0]
+        assert 'Public domain' in statement
 
         rv = c.get(
             url_for('api_v1_files.get_iiif_canvas', id=e.file.id, version='2'))

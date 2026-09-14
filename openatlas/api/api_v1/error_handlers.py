@@ -71,7 +71,8 @@ def abort_id_not_a_file(id_: int) -> NoReturn:
         'message': f"The requested entity id {id_} is not a file. ",
         'details': {
             'provided_id': str(id_),
-            'hint': ''}, # Todo
+            'hint': 'Find more details of that entity '
+                    'via an /entity endpoint'},
         'url': request.url,
         'timestamp': datetime.now().isoformat(),
         'status': 404}
@@ -83,7 +84,8 @@ def abort_id_does_not_exist(id_: int) -> NoReturn:
         'message': f"The requested entity id {id_} is not in the database.",
         'details': {
             'provided_id': str(id_),
-            'hint': ''}, # Todo
+            'hint': 'Try searching for the entity by its name using a '
+                    'search endpoint.'},
         'url': request.url,
         'timestamp': datetime.now().isoformat(),
         'status': 404}
@@ -96,7 +98,7 @@ def abort_file_without_license(id_: int) -> NoReturn:
         'message': "The requested file has no license and can't be displayed.",
         'details': {
             'provided_id': str(id_),
-            'hint': ''}, # Todo
+            'hint': 'Please contact the project members for more details.'},
         'url': request.url,
         'timestamp': datetime.now().isoformat(),
         'status': 403}
@@ -109,7 +111,7 @@ def abort_file_not_public(id_: int) -> NoReturn:
         'message': "This file is not public shareable.",
         'details': {
             'provided_id': str(id_),
-            'hint': ''}, # Todo
+            'hint': 'Please contact the project members for more details.'},
         'url': request.url,
         'timestamp': datetime.now().isoformat(),
         'status': 403}
@@ -121,7 +123,8 @@ def abort_file_not_found(id_: int) -> NoReturn:
         'message': f"No file was found for the requested ID {id_}.",
         'details': {
             'provided_id': str(id_),
-            'hint': ''}, # Todo
+            'hint': 'Find more details of that entity '
+                    'via an /entity endpoint'},
         'url': request.url,
         'timestamp': datetime.now().isoformat(),
         'status': 404}

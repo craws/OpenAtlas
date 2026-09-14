@@ -17,6 +17,7 @@ from rdflib import Graph
 from config.default import ACDH
 from openatlas import app
 from openatlas.api.api_v04.endpoints.endpoint import Endpoint
+from openatlas.api.api_v1.util.files import get_license_url_mapping
 from openatlas.api.external.arche import add_arche_file_metadata_to_graph
 from openatlas.api.external.arche_class import ArcheFileMetadata
 from openatlas.api.api_v04.formats.rdf import rdf_export_to_file
@@ -309,33 +310,13 @@ def get_arche_file_turtle_graph(
     return graph.serialize(format="turtle")
 
 
-def _get_license_url_mapping() -> dict[int, list[str]]:
-    license_hierarchy = next(
-        type_ for type_ in g.types.values() if type_.name == "License")
-    links_for_license_types = Entity.get_links_of_entities(
-        license_hierarchy.get_sub_ids_recursive(),
-        'P67',
-        ['external_reference', 'reference_system'],
-        inverse=True)
-    license_mapping: dict[int, list[str]] = defaultdict(list)
-    for link_ in links_for_license_types:
-        if link_.domain.name not in license_mapping[link_.range.id]:
-            if link_.domain.class_.name == 'reference_system':
-                system = g.reference_systems[link_.domain.id]
-                url = f'{system.resolver_url or ''}{link_.description}'
-                license_mapping[link_.range.id].append(url)
-            else:
-                license_mapping[link_.range.id].append(link_.domain.name)
-    return dict(license_mapping)
-
-
 def get_arche_file_metadata(
         entities: list[Entity],
         type_ids: set[int] | list[int] | None,
         top_collection: str) -> list[ArcheFileMetadata]:
     publications = get_publications(entities)
     relations = get_place_and_actor_relations(entities)
-    license_urls = _get_license_url_mapping()
+    license_urls = get_license_url_mapping()
     arche_metadata_list = []
     for entity in entities:
         if not g.files.get(entity.id):
