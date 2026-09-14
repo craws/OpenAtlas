@@ -127,7 +127,7 @@ def get_vocabulary_list() -> dict[str, Any]:
     links = get_links_for_entities(list(g.types.values()))
     for id_, type_ in g.types.items():
         vocab_dict[str(id_)] = _get_vocab_flat_item(type_, links)
-    return VocabularyFlatResponse(types=vocab_dict).model_dump(by_alias=True)
+    return VocabularyFlatResponse(data=vocab_dict).model_dump(by_alias=True)
 
 
 @api_v1_vocabulary.get(
@@ -244,4 +244,4 @@ def get_vocabulary_standard_by_class(
     standard_vocab = _walk_tree(root_ids, used_vocab_ids)
 
     return VocabularyStandardResponse(
-        results=standard_vocab).model_dump(by_alias=True)
+        data=standard_vocab).model_dump(by_alias=True)

@@ -4,8 +4,14 @@ from flask_restful import Api
 
 from openatlas import app
 from openatlas.api.api_v04.routes import routes
-from openatlas.api.api_v1.routes import api_v1_files, api_v1_lod, \
-    api_v1_loud, api_v1_root, api_v1_system, api_v1_vocabulary
+from openatlas.api.api_v1.routes import (
+    api_v1_files,
+    api_v1_iiif,
+    api_v1_lod,
+    api_v1_loud,
+    api_v1_root,
+    api_v1_system,
+    api_v1_vocabulary)
 from openatlas.api.api_v1.routes.metadata import api_v1_metadata
 
 app.config['PROPAGATE_EXCEPTIONS'] = True
@@ -17,6 +23,7 @@ app.register_api(api_v1_vocabulary)
 app.register_api(api_v1_lod)
 app.register_api(api_v1_loud)
 app.register_api(api_v1_files)
+app.register_api(api_v1_iiif)
 app.register_api(api_v1_metadata)
 
 blueprint = Blueprint('api', __name__, url_prefix='/api')

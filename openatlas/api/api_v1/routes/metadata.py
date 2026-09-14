@@ -38,7 +38,7 @@ def _walk_case_studies(ids: list[int]) -> list[CaseStudyItem]:
 def get_case_studies():
     case_study_ids = g.types[g.case_study_type.id].subs
     case_studies = _walk_case_studies(case_study_ids)
-    return CaseStudyListResponse(case_studies=case_studies).model_dump(
+    return CaseStudyListResponse(data=case_studies).model_dump(
         by_alias=True)
 
 @api_v1_metadata.get(
@@ -67,7 +67,7 @@ def get_case_study_by_id(path: CaseStudyPath):
     tags=[metadata_tag],
     responses={200: AgentListResponse})
 def get_agents():
-    return AgentListResponse(agents=[]).model_dump(by_alias=True)
+    return AgentListResponse(data=[]).model_dump(by_alias=True)
 
 # todo
 @api_v1_metadata.get(

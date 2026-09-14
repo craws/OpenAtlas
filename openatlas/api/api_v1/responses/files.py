@@ -17,12 +17,3 @@ thumbnail_response = {
                 "schema": {"type": "string", "format": "binary"}}},
         "description": "Returns the generated thumbnail image."},
     404: {"description": "File or thumbnail not found"}}
-
-iiif_manifest_response = {
-    200: {
-        "description": "IIIF Manifest JSON",
-        "content": {
-            "application/json": {}}},
-    400: {"description": "Unsupported IIIF version"},
-    403: {"description": "File without license or not shareable"},
-    404: {"description": "File or annotation not found"}}

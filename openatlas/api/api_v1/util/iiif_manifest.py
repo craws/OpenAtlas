@@ -71,22 +71,22 @@ class IIIFBuilder:
         self.entity = entity
         self.version = version
         self.manifest_url = url_for(
-            'api_v1_files.get_iiif_manifest',
+            'api_v1_iiif.get_iiif_manifest',
             id=entity.id,
             version=version,
             _external=True)
         self.canvas_url = url_for(
-            'api_v1_files.get_iiif_canvas',
+            'api_v1_iiif.get_iiif_canvas',
             id=entity.id,
             version=version,
             _external=True)
         self.image_resource_url = url_for(
-            'api_v1_files.get_iiif_image',
+            'api_v1_iiif.get_iiif_image',
             id=entity.id,
             version=version,
             _external=True)
         self.annotation_list_url = url_for(
-            'api_v1_files.get_iiif_annotation_list',
+            'api_v1_iiif.get_iiif_annotation_list',
             id=entity.id,
             version=version,
             _external=True)
@@ -265,7 +265,7 @@ class V2Builder(IIIFBuilder):
                 entity_link = f'<a href={url} target=_blank>{entity.name}</a>'
 
         annotation_url = url_for(
-            'api_v1_files.get_iiif_annotation',
+            'api_v1_iiif.get_iiif_annotation',
             id=annotation.id,
             version=self.version,
             _external=True)
@@ -400,7 +400,7 @@ class V3Builder(IIIFBuilder):
                 entity_link = f'<a href={url} target=_blank>{entity.name}</a>'
 
         annotation_url = url_for(
-            'api_v1_files.get_iiif_annotation',
+            'api_v1_iiif.get_iiif_annotation',
             id=annotation.id,
             version=self.version,
             _external=True)

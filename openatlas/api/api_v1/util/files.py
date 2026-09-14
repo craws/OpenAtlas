@@ -9,8 +9,12 @@ from uuid import UUID
 
 from flask import g, url_for
 
-from openatlas.api.api_v1.error_handlers import abort_file_not_found, \
-    abort_file_not_public, abort_file_without_license
+from openatlas.api.api_v1.error_handlers import (
+    abort_file_not_found,
+    abort_file_not_public,
+    abort_file_without_license,
+    abort_id_does_not_exist,
+    abort_id_not_a_file)
 from openatlas.api.api_v1.formatters.lod_util import \
     get_iiif_manifest_and_path
 from openatlas.api.api_v1.models.files import FileItem, LicenseItem
@@ -19,20 +23,27 @@ from openatlas.models.entity import Entity
 
 def get_license_url_mapping() -> dict[int, list[str]]:
     if not hasattr(g, 'license_url_mapping'):
-        links_for_license_types = Entity.get_links_of_entities(
+        links = Entity.get_links_of_entities(
             list(get_valid_license_ids()),
             'P67',
             ['external_reference', 'reference_system'],
             inverse=True)
         license_mapping: dict[int, list[str]] = defaultdict(list)
-        for link_ in links_for_license_types:
-            if link_.domain.name not in license_mapping[link_.range.id]:
-                if link_.domain.class_.name == 'reference_system':
-                    system = g.reference_systems[link_.domain.id]
-                    url = f'{system.resolver_url or ''}{link_.description}'
-                    license_mapping[link_.range.id].append(url)
-                else:
-                    license_mapping[link_.range.id].append(link_.domain.name)
+        sorted_links = sorted(
+            links,
+            key=lambda l: l.domain.class_.name != 'external_reference')
+        for link_ in sorted_links:
+            url = None
+            if link_.domain.class_.name == 'reference_system':
+                system = g.reference_systems.get(link_.domain.id)
+                if system:
+                    url = f"{system.resolver_url or ''}{link_.description}"
+            else:
+                url = link_.domain.name
+            if url and url not in license_mapping[link_.range.id]:
+                license_mapping[link_.range.id].append(url)
+
+        g.license_url_mapping = dict(license_mapping)
     return g.license_url_mapping
 
 def get_valid_license_ids() -> set[int]:
@@ -85,6 +96,15 @@ def check_file_access(file_entity: Entity) -> bool:
         abort_file_not_public(file_entity.id)
 
     return True
+
+
+def get_file_entity(file_id: int) -> Entity:
+    entity = Entity.get_by_id(file_id, types=True, with_location=False)
+    if not entity:
+        abort_id_does_not_exist(file_id)
+    if entity.class_.name != 'file':
+        abort_id_not_a_file(file_id)
+    return entity
 
 
 def get_license_item(license_type: Entity) -> LicenseItem:

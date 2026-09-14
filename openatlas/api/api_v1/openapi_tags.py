@@ -7,8 +7,11 @@ system_tag = Tag(
 vocabulary_tag = Tag(name="Vocabulary", description="Types and Vocabularies")
 
 # Files
-# single images, iiif manifest, all public/licensed images
-file_tag = Tag(name="Files", description="IIIF, display and licenses")
+# single images, display and licenses
+file_tag = Tag(name="Files", description="Display and licenses")
+
+# IIIF
+iiif_tag = Tag(name="IIIF", description="IIIF endpoints")
 
 # Thanados, PFP, CSV, and other
 export_tag = Tag(name="Export", description="Different export formats")
