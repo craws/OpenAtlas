@@ -105,13 +105,12 @@ def arche_export() -> bool:
         f'{current_date_for_filename()}_'
         f'{external_metadata['topCollection'].replace(' ', '_')}.zip')
 
-    tempfile.tempdir = str(app.config['TMP_PATH'])
-
     arche_dir = app.config['ARCHE_PATH']
     arche_dir.mkdir(parents=True, exist_ok=True)
     final_archive_path = arche_dir / archive_name
 
-    with tempfile.TemporaryDirectory() as temp_dir:
+    Path(app.config['TMP_PATH']).mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=app.config['TMP_PATH']) as temp_dir:
         temp_path = Path(temp_dir)
         tmp_archive_path = temp_path / archive_name
         failed_files_md = "\n".join(
@@ -252,7 +251,7 @@ def get_publications(
 
 def sort_files_by_types(
         entities: list[Entity],
-        type_ids: set[int],
+        type_ids: set[int] | list[int] | None,
         top_collection: str) -> dict[str, set[Path]]:
     files_by_types = defaultdict(set)
     for entity in entities:
@@ -300,7 +299,7 @@ def check_files_for_arche(
 
 def get_arche_file_turtle_graph(
         entities: list[Entity],
-        type_ids: set[int],
+        type_ids: set[int] | list[int] | None,
         top_collection: str) -> str:
     graph = Graph()
     graph.bind("acdh", ACDH)
@@ -310,28 +309,44 @@ def get_arche_file_turtle_graph(
     return graph.serialize(format="turtle")
 
 
+def _get_license_url_mapping() -> dict[int, list[str]]:
+    license_hierarchy = next(
+        type_ for type_ in g.types.values() if type_.name == "License")
+    links_for_license_types = Entity.get_links_of_entities(
+        license_hierarchy.get_sub_ids_recursive(),
+        'P67',
+        ['external_reference', 'reference_system'],
+        inverse=True)
+    license_mapping: dict[int, list[str]] = defaultdict(list)
+    for link_ in links_for_license_types:
+        if link_.domain.name not in license_mapping[link_.range.id]:
+            if link_.domain.class_.name == 'reference_system':
+                system = g.reference_systems[link_.domain.id]
+                url = f'{system.resolver_url or ''}{link_.description}'
+                license_mapping[link_.range.id].append(url)
+            else:
+                license_mapping[link_.range.id].append(link_.domain.name)
+    return dict(license_mapping)
+
+
 def get_arche_file_metadata(
         entities: list[Entity],
-        type_ids: set[int],
+        type_ids: set[int] | list[int] | None,
         top_collection: str) -> list[ArcheFileMetadata]:
     publications = get_publications(entities)
     relations = get_place_and_actor_relations(entities)
-    license_urls = {}
+    license_urls = _get_license_url_mapping()
     arche_metadata_list = []
     for entity in entities:
+        if not g.files.get(entity.id):
+            continue
         standard_type = entity.standard_type
-        if not g.files.get(entity.id) or not standard_type:
+        if not standard_type:
             continue
-        if standard_type.id in license_urls:
+        license_url_list = license_urls.get(standard_type.id)
+        if not license_url_list:  # pragma: no cover
             continue
-        url = None
-        for link_ in standard_type.get_links('P67', inverse=True):
-            if link_.domain.class_.name == "external_reference":
-                url = link_.domain.name
-                break
-        if url is None:  # pragma: no cover
-            continue
-        license_urls[standard_type.id] = url
+
         if type_ids:
             for type_ in entity.types:
                 if type_.id in type_ids:
@@ -342,7 +357,7 @@ def get_arche_file_metadata(
                             type_name,
                             relations.get(entity.id, []),
                             publications.get(entity.id, []),
-                            license_urls[standard_type.id]))
+                            license_url_list))
         else:
             arche_metadata_list.append(
                 ArcheFileMetadata.construct(
@@ -350,7 +365,7 @@ def get_arche_file_metadata(
                     top_collection,
                     relations.get(entity.id, []),
                     publications.get(entity.id, []),
-                    license_urls[standard_type.id]))
+                    license_url_list))
     return arche_metadata_list
 
 
@@ -388,9 +403,11 @@ def open_tmp_sql_file() -> str:
     pg_dump_bin = get_binary_path('pg_dump', required=True)
     if not pg_dump_bin:  # pragma: no cover
         raise FileNotFoundError("pg_dump binary not found")
+    Path(app.config['TMP_PATH']).mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(
             mode='w+',
             suffix='.sql',
+            dir=app.config['TMP_PATH'],
             delete=False) as tmp_sql:
 
         tmp_sql.write("CREATE EXTENSION IF NOT EXISTS postgis;\n\n")
