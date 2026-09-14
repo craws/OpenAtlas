@@ -44,18 +44,20 @@ cursor = connection.cursor(cursor_factory=extras.DictCursor)
 id_map: dict[int, int] = {}  # Map imported entity ids to existing ones
 id_added: list[int] = []  # Track already inserted entities
 
+
 def cleanup(id_: int) -> None:
-        g.cursor.execute(
-            """
-            DELETE FROM model.entity
-            WHERE id IN (
-                SELECT entity_id
-                FROM import.entity WHERE project_id = %(project_id)s);
-            """, {'project_id': id_})
-        g.cursor.execute(
-            'DELETE FROM import.entity WHERE project_id = %(project_id)s;',
-            {'project_id': id_})
-        g.types = Entity.get_all_types(False)  # Reload type hierarchies
+    g.cursor.execute(
+        """
+        DELETE FROM model.entity
+        WHERE id IN (
+            SELECT entity_id
+            FROM import.entity WHERE project_id = %(project_id)s);
+        """, {'project_id': id_})
+    g.cursor.execute(
+        'DELETE FROM import.entity WHERE project_id = %(project_id)s;',
+        {'project_id': id_})
+    g.types = Entity.get_all_types(False)  # Reload type hierarchies
+
 
 def insert_project() -> int:
     g.cursor.execute(
@@ -68,6 +70,7 @@ def insert_project() -> int:
         """,
         {'name': PROJECT_NAME, 'description': PROJECT_DESCRIPTION})
     return g.cursor.fetchone()['id']
+
 
 def hierarchies() -> None:
     cursor.execute(
@@ -125,6 +128,50 @@ def insert_hierarchy(item: dict[str, Any]) -> None:
     if item['required']:
         set_required(entity_.id)
 
+
+def types() -> None:
+    for import_hierarchy in [
+            type_ for type_ in import_types.values() if not type_.root]:
+        print(import_hierarchy.name)
+        hierarchy = Entity.get_hierarchy(import_hierarchy.name)
+        for id_ in import_hierarchy.subs:
+            types_recursive(id_, hierarchy)
+
+
+def types_recursive(id_, super_) -> None:
+    exists = False
+    for sub_id in super_.subs:
+        if g.types[sub_id].name == import_types[id_].name:
+            id_map[id_] = sub_id
+            print(f'exists: {import_types[id_].name}')
+            for import_sub_id in import_types[id_].subs:
+                types_recursive(import_sub_id, g.types[sub_id])
+            exists = True
+            break
+    if not exists:
+        insert_type_recursive(import_types[id_])
+
+
+def insert_type_recursive(import_type):
+    print(f'new: {import_type.name}')
+    # new_type = insert({
+    #    'name': import_type.name,
+    #    'description': import_type.description,
+    #    'openatlas_class_name': import_type.class_.name,
+    #    'begin_from': import_type.dates['begin_from'],
+    #    'begin_to': import_type.dates['begin_to'],
+    #    'begin_comment': import_type.dates['begin_comment'],
+    #    'end_from': import_type.dates['end_from'],
+    #    'end_to': import_type.dates['end_to'],
+    #    'end_comment': import_type.dates['end_comment']})
+    # id_map[import_type.id] = new_type.id
+    # import_data(project_id, new_type.id, IMPORT_USER_ID, import_type.id)
+    #
+    # Todo: link type with correct property to super (take from model?)
+    # super_id = id_map[import_type.root[-1]]
+    # new_type.link(g.types[super_id])
+
+
 def insert_entities() -> None:
     cursor.execute(
         """
@@ -158,11 +205,18 @@ def insert_entities() -> None:
     #             IMPORT_USER_ID,
     #             origin_id=row['id'])
 
+
 with app.test_request_context():
     app.preprocess_request()
     project_id = insert_project()
     cleanup(project_id)
     hierarchies()
+    g.types = Entity.get_all_types(False)
+    cursor_current = g.cursor
+    g.cursor = cursor
+    import_types = Entity.get_all_types(False)
+    g.cursor = cursor_current
+    types()
     insert_entities()
 
 print(f'Execution time: {int(time.time() - start)} seconds')
