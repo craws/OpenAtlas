@@ -17,7 +17,9 @@ from flask import g
 from psycopg2 import extras
 
 from openatlas import app
-from openatlas.models.entity import Entity
+from openatlas.database.entity import set_required
+from openatlas.database.imports import import_data
+from openatlas.models.entity import Entity, insert
 
 DATABASE_NAME = 'openatlas_demo'  # The database to fetch data from
 PROJECT_NAME = 'MEDCON'  # Will also be added as case study
@@ -53,6 +55,7 @@ def cleanup(project_id: int) -> None:
         g.cursor.execute(
             'DELETE FROM import.entity WHERE project_id = %(project_id)s;',
             {'project_id': project_id})
+        g.types = Entity.get_all_types(False)  # Reload type hierarchies
 
 def insert_project() -> int:
     g.cursor.execute(
@@ -96,22 +99,29 @@ def hierarchies() -> None:
 def insert_hierarchy(item: dict[str, Any]) -> None:
     print(f"New hierarchy: {item['name']}")
     cursor.execute(
-        'SELECT description FROM model.entity WHERE id = %(id)s;',
+        """
+        SELECT
+            name, openatlas_class_name, description,
+            begin_from, begin_to, begin_comment, end_from, end_to, end_comment
+        FROM model.entity WHERE id = %(id)s;
+        """,
         {'id': item['id']})
-    # description = cursor.fetchone()['description']
-    # entity_ = insert('type', item['name'], description)
-    # id_map[item['id']] = entity_.id
-    # cursor.execute(
-    #    """
-    #    SELECT openatlas_class_name
-    #    FROM web.hierarchy_openatlas_class
-    #    WHERE hierarchy_id = %(id)s;
-    #    """, {'id': item['id']})
-    # Entity.insert_hierarchy(
-    #    entity_,
-    #    item['category'],
-    #    [x[0] for x in list(cursor)],
-    #   item['multiple'])
+    entity_ = insert(cursor.fetchone())
+    import_data(project_id, entity_.id, IMPORT_USER_ID, item['id'])
+    id_map[item['id']] = entity_.id
+    cursor.execute(
+       """
+       SELECT openatlas_class_name
+       FROM web.hierarchy_openatlas_class
+       WHERE hierarchy_id = %(id)s;
+       """, {'id': item['id']})
+    Entity.insert_hierarchy(
+       entity_,
+       item['category'],
+       [x[0] for x in list(cursor)],
+       item['multiple'])
+    if item['required']:
+        set_required(entity_.id)
 
 with app.test_request_context():
     app.preprocess_request()
