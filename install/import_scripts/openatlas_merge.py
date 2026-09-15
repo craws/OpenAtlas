@@ -1,13 +1,15 @@
 # Used to join data from OpenAtlas projects
-# Before running the script make sure you have configured the db to write to in
-# instance/production.py
+# Before running the script make sure you have configured:
+# * The database to write to in instance/production.py
+# * The database to read from in this script
 
 # Work in progress, to do:
+# * Reference systems
+# * Links
+# * Files
 # * Add case studies (if available)
-# * Import new hierarchies and subs
-# * What about place locations?
-# * Link everything
-# * What about files?
+# * Track manual mapping for e.g. duplicates
+# ** What about place locations
 
 import time
 from typing import Any
@@ -165,8 +167,7 @@ def insert_type_recursive(import_type):
        'end_from': import_type.dates.end_from,
        'end_to': import_type.dates.end_to,
        'end_comment': import_type.dates.end_comment})
-    id_map[import_type.id] = new_type.id
-    import_data(project_id, new_type.id, IMPORT_USER_ID, import_type.id)
+    track(import_type.id, new_type.id)
     super_id = id_map[import_type.root[-1]]
     new_type.link(
         new_type.class_.relations['super'].property,
@@ -174,6 +175,11 @@ def insert_type_recursive(import_type):
     g.types = Entity.get_all_types(False)
     for sub_id in import_type.subs:
         insert_type_recursive(import_types[sub_id])
+
+
+def track(import_id: int, new_id: int) -> None:
+    import_data(project_id, new_id, IMPORT_USER_ID, import_id)
+    id_map[import_id] = new_id
 
 
 def insert_entities() -> None:
@@ -195,19 +201,23 @@ def insert_entities() -> None:
         FROM
             model.entity;
         """)
-    # for row in list(cursor):
-    #     if row['openatlas_class_name'] not in [
-    #             'type',
-    #             'type_tools']:
-    #         entity = insert(
-    #             row['openatlas_class_name'],
-    #             row['name'],
-    #             row['description'])
-    #         import_data(
-    #             PROJECT_ID,
-    #             entity.id,
-    #             IMPORT_USER_ID,
-    #             origin_id=row['id'])
+    for row in list(cursor):
+        if row['openatlas_class_name'] not in [
+                'administrative_unit',
+                'reference_system',
+                'type',
+                'type_tools']:
+            entity = insert({
+               'name': row['name'],
+               'description': row['description'],
+               'openatlas_class_name': row['openatlas_class_name'],
+               'begin_from': row['begin_from'],
+               'begin_to': row['begin_to'],
+               'begin_comment': row['begin_comment'],
+               'end_from': row['end_from'],
+               'end_to': row['end_to'],
+               'end_comment': row['end_comment']})
+            track(row['id'], entity.id)
 
 
 with app.test_request_context():
