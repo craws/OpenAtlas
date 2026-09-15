@@ -6,16 +6,15 @@ from flask_openapi3 import APIBlueprint
 from openatlas import app
 from openatlas.api.api_v1.error_handlers import (
     abort_file_not_found,
-    abort_id_does_not_exist,
     register_error_handlers)
 from openatlas.api.api_v1.models.files import (
     FileIdPath,
-    LicensedFileOverviewResponse)
+    PublicFileOverviewResponse)
 from openatlas.api.api_v1.models.util import DownloadQuery
 from openatlas.api.api_v1.openapi_tags import file_tag
 from openatlas.api.api_v1.responses.files import (
     display_file_response,
-    licensed_files_response,
+    public_files_response,
     thumbnail_response)
 from openatlas.api.api_v1.util.files import (
     check_file_access,
@@ -116,11 +115,11 @@ def display_thumbnail(path: FileIdPath, query: DownloadQuery):
 
 # todo
 @api_v1_files.get(
-    '/licensed',
+    '/public',
     summary="Get licensed files overview",
     tags=[file_tag],
-    responses=licensed_files_response)
-def get_licensed_files():
+    responses=public_files_response)
+def get_public_files():
     """Retrieves all existing files with a license, their display URLs,
     and metadata."""
     entities = Entity.get_by_class(['file'], types=True)
@@ -130,4 +129,4 @@ def get_licensed_files():
     files = []
     for file_ in valid_files:
         files.append(get_file_item(file_))
-    return LicensedFileOverviewResponse(files={}).model_dump(by_alias=True)
+    return PublicFileOverviewResponse(data=files).model_dump(by_alias=True)

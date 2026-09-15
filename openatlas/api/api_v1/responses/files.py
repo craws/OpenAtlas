@@ -1,6 +1,6 @@
-from openatlas.api.api_v1.models.files import LicensedFileOverviewResponse
+from openatlas.api.api_v1.models.files import PublicFileOverviewResponse
 
-licensed_files_response = {200: LicensedFileOverviewResponse}
+public_files_response = {200: PublicFileOverviewResponse}
 
 display_file_response = {
     200: {

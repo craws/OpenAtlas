@@ -82,16 +82,13 @@ class FileItem(BaseSchema):
     #    examples=[5242880])
 
 
-class LicensedFileOverviewResponse(BaseSchema):
-    files: dict[str, FileItem] = Field(
-        ...,
+class PublicFileOverviewResponse(BaseSchema):
+    data: list[FileItem] = Field(
         description="Dictionary of licensed files, mapped by their ID")
 
-
+# Todo: implement
 class FilesByEntitiesQuery(BaseSchema):
-    # Für den Endpunkt, der Dateien nach Entitäten sucht
     entity_ids: list[int] = Field(
-        ...,
         alias="entityIds",
         description="List of entity IDs to fetch files for")
 
