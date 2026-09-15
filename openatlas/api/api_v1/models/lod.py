@@ -9,13 +9,12 @@ from openatlas.api.api_v1.util.date_util import handle_date
 
 
 class EntityPath(BaseSchema):
-    uuid: UUID = Field(..., description="Unique identifier of the entity")
+    uuid: UUID = Field(description="Unique identifier of the entity")
 
 
 class EntityPathExt(BaseSchema):
-    uuid: UUID = Field(..., description="Unique identifier of the entity")
+    uuid: UUID = Field(description="Unique identifier of the entity")
     ext: ExtensionsType = Field(
-        ...,
         description="File extension (.json, .ttl, .xml, .nt)",
         json_schema_extra={
             "examples": {

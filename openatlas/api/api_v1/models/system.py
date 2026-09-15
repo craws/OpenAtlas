@@ -26,8 +26,7 @@ class MapConfig(BaseSchema):
 
 
 class SystemInfoResponse(BaseSchema):
-    version: str = Field(
-        description="OpenAtlas Core Version")
+    version: str = Field(description="OpenAtlas Core Version")
     api_versions: list[str]
     site_name: str
     logo_file_id: int | None = None

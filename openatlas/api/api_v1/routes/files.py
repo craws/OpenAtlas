@@ -5,26 +5,18 @@ from flask_openapi3 import APIBlueprint
 
 from openatlas import app
 from openatlas.api.api_v1.error_handlers import (
-    abort_file_not_found,
-    register_error_handlers)
+    abort_file_not_found, register_error_handlers)
 from openatlas.api.api_v1.models.files import (
-    FileIdPath,
-    PublicFileOverviewResponse)
+    FileIdPath, PublicFileOverviewResponse)
 from openatlas.api.api_v1.models.util import DownloadQuery
 from openatlas.api.api_v1.openapi_tags import file_tag
 from openatlas.api.api_v1.responses.files import (
-    display_file_response,
-    public_files_response,
-    thumbnail_response)
+    display_file_response, public_files_response, thumbnail_response)
 from openatlas.api.api_v1.util.files import (
-    check_file_access,
-    get_file_entity,
-    get_file_item,
-    get_file_path,
+    check_file_access, get_file_entity, get_file_item, get_file_path,
     has_file_access)
 from openatlas.display.image_processing import (
-    check_iiif_activation,
-    check_iiif_file_exist)
+    check_iiif_activation, check_iiif_file_exist)
 from openatlas.models.entity import Entity
 
 api_v1_files = APIBlueprint(
@@ -113,7 +105,10 @@ def display_thumbnail(path: FileIdPath, query: DownloadQuery):
     return send_file(thumbnail_path, as_attachment=bool(query.download))
 
 
-# todo
+# todo:
+#   Performance
+#   Try not to use g.files
+#   Pagination
 @api_v1_files.get(
     '/public',
     summary="Get licensed files overview",
