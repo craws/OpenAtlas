@@ -139,9 +139,10 @@ def types() -> None:
         hierarchy = Entity.get_hierarchy(import_hierarchy.name)
         for id_ in import_hierarchy.subs:
             types_recursive(id_, hierarchy)
+    g.types = Entity.get_all_types(False)
 
 
-def types_recursive(id_, super_) -> None:
+def types_recursive(id_: int, super_: Entity) -> None:
     exists = False
     for sub_id in super_.subs:
         if g.types[sub_id].name == import_types[id_].name:
@@ -225,12 +226,13 @@ with app.test_request_context():
     project_id = insert_project()
     cleanup(project_id)
     hierarchies()
-    g.types = Entity.get_all_types(False)
+
     cursor_current = g.cursor
     g.cursor = cursor
     import_types = Entity.get_all_types(False)
     g.cursor = cursor_current
     types()
+
     insert_entities()
 
 print(f'Execution time: {int(time.time() - start)} seconds')
