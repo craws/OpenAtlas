@@ -60,9 +60,6 @@ def cleanup(id_: int) -> None:
             SELECT entity_id
             FROM import.entity WHERE project_id = %(project_id)s);
         """, {'project_id': id_})
-    # for row in list(g.cursor):
-    #    print(row['id'])
-    #    g.cursor.execute(f'DELETE FROM model.entity WHERE id = {row['id']};')
     g.cursor.execute(
         'DELETE FROM import.entity WHERE project_id = %(project_id)s;',
         {'project_id': id_})
@@ -74,8 +71,7 @@ def insert_project() -> int:
         """
         INSERT INTO import.project (name, description)
         VALUES (%(name)s, %(description)s)
-        ON CONFLICT (name)
-            DO UPDATE SET description = %(description)s
+        ON CONFLICT (name) DO UPDATE SET description = %(description)s
         RETURNING id;
         """,
         {'name': PROJECT_NAME, 'description': PROJECT_DESCRIPTION})
