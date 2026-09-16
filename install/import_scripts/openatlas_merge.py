@@ -4,12 +4,16 @@
 # * The database to read from in this script
 
 # Work in progress, to do:
-# * Reference systems
-# * Links
+# * Prevent double system references type match links
+# * Link admin units
 # * Files
-# * Add case studies (if available)
+# * Add case studies
+# * Check additional classes for reference systems
+# * Check additional classes for types
+#
+# 2nd part when dealing with multiple data sests
 # * Track manual mapping for e.g. duplicates
-# ** What about place locations
+# * New reference systems
 
 import time
 from typing import Any
@@ -19,6 +23,7 @@ from flask import g
 from psycopg2 import extras
 
 from openatlas import app
+from openatlas.database import entity as db
 from openatlas.database.entity import set_required
 from openatlas.database.imports import import_data
 from openatlas.models.entity import Entity, insert
@@ -55,6 +60,9 @@ def cleanup(id_: int) -> None:
             SELECT entity_id
             FROM import.entity WHERE project_id = %(project_id)s);
         """, {'project_id': id_})
+    # for row in list(g.cursor):
+    #    print(row['id'])
+    #    g.cursor.execute(f'DELETE FROM model.entity WHERE id = {row['id']};')
     g.cursor.execute(
         'DELETE FROM import.entity WHERE project_id = %(project_id)s;',
         {'project_id': id_})
@@ -133,31 +141,40 @@ def insert_hierarchy(item: dict[str, Any]) -> None:
 
 
 def types() -> None:
+    cursor_current = g.cursor
+    g.cursor = cursor
+    import_types = Entity.get_all_types(False)
+    g.cursor = cursor_current
     for import_hierarchy in [
             type_ for type_ in import_types.values() if not type_.root]:
         print(import_hierarchy.name)
         hierarchy = Entity.get_hierarchy(import_hierarchy.name)
         for id_ in import_hierarchy.subs:
-            types_recursive(id_, hierarchy)
+            types_recursive(id_, hierarchy, import_types)
     g.types = Entity.get_all_types(False)
 
 
-def types_recursive(id_: int, super_: Entity) -> None:
+def types_recursive(
+        id_: int,
+        super_: Entity,
+        import_types: dict[int, Entity]) -> None:
     exists = False
     for sub_id in super_.subs:
         if g.types[sub_id].name == import_types[id_].name:
             id_map[id_] = sub_id
             print(f'exists: {import_types[id_].name}')
             for import_sub_id in import_types[id_].subs:
-                types_recursive(import_sub_id, g.types[sub_id])
+                types_recursive(import_sub_id, g.types[sub_id], import_types)
             exists = True
             break
     if not exists:
-        insert_type_recursive(import_types[id_])
+        insert_type_recursive(import_types[id_], import_types)
 
 
-def insert_type_recursive(import_type):
-    print(f'new: {import_type.name}')
+def insert_type_recursive(
+        import_type: Entity,
+        import_types: dict[int, Entity]):
+    print(f'New type: {import_type.name}')
     new_type = insert({
        'name': import_type.name,
        'description': import_type.description,
@@ -175,7 +192,7 @@ def insert_type_recursive(import_type):
         g.types[super_id])
     g.types = Entity.get_all_types(False)
     for sub_id in import_type.subs:
-        insert_type_recursive(import_types[sub_id])
+        insert_type_recursive(import_types[sub_id], import_types)
 
 
 def track(import_id: int, new_id: int) -> None:
@@ -184,6 +201,7 @@ def track(import_id: int, new_id: int) -> None:
 
 
 def insert_entities() -> None:
+    print('Insert entities')
     cursor.execute(
         """
         SELECT
@@ -200,25 +218,85 @@ def insert_entities() -> None:
             end_comment,
             openatlas_class_name
         FROM
-            model.entity;
+            model.entity
+        WHERE openatlas_class_name NOT IN (
+            'administrative_unit', 'reference_system', 'type', 'type_tools');
         """)
     for row in list(cursor):
-        if row['openatlas_class_name'] not in [
-                'administrative_unit',
-                'reference_system',
-                'type',
-                'type_tools']:
-            entity = insert({
-               'name': row['name'],
-               'description': row['description'],
-               'openatlas_class_name': row['openatlas_class_name'],
-               'begin_from': row['begin_from'],
-               'begin_to': row['begin_to'],
-               'begin_comment': row['begin_comment'],
-               'end_from': row['end_from'],
-               'end_to': row['end_to'],
-               'end_comment': row['end_comment']})
-            track(row['id'], entity.id)
+        new_id = db.insert({
+           'name': row['name'],
+           'description': row['description'],
+           'openatlas_class_name': row['openatlas_class_name'],
+           'begin_from': row['begin_from'],
+           'begin_to': row['begin_to'],
+           'begin_comment': row['begin_comment'],
+           'end_from': row['end_from'],
+           'end_to': row['end_to'],
+           'end_comment': row['end_comment']})
+        track(row['id'], new_id)
+
+
+def reference_systems() -> None:
+    cursor_current = g.cursor
+    g.cursor = cursor
+    system_rows = db.get_reference_systems()
+    g.cursor = cursor_current
+    for row in system_rows:
+        exists = False
+        for existing_system in g.reference_systems.values():
+            if row['name'] == existing_system.name:
+                print(f'Reference system exists: {row['name']}')
+                exists = True
+                id_map[row['id']] = existing_system.id
+        if not exists:
+            # Todo: implement adding reference systems
+            print(f'New reference system: {row['name']}')
+
+
+def link_entities() -> None:
+    print('Insert links')
+    cursor.execute(
+        """
+        SELECT
+            id,
+            property_code,
+            domain_id,
+            range_id,
+            description,
+            created,
+            modified,
+            type_id,
+            COALESCE(to_char(begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                AS begin_from, begin_comment,
+            COALESCE(to_char(begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                AS begin_to,
+            COALESCE(to_char(end_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                AS end_from, end_comment,
+            COALESCE(to_char(end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                AS end_to
+        FROM model.link
+        WHERE property_code NOT IN ('P127', 'P89');
+        """)
+    for row in list(cursor):
+        if row['domain_id'] not in id_map:
+            print(f'Missing domain_id in id_map: {row['domain_id']}')
+            continue
+        if row['range_id'] not in id_map:
+            print(f'Missing range_id in id_map: {row['range_id']}')
+            continue
+        db.link({
+            'property_code': row['property_code'],
+            'domain_id': id_map[row['domain_id']],
+            'range_id': id_map[row['range_id']],
+            'description': row['description'],
+            'type_id': id_map[row['type_id']] if row['type_id'] else None,
+            'begin_from': row['begin_from'] or None,
+            'begin_to': row['begin_to'] or None,
+            'begin_comment': row['begin_comment'] or None,
+            'end_from': row['end_from'] or None,
+            'end_to': row['end_to'] or None,
+            'end_comment': row['end_comment'] or None
+        })
 
 
 with app.test_request_context():
@@ -226,13 +304,9 @@ with app.test_request_context():
     project_id = insert_project()
     cleanup(project_id)
     hierarchies()
-
-    cursor_current = g.cursor
-    g.cursor = cursor
-    import_types = Entity.get_all_types(False)
-    g.cursor = cursor_current
+    reference_systems()
     types()
-
     insert_entities()
+    link_entities()
 
 print(f'Execution time: {int(time.time() - start)} seconds')
