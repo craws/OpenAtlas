@@ -23,6 +23,7 @@ from openatlas.api.api_v1.util.iiif_manifest import (
     build_image,
     build_manifest_v2,
     build_manifest_v3)
+from openatlas.database.annotation import get_annotation_image_by_id
 from openatlas.models.annotation import AnnotationImage
 
 api_v1_iiif = APIBlueprint(
@@ -105,9 +106,9 @@ def get_iiif_annotation(path: AnnotationIiifPath):
     """Returns a specific IIIF annotation."""
     if path.version not in ['2', '3']:
         abort_unsupported_iiif_version(path.version)
-    annotation = AnnotationImage.get_by_id(path.id)
-    if not annotation:
+    if not (data := get_annotation_image_by_id(path.id)):
         abort_id_does_not_exist(path.id)
+    annotation = AnnotationImage(data)
     image_entity = get_file_entity(annotation.image_id)
     check_file_access(image_entity)
     return build_annotation(annotation, version=int(path.version))

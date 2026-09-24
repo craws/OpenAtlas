@@ -161,6 +161,15 @@ class ApiV1(ApiTestCase):
                 child,
                 'vocabulary-id',
                 type_id=self.precision_type.subs[0])
+            resolver = reference_system.resolver_url
+            other = g.types[root.subs[-1]]
+            other_uri = URIRef(url_for(
+                'api.entity_uuid', uuid=other.uuid, _external=True))
+            reference_system.link(
+                'P67',
+                other,
+                'University positions',
+                type_id=self.precision_type.subs[0])
             root_uri = URIRef(url_for(
                 'api.entity_uuid', uuid=root.uuid, _external=True))
             child_uri = URIRef(url_for(
@@ -239,6 +248,35 @@ class ApiV1(ApiTestCase):
             graph.objects(child_uri, URIRef(f'{skos}exactMatch'))) + list(
             graph.objects(child_uri, URIRef(f'{skos}closeMatch')))
         assert match_links
+
+        # Identifiers with spaces are URL-encoded, values without a
+        # resolvable URI are skipped instead of crashing the serializer
+        rv = c.get(
+            url_for(
+                'api_v1_vocabulary.get_vocabulary_skos',
+                id=root.id,
+                ext='nt'))
+        assert rv.status_code == 200
+        graph = Graph()
+        graph.parse(data=rv.data, format='nt')
+        match_links = list(
+            graph.objects(other_uri, URIRef(f'{skos}exactMatch'))) + list(
+            graph.objects(other_uri, URIRef(f'{skos}closeMatch')))
+        assert all(' ' not in str(uri) for uri in match_links)
+        if resolver:
+            assert URIRef(f'{resolver}University%20positions') in match_links
+
+        from openatlas.api.api_v1.formatters.skos import _get_match_uri
+        from openatlas.api.api_v1.models.util import \
+            ExternalReferenceSystemModel
+        assert _get_match_uri(ExternalReferenceSystemModel(
+            id=1, name='Local', identifier='University positions')) is None
+        assert _get_match_uri(ExternalReferenceSystemModel(
+            id=1,
+            name='Wikidata',
+            url='https://www.wikidata.org/wiki/',
+            identifier='https://www.wikidata.org/wiki/Q 1')) == URIRef(
+            'https://www.wikidata.org/wiki/Q%201')
 
         # Unknown id returns 404
         rv = c.get(
@@ -466,6 +504,11 @@ class ApiV1(ApiTestCase):
         # Error cases: id does not exist
         rv = c.get('/api/1/iiif/999999/manifest/2')
         assert rv.status_code in (404, 418)
+
+        for id_ in [0, 999999]:
+            rv = c.get(f'/api/1/iiif/{id_}/annotation/3')
+            assert rv.status_code == 404
+            assert rv.get_json()['details']['provided_id'] == str(id_)
 
 
 
