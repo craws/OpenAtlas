@@ -7,6 +7,7 @@ from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
 from tests.base import ApiTestCase, get_hierarchy, insert
 
+from rdflib import Graph, RDF, URIRef
 
 
 class ApiV1(ApiTestCase):
@@ -123,6 +124,107 @@ class ApiV1(ApiTestCase):
         rv_json = rv.get_json()
         assert 'data' in rv_json
         assert isinstance(rv_json['data'], list)
+
+    def test_vocabulary_skos(self) -> None:
+        skos = 'http://www.w3.org/2004/02/skos/core#'
+        dcterms = 'http://purl.org/dc/terms/'
+        c = self.client
+        with app.test_request_context():
+            app.preprocess_request()
+            root = self.precision_type
+            child = g.types[root.subs[0]]
+            reference_system = next(iter(g.reference_systems.values()))
+            reference_system.link(
+                'P67',
+                child,
+                'vocabulary-id',
+                type_id=self.precision_type.subs[0])
+            root_uri = URIRef(url_for(
+                'api.entity_uuid', uuid=root.uuid, _external=True))
+            child_uri = URIRef(url_for(
+                'api.entity_uuid', uuid=child.uuid, _external=True))
+            grandchild = g.types[child.subs[0]] if child.subs else None
+            grandchild_uri = URIRef(url_for(
+                'api.entity_uuid',
+                uuid=grandchild.uuid,
+                _external=True)) if grandchild else None
+
+        format_map = {
+            'ttl': ('turtle', 'text/turtle'),
+            'xml': ('xml', 'application/rdf+xml'),
+            'json': ('json-ld', 'application/ld+json'),
+            'nt': ('nt', 'application/n-triples')}
+        for ext, (rdf_format, mimetype) in format_map.items():
+            rv = c.get(
+                url_for(
+                    'api_v1_vocabulary.get_vocabulary_skos',
+                    id=root.id,
+                    ext=ext))
+            assert rv.status_code == 200
+            assert mimetype in rv.headers.get('Content-Type')
+            graph = Graph()
+            graph.parse(data=rv.data, format=rdf_format)
+            assert (
+                root_uri, RDF.type, URIRef(f'{skos}ConceptScheme')) in graph
+
+        rv = c.get(
+            url_for(
+                'api_v1_vocabulary.get_vocabulary_skos',
+                id=root.id,
+                ext='ttl'))
+        graph = Graph()
+        graph.parse(data=rv.data, format='turtle')
+
+        # ConceptScheme with placeholder dcterms metadata
+        assert (root_uri, RDF.type, URIRef(f'{skos}ConceptScheme')) in graph
+        assert (root_uri, URIRef(f'{dcterms}title'), None) in graph
+        assert (root_uri, URIRef(f'{dcterms}creator'), None) in graph
+        assert (root_uri, URIRef(f'{dcterms}license'), None) in graph
+
+        # Immediate child is a top concept linked via hasTopConcept /
+        # topConceptOf (never inScheme / broader / narrower to the scheme)
+        assert (child_uri, RDF.type, URIRef(f'{skos}Concept')) in graph
+        assert (root_uri, URIRef(f'{skos}hasTopConcept'), child_uri) in graph
+        assert (child_uri, URIRef(f'{skos}topConceptOf'), root_uri) in graph
+        assert (child_uri, URIRef(f'{skos}inScheme'), root_uri) not in graph
+        assert (child_uri, URIRef(f'{skos}broader'), root_uri) not in graph
+        assert (root_uri, URIRef(f'{skos}narrower'), child_uri) not in graph
+
+        # Deeper descendants use inScheme and reciprocal broader / narrower
+        # to their parent concept (not to the scheme)
+        if grandchild_uri is not None:
+            assert (
+                grandchild_uri, RDF.type, URIRef(f'{skos}Concept')) in graph
+            assert (
+                grandchild_uri,
+                URIRef(f'{skos}inScheme'),
+                root_uri) in graph
+            assert (
+                grandchild_uri,
+                URIRef(f'{skos}broader'),
+                child_uri) in graph
+            assert (
+                child_uri,
+                URIRef(f'{skos}narrower'),
+                grandchild_uri) in graph
+            assert (
+                grandchild_uri,
+                URIRef(f'{skos}topConceptOf'),
+                root_uri) not in graph
+
+        # External reference produces a match link
+        match_links = list(
+            graph.objects(child_uri, URIRef(f'{skos}exactMatch'))) + list(
+            graph.objects(child_uri, URIRef(f'{skos}closeMatch')))
+        assert match_links
+
+        # Unknown id returns 404
+        rv = c.get(
+            url_for(
+                'api_v1_vocabulary.get_vocabulary_skos',
+                id=999999,
+                ext='ttl'))
+        assert rv.status_code == 404
 
     def test_metadata(self) -> None:
         c = self.client

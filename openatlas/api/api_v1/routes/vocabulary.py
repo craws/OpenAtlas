@@ -1,7 +1,7 @@
 from typing import Any, cast
 from uuid import UUID
 
-from flask import g
+from flask import g, Response
 from flask_openapi3 import APIBlueprint
 from pydantic import BaseModel, Field
 
@@ -10,13 +10,16 @@ from openatlas.api.api_v1.error_handlers import abort_not_found, \
     register_error_handlers
 from openatlas.api.api_v1.formatters.lod_util import (
     EntityLinks, get_links_for_entities)
+from openatlas.api.api_v1.formatters.skos import (
+    build_skos_graph, serialize_skos)
 from openatlas.api.api_v1.openapi_tags import vocabulary_tag
 from openatlas.api.api_v1.models.util import (
-    ExternalReferenceSystemModel, MatchTypeEnum, OpenAtlasClassEnum,
-    ReferenceModel, TypeCategoryEnum)
+    ExtensionsType, ExternalReferenceSystemModel, MatchTypeEnum,
+    OpenAtlasClassEnum, ReferenceModel, TypeCategoryEnum)
 from openatlas.api.api_v1.responses.vocabulary import \
     vocabulary_flat_response, vocabulary_list_response, \
-    vocabulary_standard_by_class_response, vocabulary_tree_response
+    vocabulary_skos_response, vocabulary_standard_by_class_response, \
+    vocabulary_tree_response
 from openatlas.api.api_v1.models.vocabulary import (
     LinkedTypeItem, VocabularyFlatItem, VocabularyTreeItem,
     VocabularyFlatResponse,
@@ -44,6 +47,19 @@ class VocabularyId(BaseModel):
     id: int = Field(
         ...,
         description="ID of a type")
+
+
+class VocabularySkosPath(BaseModel):
+    id: int = Field(
+        description="Root ID of the vocabulary hierarchy.")
+    ext: ExtensionsType = Field(
+        description="Serialization format (.ttl, .xml, .json, .nt).",
+        json_schema_extra={
+            "examples": {
+                "turtle": {"summary": "Turtle Format", "value": "ttl"},
+                "xml": {"summary": "RDF/XML Format", "value": "xml"},
+                "json": {"summary": "JSON-LD Format", "value": "json"},
+                "ntriples": {"summary": "N-Triples Format", "value": "nt"}}})
 
 
 def _get_reference_item(link_: Link) -> ReferenceModel:
@@ -75,6 +91,17 @@ def _get_external_reference_item(
         url=entity.resolver_url)
 
 
+def get_external_reference_items(
+        inverse_links: list[Link]) -> list[ExternalReferenceSystemModel]:
+    external_references = []
+    for link_ in inverse_links:
+        if link_.type and \
+                (entity := g.reference_systems.get(link_.domain.id)):
+            external_references.append(
+                _get_external_reference_item(link_, entity))
+    return external_references
+
+
 def _get_vocab_flat_item(
         type_: Entity,
         links: dict[int, EntityLinks]) -> VocabularyFlatItem:
@@ -88,12 +115,7 @@ def _get_vocab_flat_item(
          if link_.domain.class_.name == 'file'
          and link_.property.code == 'P67'),
         None)
-    external_references = []
-    for link_ in inverse_links:
-        if link_.type and \
-                (entity := g.reference_systems.get(link_.domain.id)):
-            external_references.append(
-                _get_external_reference_item(link_, entity))
+    external_references = get_external_reference_items(inverse_links)
     references = [
         _get_reference_item(link_) for link_ in inverse_links
         if link_.domain.class_.group.get('name') == 'reference'
@@ -142,6 +164,27 @@ def get_vocabulary_item(path: VocabularyId) -> dict[str, Any]:
         abort_not_found(path.id)
     links = get_links_for_entities([type_])
     return _get_vocab_flat_item(type_, links).model_dump(by_alias=True)
+
+
+@api_v1_vocabulary.get(
+    '/<int:id>/skos.<ext>',
+    summary="Export vocabulary hierarchy as SKOS",
+    responses=vocabulary_skos_response,
+    tags=[vocabulary_tag])
+def get_vocabulary_skos(path: VocabularySkosPath) -> Response:
+    """Exports a single vocabulary tree as a SKOS ConceptScheme for
+    thesaurus management tools such as SKOSMOS.
+
+    The type identified by ``id`` becomes the ``skos:ConceptScheme`` and all
+    of its descendants are exported as ``skos:Concept`` linked via
+    ``skos:broader``/``skos:narrower``. The serialization format is driven by
+    the URL extension (``ttl``, ``xml``, ``json``, ``nt``).
+    """
+    root = g.types.get(path.id)
+    if not root:
+        abort_not_found(path.id)
+    ext = path.ext.value if hasattr(path.ext, 'value') else str(path.ext)
+    return serialize_skos(build_skos_graph(root), ext)
 
 
 def _walk_tree(
