@@ -2,10 +2,27 @@ from typing import Any
 from uuid import UUID
 
 from flask import g
+from werkzeug.exceptions import ImATeapot
 
-from openatlas.api.api_v1.error_handlers import abort_invalid_class
+from openatlas.api.api_v1.error_handlers import (
+    abort_invalid_class, abort_not_found)
 from openatlas.database.api import get_by_class_api, get_count_by_class_api
 from openatlas.models.entity import Entity
+
+
+def get_entity_by_id(
+        id_: int,
+        types: bool = False,
+        aliases: bool = False,
+        with_location: bool = True) -> Entity:
+    try:
+        return Entity.get_by_id(
+            id_,
+            types=types,
+            aliases=aliases,
+            with_location=with_location)
+    except ImATeapot:  # Entity.get_by_id() aborts with 418 if id not found
+        abort_not_found(id_)
 
 
 def resolve_type_ids(

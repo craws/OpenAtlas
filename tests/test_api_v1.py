@@ -48,7 +48,17 @@ class ApiV1(ApiTestCase):
             'api_v1_lod.entities', entity_class='acquisition',
             startDate='999999999'))
         assert rv.status_code == 400
-        assert rv.get_json()['status'] == 400
+        rv_json = rv.get_json()
+        assert rv_json['status'] == 400
+        assert {'title', 'message', 'details', 'url', 'timestamp'} \
+            <= rv_json.keys()
+
+        rv = c.get(url_for('api_v1_metadata.get_agent_by_id', id=999999))
+        assert rv.status_code == 404
+        rv_json = rv.get_json()
+        assert rv_json['status'] == 404
+        assert {'title', 'message', 'details', 'url', 'timestamp'} \
+            <= rv_json.keys()
 
 
     def test_system(self) -> None:
@@ -314,6 +324,10 @@ class ApiV1(ApiTestCase):
         assert isinstance(rv_json['data'], list)
 
         # Agent by ID (dummy 1 for now)
+        rv = c.get(url_for('api_v1_metadata.get_agent_by_id', id=999999))
+        assert rv.status_code == 404
+        assert rv.get_json()['details']['provided_uuid'] == '999999'
+
         rv = c.get(url_for('api_v1_metadata.get_agent_by_id', id=1))
         assert rv.status_code == 200
         rv_json = rv.get_json()
@@ -503,7 +517,8 @@ class ApiV1(ApiTestCase):
 
         # Error cases: id does not exist
         rv = c.get('/api/1/iiif/999999/manifest/2')
-        assert rv.status_code in (404, 418)
+        assert rv.status_code == 404
+        assert rv.get_json()['details']['provided_uuid'] == '999999'
 
         for id_ in [0, 999999]:
             rv = c.get(f'/api/1/iiif/{id_}/annotation/3')

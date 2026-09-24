@@ -1,6 +1,7 @@
 from flask import g
 from flask_openapi3 import APIBlueprint
 
+from openatlas.api.api_v1.entity import get_entity_by_id
 from openatlas.api.api_v1.error_handlers import abort_not_found, \
     register_error_handlers
 from openatlas.api.api_v1.models.agent import AgentItem, AgentListResponse, \
@@ -9,7 +10,6 @@ from openatlas.api.api_v1.models.metadata import CaseStudyItem, \
     CaseStudyListResponse, \
     CaseStudyPath
 from openatlas.api.api_v1.openapi_tags import metadata_tag
-from openatlas.models.entity import Entity
 
 api_v1_metadata = APIBlueprint(
     'api_v1_metadata',
@@ -76,9 +76,7 @@ def get_agents():
     tags=[metadata_tag],
     responses={200: AgentItem})
 def get_agent_by_id(path: AgentPath):
-    entity = Entity.get_by_id(path.id)
-    if not entity:
-        abort_not_found(path.id)
+    entity = get_entity_by_id(path.id)
     return AgentItem(
         id=entity.id,
         name=entity.name,

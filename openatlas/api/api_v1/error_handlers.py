@@ -1,45 +1,60 @@
 from datetime import datetime
-from typing import NoReturn
+from typing import Any, NoReturn
 from uuid import UUID
 
-from flask import abort, current_app, jsonify, make_response, request
+from flask import Response, abort, current_app, jsonify, make_response, request
 from werkzeug.exceptions import HTTPException
 import psycopg2
 
 
+def error_response(
+        status: int,
+        title: str,
+        message: str,
+        details: dict[str, Any] | None = None) -> Response:
+    error_payload = {
+        'title': title,
+        'message': message,
+        'details': details or {},
+        'url': request.url,
+        'timestamp': datetime.now().isoformat(),
+        'status': status}
+    return make_response(jsonify(error_payload), status)
+
+
+def abort_with_error(
+        status: int,
+        title: str,
+        message: str,
+        details: dict[str, Any] | None = None) -> NoReturn:
+    abort(error_response(status, title, message, details))
+
+
 def handle_db_error(e):
     current_app.logger.exception(e)
-    return jsonify({
-        "status": 500,
-        "title": "Internal Server Error",
-        "message": "Unexpected database error occurred"
-    }), 500
+    return error_response(
+        500,
+        'Internal Server Error',
+        'Unexpected database error occurred',
+        {'hint': 'Please try again later or contact the project members.'})
 
 
 def handle_db_data_error(e):
     current_app.logger.warning(e)
-    return jsonify({
-        "status": 400,
-        "title": "Bad Request",
-        "message": "Invalid value in request parameters, e.g. a date "
-                   "out of range or with an invalid format."
-    }), 400
+    return error_response(
+        400,
+        'Bad Request',
+        'Invalid value in request parameters, e.g. a date '
+        'out of range or with an invalid format.',
+        {'hint': 'Check the request parameters in the API documentation.'})
 
 
 def handle_http_exception(e):
-    return jsonify({
-        "status": e.code,
-        "title": e.name,
-        "message": e.description
-    }), e.code
+    return error_response(e.code, e.name, e.description)
 
 
 def handle_file_not_found_exception(e):
-    return jsonify({
-        "status": e.code,
-        "title": e.name,
-        "message": e.description
-    }), e.code
+    return error_response(e.code, e.name, e.description)
 
 
 def register_error_handlers(api_v1) -> None:
@@ -49,108 +64,86 @@ def register_error_handlers(api_v1) -> None:
 
 
 def abort_not_found(uuid: UUID | str | int) -> NoReturn:
-    error_payload = {
-        'title': 'Entity does not exist',
-        'message': 'The requested entity could not be found in the database.',
-        'details': {
+    abort_with_error(
+        404,
+        'Entity does not exist',
+        'The requested entity could not be found in the database.',
+        {
             'provided_uuid': str(uuid),
             'hint': 'Check if the UUID is correct '
-                    'and the entity has not been deleted.'},
-        'url': request.url,
-        'timestamp': datetime.now().isoformat(),
-        'status': 404}
-    abort(make_response(jsonify(error_payload), 404))
+                    'and the entity has not been deleted.'})
 
 
 def abort_invalid_class(class_name: str) -> NoReturn:
-    error_payload = {
-        'title': 'Invalid system class',
-        'message': f"The requested entity class '{class_name}' "
-                   f"is not a valid system class.",
-        'details': {
+    abort_with_error(
+        404,
+        'Invalid system class',
+        f"The requested entity class '{class_name}' "
+        f"is not a valid system class.",
+        {
             'provided_class': str(class_name),
             'hint': 'Check if the class name is spelled '
-                    'correctly and exists in the system.'},
-        'url': request.url,
-        'timestamp': datetime.now().isoformat(),
-        'status': 404}
-    abort(make_response(jsonify(error_payload), 404))
+                    'correctly and exists in the system.'})
 
 
 def abort_id_not_a_file(id_: int) -> NoReturn:
-    error_payload = {
-        'title': 'ID is not a file',
-        'message': f"The requested entity id {id_} is not a file. ",
-        'details': {
+    abort_with_error(
+        404,
+        'ID is not a file',
+        f"The requested entity id {id_} is not a file. ",
+        {
             'provided_id': str(id_),
             'hint': 'Find more details of that entity '
-                    'via an /entity endpoint'},
-        'url': request.url,
-        'timestamp': datetime.now().isoformat(),
-        'status': 404}
-    abort(make_response(jsonify(error_payload), 404))
+                    'via an /entity endpoint'})
+
 
 def abort_id_does_not_exist(id_: int) -> NoReturn:
-    error_payload = {
-        'title': 'ID does not exist',
-        'message': f"The requested entity id {id_} is not in the database.",
-        'details': {
+    abort_with_error(
+        404,
+        'ID does not exist',
+        f"The requested entity id {id_} is not in the database.",
+        {
             'provided_id': str(id_),
             'hint': 'Try searching for the entity by its name using a '
-                    'search endpoint.'},
-        'url': request.url,
-        'timestamp': datetime.now().isoformat(),
-        'status': 404}
-    abort(make_response(jsonify(error_payload), 404))
+                    'search endpoint.'})
 
 
 def abort_file_without_license(id_: int) -> NoReturn:
-    error_payload = {
-        'title': 'No Licenser',
-        'message': "The requested file has no license and can't be displayed.",
-        'details': {
+    abort_with_error(
+        403,
+        'No Licenser',
+        "The requested file has no license and can't be displayed.",
+        {
             'provided_id': str(id_),
-            'hint': 'Please contact the project members for more details.'},
-        'url': request.url,
-        'timestamp': datetime.now().isoformat(),
-        'status': 403}
-    abort(make_response(jsonify(error_payload), 403))
+            'hint': 'Please contact the project members for more details.'})
 
 
 def abort_file_not_public(id_: int) -> NoReturn:
-    error_payload = {
-        'title': 'Not shareable',
-        'message': "This file is not public shareable.",
-        'details': {
+    abort_with_error(
+        403,
+        'Not shareable',
+        "This file is not public shareable.",
+        {
             'provided_id': str(id_),
-            'hint': 'Please contact the project members for more details.'},
-        'url': request.url,
-        'timestamp': datetime.now().isoformat(),
-        'status': 403}
-    abort(make_response(jsonify(error_payload), 403))
+            'hint': 'Please contact the project members for more details.'})
+
 
 def abort_file_not_found(id_: int) -> NoReturn:
-    error_payload = {
-        'title': 'File not found',
-        'message': f"No file was found for the requested ID {id_}.",
-        'details': {
+    abort_with_error(
+        404,
+        'File not found',
+        f"No file was found for the requested ID {id_}.",
+        {
             'provided_id': str(id_),
             'hint': 'Find more details of that entity '
-                    'via an /entity endpoint'},
-        'url': request.url,
-        'timestamp': datetime.now().isoformat(),
-        'status': 404}
-    abort(make_response(jsonify(error_payload), 404))
+                    'via an /entity endpoint'})
 
 
 def abort_unsupported_iiif_version(version: str) -> NoReturn:
-    error_payload = {
-        'title': 'Unsupported IIIF version',
-        'message': f"The requested IIIF version '{version}' is not supported.",
-        'details': {
+    abort_with_error(
+        400,
+        'Unsupported IIIF version',
+        f"The requested IIIF version '{version}' is not supported.",
+        {
             'provided_version': str(version),
-            'hint': 'Only IIIF versions 2 and 3 are supported.'},
-        'url': request.url,
-        'timestamp': datetime.now().isoformat(),
-        'status': 400}
-    abort(make_response(jsonify(error_payload), 400))
+            'hint': 'Only IIIF versions 2 and 3 are supported.'})

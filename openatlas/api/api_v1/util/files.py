@@ -9,11 +9,11 @@ from uuid import UUID
 
 from flask import g, url_for
 
+from openatlas.api.api_v1.entity import get_entity_by_id
 from openatlas.api.api_v1.error_handlers import (
     abort_file_not_found,
     abort_file_not_public,
     abort_file_without_license,
-    abort_id_does_not_exist,
     abort_id_not_a_file)
 from openatlas.api.api_v1.formatters.lod_util import \
     get_iiif_manifest_and_path
@@ -99,9 +99,7 @@ def check_file_access(file_entity: Entity) -> bool:
 
 
 def get_file_entity(file_id: int) -> Entity:
-    entity = Entity.get_by_id(file_id, types=True, with_location=False)
-    if not entity:
-        abort_id_does_not_exist(file_id)
+    entity = get_entity_by_id(file_id, types=True, with_location=False)
     if entity.class_.name != 'file':
         abort_id_not_a_file(file_id)
     return entity

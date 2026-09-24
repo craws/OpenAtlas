@@ -6,6 +6,7 @@ import svgwrite
 from flask import g, url_for, request
 from flask_babel import gettext as _
 
+from openatlas.api.api_v1.entity import get_entity_by_id
 from openatlas.api.api_v1.error_handlers import abort_file_not_found
 from openatlas.api.api_v1.formatters.lod_util import get_license_type
 from openatlas.api.api_v1.models.files import LicenseItem
@@ -259,7 +260,7 @@ class V2Builder(IIIFBuilder):
             annotation: AnnotationImage) -> dict[str, Any]:
         entity_link = ''
         if annotation.entity_id:
-            entity = Entity.get_by_id(annotation.entity_id)
+            entity = get_entity_by_id(annotation.entity_id)
             if entity:
                 url = get_url(entity.id)
                 entity_link = f'<a href={url} target=_blank>{entity.name}</a>'
@@ -394,7 +395,7 @@ class V3Builder(IIIFBuilder):
             annotation: AnnotationImage) -> dict[str, Any]:
         entity_link = ''
         if annotation.entity_id:
-            entity = Entity.get_by_id(annotation.entity_id)
+            entity = get_entity_by_id(annotation.entity_id)
             if entity:
                 url = get_url(entity.id)
                 entity_link = f'<a href={url} target=_blank>{entity.name}</a>'
@@ -459,7 +460,7 @@ def build_image(entity: Entity, version: int = 2) -> dict[str, Any]:
 def build_annotation(
         annotation: AnnotationImage,
         version: int = 2) -> dict[str, Any]:
-    entity = Entity.get_by_id(annotation.image_id)
+    entity = get_entity_by_id(annotation.image_id)
     builder = V3Builder(entity, 3) if version == 3 else V2Builder(entity, 2)
     return builder.build_annotation(annotation)
 

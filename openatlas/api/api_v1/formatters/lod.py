@@ -8,6 +8,7 @@ import validators
 from flask import g, url_for
 
 from openatlas import app
+from openatlas.api.api_v1.entity import get_entity_by_id
 from openatlas.api.api_v1.formatters.lod_helpers import (
     ARCHAEOLOGY_AAT, BIBLIOGRAPHY_AAT, MIME_CLASSIFICATIONS, TYPE_OVERWRITES,
     UNIT_MAP, aat_type, category_aat, get_language, primary_name)
@@ -840,7 +841,7 @@ class LodFormatter:
                         "_label": "end",
                         "content": f'{annotation.link_end}'}]}]}]}
         if annotation.entity_id:
-            linked = Entity.get_by_id(annotation.entity_id)
+            linked = get_entity_by_id(annotation.entity_id)
             annotation_dict['about'] = [{
                 'id': entity_uri(linked),
                 'type': LodFormatter._resolve_type(linked),
