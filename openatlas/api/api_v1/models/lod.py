@@ -106,11 +106,13 @@ class EntityCollectionQuery(BaseSchema):
     start_date: str | None = Field(
         None,
         description="Filter entities with begin date on or after this date ("
-                    "e.g. 0400-01-01, 400, -400).")
+                    "e.g. 0400-01-01, 400, -400). Negative years are BC, "
+                    "year 0 does not exist.")
     end_date: str | None = Field(
         None,
         description="Filter entities with end date on or before this date ("
-                    "e.g. 0400-12-31, 400, -400).")
+                    "e.g. 0400-12-31, 400, -400). Negative years are BC, "
+                    "year 0 does not exist.")
     type_id: int | UUID | None = Field(
         None,
         description="Filter entities by type ID (integer) or type UUID.")

@@ -40,6 +40,10 @@ def handle_date(value: Any, is_end_date: bool = False) -> str | None:
         raise ValueError(f"Invalid date format: {value}")
 
     year_int = int(parts[0])
+    if year_int == 0:
+        raise ValueError(
+            f"Invalid year: 0 in date {value}. There is no year 0, "
+            f"use 1 (AD) or -1 (BC).")
     year_str = f"{year_int:04d}"
     if is_negative:
         year_str = f"-{year_str}"

@@ -2,17 +2,28 @@ from datetime import datetime
 from typing import NoReturn
 from uuid import UUID
 
-from flask import abort, jsonify, make_response, request
+from flask import abort, current_app, jsonify, make_response, request
 from werkzeug.exceptions import HTTPException
 import psycopg2
 
 
 def handle_db_error(e):
+    current_app.logger.exception(e)
     return jsonify({
         "status": 500,
         "title": "Internal Server Error",
         "message": "Unexpected database error occurred"
-    }), e.code
+    }), 500
+
+
+def handle_db_data_error(e):
+    current_app.logger.warning(e)
+    return jsonify({
+        "status": 400,
+        "title": "Bad Request",
+        "message": "Invalid value in request parameters, e.g. a date "
+                   "out of range or with an invalid format."
+    }), 400
 
 
 def handle_http_exception(e):
@@ -32,6 +43,7 @@ def handle_file_not_found_exception(e):
 
 
 def register_error_handlers(api_v1) -> None:
+    api_v1.register_error_handler(psycopg2.DataError, handle_db_data_error)
     api_v1.register_error_handler(psycopg2.Error, handle_db_error)
     api_v1.register_error_handler(HTTPException, handle_http_exception)
 

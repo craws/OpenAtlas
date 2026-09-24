@@ -28,6 +28,28 @@ class ApiV1(ApiTestCase):
         assert rv_json['type'] == 'Site'
         assert rv_json['_label'] == 'Shire'
 
+        rv = c.get(url_for(
+            'api_v1_lod.entities', entity_class='acquisition',
+            startDate='-400', endDate='2000-05'))
+        assert rv.status_code == 200
+
+        for params in [
+                {'startDate': '0'},
+                {'startDate': '-0'},
+                {'startDate': '0000-03-15'},
+                {'endDate': '0'},
+                {'endDate': '0-05'}]:
+            rv = c.get(url_for(
+                'api_v1_lod.entities', entity_class='acquisition', **params))
+            assert rv.status_code == 422
+            assert b'There is no year 0' in rv.data
+
+        rv = c.get(url_for(
+            'api_v1_lod.entities', entity_class='acquisition',
+            startDate='999999999'))
+        assert rv.status_code == 400
+        assert rv.get_json()['status'] == 400
+
 
     def test_system(self) -> None:
         c = self.client
