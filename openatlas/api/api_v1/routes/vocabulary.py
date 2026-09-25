@@ -167,11 +167,31 @@ def get_vocabulary_item(path: VocabularyId) -> dict[str, Any]:
 
 
 @api_v1_vocabulary.get(
-    '/<int:id>/skos.<ext>',
+    '/<int:id>/skos',
     summary="Export vocabulary hierarchy as SKOS",
     responses=vocabulary_skos_response,
     tags=[vocabulary_tag])
-def get_vocabulary_skos(path: VocabularySkosPath) -> Response:
+def get_vocabulary_skos(path: VocabularyId) -> Response:
+    """Exports a single vocabulary tree as a SKOS ConceptScheme for
+    thesaurus management tools such as SKOSMOS.
+
+    The type identified by ``id`` becomes the ``skos:ConceptScheme`` and all
+    of its descendants are exported as ``skos:Concept`` linked via
+    ``skos:broader``/``skos:narrower``. The serialization format is negotiated
+    via the ``Accept`` header (defaulting to JSON-LD).
+    """
+    root = g.types.get(path.id)
+    if not root:
+        abort_not_found(path.id)
+    return serialize_skos(build_skos_graph(root))
+
+
+@api_v1_vocabulary.get(
+    '/<int:id>/skos.<ext>',
+    summary="Export vocabulary hierarchy as SKOS with format extension",
+    responses=vocabulary_skos_response,
+    tags=[vocabulary_tag])
+def get_vocabulary_skos_ext(path: VocabularySkosPath) -> Response:
     """Exports a single vocabulary tree as a SKOS ConceptScheme for
     thesaurus management tools such as SKOSMOS.
 

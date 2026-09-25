@@ -8,19 +8,19 @@ from dataclasses import dataclass, field
 from typing import Any, Optional
 from uuid import UUID
 
-from flask import Response, g, request, url_for
-from rdflib import Graph
+from flask import Response, g, url_for
 
 from openatlas import app
 from openatlas.api.api_v1.entity import (
     get_by_system_class, get_count_by_system_class)
 from openatlas.api.api_v1.error_handlers import abort_not_found
+from openatlas.api.api_v1.util.content_negotiation import (
+    make_lod_response)
 from openatlas.api.api_v1.util.pagination import get_pagination_lod
 from openatlas.database.api import get_wkts_by_ids
 from openatlas.display.image_processing import (
     check_iiif_activation, check_iiif_file_exist)
 from openatlas.models.entity import Entity, Link
-
 
 _DATE_PARTS_RE = re.compile(
     r'^(-?\d{4,})-(\d{2})-(\d{2})'
@@ -157,42 +157,6 @@ def parse_lod_context() -> dict[str, str]:
     return inverted
 
 
-def set_accept_header(extension: str | None = None) -> None:
-    if not extension:
-        return
-    ext_map = {
-        'json': 'application/ld+json',
-        'ttl': 'text/turtle',
-        'xml': 'application/rdf+xml',
-        'nt': 'application/n-triples'}
-    if extension in ext_map:
-        request.environ['HTTP_ACCEPT'] = ext_map[extension]
-
-
-def make_lod_response(data: dict[str, Any]) -> Response:
-    accepted = request.accept_mimetypes.best_match(app.config['LOD_HEADER'])
-    json_str = app.json.dumps(data)
-    if accepted not in [
-        'text/turtle', 'application/rdf+xml', 'application/n-triples']:
-        return Response(json_str, mimetype='application/ld+json')
-
-    graph = Graph()
-    graph.parse(data=json_str, format='json-ld')
-
-    match accepted:
-        case 'text/turtle':
-            turtle_output = graph.serialize(format='turtle')
-            return Response(turtle_output, mimetype='text/turtle')
-
-        case 'application/rdf+xml':
-            xml_output = graph.serialize(format='xml')
-            return Response(xml_output, mimetype='application/rdf+xml')
-
-        case 'application/n-triples':
-            nt_output = graph.serialize(format='nt')
-            return Response(nt_output, mimetype='application/n-triples')
-
-
 def get_entity_response(
         entity_id: UUID,
         formatter: Callable[[Entity], dict[str, Any]],
@@ -200,9 +164,7 @@ def get_entity_response(
     entity = Entity.get_by_uuid(entity_id, types=True, aliases=True)
     if not entity:
         abort_not_found(entity_id)
-    if ext:
-        set_accept_header(ext)
-    return make_lod_response(formatter(entity))
+    return make_lod_response(formatter(entity), ext=ext)
 
 
 def get_entities_response(

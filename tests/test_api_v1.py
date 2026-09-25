@@ -198,7 +198,7 @@ class ApiV1(ApiTestCase):
         for ext, (rdf_format, mimetype) in format_map.items():
             rv = c.get(
                 url_for(
-                    'api_v1_vocabulary.get_vocabulary_skos',
+                    'api_v1_vocabulary.get_vocabulary_skos_ext',
                     id=root.id,
                     ext=ext))
             assert rv.status_code == 200
@@ -208,9 +208,29 @@ class ApiV1(ApiTestCase):
             assert (
                 root_uri, RDF.type, URIRef(f'{skos}ConceptScheme')) in graph
 
+        # Content negotiation tests
+        rv = c.get(url_for('api_v1_vocabulary.get_vocabulary_skos', id=root.id))
+        assert rv.status_code == 200
+        assert 'application/ld+json' in rv.headers.get('Content-Type')
+
+        for rdf_format, mimetype in [
+                ('turtle', 'text/turtle'),
+                ('xml', 'application/rdf+xml'),
+                ('json-ld', 'application/ld+json'),
+                ('nt', 'application/n-triples')]:
+            rv = c.get(
+                url_for('api_v1_vocabulary.get_vocabulary_skos', id=root.id),
+                headers={'Accept': mimetype})
+            assert rv.status_code == 200
+            assert mimetype in rv.headers.get('Content-Type')
+            graph = Graph()
+            graph.parse(data=rv.data, format=rdf_format)
+            assert (
+                root_uri, RDF.type, URIRef(f'{skos}ConceptScheme')) in graph
+
         rv = c.get(
             url_for(
-                'api_v1_vocabulary.get_vocabulary_skos',
+                'api_v1_vocabulary.get_vocabulary_skos_ext',
                 id=root.id,
                 ext='ttl'))
         graph = Graph()
@@ -263,7 +283,7 @@ class ApiV1(ApiTestCase):
         # resolvable URI are skipped instead of crashing the serializer
         rv = c.get(
             url_for(
-                'api_v1_vocabulary.get_vocabulary_skos',
+                'api_v1_vocabulary.get_vocabulary_skos_ext',
                 id=root.id,
                 ext='nt'))
         assert rv.status_code == 200
@@ -292,6 +312,11 @@ class ApiV1(ApiTestCase):
         rv = c.get(
             url_for(
                 'api_v1_vocabulary.get_vocabulary_skos',
+                id=999999))
+        assert rv.status_code == 404
+        rv = c.get(
+            url_for(
+                'api_v1_vocabulary.get_vocabulary_skos_ext',
                 id=999999,
                 ext='ttl'))
         assert rv.status_code == 404
@@ -375,9 +400,9 @@ class ApiV1(ApiTestCase):
             assert f'filename={e.file.id}.png' in rv.headers.get(
                 'Content-Disposition', '')
 
-        rv = c.get(url_for('api_v1_files.get_licensed_files'))
+        rv = c.get(url_for('api_v1_files.get_public_files'))
         assert rv.status_code == 200
-        assert 'files' in rv.get_json()
+        assert 'data' in rv.get_json()
 
     def test_iiif(self) -> None:
         c = self.client

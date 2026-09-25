@@ -7,17 +7,12 @@ from openatlas.api.api_v1.formatters.lod import entity_uri
 from openatlas.api.api_v1.formatters.lod_util import get_type_references
 from openatlas.api.api_v1.models.util import (
     ExternalReferenceSystemModel, MatchTypeEnum)
+from openatlas.api.api_v1.util.content_negotiation import make_graph_response
 from openatlas.models.entity import Entity
 
 
 # todo: move to api config
 SKOS = Namespace('http://www.w3.org/2004/02/skos/core#')
-
-SKOS_FORMAT_MAP: dict[str, tuple[str, str]] = {
-    'ttl': ('turtle', 'text/turtle'),
-    'xml': ('xml', 'application/rdf+xml'),
-    'json': ('json-ld', 'application/ld+json'),
-    'nt': ('nt', 'application/n-triples')}
 
 URI_SAFE_CHARS = ":/?#[]@!$&'()*+,;=%~"
 
@@ -112,6 +107,5 @@ def build_skos_graph(root: Entity) -> Graph:
     return graph
 
 
-def serialize_skos(graph: Graph, ext: str) -> Response:
-    rdf_format, mimetype = SKOS_FORMAT_MAP[ext]
-    return Response(graph.serialize(format=rdf_format), mimetype=mimetype)
+def serialize_skos(graph: Graph, ext: str | None = None) -> Response:
+    return make_graph_response(graph, ext=ext)
