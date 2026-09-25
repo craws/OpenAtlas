@@ -1,7 +1,7 @@
-from typing import Any
+from typing import Any, Final
 from openatlas import app
 
-LANGUAGES: dict[str, dict[str, Any]] = {
+LANGUAGES: Final[dict[str, dict[str, Any]]] = {
     'en': {
         'id': 'https://vocab.getty.edu/aat/300388277',
         'type': 'Language',
@@ -39,14 +39,14 @@ LANGUAGES: dict[str, dict[str, Any]] = {
         'type': 'Language',
         '_label': 'Slovak'}}
 
-UNIT_MAP = {
+UNIT_MAP: Final[dict[str, str]] = {
     'B': 'bytes',
     'KB': 'kilobytes',
     'MB': 'megabytes',
     'GB': 'gigabytes',
     'TB': 'terabytes'}
 
-TYPE_OVERWRITES = {
+TYPE_OVERWRITES: Final[dict[str, str]] = {
     'file': 'DigitalObject',
     'human_remains': 'BiologicalObject',
     'place': 'Site',
@@ -63,11 +63,11 @@ def aat_type(id_: str, label: str) -> dict[str, str]:
         '_label': label}
 
 
-ARCHAEOLOGY_AAT: dict[str, dict[str, str]] = {
+ARCHAEOLOGY_AAT: Final[dict[str, dict[str, str]]] = {
     'artifact': aat_type('300117127', 'artifacts'),
     'human_remains': aat_type('300379896', 'human remains')}
 
-MIME_CLASSIFICATIONS: dict[str, list[dict[str, str]]] = {
+MIME_CLASSIFICATIONS: Final[dict[str, list[dict[str, str]]]] = {
     'image/': [aat_type('300215302', 'Digital image')],
     'application/pdf': [aat_type('300424602', 'Digital documents')],
     'model/': [
@@ -76,7 +76,7 @@ MIME_CLASSIFICATIONS: dict[str, list[dict[str, str]]] = {
             'type': 'Type',
             '_label': '3D Model'}]}
 
-BIBLIOGRAPHY_AAT: dict[str, dict[str, str]] = {
+BIBLIOGRAPHY_AAT: Final[dict[str, dict[str, str]]] = {
     'bibliography': aat_type('300026497', 'bibliography'),
     'edition': aat_type('300121294', 'edition')}
 

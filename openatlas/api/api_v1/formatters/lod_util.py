@@ -5,7 +5,7 @@ import re
 from collections import defaultdict
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any, Final, Optional
 from uuid import UUID
 
 from flask import Response, g, url_for
@@ -22,7 +22,7 @@ from openatlas.display.image_processing import (
     check_iiif_activation, check_iiif_file_exist)
 from openatlas.models.entity import Entity, Link
 
-_DATE_PARTS_RE = re.compile(
+DATE_PARTS_RE: Final = re.compile(
     r'^(-?\d{4,})-(\d{2})-(\d{2})'
     r'(?:[T ](\d{2}):(\d{2}):(\d{2})(?:\.\d+)?)?Z?$')
 
@@ -38,7 +38,7 @@ class EntityLinks:
 def date_to_utc_iso_str(date: Any) -> str | None:
     if not date:
         return None
-    match = _DATE_PARTS_RE.match(str(date))
+    match = DATE_PARTS_RE.match(str(date))
     if not match:
         return str(date)
     year, month, day, hour, minute, second = match.groups()

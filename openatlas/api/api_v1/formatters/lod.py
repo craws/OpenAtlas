@@ -2,7 +2,7 @@ import ast
 import hashlib
 import mimetypes
 from collections import defaultdict
-from typing import Any
+from typing import Any, Final
 
 import validators
 from flask import g, url_for
@@ -20,6 +20,8 @@ from openatlas.api.api_v1.formatters.lod_util import (
 from openatlas.display.util2 import get_file_path
 from openatlas.models.annotation import AnnotationText
 from openatlas.models.entity import Entity, Link
+
+LOUD_CONTEXT: Final[str] = 'https://linked.art/ns/v1/linked-art.json'
 
 
 def entity_uri(entity: Entity) -> str:
@@ -947,9 +949,7 @@ def format_lod_entities(
         entities: list[Entity],
         pagination: dict[str, Any] | None = None) -> dict[str, Any]:
     if not entities and pagination is None:
-        return {
-            '@context': app.config['API_CONTEXT']['LOUD'],
-            '@graph': []}
+        return {'@context': LOUD_CONTEXT, '@graph': []}
     links_data = get_links_for_entities(entities) if entities else {}
     type_references = get_type_references()
     formatter = LodFormatter(type_references=type_references)
@@ -959,7 +959,7 @@ def format_lod_entities(
     if pagination is not None:
         result: dict[str, Any] = {
             '@context': [
-                app.config['API_CONTEXT']['LOUD'],
+                LOUD_CONTEXT,
                 {'hydra': 'http://www.w3.org/ns/hydra/core#'}],
             'id': pagination['id'],
             'type': 'hydra:PartialCollectionView',
@@ -972,9 +972,7 @@ def format_lod_entities(
         result['hydra:last'] = pagination['last']
         result['@graph'] = graph
         return result
-    return {
-        '@context': app.config['API_CONTEXT']['LOUD'],
-        '@graph': graph}
+    return {'@context': LOUD_CONTEXT, '@graph': graph}
 
 
 def get_lod_entities(

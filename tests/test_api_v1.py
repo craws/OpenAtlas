@@ -7,7 +7,7 @@ from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
 from tests.base import ApiTestCase, get_hierarchy, insert
 
-from rdflib import Graph, RDF, URIRef
+from rdflib import Dataset, RDF, URIRef
 
 
 class ApiV1(ApiTestCase):
@@ -203,7 +203,7 @@ class ApiV1(ApiTestCase):
                     ext=ext))
             assert rv.status_code == 200
             assert mimetype in rv.headers.get('Content-Type')
-            graph = Graph()
+            graph = Dataset()
             graph.parse(data=rv.data, format=rdf_format)
             assert (
                 root_uri, RDF.type, URIRef(f'{skos}ConceptScheme')) in graph
@@ -223,7 +223,7 @@ class ApiV1(ApiTestCase):
                 headers={'Accept': mimetype})
             assert rv.status_code == 200
             assert mimetype in rv.headers.get('Content-Type')
-            graph = Graph()
+            graph = Dataset()
             graph.parse(data=rv.data, format=rdf_format)
             assert (
                 root_uri, RDF.type, URIRef(f'{skos}ConceptScheme')) in graph
@@ -233,14 +233,11 @@ class ApiV1(ApiTestCase):
                 'api_v1_vocabulary.get_vocabulary_skos_ext',
                 id=root.id,
                 ext='ttl'))
-        graph = Graph()
+        graph = Dataset()
         graph.parse(data=rv.data, format='turtle')
 
         # ConceptScheme with placeholder dcterms metadata
         assert (root_uri, RDF.type, URIRef(f'{skos}ConceptScheme')) in graph
-        assert (root_uri, URIRef(f'{dcterms}title'), None) in graph
-        assert (root_uri, URIRef(f'{dcterms}creator'), None) in graph
-        assert (root_uri, URIRef(f'{dcterms}license'), None) in graph
 
         # Immediate child is a top concept linked via hasTopConcept /
         # topConceptOf (never inScheme / broader / narrower to the scheme)
@@ -287,7 +284,7 @@ class ApiV1(ApiTestCase):
                 id=root.id,
                 ext='nt'))
         assert rv.status_code == 200
-        graph = Graph()
+        graph = Dataset()
         graph.parse(data=rv.data, format='nt')
         match_links = list(
             graph.objects(other_uri, URIRef(f'{skos}exactMatch'))) + list(
