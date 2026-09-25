@@ -7,16 +7,14 @@ from typing import Any, Final
 import validators
 from flask import g, url_for
 
-from openatlas import app
 from openatlas.api.api_v1.entity import get_entity_by_id
 from openatlas.api.api_v1.formatters.lod_helpers import (
     ARCHAEOLOGY_AAT, BIBLIOGRAPHY_AAT, MIME_CLASSIFICATIONS, TYPE_OVERWRITES,
     UNIT_MAP, aat_type, category_aat, get_language, primary_name)
-from openatlas.api.api_v1.formatters.lod_util import (
-    EntityLinks, date_to_utc_iso_str, get_iiif_manifest_and_path,
-    get_license_type, is_float, remove_spaces_dashes)
-from openatlas.api.api_v1.formatters.lod_util import (
-    get_links_for_entities, get_type_references, parse_lod_context)
+from openatlas.api.api_v1.formatters.lod_util import EntityLinks, \
+    date_to_utc_iso_str, get_iiif_manifest_and_path, get_license_type, \
+    get_links_for_entities, get_type_references, is_float, parse_lod_context, \
+    remove_spaces_dashes
 from openatlas.display.util2 import get_file_path
 from openatlas.models.annotation import AnnotationText
 from openatlas.models.entity import Entity, Link

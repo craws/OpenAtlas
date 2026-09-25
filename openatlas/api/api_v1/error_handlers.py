@@ -2,9 +2,9 @@ from datetime import datetime
 from typing import Any, NoReturn
 from uuid import UUID
 
-from flask import Response, abort, current_app, jsonify, make_response, request
-from werkzeug.exceptions import HTTPException
 import psycopg2
+from flask import Response, abort, jsonify, make_response, request
+from werkzeug.exceptions import HTTPException
 
 
 def error_response(
@@ -30,8 +30,7 @@ def abort_with_error(
     abort(error_response(status, title, message, details))
 
 
-def handle_db_error(e):
-    current_app.logger.exception(e)
+def handle_db_error():
     return error_response(
         500,
         'Internal Server Error',
@@ -39,8 +38,7 @@ def handle_db_error(e):
         {'hint': 'Please try again later or contact the project members.'})
 
 
-def handle_db_data_error(e):
-    current_app.logger.warning(e)
+def handle_db_data_error():
     return error_response(
         400,
         'Bad Request',

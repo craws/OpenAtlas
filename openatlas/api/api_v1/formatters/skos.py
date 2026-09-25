@@ -8,6 +8,8 @@ from openatlas.api.api_v1.formatters.lod import entity_uri
 from openatlas.api.api_v1.formatters.lod_util import get_type_references
 from openatlas.api.api_v1.models.util import (
     ExternalReferenceSystemModel, MatchTypeEnum)
+from openatlas.api.api_v1.routes.vocabulary import \
+    get_external_reference_items
 from openatlas.api.api_v1.util.content_negotiation import make_graph_response
 from openatlas.models.entity import Entity
 
@@ -31,8 +33,6 @@ def _get_match_uri(reference: ExternalReferenceSystemModel) -> URIRef | None:
 
 
 def _add_match_links(graph: Dataset, concept: URIRef, type_id: int) -> None:
-    from openatlas.api.api_v1.routes.vocabulary import \
-        get_external_reference_items
     inverse_links = get_type_references().get(type_id, [])
     for reference in get_external_reference_items(inverse_links):
         if not (uri := _get_match_uri(reference)):

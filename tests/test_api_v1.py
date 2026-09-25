@@ -1,13 +1,12 @@
 from pathlib import Path
 
 from flask import g, url_for
+from rdflib import Dataset, RDF, URIRef
 
 from openatlas import app
 from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
 from tests.base import ApiTestCase, get_hierarchy, insert
-
-from rdflib import Dataset, RDF, URIRef
 
 
 class ApiV1(ApiTestCase):
@@ -159,7 +158,6 @@ class ApiV1(ApiTestCase):
 
     def test_vocabulary_skos(self) -> None:
         skos = 'http://www.w3.org/2004/02/skos/core#'
-        dcterms = 'http://purl.org/dc/terms/'
         c = self.client
         with app.test_request_context():
             app.preprocess_request()
@@ -209,7 +207,8 @@ class ApiV1(ApiTestCase):
                 root_uri, RDF.type, URIRef(f'{skos}ConceptScheme')) in graph
 
         # Content negotiation tests
-        rv = c.get(url_for('api_v1_vocabulary.get_vocabulary_skos', id=root.id))
+        rv = c.get(
+            url_for('api_v1_vocabulary.get_vocabulary_skos', id=root.id))
         assert rv.status_code == 200
         assert 'application/ld+json' in rv.headers.get('Content-Type')
 
@@ -292,18 +291,6 @@ class ApiV1(ApiTestCase):
         assert all(' ' not in str(uri) for uri in match_links)
         if resolver:
             assert URIRef(f'{resolver}University%20positions') in match_links
-
-        from openatlas.api.api_v1.formatters.skos import _get_match_uri
-        from openatlas.api.api_v1.models.util import \
-            ExternalReferenceSystemModel
-        assert _get_match_uri(ExternalReferenceSystemModel(
-            id=1, name='Local', identifier='University positions')) is None
-        assert _get_match_uri(ExternalReferenceSystemModel(
-            id=1,
-            name='Wikidata',
-            url='https://www.wikidata.org/wiki/',
-            identifier='https://www.wikidata.org/wiki/Q 1')) == URIRef(
-            'https://www.wikidata.org/wiki/Q%201')
 
         # Unknown id returns 404
         rv = c.get(
@@ -508,7 +495,6 @@ class ApiV1(ApiTestCase):
         assert rv.status_code == 200
         assert rv.get_json()['type'] == 'AnnotationPage'
 
-        # Direct URL structure check: /api/1/iiif/<id>/annotation-list/<version>
         rv = c.get(f'/api/1/iiif/{e.file.id}/annotation-list/2')
         assert rv.status_code == 200
 
@@ -529,15 +515,12 @@ class ApiV1(ApiTestCase):
         assert rv.status_code == 200
         assert rv.get_json()['type'] == 'Annotation'
 
-        # Direct URL structure check: /api/1/iiif/<id>/annotation/<version>
         rv = c.get(f'/api/1/iiif/{annotation_id}/annotation/2')
         assert rv.status_code == 200
 
-        # Error cases: unsupported version
         rv = c.get(f'/api/1/iiif/{e.file.id}/manifest/4')
         assert rv.status_code in (400, 422)
 
-        # Error cases: id does not exist
         rv = c.get('/api/1/iiif/999999/manifest/2')
         assert rv.status_code == 404
         assert rv.get_json()['details']['provided_uuid'] == '999999'

@@ -1,7 +1,7 @@
 from typing import Any, Final
 
 from flask import Response, request
-from rdflib import Dataset, Graph
+from rdflib import Dataset
 
 from openatlas import app
 
@@ -38,7 +38,8 @@ def make_graph_response(
         set_accept_header(ext)
     accepted = request.accept_mimetypes.best_match(LOD_HEADER)
     rdf_format = MIME_FORMAT_MAP.get(accepted, 'json-ld')
-    mimetype = accepted if accepted in MIME_FORMAT_MAP else 'application/ld+json'
+    mimetype = accepted if accepted in MIME_FORMAT_MAP \
+        else 'application/ld+json'
     return Response(graph.serialize(format=rdf_format), mimetype=mimetype)
 
 

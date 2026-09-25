@@ -197,4 +197,3 @@ def get_file_item(entity: Entity) -> FileItem:
         iiif_base_url=iiif['IIIFBasePath'] or None,
         creators=[],
         license_holders=[])
-
