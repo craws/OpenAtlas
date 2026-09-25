@@ -5,11 +5,10 @@ from flask import Response, g
 from rdflib import DCTERMS, Dataset, Literal, Namespace, RDF, URIRef
 
 from openatlas.api.api_v1.formatters.lod import entity_uri
-from openatlas.api.api_v1.formatters.lod_util import get_type_references
+from openatlas.api.api_v1.formatters.lod_util import (
+    get_external_reference_items, get_type_references)
 from openatlas.api.api_v1.models.util import (
     ExternalReferenceSystemModel, MatchTypeEnum)
-from openatlas.api.api_v1.routes.vocabulary import \
-    get_external_reference_items
 from openatlas.api.api_v1.util.content_negotiation import make_graph_response
 from openatlas.models.entity import Entity
 

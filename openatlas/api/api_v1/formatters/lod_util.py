@@ -11,9 +11,12 @@ from uuid import UUID
 from flask import Response, g, url_for
 
 from openatlas import app
+from openatlas.api.api_v04.resources.util import to_camel_case
 from openatlas.api.api_v1.entity import (
     get_by_system_class, get_count_by_system_class)
 from openatlas.api.api_v1.error_handlers import abort_not_found
+from openatlas.api.api_v1.models.util import (
+    ExternalReferenceSystemModel, MatchTypeEnum)
 from openatlas.api.api_v1.util.content_negotiation import (
     make_lod_response)
 from openatlas.api.api_v1.util.pagination import get_pagination_lod
@@ -134,6 +137,35 @@ def get_type_references() -> dict[int, list[Link]]:
 
     g.type_references = out
     return out
+
+
+def _get_match_type(link_: Link) -> MatchTypeEnum:
+    assert link_.type
+    return MatchTypeEnum(to_camel_case(g.types[link_.type.id].name))
+
+
+def _get_external_reference_item(
+        link_: Link,
+        entity: Entity) -> ExternalReferenceSystemModel:
+    return ExternalReferenceSystemModel(
+        id=entity.id,
+        name=entity.name,
+        match_type=_get_match_type(link_),
+        identifier=f'{entity.resolver_url or ""}{link_.description}',
+        description=entity.description,
+        system_url=entity.website_url,
+        url=entity.resolver_url)
+
+
+def get_external_reference_items(
+        inverse_links: list[Link]) -> list[ExternalReferenceSystemModel]:
+    external_references = []
+    for link_ in inverse_links:
+        if link_.type and \
+                (entity := g.reference_systems.get(link_.domain.id)):
+            external_references.append(
+                _get_external_reference_item(link_, entity))
+    return external_references
 
 
 @functools.lru_cache

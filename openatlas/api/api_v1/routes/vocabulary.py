@@ -5,17 +5,15 @@ from flask import g, Response
 from flask_openapi3 import APIBlueprint
 from pydantic import BaseModel, Field
 
-from openatlas.api.api_v04.resources.util import to_camel_case
 from openatlas.api.api_v1.error_handlers import abort_not_found, \
     register_error_handlers
 from openatlas.api.api_v1.formatters.lod_util import (
-    EntityLinks, get_links_for_entities)
+    EntityLinks, get_external_reference_items, get_links_for_entities)
 from openatlas.api.api_v1.formatters.skos import (
     build_skos_graph, serialize_skos)
 from openatlas.api.api_v1.openapi_tags import vocabulary_tag
 from openatlas.api.api_v1.models.util import (
-    ExtensionsType, ExternalReferenceSystemModel, MatchTypeEnum,
-    OpenAtlasClassEnum, ReferenceModel, TypeCategoryEnum)
+    ExtensionsType, OpenAtlasClassEnum, ReferenceModel, TypeCategoryEnum)
 from openatlas.api.api_v1.responses.vocabulary import \
     vocabulary_flat_response, vocabulary_list_response, \
     vocabulary_skos_response, vocabulary_standard_by_class_response, \
@@ -71,35 +69,6 @@ def _get_reference_item(link_: Link) -> ReferenceModel:
         type=entity.standard_type.name if entity.standard_type else None,
         pages=link_.description or None,
         citation=entity.description)
-
-
-def _get_match_type(link_: Link) -> MatchTypeEnum:
-    assert link_.type
-    return MatchTypeEnum(to_camel_case(g.types[link_.type.id].name))
-
-
-def _get_external_reference_item(
-        link_: Link,
-        entity: Entity) -> ExternalReferenceSystemModel:
-    return ExternalReferenceSystemModel(
-        id=entity.id,
-        name=entity.name,
-        match_type=_get_match_type(link_),
-        identifier=f'{entity.resolver_url or ''}{link_.description}',
-        description=entity.description,
-        system_url=entity.website_url,
-        url=entity.resolver_url)
-
-
-def get_external_reference_items(
-        inverse_links: list[Link]) -> list[ExternalReferenceSystemModel]:
-    external_references = []
-    for link_ in inverse_links:
-        if link_.type and \
-                (entity := g.reference_systems.get(link_.domain.id)):
-            external_references.append(
-                _get_external_reference_item(link_, entity))
-    return external_references
 
 
 def _get_vocab_flat_item(

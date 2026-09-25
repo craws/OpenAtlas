@@ -30,7 +30,7 @@ def abort_with_error(
     abort(error_response(status, title, message, details))
 
 
-def handle_db_error():
+def handle_db_error(_e: Any = None) -> Response:
     return error_response(
         500,
         'Internal Server Error',
@@ -38,7 +38,7 @@ def handle_db_error():
         {'hint': 'Please try again later or contact the project members.'})
 
 
-def handle_db_data_error():
+def handle_db_data_error(_e: Any = None) -> Response:
     return error_response(
         400,
         'Bad Request',
@@ -47,11 +47,11 @@ def handle_db_data_error():
         {'hint': 'Check the request parameters in the API documentation.'})
 
 
-def handle_http_exception(e):
+def handle_http_exception(e: HTTPException) -> Response:
     return error_response(e.code, e.name, e.description)
 
 
-def handle_file_not_found_exception(e):
+def handle_file_not_found_exception(e: HTTPException) -> Response:
     return error_response(e.code, e.name, e.description)
 
 
