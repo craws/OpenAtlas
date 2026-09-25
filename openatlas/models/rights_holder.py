@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from flask import g
+from flask import abort, g
 
 from openatlas.database import rights_holder as db
 
@@ -20,7 +20,7 @@ class RightsHolder:
             setattr(self, name, value)
 
     @staticmethod
-    def get_rights_holder() -> list[RightsHolder]:
+    def get_rights_holders() -> list[RightsHolder]:
         return [RightsHolder(item) for item in db.get_rights_holder()]
 
     @staticmethod
@@ -31,9 +31,11 @@ class RightsHolder:
                 db.get_rights_holders_by_entity_and_role(entity_id, role)]
 
     @staticmethod
-    def get_rights_holder_by_id(id_: int) -> RightsHolder | None:
+    def get_rights_holder_by_id(id_: int) -> RightsHolder:
         item = db.get_rights_holder_by_id(id_)
-        return RightsHolder(item) if item else None
+        if not item:
+            abort(418)
+        return RightsHolder(item)
 
     @staticmethod
     def insert_rights_holder(entry: dict[str, Any]) -> int:

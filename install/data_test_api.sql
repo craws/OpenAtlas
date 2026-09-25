@@ -33,7 +33,6 @@ VALUES
   ('activity', 'Travel to Mordor', NULL, CURRENT_TIMESTAMP),
   ('activity', 'Exchange of the one ring', NULL, CURRENT_TIMESTAMP),
   ('type', 'Lord of the rings', NULL, CURRENT_TIMESTAMP),
-  ('type', 'Case Study', NULL, CURRENT_TIMESTAMP),
   ('type', 'Tavern', NULL, CURRENT_TIMESTAMP),
   ('type', 'Hills', NULL, CURRENT_TIMESTAMP),
   ('type', 'Ring', NULL, CURRENT_TIMESTAMP),
@@ -91,7 +90,7 @@ INSERT INTO model.link (property_code, range_id, domain_id)
 VALUES
   ('P2', (SELECT id FROM model.entity WHERE name='Original Text'), (SELECT id FROM model.entity WHERE name='Silmarillion text')),
   ('P73', (SELECT id FROM model.entity WHERE name='Silmarillion text'), (SELECT id FROM model.entity WHERE name='Silmarillion')),
-  ('P127', (SELECT id FROM model.entity WHERE name='Case Study'), (SELECT id FROM model.entity WHERE name='Lord of the rings')),
+  ('P127', (SELECT id FROM model.entity WHERE name='Case study'), (SELECT id FROM model.entity WHERE name='Lord of the rings')),
   ('P127', (SELECT id FROM model.entity WHERE name='Stratigraphic unit'), (SELECT id FROM model.entity WHERE name='Tavern')),
   ('P127', (SELECT id FROM model.entity WHERE name='Feature'), (SELECT id FROM model.entity WHERE name='Hills')),
   ('P127', (SELECT id FROM model.entity WHERE name='Artifact'), (SELECT id FROM model.entity WHERE name='Ring')),
@@ -234,6 +233,3 @@ UPDATE model.entity
 SET begin_from = CURRENT_DATE
 WHERE name = 'Economical';
 
-
-INSERT INTO web.hierarchy (id, name, multiple, category)
-VALUES ((SELECT id FROM model.entity WHERE name='Case Study'), 'Case Study', true, 'custom');

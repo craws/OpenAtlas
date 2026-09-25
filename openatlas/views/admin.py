@@ -194,7 +194,7 @@ def get_rights_holder_table() -> Table:
     table = Table(
         ['name', 'class', 'creator', 'license_holder', 'description'])
     file_count = RightsHolder.get_rights_holder_file_count()
-    for holder in RightsHolder.get_rights_holder():
+    for holder in RightsHolder.get_rights_holders():
         row = [
             link(holder, url_for('rights_holder_view', id_=holder.id)),
             uc_first(f'{_(holder.class_) if holder.class_ else ''}'),

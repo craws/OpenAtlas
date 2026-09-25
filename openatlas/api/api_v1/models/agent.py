@@ -6,15 +6,14 @@ from openatlas.api.api_v1.models.util import BaseSchema
 
 
 class AgentPath(BaseModel):
-    id: int | None = Field(
-        None,
+    id: int = Field(
         description="Filter by a specific Agent ID")
 
 
 class AgentItem(BaseModel):
     id: int
     name: str
-    class_name: str = Field(
+    class_name: str | None = Field(
         serialization_alias="class",
         description="The OpenAtlas entity class.")
     description: str | None = Field(

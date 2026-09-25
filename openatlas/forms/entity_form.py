@@ -58,7 +58,7 @@ def get_entity_form(
                     Form,
                     key,
                     TableMultiField(
-                        RightsHolder.get_rights_holder(),
+                        RightsHolder.get_rights_holders(),
                         selection))
             case 'dates':
                 add_date_fields(Form, entity)

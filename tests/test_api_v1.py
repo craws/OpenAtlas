@@ -33,11 +33,11 @@ class ApiV1(ApiTestCase):
         assert rv.status_code == 200
 
         for params in [
-                {'startDate': '0'},
-                {'startDate': '-0'},
-                {'startDate': '0000-03-15'},
-                {'endDate': '0'},
-                {'endDate': '0-05'}]:
+            {'startDate': '0'},
+            {'startDate': '-0'},
+            {'startDate': '0000-03-15'},
+            {'endDate': '0'},
+            {'endDate': '0-05'}]:
             rv = c.get(url_for(
                 'api_v1_lod.entities', entity_class='acquisition', **params))
             assert rv.status_code == 422
@@ -50,15 +50,14 @@ class ApiV1(ApiTestCase):
         rv_json = rv.get_json()
         assert rv_json['status'] == 400
         assert {'title', 'message', 'details', 'url', 'timestamp'} \
-            <= rv_json.keys()
+               <= rv_json.keys()
 
         rv = c.get(url_for('api_v1_metadata.get_agent_by_id', id=999999))
         assert rv.status_code == 404
         rv_json = rv.get_json()
         assert rv_json['status'] == 404
         assert {'title', 'message', 'details', 'url', 'timestamp'} \
-            <= rv_json.keys()
-
+               <= rv_json.keys()
 
     def test_system(self) -> None:
         c = self.client
@@ -67,7 +66,7 @@ class ApiV1(ApiTestCase):
         rv = c.get(url_for('api_v1_root.index'))
         assert rv.status_code == 200
         rv = rv.get_json()
-        assert rv['name'] == "OpenAtlas API V1"
+        assert rv['name'] == "OpenAtlas API"
         assert 'version' in rv
         assert 'openapiSchema' in rv
         assert 'documentation' in rv
@@ -77,7 +76,7 @@ class ApiV1(ApiTestCase):
         assert rv.status_code == 200
         rv = rv.get_json()
         assert 'apiVersions' in rv
-        assert isinstance(rv['apiVersions'], list)
+        assert isinstance(rv['apiVersions'], dict)
         assert 'defaultLanguage' in rv
         assert 'iiif' in rv
         assert isinstance(rv['iiif'], dict)
@@ -204,7 +203,8 @@ class ApiV1(ApiTestCase):
             graph = Dataset()
             graph.parse(data=rv.data, format=rdf_format)
             assert (
-                root_uri, RDF.type, URIRef(f'{skos}ConceptScheme')) in graph
+                       root_uri, RDF.type,
+                       URIRef(f'{skos}ConceptScheme')) in graph
 
         # Content negotiation tests
         rv = c.get(
@@ -213,10 +213,10 @@ class ApiV1(ApiTestCase):
         assert 'application/ld+json' in rv.headers.get('Content-Type')
 
         for rdf_format, mimetype in [
-                ('turtle', 'text/turtle'),
-                ('xml', 'application/rdf+xml'),
-                ('json-ld', 'application/ld+json'),
-                ('nt', 'application/n-triples')]:
+            ('turtle', 'text/turtle'),
+            ('xml', 'application/rdf+xml'),
+            ('json-ld', 'application/ld+json'),
+            ('nt', 'application/n-triples')]:
             rv = c.get(
                 url_for('api_v1_vocabulary.get_vocabulary_skos', id=root.id),
                 headers={'Accept': mimetype})
@@ -225,7 +225,8 @@ class ApiV1(ApiTestCase):
             graph = Dataset()
             graph.parse(data=rv.data, format=rdf_format)
             assert (
-                root_uri, RDF.type, URIRef(f'{skos}ConceptScheme')) in graph
+                       root_uri, RDF.type,
+                       URIRef(f'{skos}ConceptScheme')) in graph
 
         rv = c.get(
             url_for(
@@ -251,23 +252,24 @@ class ApiV1(ApiTestCase):
         # to their parent concept (not to the scheme)
         if grandchild_uri is not None:
             assert (
-                grandchild_uri, RDF.type, URIRef(f'{skos}Concept')) in graph
+                       grandchild_uri, RDF.type,
+                       URIRef(f'{skos}Concept')) in graph
             assert (
-                grandchild_uri,
-                URIRef(f'{skos}inScheme'),
-                root_uri) in graph
+                       grandchild_uri,
+                       URIRef(f'{skos}inScheme'),
+                       root_uri) in graph
             assert (
-                grandchild_uri,
-                URIRef(f'{skos}broader'),
-                child_uri) in graph
+                       grandchild_uri,
+                       URIRef(f'{skos}broader'),
+                       child_uri) in graph
             assert (
-                child_uri,
-                URIRef(f'{skos}narrower'),
-                grandchild_uri) in graph
+                       child_uri,
+                       URIRef(f'{skos}narrower'),
+                       grandchild_uri) in graph
             assert (
-                grandchild_uri,
-                URIRef(f'{skos}topConceptOf'),
-                root_uri) not in graph
+                       grandchild_uri,
+                       URIRef(f'{skos}topConceptOf'),
+                       root_uri) not in graph
 
         # External reference produces a match link
         match_links = list(
@@ -325,6 +327,9 @@ class ApiV1(ApiTestCase):
         assert 'id' in rv_json
         assert 'name' in rv_json
 
+        rv = c.get(url_for('api_v1_metadata.get_case_study_by_id', id=99999))
+        assert rv.status_code == 404
+
         # Agents
         rv = c.get(url_for('api_v1_metadata.get_agents'))
         assert rv.status_code == 200
@@ -332,7 +337,7 @@ class ApiV1(ApiTestCase):
         assert 'data' in rv_json
         assert isinstance(rv_json['data'], list)
 
-        # Agent by ID (dummy 1 for now)
+        # Agent by ID
         rv = c.get(url_for('api_v1_metadata.get_agent_by_id', id=999999))
         assert rv.status_code == 404
         assert rv.get_json()['details']['provided_uuid'] == '999999'
@@ -342,7 +347,6 @@ class ApiV1(ApiTestCase):
         rv_json = rv.get_json()
         assert 'name' in rv_json
         assert 'class' in rv_json
-
 
     def test_files(self) -> None:
         c = self.client
@@ -530,15 +534,13 @@ class ApiV1(ApiTestCase):
             assert rv.status_code == 404
             assert rv.get_json()['details']['provided_id'] == str(id_)
 
-
-
     def test_docs(self) -> None:
         c = self.client
         for url in [
-                '/api/1/docs/swagger',
-                '/api/1/docs/redoc',
-                '/api/1/docs/scalar',
-                '/api/1/docs/openapi.json',
-                '/api/1/docs/']:
+            '/api/1/docs/swagger',
+            '/api/1/docs/redoc',
+            '/api/1/docs/scalar',
+            '/api/1/docs/openapi.json',
+            '/api/1/docs/']:
             rv = c.get(url)
             assert rv.status_code == 200

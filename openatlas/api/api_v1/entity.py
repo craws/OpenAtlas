@@ -8,6 +8,7 @@ from openatlas.api.api_v1.error_handlers import (
     abort_invalid_class, abort_not_found)
 from openatlas.database.api import get_by_class_api, get_count_by_class_api
 from openatlas.models.entity import Entity
+from openatlas.models.rights_holder import RightsHolder
 
 
 def get_entity_by_id(
@@ -21,7 +22,14 @@ def get_entity_by_id(
             types=types,
             aliases=aliases,
             with_location=with_location)
-    except ImATeapot:  # Entity.get_by_id() aborts with 418 if id not found
+    except ImATeapot:
+        abort_not_found(id_)
+
+
+def get_rightsholder_by_id(id_: int) -> RightsHolder:
+    try:
+        return RightsHolder.get_rights_holder_by_id(id_)
+    except ImATeapot:
         abort_not_found(id_)
 
 

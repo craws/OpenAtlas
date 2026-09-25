@@ -1,7 +1,7 @@
 from flask import g
 from flask_openapi3 import APIBlueprint
 
-from openatlas.api.api_v1.entity import get_entity_by_id
+from openatlas.api.api_v1.entity import get_rightsholder_by_id
 from openatlas.api.api_v1.error_handlers import abort_not_found, \
     register_error_handlers
 from openatlas.api.api_v1.models.agent import AgentItem, AgentListResponse, \
@@ -10,12 +10,14 @@ from openatlas.api.api_v1.models.metadata import CaseStudyItem, \
     CaseStudyListResponse, \
     CaseStudyPath
 from openatlas.api.api_v1.openapi_tags import metadata_tag
+from openatlas.models.rights_holder import RightsHolder
 
 api_v1_metadata = APIBlueprint(
     'api_v1_metadata',
     __name__,
     url_prefix='/api/1')
 register_error_handlers(api_v1_metadata)
+
 
 def _walk_case_studies(ids: list[int]) -> list[CaseStudyItem]:
     items = []
@@ -30,6 +32,7 @@ def _walk_case_studies(ids: list[int]) -> list[CaseStudyItem]:
                 sub_case_studies=_walk_case_studies(item.subs)))
     return items
 
+
 @api_v1_metadata.get(
     '/case-studies',
     summary="Get case studies metadata",
@@ -40,6 +43,7 @@ def get_case_studies():
     case_studies = _walk_case_studies(case_study_ids)
     return CaseStudyListResponse(data=case_studies).model_dump(
         by_alias=True)
+
 
 @api_v1_metadata.get(
     '/case-studies/<int:id>',
@@ -60,25 +64,33 @@ def get_case_study_by_id(path: CaseStudyPath):
         sub_case_studies=_walk_case_studies(case_study.subs)
     ).model_dump(by_alias=True)
 
-# todo
+
 @api_v1_metadata.get(
     '/agents',
     summary="Get agents information",
     tags=[metadata_tag],
     responses={200: AgentListResponse})
 def get_agents():
-    return AgentListResponse(data=[]).model_dump(by_alias=True)
+    right_holders = []
+    for entity in RightsHolder.get_rights_holders():
+        right_holders.append(
+            AgentItem(
+                id=entity.id,
+                name=entity.name,
+                class_name=entity.class_,
+                description=entity.description))
+    return AgentListResponse(data=right_holders).model_dump(by_alias=True)
 
-# todo
+
 @api_v1_metadata.get(
     '/agents/<int:id>',
     summary="Get information about an agent",
     tags=[metadata_tag],
     responses={200: AgentItem})
 def get_agent_by_id(path: AgentPath):
-    entity = get_entity_by_id(path.id)
+    entity = get_rightsholder_by_id(path.id)
     return AgentItem(
         id=entity.id,
         name=entity.name,
-        class_name=entity.class_.name,
+        class_name=entity.class_,
         description=entity.description).model_dump(by_alias=True)

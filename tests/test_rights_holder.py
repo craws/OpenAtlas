@@ -37,7 +37,7 @@ class RightsHolderTests(TestBaseCase):
 
         with app.test_request_context():
             app.preprocess_request()
-            rights_holders = RightsHolder.get_rights_holder()
+            rights_holders = RightsHolder.get_rights_holders()
             rh_id = rights_holders[-1].id
             rh_name = rights_holders[-1].name
             person = insert('person', 'Nice person')
@@ -76,7 +76,7 @@ class RightsHolderTests(TestBaseCase):
         assert b'Updated Creator' in rv.data
 
         rv = c.post(url_for('rights_holder_update', id_=999), data=update_data)
-        assert b'404' in rv.data
+        assert b'418' in rv.data
 
         c.get(url_for('logout'))
 

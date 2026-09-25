@@ -135,7 +135,7 @@ def setup_files() -> None:
         g.display_file_ext += app.config['PROCESSABLE_EXT']
     if g.settings['iiif'] and g.settings['iiif_path']:
         g.writable_paths.append(g.settings['iiif_path'])
-    g.rights_holder = RightsHolder.get_rights_holder()
+    g.rights_holder = RightsHolder.get_rights_holders()
     rights_holder_info = RightsHolder.get_rights_holder_information()
     file_info = {}
     for file_id in g.files:
