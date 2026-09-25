@@ -5,7 +5,7 @@ from typing import Any, TYPE_CHECKING, Type
 
 from flask import g
 from flask_restful import fields
-from flask_restful.fields import Integer, List, Nested, String
+from flask_restful.fields import Integer, List, Nested, Raw, String
 
 from openatlas import app
 from openatlas.models.entity import Entity
@@ -454,7 +454,7 @@ def properties_template(properties: dict[str, Any]) -> dict[str, Type[String]]:
     return dict_
 
 
-def backend_details_template() -> dict[str, Type[String]]:
+def backend_details_template() -> dict[str, type[String] | type[Raw] | Nested]:
     return {
         'version': fields.String,
         'apiVersions': fields.Raw,

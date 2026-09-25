@@ -3,6 +3,7 @@ from typing import Any
 from flask import url_for
 from flask_openapi3 import APIBlueprint
 
+from openatlas import app
 from openatlas.api.api_v1.error_handlers import register_error_handlers
 from openatlas.api.api_v1.models.root import ApiIndexResponse
 from openatlas.api.api_v1.openapi_tags import system_tag
@@ -25,10 +26,11 @@ def api_v1_index() -> dict[str, Any]:
     schemas.
     """
     response = ApiIndexResponse(
-        name="OpenAtlas API V1",
-        version="1.0.0",
+        name="OpenAtlas API",
+        version=app.config['API_VERSIONS'].get('1', '1'),
         # todo: only schema dynamic link
-        openapi_schema="/openapi/openapi.json",
+        openapi_schema=url_for('api_v1_root.index', _external=True) \
+                       + "docs/openapi.json",
         documentation=url_for('custom_swagger_ui', _external=True),
         manual=url_for(
             'static',

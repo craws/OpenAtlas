@@ -22,17 +22,19 @@ from openatlas.database.token import check_token_revoked
 from openatlas.database.user import admins_available
 from openatlas.models.openatlas_class import get_classes
 
-info = Info(title="OpenAtlas API V1", version="1.0.0")
 app: OpenAPI = OpenAPI(
     __name__,
     security_schemes={},
     instance_relative_config=True,
-    info=info,
     doc_prefix="/api/1/docs")
 
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 app.config.from_object('config.default')
 app.config.from_object('config.api')
+
+app.info = Info(
+    title="OpenAtlas API",
+    version=app.config['API_VERSIONS'].get('1', '1'))
 
 CONFIG_PATH = ''
 if 'INSTANCE_PATH' in os.environ:  # Used for multi instance
@@ -163,7 +165,7 @@ def count_type() -> bool:
         '/orphans',
         '/api/1/vocabulary',
         '/api/type_tree',
-        *[f'/api/{v}/type_tree' for v in app.config['API_VERSIONS']]]
+        '/api/0.4/type_tree']
     if request.path.startswith(tuple(prefixes)):
         return True
     if request.path.startswith('/entity/') and \
