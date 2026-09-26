@@ -30,3 +30,7 @@ network_tag = Tag(name="Network", description="Network analysis endpoints")
 metadata_tag = Tag(
     name="Metadata",
     description="Project metadata and case studies")
+
+
+# todo: check which tags are not used
+# todo: either add an endpoint parameter to each endpoint or remove it
