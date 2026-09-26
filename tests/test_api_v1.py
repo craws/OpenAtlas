@@ -411,6 +411,24 @@ class ApiV1(ApiTestCase):
             assert f'filename={e.file.id}.png' in rv.headers.get(
                 'Content-Disposition', '')
 
+        with c.get(
+                url_for(
+                    'api_v1_files.display_thumbnail',
+                    id=e.file_not_public.id)) as rv:
+            assert rv.status_code == 403
+
+        with c.get(
+                url_for(
+                    'api_v1_files.display_thumbnail',
+                    id=e.file_without_licences.id)) as rv:
+            assert rv.status_code == 403
+
+        with c.get(
+                url_for(
+                    'api_v1_files.display_thumbnail',
+                    id=e.place.id)) as rv:
+            assert rv.status_code == 404
+
         rv = c.get(url_for('api_v1_files.get_public_files'))
         assert rv.status_code == 200
         assert 'data' in rv.get_json()
@@ -497,7 +515,6 @@ class ApiV1(ApiTestCase):
         rv = c.get(
             url_for('api_v1_iiif.get_iiif_canvas', id=e.file.id, version='99'))
         assert rv.status_code == 422
-
 
         # Image
         rv = c.get(

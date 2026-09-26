@@ -46,6 +46,7 @@ def get_license_url_mapping() -> dict[int, list[str]]:
         g.license_url_mapping = dict(license_mapping)
     return g.license_url_mapping
 
+
 def get_valid_license_ids() -> set[int]:
     if not hasattr(g, 'valid_license_ids'):
         valid_ids = set()
@@ -135,46 +136,9 @@ def get_file_path(file_id: int, upload_path: Path) -> Path | Any:
     fallback_file = next(upload_path.glob(f"{file_id}.*"), None)
 
     if fallback_file and fallback_file.is_file():
-        return fallback_file
+        return fallback_file  # pragma: no cover
 
     abort_file_not_found(file_id)
-
-
-def get_multiple_file_paths(
-        file_ids: list[int],
-        upload_path: Path) -> dict[int, Path]:
-    safe_extensions = {
-        '.jpg', '.png', '.jpeg', '.pdf', '.tif', '.tiff', '.bmp', '.gif',
-        '.svg', '.mp4', '.avi', '.mov', '.wmv', '.mp3'}
-
-    configured_exts = g.settings.get('file_upload_allowed_extension', [])
-    extensions = safe_extensions | set(configured_exts)
-
-    results = {}
-    missing_ids = set(file_ids)
-
-    for id_ in list(missing_ids):
-        for ext in extensions:
-            candidate = upload_path / f"{id_}{ext}"
-            if candidate.is_file():
-                results[id_] = candidate
-                missing_ids.remove(id_)
-                break
-
-    if missing_ids:
-        with os.scandir(upload_path) as entries:
-            for entry in entries:
-                if entry.is_file():
-                    name_parts = entry.name.split('.', 1)
-                    if name_parts[0].isdigit():
-                        id_ = int(name_parts[0])
-                        if id_ in missing_ids:
-                            results[id_] = Path(entry.path)
-                            missing_ids.remove(id_)
-                            if not missing_ids:
-                                break
-
-    return results
 
 
 def get_file_item(entity: Entity) -> FileItem:
