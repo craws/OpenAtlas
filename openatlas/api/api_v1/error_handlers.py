@@ -73,19 +73,6 @@ def abort_not_found(uuid: UUID | str | int) -> NoReturn:
         details)
 
 
-def abort_invalid_class(class_name: str) -> NoReturn:
-    details = {
-        'provided_class': str(class_name),
-        'hint': 'Check if the class name is spelled '
-                'correctly and exists in the system.'}
-    abort_with_error(
-        404,
-        'Invalid system class',
-        f"The requested entity class '{class_name}' "
-        f"is not a valid system class.",
-        details)
-
-
 def abort_id_not_a_file(id_: int) -> NoReturn:
     details = {
         'provided_id': str(id_),

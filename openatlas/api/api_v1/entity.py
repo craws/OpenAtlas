@@ -4,8 +4,7 @@ from uuid import UUID
 from flask import g
 from werkzeug.exceptions import ImATeapot
 
-from openatlas.api.api_v1.error_handlers import (
-    abort_invalid_class, abort_not_found)
+from openatlas.api.api_v1.error_handlers import abort_not_found
 from openatlas.database.api import get_by_class_api, get_count_by_class_api
 from openatlas.models.entity import Entity
 from openatlas.models.rights_holder import RightsHolder
@@ -25,6 +24,20 @@ def get_entity_by_id(
     except ImATeapot:
         abort_not_found(id_)
 
+def get_entity_by_uuid(
+        uuid: UUID,
+        types: bool = False,
+        aliases: bool = False,
+        with_location: bool = True) -> Entity | None:
+    try:
+        return Entity.get_by_uuid(
+            uuid,
+            types=types,
+            aliases=aliases,
+            with_location=with_location)
+    except ImATeapot:
+        abort_not_found(uuid)
+
 
 def get_rightsholder_by_id(id_: int) -> RightsHolder:
     try:
@@ -33,46 +46,33 @@ def get_rightsholder_by_id(id_: int) -> RightsHolder:
         abort_not_found(id_)
 
 
-def resolve_type_ids(
-        identifier: int | str | UUID | None) -> list[int] | None:
+def resolve_type_ids(identifier: int | UUID | None) -> list[int] | None:
     if identifier is None:
         return None
+
     if isinstance(identifier, int):
-        type_id = identifier
-    elif isinstance(identifier, str) and identifier.isdigit():
-        type_id = int(identifier)
-    else:
-        uuid_str = str(identifier)
-        for t_id, type_entity in g.types.items():
-            if str(type_entity.uuid) == uuid_str:
-                return [t_id] + type_entity.get_sub_ids_recursive()
-        entity = Entity.get_by_uuid(uuid_str)
-        if not entity:
-            return []
-        type_id = entity.id
+        entity = g.types.get(identifier)
+        return [identifier, *entity.get_sub_ids_recursive()] \
+            if entity else None
 
-    if type_id in g.types:
-        return [type_id] + g.types[type_id].get_sub_ids_recursive()
-    return [type_id]
+    uuid_str = str(identifier)
+    for type_id, entity in g.types.items():
+        if str(entity.uuid) == uuid_str:
+            return [type_id, *entity.get_sub_ids_recursive()]
 
-
-def _validate_class(name: str) -> str:
-    if name not in g.classes:
-        abort_invalid_class(name)
-    return name
+    return None
 
 
 def get_by_system_class(
-        name: str,
+        class_name: str,
         order_by: str | None = None,
         limit: int | None = None,
         offset: int | None = None,
         search: str | None = None,
         start_date: Any = None,
         end_date: Any = None,
-        type_id: int | str | UUID | None = None,
-        case_study: int | str | UUID | None = None) -> list[Entity]:
-    class_name = _validate_class(name)
+        type_id: int | UUID | None = None,
+        case_study: int | UUID | None = None) -> list[Entity]:
     type_ids = resolve_type_ids(type_id)
     case_study_ids = resolve_type_ids(case_study)
     aliases = True
@@ -94,13 +94,12 @@ def get_by_system_class(
 
 
 def get_count_by_system_class(
-        name: str,
+        class_name: str,
         search: str | None = None,
         start_date: Any = None,
         end_date: Any = None,
         type_id: int | str | UUID | None = None,
         case_study: int | str | UUID | None = None) -> int:
-    class_name = _validate_class(name)
     type_ids = resolve_type_ids(type_id)
     case_study_ids = resolve_type_ids(case_study)
     return get_count_by_class_api(

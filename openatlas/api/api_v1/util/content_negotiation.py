@@ -34,8 +34,7 @@ def set_accept_header(extension: str | None = None) -> None:
 def make_graph_response(
         graph: Dataset,
         ext: str | None = None) -> Response:
-    if ext:
-        set_accept_header(ext)
+    set_accept_header(ext)
     accepted = request.accept_mimetypes.best_match(LOD_HEADER)
     rdf_format = MIME_FORMAT_MAP.get(accepted, 'json-ld')
     mimetype = accepted if accepted in MIME_FORMAT_MAP \
@@ -46,8 +45,7 @@ def make_graph_response(
 def make_lod_response(
         data: dict[str, Any],
         ext: str | None = None) -> Response:
-    if ext:
-        set_accept_header(ext)
+    set_accept_header(ext)
     accepted = request.accept_mimetypes.best_match(LOD_HEADER)
     json_str = app.json.dumps(data)
     if accepted not in [

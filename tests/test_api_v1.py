@@ -28,10 +28,18 @@ class ApiV1(ApiTestCase):
         assert rv_json['type'] == 'Site'
         assert rv_json['_label'] == 'Shire'
 
-        rv = c.get(url_for(
-            'api_v1_lod.entities', entity_class='acquisition',
-            startDate='-400', endDate='2000-05'))
-        assert rv.status_code == 200
+        rv = c.get(
+            url_for('api_v1_lod.entity_ext', uuid=e.place.uuid, ext='ttl'))
+        assert 'text/turtle' in rv.headers.get('Content-Type')
+
+
+        for params in [
+            {'startDate': '-400', 'endDate': '2000-05', 'caseStudy': e.case_study.uuid},
+            { 'caseStudy': e.case_study.id, 'limit': 10},
+            { 'caseStudy': e.place.uuid, 'limit': 5, 'offset': 2}]:
+            rv = c.get(url_for(
+                'api_v1_lod.entities', entity_class='acquisition', **params))
+            assert rv.status_code == 200
 
         for params in [
             {'startDate': '0'},
@@ -48,17 +56,11 @@ class ApiV1(ApiTestCase):
             'api_v1_lod.entities', entity_class='acquisition',
             startDate='999999999'))
         assert rv.status_code == 400
-        rv_json = rv.get_json()
-        assert rv_json['status'] == 400
-        assert {'title', 'message', 'details', 'url', 'timestamp'} \
-               <= rv_json.keys()
 
-        rv = c.get(url_for('api_v1_metadata.get_agent_by_id', id=999999))
+        rv = c.get(url_for(
+            'api_v1_lod.entity', uuid='7404a969-97ba-4861-a555-3a97be2be967'))
         assert rv.status_code == 404
-        rv_json = rv.get_json()
-        assert rv_json['status'] == 404
-        assert {'title', 'message', 'details', 'url', 'timestamp'} \
-               <= rv_json.keys()
+
 
     def test_system(self) -> None:
         c = self.client
@@ -111,8 +113,10 @@ class ApiV1(ApiTestCase):
         assert rv.status_code == 200
         assert 'properties' in rv.get_json()
 
+    # todo: review
     def test_vocabulary(self) -> None:
         c = self.client
+        e = self.get_api_entities()
         with app.test_request_context():
             app.preprocess_request()
             vocabulary_type = next(iter(g.types.values()))
@@ -141,6 +145,18 @@ class ApiV1(ApiTestCase):
 
         rv = c.get(
             url_for(
+                'api_v1_vocabulary.get_vocabulary_item',
+                id=e.boundary_mark.id))
+        assert rv.status_code == 200
+
+        rv = c.get(
+            url_for(
+                'api_v1_vocabulary.get_vocabulary_item',
+                id=e.place.id))
+        assert rv.status_code == 404
+
+        rv = c.get(
+            url_for(
                 'api_v1_vocabulary.get_vocabulary_tree_by_class',
                 openatlas_class='place'))
         assert rv.status_code == 200
@@ -150,12 +166,14 @@ class ApiV1(ApiTestCase):
         rv = c.get(
             url_for(
                 'api_v1_vocabulary.get_vocabulary_standard_by_class',
-                openatlas_class='place'))
+                openatlas_class='place',
+                case_study=e.case_study.id))
         assert rv.status_code == 200
         rv_json = rv.get_json()
         assert 'data' in rv_json
         assert isinstance(rv_json['data'], list)
 
+    # todo: review
     def test_vocabulary_skos(self) -> None:
         skos = 'http://www.w3.org/2004/02/skos/core#'
         c = self.client

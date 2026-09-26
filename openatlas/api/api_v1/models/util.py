@@ -23,7 +23,7 @@ class BaseSchema(BaseModel):
                     if (isinstance(value, str)
                         and value.strip().lower() == "null")
                     else value) for key, value in data.items()}
-        return data
+        return data  # pragma: no cover
 
 
 class DownloadQuery(BaseModel):

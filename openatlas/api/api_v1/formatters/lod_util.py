@@ -13,7 +13,7 @@ from flask import Response, g, url_for
 from openatlas import app
 from openatlas.api.api_v04.resources.util import to_camel_case
 from openatlas.api.api_v1.entity import (
-    get_by_system_class, get_count_by_system_class)
+    get_by_system_class, get_count_by_system_class, get_entity_by_uuid)
 from openatlas.api.api_v1.error_handlers import abort_not_found
 from openatlas.api.api_v1.models.util import (
     ExternalReferenceSystemModel, MatchTypeEnum)
@@ -57,6 +57,7 @@ def get_license_type(entity: Entity) -> Optional[Entity]:
             license_ = type_
             break
     return license_
+
 
 # todo: rewrite without using g.files!
 def get_iiif_manifest_and_path(img_id: int) -> dict[str, str]:
@@ -193,7 +194,7 @@ def get_entity_response(
         entity_id: UUID,
         formatter: Callable[[Entity], dict[str, Any]],
         ext: str | None = None) -> dict[str, Any] | Response:
-    entity = Entity.get_by_uuid(entity_id, types=True, aliases=True)
+    entity = get_entity_by_uuid(entity_id, types=True, aliases=True)
     if not entity:
         abort_not_found(entity_id)
     return make_lod_response(formatter(entity), ext=ext)
