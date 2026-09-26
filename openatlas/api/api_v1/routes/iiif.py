@@ -1,9 +1,7 @@
 from flask_openapi3 import APIBlueprint
 
 from openatlas.api.api_v1.error_handlers import (
-    abort_file_not_found,
     abort_id_does_not_exist,
-    abort_unsupported_iiif_version,
     register_error_handlers)
 from openatlas.api.api_v1.models.iiif import (
     AnnotationIiifPath,
@@ -40,8 +38,6 @@ register_error_handlers(api_v1_iiif)
     responses=iiif_manifest_response)
 def get_iiif_manifest(path: FileIiifPath):
     """Returns the IIIF manifest for a specific file and IIIF version."""
-    if path.version not in ['2', '3']:
-        abort_unsupported_iiif_version(path.version)
     entity = get_file_entity(path.id)
     check_file_access(entity)
     if path.version == '3':
@@ -56,12 +52,8 @@ def get_iiif_manifest(path: FileIiifPath):
     responses=iiif_canvas_response)
 def get_iiif_canvas(path: FileIiifPath):
     """Returns the IIIF canvas for a specific file and IIIF version."""
-    if path.version not in ['2', '3']:
-        abort_unsupported_iiif_version(path.version)
     entity = get_file_entity(path.id)
     check_file_access(entity)
-    if not entity:
-        abort_file_not_found(entity.id)
     return build_canvas(entity, version=int(path.version))
 
 
@@ -72,12 +64,8 @@ def get_iiif_canvas(path: FileIiifPath):
     responses=iiif_image_response)
 def get_iiif_image(path: FileIiifPath):
     """Returns the IIIF image (annotation) for a specific file and version."""
-    if path.version not in ['2', '3']:
-        abort_unsupported_iiif_version(path.version)
     entity = get_file_entity(path.id)
     check_file_access(entity)
-    if not entity:
-        abort_file_not_found(path.id)
     return build_image(entity, version=int(path.version))
 
 
@@ -88,12 +76,8 @@ def get_iiif_image(path: FileIiifPath):
     responses=iiif_annotation_list_response)
 def get_iiif_annotation_list(path: FileIiifPath):
     """Returns the IIIF annotation list (v2) or page (v3)."""
-    if path.version not in ['2', '3']:
-        abort_unsupported_iiif_version(path.version)
     entity = get_file_entity(path.id)
     check_file_access(entity)
-    if not entity:
-        abort_file_not_found(path.id)
     return build_annotation_list(entity, version=int(path.version))
 
 
@@ -104,8 +88,6 @@ def get_iiif_annotation_list(path: FileIiifPath):
     responses=iiif_annotation_response)
 def get_iiif_annotation(path: AnnotationIiifPath):
     """Returns a specific IIIF annotation."""
-    if path.version not in ['2', '3']:
-        abort_unsupported_iiif_version(path.version)
     if not (data := get_annotation_image_by_id(path.id)):
         abort_id_does_not_exist(path.id)
     annotation = AnnotationImage(data)

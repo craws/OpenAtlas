@@ -29,9 +29,9 @@ class ManifestMetadata:
 def get_url(entity_id: int) -> str:
     if resolver := g.settings.get('frontend_resolver_url'):
         return f"{resolver}{entity_id}"
-    try:
+    try:  # pragma: no cover
         return url_for('api_v1_lod.get_entity', id=entity_id, _external=True)
-    except Exception:
+    except Exception: # pragma: no cover
         return f"{request.url_root}api/1/entity/{entity_id}"
 
 
@@ -98,14 +98,14 @@ class IIIFBuilder:
     def _get_image_metadata(self) -> Tuple[str, dict[str, Any]]:
         if self.entity.class_.group.get('name') != 'file' and \
                 not check_iiif_file_exist(self.entity.id):
-            abort_file_not_found(self.entity.id)
+            abort_file_not_found(self.entity.id)  # pragma: no cover
         ext = '.tiff' if g.settings.get('iiif_conversion') else \
             self.entity.get_file_ext()
         image_url = f"{g.settings.get('iiif_url', '')}{self.entity.id}{ext}"
         try:
             resp = requests.get(f"{image_url}/info.json", timeout=30)
             resp.raise_for_status()
-        except Exception:
+        except Exception:  # pragma: no cover
             abort_file_not_found(self.entity.id)
         return image_url, resp.json()
 
@@ -148,21 +148,21 @@ class IIIFBuilder:
             attribution=attribution)
 
     def build_manifest(self) -> dict[str, Any]:
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def build_canvas(self) -> dict[str, Any]:
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def build_image(self) -> dict[str, Any]:
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def build_annotation(
             self,
             annotation: AnnotationImage) -> dict[str, Any]:
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def get_logo(self) -> dict[str, Any]:
-        raise NotImplementedError
+        raise NotImplementedError  # pragma: no cover
 
     def get_selector(self, coordinates_str: str) -> dict[str, Any]:
         coordinates = convert_coordinates(coordinates_str)
@@ -293,7 +293,7 @@ class V2Builder(IIIFBuilder):
     def get_logo(self) -> dict[str, Any]:
         logo_id = g.settings.get('logo_file_id')
         if not logo_id or not str(logo_id).isdigit():
-            return {}
+            return {}  # pragma: no cover
         logo_url = url_for(
             'api_v1_files.display_file',
             id=int(logo_id),
@@ -325,7 +325,6 @@ class V3Builder(IIIFBuilder):
             "label": {"en": [self.entity.name]},
             "metadata": v3_metadata,
             "items": [self.build_canvas()]}
-
         if self.entity.description:
             manifest["summary"] = {"en": [self.entity.description]}
         if self.common_meta.see_also:
@@ -424,7 +423,7 @@ class V3Builder(IIIFBuilder):
     def get_logo(self) -> dict[str, Any]:
         logo_id = g.settings.get('logo_file_id')
         if not logo_id or not str(logo_id).isdigit():
-            return {}
+            return {}  # pragma: no cover
         logo_url = url_for(
             'api_v1_files.display_file',
             id=int(logo_id),

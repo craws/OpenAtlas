@@ -6,6 +6,7 @@ from rdflib import Dataset, RDF, URIRef
 from openatlas import app
 from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
+from openatlas.models.settings import set_logo
 from tests.base import ApiTestCase, get_hierarchy, insert
 
 
@@ -362,6 +363,7 @@ class ApiV1(ApiTestCase):
                 data={
                     'name': 'OpenAtlas logo',
                     'file': img,
+                    'description': 'OpenAtlas logo',
                     'creator': f'{rights_holder_ids}',
                     'license_holder': f'{rights_holder_ids}',
                     str(public_type.id): public_type.subs[1]},
@@ -378,10 +380,31 @@ class ApiV1(ApiTestCase):
         with c.get(
                 url_for('api_v1_files.display_file', id=e.file.id)) as rv:
             assert rv.status_code in (200, 302, 404)
-
         with c.get(
                 url_for(
                     'api_v1_files.display_file',
+                    id=e.file_without_file.id)) as rv:
+            assert rv.status_code in (200, 302, 404)
+        with c.get(
+                url_for(
+                    'api_v1_files.display_file',
+                    id=e.file.id,
+                    download=True)) as rv:
+            assert rv.status_code == 200
+            assert f'filename={e.file.id}.png' in rv.headers.get(
+                'Content-Disposition', '')
+
+        with c.get(
+                url_for('api_v1_files.display_thumbnail', id=e.file.id)) as rv:
+            assert rv.status_code in (200, 302, 404)
+        with c.get(
+                url_for(
+                    'api_v1_files.display_thumbnail',
+                    id=e.file_without_file.id)) as rv:
+            assert rv.status_code in (200, 302, 404)
+        with c.get(
+                url_for(
+                    'api_v1_files.display_thumbnail',
                     id=e.file.id,
                     download=True)) as rv:
             assert rv.status_code == 200
@@ -405,6 +428,7 @@ class ApiV1(ApiTestCase):
                 url_for('insert', class_='file'),
                 data={
                     'name': 'OpenAtlas logo',
+                    'description': 'OpenAtlas logo',
                     'file': img,
                     'creator': f'{rights_holder_ids}',
                     'license_holder': f'{rights_holder_ids}',
@@ -418,10 +442,14 @@ class ApiV1(ApiTestCase):
             lic_ext_ref = insert('external_reference', lic_url)
             lic_ext_ref.link('P67', e.open_license)
             e.file.link('P2', e.open_license)
+            e.file.link('P67', e.actor)
+            e.file.link('P67', lic_ext_ref, inverse=True)
+            set_logo(e.file.id)
 
             AnnotationImage.insert(
                 image_id=e.file.id,
                 coordinates='10,10,50,50',
+                entity_id=e.place.id,
                 text='Sample IIIF annotation')
             annotations = AnnotationImage.get_by_file_id(e.file.id)
             annotation_id = annotations[0].id
@@ -450,11 +478,12 @@ class ApiV1(ApiTestCase):
         statement = manifest_v3['requiredStatement']['value']['en'][0]
         assert 'Public domain' in statement
 
-        # Direct URL structure check: /api/1/iiif/<id>/manifest/<version>
-        rv = c.get(f'/api/1/iiif/{e.file.id}/manifest/2')
-        assert rv.status_code == 200
-        rv = c.get(f'/api/1/iiif/{e.file.id}/manifest/3')
-        assert rv.status_code == 200
+        rv = c.get(
+            url_for(
+                'api_v1_iiif.get_iiif_manifest',
+                id=e.file.id,
+                version='99'))
+        assert rv.status_code == 422
 
         # Canvas
         rv = c.get(
@@ -465,9 +494,10 @@ class ApiV1(ApiTestCase):
             url_for('api_v1_iiif.get_iiif_canvas', id=e.file.id, version='3'))
         assert rv.status_code == 200
 
-        # Direct URL structure check: /api/1/iiif/<id>/canvas/<version>
-        rv = c.get(f'/api/1/iiif/{e.file.id}/canvas/2')
-        assert rv.status_code == 200
+        rv = c.get(
+            url_for('api_v1_iiif.get_iiif_canvas', id=e.file.id, version='99'))
+        assert rv.status_code == 422
+
 
         # Image
         rv = c.get(
@@ -477,6 +507,10 @@ class ApiV1(ApiTestCase):
         rv = c.get(
             url_for('api_v1_iiif.get_iiif_image', id=e.file.id, version='3'))
         assert rv.status_code == 200
+
+        rv = c.get(
+            url_for('api_v1_iiif.get_iiif_image', id=e.file.id, version='99'))
+        assert rv.status_code == 422
 
         # Direct URL structure check: /api/1/iiif/<id>/image/<version>
         rv = c.get(f'/api/1/iiif/{e.file.id}/image/2')
@@ -499,8 +533,12 @@ class ApiV1(ApiTestCase):
         assert rv.status_code == 200
         assert rv.get_json()['type'] == 'AnnotationPage'
 
-        rv = c.get(f'/api/1/iiif/{e.file.id}/annotation-list/2')
-        assert rv.status_code == 200
+        rv = c.get(
+            url_for(
+                'api_v1_iiif.get_iiif_annotation_list',
+                id=e.file.id,
+                version='99'))
+        assert rv.status_code == 422
 
         # Annotation
         rv = c.get(

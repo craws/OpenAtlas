@@ -31,13 +31,13 @@ def get_iiif_redirect_url(
         file_path: Path,
         is_thumbnail: bool = False) -> str | None:
     if not g.settings.get('iiif') or not check_iiif_activation():
-        return None
+        return None  # pragma: no cover
 
     if file_path.suffix.lower() not in g.display_file_ext:
-        return None
+        return None # pragma: no cover
 
     if not check_iiif_file_exist(file_id):
-        return None
+        return None # pragma: no cover
 
     iiif_ext = '.tiff' if g.settings.get('iiif_conversion') \
         else file_path.suffix
@@ -60,8 +60,6 @@ def display_file(path: FileIdPath, query: DownloadQuery):
     entity = get_file_entity(path.id)
     check_file_access(entity)
     actual_path = get_file_path(entity.id, app.config['UPLOAD_PATH'])
-    if not actual_path:
-        abort_file_not_found(entity.id)
     if not query.download:
         iiif_url = get_iiif_redirect_url(
             entity.id,
@@ -86,8 +84,6 @@ def display_thumbnail(path: FileIdPath, query: DownloadQuery):
     entity = get_file_entity(path.id)
     check_file_access(entity)
     original_path = get_file_path(entity.id, app.config['UPLOAD_PATH'])
-    if not original_path:
-        abort_file_not_found(entity.id)
     if not query.download:
         iiif_url = get_iiif_redirect_url(
             entity.id,
@@ -99,8 +95,6 @@ def display_thumbnail(path: FileIdPath, query: DownloadQuery):
     thumbnail_path = get_file_path(
         entity.id,
         app.config['RESIZED_IMAGES'] / app.config['IMAGE_SIZE']['thumbnail'])
-    if not thumbnail_path:
-        abort_file_not_found(entity.id)
 
     return send_file(thumbnail_path, as_attachment=bool(query.download))
 

@@ -62,86 +62,82 @@ def register_error_handlers(api_v1) -> None:
 
 
 def abort_not_found(uuid: UUID | str | int) -> NoReturn:
+    details = {
+        'provided_uuid': str(uuid),
+        'hint': 'Check if the UUID is correct '
+                'and the entity has not been deleted.'}
     abort_with_error(
         404,
         'Entity does not exist',
         'The requested entity could not be found in the database.',
-        {
-            'provided_uuid': str(uuid),
-            'hint': 'Check if the UUID is correct '
-                    'and the entity has not been deleted.'})
+        details)
 
 
 def abort_invalid_class(class_name: str) -> NoReturn:
+    details = {
+        'provided_class': str(class_name),
+        'hint': 'Check if the class name is spelled '
+                'correctly and exists in the system.'}
     abort_with_error(
         404,
         'Invalid system class',
         f"The requested entity class '{class_name}' "
         f"is not a valid system class.",
-        {
-            'provided_class': str(class_name),
-            'hint': 'Check if the class name is spelled '
-                    'correctly and exists in the system.'})
+        details)
 
 
 def abort_id_not_a_file(id_: int) -> NoReturn:
+    details = {
+        'provided_id': str(id_),
+        'hint': 'Find more details of that entity via an /entity endpoint'}
     abort_with_error(
         404,
         'ID is not a file',
         f"The requested entity id {id_} is not a file. ",
-        {
-            'provided_id': str(id_),
-            'hint': 'Find more details of that entity '
-                    'via an /entity endpoint'})
+        details)
 
 
 def abort_id_does_not_exist(id_: int) -> NoReturn:
+    details = {
+        'provided_id': str(id_),
+        'hint': 'Try searching for the entity by its name using a '
+                'search endpoint.'}
     abort_with_error(
         404,
         'ID does not exist',
         f"The requested entity id {id_} is not in the database.",
-        {
-            'provided_id': str(id_),
-            'hint': 'Try searching for the entity by its name using a '
-                    'search endpoint.'})
+        details)
 
 
 def abort_file_without_license(id_: int) -> NoReturn:
+    details = {
+        'provided_id': str(id_),
+        'hint': 'Please contact the project members for more details.'}
     abort_with_error(
         403,
         'No Licenser',
         "The requested file has no license and can't be displayed.",
-        {
-            'provided_id': str(id_),
-            'hint': 'Please contact the project members for more details.'})
+        details)
 
 
 def abort_file_not_public(id_: int) -> NoReturn:
+    details = {
+        'provided_id': str(id_),
+        'hint': 'Please contact the project members for more details.'}
     abort_with_error(
         403,
         'Not shareable',
         "This file is not public shareable.",
-        {
-            'provided_id': str(id_),
-            'hint': 'Please contact the project members for more details.'})
+        details)
 
 
 def abort_file_not_found(id_: int) -> NoReturn:
+    details = {
+        'provided_id': str(id_),
+        'hint': 'Find more details of that entity via an /entity endpoint'}
     abort_with_error(
         404,
         'File not found',
         f"No file was found for the requested ID {id_}.",
-        {
-            'provided_id': str(id_),
-            'hint': 'Find more details of that entity '
-                    'via an /entity endpoint'})
+        details)
 
-
-def abort_unsupported_iiif_version(version: str) -> NoReturn:
-    abort_with_error(
-        400,
-        'Unsupported IIIF version',
-        f"The requested IIIF version '{version}' is not supported.",
-        {
-            'provided_version': str(version),
-            'hint': 'Only IIIF versions 2 and 3 are supported.'})

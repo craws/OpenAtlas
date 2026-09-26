@@ -232,4 +232,3 @@ VALUES
 UPDATE model.entity
 SET begin_from = CURRENT_DATE
 WHERE name = 'Economical';
-
