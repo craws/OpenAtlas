@@ -191,7 +191,8 @@ class Display:
                 f'+ {uc_first(_('add'))}')
             self.tabs['additional'].content = ''
             for name in empty_tabs:
-                if self.tabs[name].buttons:
+                if self.tabs[name].buttons \
+                        and self.entity.category != 'system':
                     self.tabs['additional'].content += \
                         f'<h2>{self.tabs[name].label}</h2>' + \
                         button_bar(self.tabs[name].buttons)
@@ -373,7 +374,8 @@ class Display:
 
     def add_button_update(self) -> None:
         if not is_authorized(self.entity.class_.write_access) \
-                or self.problematic_type:
+                or self.problematic_type \
+                or self.entity.category == 'system':
             return
         self.buttons.append(
             button(
