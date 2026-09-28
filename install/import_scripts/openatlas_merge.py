@@ -4,7 +4,6 @@
 # * The database to read from in this script
 
 # Work in progress, to do:
-# * Prevent double system references type match links
 # * Link admin units
 # * Files
 # * Add case studies
@@ -24,6 +23,7 @@ from psycopg2 import extras
 
 from openatlas import app
 from openatlas.database import entity as db
+from openatlas.database.checks import delete_link_duplicates
 from openatlas.database.entity import set_required
 from openatlas.database.imports import import_data
 from openatlas.models.entity import Entity, insert
@@ -52,7 +52,7 @@ id_map: dict[int, int] = {}  # Map imported entity ids to existing ones
 id_added: list[int] = []  # Track already inserted entities
 
 
-def cleanup(id_: int) -> None:
+def cleanup_before(id_: int) -> None:
     g.cursor.execute(
         'ALTER TABLE model.entity DISABLE TRIGGER on_delete_entity;')
     g.cursor.execute(
@@ -295,18 +295,22 @@ def link_entities() -> None:
             'begin_comment': row['begin_comment'] or None,
             'end_from': row['end_from'] or None,
             'end_to': row['end_to'] or None,
-            'end_comment': row['end_comment'] or None
-        })
+            'end_comment': row['end_comment'] or None})
+
+
+def cleanup_after() -> None:
+    delete_link_duplicates()
 
 
 with app.test_request_context():
     app.preprocess_request()
     project_id = insert_project()
-    cleanup(project_id)
+    cleanup_before(project_id)
     hierarchies()
     reference_systems()
     types()
     insert_entities()
     link_entities()
+    cleanup_after()
 
 print(f'Execution time: {int(time.time() - start)} seconds')
