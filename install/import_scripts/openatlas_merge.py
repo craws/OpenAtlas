@@ -4,15 +4,14 @@
 # * The database to read from in this script
 
 # Work in progress, to do:
-# * Link admin units
-# * Files
-# * Add case studies
+# * Add case study
 # * Check additional classes for reference systems
-# * Check additional classes for types
+# * Files
 #
 # 2nd part when dealing with multiple data sests
-# * Track manual mapping for e.g. duplicates
+# * Offer manual mapping for e.g. duplicates
 # * New reference systems
+# * New case studies (would have to be subs of import case study)
 
 import time
 from typing import Any
@@ -108,6 +107,22 @@ def hierarchies() -> None:
             pass
         if not exists:
             insert_hierarchy(item)
+    cursor.execute(
+        """
+        SELECT hierarchy_id, openatlas_class_name
+        FROM web.hierarchy_openatlas_class;
+        """)
+    for item in list(cursor):
+        g.cursor.execute(
+            """
+            INSERT INTO web.hierarchy_openatlas_class
+                (hierarchy_id, openatlas_class_name)
+            VALUES
+                (%(hierarchy_id)s, %(openatlas_class_name)s)
+            ON CONFLICT DO NOTHING;
+            """, {
+                'hierarchy_id': id_map[item['hierarchy_id']],
+                'openatlas_class_name': item['openatlas_class_name']})
 
 
 def insert_hierarchy(item: dict[str, Any]) -> None:
@@ -274,8 +289,7 @@ def link_entities() -> None:
                 AS end_from, end_comment,
             COALESCE(to_char(end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
                 AS end_to
-        FROM model.link
-        WHERE property_code NOT IN ('P127', 'P89');
+        FROM model.link;
         """)
     for row in list(cursor):
         if row['domain_id'] not in id_map:
@@ -296,9 +310,6 @@ def link_entities() -> None:
             'end_from': row['end_from'] or None,
             'end_to': row['end_to'] or None,
             'end_comment': row['end_comment'] or None})
-
-
-def cleanup_after() -> None:
     delete_link_duplicates()
 
 
@@ -311,6 +322,5 @@ with app.test_request_context():
     types()
     insert_entities()
     link_entities()
-    cleanup_after()
 
 print(f'Execution time: {int(time.time() - start)} seconds')
