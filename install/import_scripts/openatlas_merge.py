@@ -54,12 +54,16 @@ id_added: list[int] = []  # Track already inserted entities
 
 def cleanup(id_: int) -> None:
     g.cursor.execute(
+        'ALTER TABLE model.entity DISABLE TRIGGER on_delete_entity;')
+    g.cursor.execute(
         """
         DELETE FROM model.entity
         WHERE id IN (
             SELECT entity_id
             FROM import.entity WHERE project_id = %(project_id)s);
         """, {'project_id': id_})
+    g.cursor.execute(
+        'ALTER TABLE model.entity ENABLE TRIGGER on_delete_entity;')
     g.cursor.execute(
         'DELETE FROM import.entity WHERE project_id = %(project_id)s;',
         {'project_id': id_})
