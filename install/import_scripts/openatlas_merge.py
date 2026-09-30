@@ -4,7 +4,6 @@
 # * The database to read from in this script
 
 # Work in progress, to do:
-# * Add case study
 # * Check additional classes for reference systems
 # * Files
 #
@@ -188,7 +187,7 @@ def types_recursive(
 
 def insert_type_recursive(
         import_type: Entity,
-        import_types: dict[int, Entity]):
+        import_types: dict[int, Entity]) -> None:
     print(f'New type: {import_type.name}')
     new_type = insert({
        'name': import_type.name,
@@ -237,8 +236,9 @@ def insert_entities() -> None:
         WHERE openatlas_class_name NOT IN (
             'administrative_unit', 'reference_system', 'type', 'type_tools');
         """)
+    case_study_hierarchy = Entity.get_hierarchy('Case study')
     for row in list(cursor):
-        new_id = db.insert({
+        entity = insert({
            'name': row['name'],
            'description': row['description'],
            'openatlas_class_name': row['openatlas_class_name'],
@@ -248,7 +248,9 @@ def insert_entities() -> None:
            'end_from': row['end_from'],
            'end_to': row['end_to'],
            'end_comment': row['end_comment']})
-        track(row['id'], new_id)
+        track(row['id'], entity.id)
+        if row['openatlas_class_name'] in case_study_hierarchy.classes:
+            entity.link('P2', case_study)
 
 
 def reference_systems() -> None:
@@ -313,10 +315,21 @@ def link_entities() -> None:
     delete_link_duplicates()
 
 
+def add_case_study() -> Entity:
+    case = insert({
+        'name': PROJECT_NAME,
+        'description': PROJECT_DESCRIPTION,
+        'openatlas_class_name': 'type'})
+    case.link('P127', Entity.get_hierarchy('Case study'))
+    import_data(project_id, case.id, IMPORT_USER_ID)
+    return case
+
+
 with app.test_request_context():
     app.preprocess_request()
     project_id = insert_project()
     cleanup_before(project_id)
+    case_study = add_case_study()
     hierarchies()
     reference_systems()
     types()
