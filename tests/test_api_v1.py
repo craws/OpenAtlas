@@ -25,7 +25,7 @@ class ApiV1(ApiTestCase):
         assert rv_json[
                    '@context'] == 'https://linked.art/ns/v1/linked-art.json'
         assert '@graph' not in rv_json
-        assert rv_json['type'] == 'Site'
+        assert rv_json['type'] == 'Physical Thing'
         assert rv_json['_label'] == 'Shire'
 
         rv = c.get(
@@ -89,7 +89,8 @@ class ApiV1(ApiTestCase):
         assert rv_json[
                    '@context'] == 'https://linked.art/ns/v1/linked-art.json'
         assert '@graph' not in rv_json
-        assert rv_json['type'] == 'Site'
+        assert rv_json['type'] == 'HumanMadeObject'
+        assert rv_json['current_location']['type'] == 'Place'
         assert rv_json['_label'] == 'Shire'
 
         rv = c.get(
@@ -101,6 +102,57 @@ class ApiV1(ApiTestCase):
                 'api_v1_loud.loud_entity',
                 uuid='7404a969-97ba-4861-a555-3a97be2be967'))
         assert rv.status_code == 404
+
+        for class_ in ['place', 'person', 'artifact', 'file', 'type']:
+            rv = c.get(
+                url_for('api_v1_loud.loud_entities', entity_class=class_))
+            assert rv.status_code == 200
+            rv_json = rv.get_json()
+            assert rv_json['type'] == 'hydra:PartialCollectionView'
+            assert rv_json['@graph']
+
+        with app.test_request_context():
+            app.preprocess_request()
+            move = insert('move', 'Move of ring')
+            move.link('P25', e.artifact)
+            move.link('P26', e.location)
+            move.link('P27', e.location)
+            self.cursor.execute(
+                "UPDATE model.entity SET begin_from = '2000-01-01', "
+                "end_to = '2001-01-01' WHERE id = %s",
+                (e.artifact.id,))
+        rv = c.get(url_for('api_v1_loud.loud_entity', uuid=move.uuid))
+        part = rv.get_json()['part'][0]
+        assert part['type'] == 'Move'
+        assert part['moved'][0]['id'].endswith(e.artifact.uuid)
+        assert part['moved_to']['type'] == 'Place'
+        assert part['moved_from']['type'] == 'Place'
+
+        rv = c.get(url_for('api_v1_loud.loud_entity', uuid=e.artifact.uuid))
+        rv_json = rv.get_json()
+        assert rv_json['produced_by']['type'] == 'Production'
+        assert rv_json['destroyed_by']['type'] == 'Destruction'
+        assert 'timespan' in rv_json['destroyed_by']
+
+        with app.test_request_context():
+            app.preprocess_request()
+            self.cursor.execute(
+                "UPDATE model.entity SET begin_from = '0750-01-01', "
+                "end_from = '0900-01-01', begin_comment = 'Excavation' "
+                "WHERE id IN (%s, %s)",
+                (e.place.id, e.feature.id))
+        for entity in (e.place, e.feature):
+            rv = c.get(url_for('api_v1_loud.loud_entity', uuid=entity.uuid))
+            rv_json = rv.get_json()
+            assert rv_json['type'] == 'HumanMadeObject'
+            assert 'timespan' not in rv_json
+            production = rv_json['produced_by']
+            assert production['type'] == 'Production'
+            assert production['timespan']['begin_of_the_begin'].startswith(
+                '0750-01-01')
+            assert production['referred_to_by'][0]['content'] == 'Excavation'
+            assert 'destroyed_by' in rv_json
+        assert rv_json['part_of']['id'].endswith(e.place.uuid)
 
     def test_system(self) -> None:
         c = self.client

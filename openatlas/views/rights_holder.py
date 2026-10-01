@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from flask import abort, flash, g, redirect, render_template, request, url_for
+from flask import flash, g, redirect, render_template, request, url_for
 from flask_babel import gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.wrappers import Response

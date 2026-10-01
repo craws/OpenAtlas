@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import mimetypes
-import os
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, cast

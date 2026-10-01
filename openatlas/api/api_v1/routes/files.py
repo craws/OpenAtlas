@@ -4,8 +4,7 @@ from flask import g, redirect, send_file
 from flask_openapi3 import APIBlueprint
 
 from openatlas import app
-from openatlas.api.api_v1.error_handlers import (
-    abort_file_not_found, register_error_handlers)
+from openatlas.api.api_v1.error_handlers import register_error_handlers
 from openatlas.api.api_v1.models.files import (
     FileIdPath, PublicFileOverviewResponse)
 from openatlas.api.api_v1.models.util import DownloadQuery

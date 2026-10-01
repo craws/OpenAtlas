@@ -4,9 +4,8 @@ from urllib.parse import quote, urlparse
 from flask import Response, g
 from rdflib import DCTERMS, Dataset, Literal, Namespace, RDF, URIRef
 
-from openatlas.api.api_v1.formatters.lod import entity_uri
 from openatlas.api.api_v1.formatters.lod_util import (
-    get_external_reference_items, get_type_references)
+    entity_uri, get_external_reference_items, get_type_references)
 from openatlas.api.api_v1.models.util import (
     ExternalReferenceSystemModel, MatchTypeEnum)
 from openatlas.api.api_v1.util.content_negotiation import make_graph_response

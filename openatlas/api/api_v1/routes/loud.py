@@ -29,8 +29,9 @@ def get_entity(path: EntityPath) -> dict[str, Any] | Response:
     Retrieves a single entity formatted as Linked Open Usable Data
     (Linked.Art).
 
-    This endpoint applies strict profile cleaning to ensure
-    additionalProperties: false compliance with the Linked.Art standard.
+    The record is built directly from the Linked.Art entity profiles and
+    only contains properties allowed by the Linked.Art JSON schemas
+    (additionalProperties: false).
     """
     return get_entity_response(path.uuid, formatter=format_loud_entity)
 

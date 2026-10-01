@@ -127,4 +127,3 @@ def abort_file_not_found(id_: int) -> NoReturn:
         'File not found',
         f"No file was found for the requested ID {id_}.",
         details)
-
