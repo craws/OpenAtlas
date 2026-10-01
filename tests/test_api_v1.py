@@ -32,14 +32,29 @@ class ApiV1(ApiTestCase):
             url_for('api_v1_lod.entity_ext', uuid=e.place.uuid, ext='ttl'))
         assert 'text/turtle' in rv.headers.get('Content-Type')
 
-
         for params in [
-            {'startDate': '-400', 'endDate': '2000-05', 'caseStudy': e.case_study.uuid},
-            { 'caseStudy': e.case_study.id, 'limit': 10},
-            { 'caseStudy': e.place.uuid, 'limit': 5, 'offset': 2}]:
+            {'startDate': '-400', 'endDate': '2000-05',
+             'caseStudy': e.case_study.uuid},
+            {'caseStudy': e.case_study.id, 'limit': 10},
+            {'caseStudy': e.place.uuid, 'limit': 5, 'offset': 2}]:
             rv = c.get(url_for(
                 'api_v1_lod.entities', entity_class='acquisition', **params))
             assert rv.status_code == 200
+
+        for sort_field in [
+            'name', 'startDate', 'endDate', 'start_date', 'end_date']:
+            rv = c.get(url_for(
+                'api_v1_lod.entities',
+                entity_class='acquisition',
+                sortBy=sort_field,
+                sort='asc'))
+            assert rv.status_code == 200
+
+        rv = c.get(url_for(
+            'api_v1_lod.entities',
+            entity_class='acquisition',
+            sortBy='invalid_field'))
+        assert rv.status_code == 422
 
         for params in [
             {'startDate': '0'},
@@ -57,10 +72,35 @@ class ApiV1(ApiTestCase):
             startDate='999999999'))
         assert rv.status_code == 400
 
-        rv = c.get(url_for(
-            'api_v1_lod.entity', uuid='7404a969-97ba-4861-a555-3a97be2be967'))
+        rv = c.get(
+            url_for(
+                'api_v1_lod.entity',
+                uuid='7404a969-97ba-4861-a555-3a97be2be967'))
         assert rv.status_code == 404
 
+
+    def test_loud(self) -> None:
+        c = self.client
+        e = self.get_api_entities()
+
+        rv = c.get(url_for('api_v1_loud.loud_entity', uuid=e.place.uuid))
+        assert 'application/ld+json' in rv.headers.get('Content-Type')
+        rv_json = rv.get_json()
+        assert rv_json[
+                   '@context'] == 'https://linked.art/ns/v1/linked-art.json'
+        assert '@graph' not in rv_json
+        assert rv_json['type'] == 'Site'
+        assert rv_json['_label'] == 'Shire'
+
+        rv = c.get(
+            url_for('api_v1_loud.loud_entity_ext', uuid=e.place.uuid, ext='ttl'))
+        assert 'text/turtle' in rv.headers.get('Content-Type')
+
+        rv = c.get(
+            url_for(
+                'api_v1_loud.loud_entity',
+                uuid='7404a969-97ba-4861-a555-3a97be2be967'))
+        assert rv.status_code == 404
 
     def test_system(self) -> None:
         c = self.client

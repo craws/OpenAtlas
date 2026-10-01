@@ -14,9 +14,9 @@ def get_pagination_lod(
     base_url = url_for(endpoint, _external=True, **endpoint_kwargs)
     query_params = dict(request.args)
 
-    def page_url(p: int) -> str:
+    def page_url(page_number: int) -> str:
         params = dict(query_params)
-        params['page'] = p
+        params['page'] = str(page_number)
         return f'{base_url}?{urlencode(params)}'
 
     total_pages = max(1, math.ceil(total_items / limit))

@@ -3,6 +3,7 @@ from functools import cache
 from pathlib import Path
 from typing import Any
 
+
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import schemathesis
@@ -12,6 +13,7 @@ from openatlas import app
 from openatlas.api.api_v1.util.files import check_file_access
 from openatlas.display.image_processing import check_iiif_file_exist
 from openatlas.models.annotation import AnnotationImage
+from openatlas.models.rights_holder import RightsHolder
 from openatlas.models.entity import Entity
 
 DEFAULT_IMAGE_ID = 1
@@ -61,12 +63,9 @@ def get_agent_id() -> int:
     try:
         with app.test_request_context():
             app.preprocess_request()
-            persons = Entity.get_by_class('person')
+            persons = RightsHolder.get_rights_holders()
             if persons:
                 return persons[0].id
-            groups = Entity.get_by_class('group')
-            if groups:
-                return groups[0].id
     except Exception:
         return DEFAULT_AGENT_ID
 
