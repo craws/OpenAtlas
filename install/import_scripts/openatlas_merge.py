@@ -4,14 +4,16 @@
 # * The database to read from in this script
 
 # Work in progress, to do:
-# * Check additional classes for reference systems
 # * Files
 #
 # 2nd part when dealing with multiple data sests
 # * Offer manual mapping for e.g. duplicates
-# * New reference systems
+# * New reference systems, add possible additional classes
 # * New case studies (would have to be subs of import case study)
 
+import os
+import pathlib
+import shutil
 import time
 from typing import Any
 
@@ -32,6 +34,7 @@ PROJECT_DESCRIPTION = \
     'Mapping Medieval Conflicts (MEDCON). A digital approach towards ' \
     'political dynamics in the pre-modern period.'
 IMPORT_USER_ID = 1
+FILES_PATH = pathlib.Path('/home/alex/Desktop/medcon_files')
 
 
 def connect() -> Any:
@@ -48,6 +51,7 @@ connection = connect()
 cursor = connection.cursor(cursor_factory=extras.DictCursor)
 id_map: dict[int, int] = {}  # Map imported entity ids to existing ones
 id_added: list[int] = []  # Track already inserted entities
+file_ids: list[int] = []  # Track file ids for copying
 
 
 def cleanup_before(id_: int) -> None:
@@ -251,6 +255,8 @@ def insert_entities() -> None:
         track(row['id'], entity.id)
         if row['openatlas_class_name'] in case_study_hierarchy.classes:
             entity.link('P2', case_study)
+        if row['openatlas_class_name'] == 'file':
+            file_ids.append(row['id'])
 
 
 def reference_systems() -> None:
@@ -268,6 +274,7 @@ def reference_systems() -> None:
         if not exists:
             # Todo: implement adding reference systems
             print(f'New reference system: {row['name']}')
+        # Todo: add possible additional classes
 
 
 def link_entities() -> None:
@@ -325,6 +332,20 @@ def add_case_study() -> Entity:
     return case
 
 
+def copy_files() -> None:
+    with os.scandir(FILES_PATH) as entries:
+        for entry in entries:
+            if entry.is_file(follow_symlinks=False) \
+                    and pathlib.Path(entry).stem.isdigit() \
+                    and int(pathlib.Path(entry).stem) in file_ids:
+                shutil.copy(
+                    entry,
+                    pathlib.Path(app.config['UPLOAD_PATH']) /
+                    f'{id_map[int(pathlib.Path(entry).stem)]}'
+                    f'{pathlib.Path(entry).suffix}')
+                print(f'File copy of: {entry.name}')
+
+
 with app.test_request_context():
     app.preprocess_request()
     project_id = insert_project()
@@ -335,5 +356,9 @@ with app.test_request_context():
     types()
     insert_entities()
     link_entities()
-
+    if FILES_PATH and file_ids:
+        if not pathlib.Path(FILES_PATH).is_dir():
+            print(f'Files path {FILES_PATH} is not available.')
+        else:
+            copy_files()
 print(f'Execution time: {int(time.time() - start)} seconds')
