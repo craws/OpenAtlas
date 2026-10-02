@@ -5,7 +5,10 @@
 
 # Work in progress, to do:
 # * File information
-# * Documentation
+# * Gis?
+# * Annotations?
+#
+# Later
 # * Offer manual mapping for e.g. duplicates
 # * New reference systems, add possible additional classes
 # * New case studies (would have to be subs of import case study)

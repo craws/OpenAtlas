@@ -16,17 +16,26 @@ As always, be sure to make backups before. The script can be run, e.g.
 from the project root with:
 
     python3 install/import_scripts/openatlas/merge.py
+
+# Tracking
+
+To be able to understand what was imported, 2 mechanism are used.
+
+## New case study
+A new case study will be created and will be linked to entities that are
+imported. The name and description of the case study can be configured in the
+script.
+
+## Database logs
+In the import schema of the database imported entities are logged with their
+project and former id. This information can be configured at the profile to be
+also shown in the user interface.
    
 # Clean up
 At the start of the script possible entries from the last run will be
 removed. This can be useful in case you have to run the script more often to
 get it right. Copied files are not cleaned up will be overridden when the
 script is run again.
-
-# New case study
-A new case study will be created and will be linked to entities that are
-imported. The name and description of the case study can be configured in the
-script.
 
 # What is imported
 
