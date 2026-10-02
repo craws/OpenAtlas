@@ -1,12 +1,11 @@
-# Used to join data from OpenAtlas projects
+# Used to join data from OpenAtlas projects, see README.md
 # Before running the script make sure you have configured:
 # * The database to write to in instance/production.py
 # * The database to read from in this script
 
 # Work in progress, to do:
-# * Files
-#
-# 2nd part when dealing with multiple data sests
+# * File information
+# * Documentation
 # * Offer manual mapping for e.g. duplicates
 # * New reference systems, add possible additional classes
 # * New case studies (would have to be subs of import case study)
