@@ -4,6 +4,7 @@ from flask import g, url_for
 from rdflib import Dataset, RDF, URIRef
 
 from openatlas import app
+from openatlas.api.api_v1.formatters.loud import format_loud_entities
 from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
 from openatlas.models.settings import set_logo
@@ -160,6 +161,19 @@ class ApiV1(ApiTestCase):
             rv_json = rv.get_json()
             assert rv_json['type'] == 'hydra:PartialCollectionView'
             assert rv_json['@graph']
+
+        rv = c.get(
+            url_for(
+                'api_v1_loud.loud_entities',
+                entity_class='type',
+                limit=1,
+                page=2))
+        assert rv.status_code == 200
+        assert 'hydra:previous' in rv.get_json()
+
+        assert format_loud_entities([]) == {
+            '@context': 'https://linked.art/ns/v1/linked-art.json',
+            '@graph': []}
 
 
         with app.test_request_context():
