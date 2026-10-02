@@ -33,10 +33,12 @@ class ApiV1(ApiTestCase):
         assert 'text/turtle' in rv.headers.get('Content-Type')
 
         for params in [
-            {'startDate': '-400', 'endDate': '2000-05',
-             'caseStudy': e.case_study.uuid},
-            {'caseStudy': e.case_study.id, 'limit': 10},
-            {'caseStudy': e.place.uuid, 'limit': 5, 'offset': 2}]:
+            {'caseStudy': e.case_study.id, 'limit': 1, 'page': 2},
+            {'caseStudy': e.place.uuid, 'limit': 5, 'offset': 2},
+            {'startDate': '1988-02-03', 'endDate': '1988-04-03'},
+            {'startDate': '-400',
+             'endDate': '2000-05',
+             'caseStudy': e.case_study.uuid}]:
             rv = c.get(url_for(
                 'api_v1_lod.entities', entity_class='acquisition', **params))
             assert rv.status_code == 200
@@ -111,6 +113,7 @@ class ApiV1(ApiTestCase):
             assert rv_json['type'] == 'hydra:PartialCollectionView'
             assert rv_json['@graph']
 
+
         with app.test_request_context():
             app.preprocess_request()
             move = insert('move', 'Move of ring')
@@ -153,6 +156,7 @@ class ApiV1(ApiTestCase):
             assert production['referred_to_by'][0]['content'] == 'Excavation'
             assert 'destroyed_by' in rv_json
         assert rv_json['part_of']['id'].endswith(e.place.uuid)
+
 
     def test_system(self) -> None:
         c = self.client

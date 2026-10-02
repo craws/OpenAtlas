@@ -25,15 +25,14 @@ CLOSE_MATCH = {
     'type': 'Type',
     '_label': 'Close Match'}
 
-# Property code -> (key if the root is the activity,
-#                   key if the root is the actor)
+
 ACTOR_EVENT_KEYS = {
     'P11': ('participant', 'participated_in'),
     'P14': ('carried_out_by', 'carried_out'),
     'P22': ('participant', 'participated_in'),
     'P23': ('participant', 'participated_in')}
 
-# Property code -> (key, embedded event type, multiple) for objects
+
 OBJECT_EVENT_KEYS = {
     'P24': ('changed_ownership_through', 'Acquisition', True),
     'P31': ('modified_by', 'Modification', True),

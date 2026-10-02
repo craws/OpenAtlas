@@ -134,14 +134,14 @@ class EntityCollectionQuery(BaseSchema):
     @classmethod
     def validate_start_date(cls, value: Any) -> str | None:
         if value is None:
-            return None
+            return None  # pragma: no cover
         return handle_date(value, is_end_date=False)
 
     @field_validator('end_date', mode='before')
     @classmethod
     def validate_end_date(cls, value: Any) -> str | None:
         if value is None:
-            return None
+            return None  # pragma: no cover
         return handle_date(value, is_end_date=True)
 
 

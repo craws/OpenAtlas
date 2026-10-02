@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from flask import g
 
 from openatlas.api.api_v04.resources.error import (
@@ -21,7 +23,7 @@ class ApiEntity(Entity):
 
     @staticmethod
     def get_by_uuid(
-            uuid: str,
+            uuid: UUID | str,
             types: bool = False,
             aliases: bool = False,
             with_location: bool = True) -> Entity:
@@ -77,9 +79,9 @@ class ApiEntity(Entity):
             properties = list(g.properties)
         entity = ApiEntity.get_by_id(id_, types=True)
         return (
-            [entity]
-            + entity.get_linked_entities_recursive(properties, types=True)
-            + entity.get_linked_entities_recursive(
-                    properties,
-                    inverse=True,
-                    types=True))
+                [entity]
+                + entity.get_linked_entities_recursive(properties, types=True)
+                + entity.get_linked_entities_recursive(
+            properties,
+            inverse=True,
+            types=True))
