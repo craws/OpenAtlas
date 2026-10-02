@@ -38,7 +38,24 @@ class ApiV1(ApiTestCase):
             {'startDate': '1988-02-03', 'endDate': '1988-04-03'},
             {'startDate': '-400',
              'endDate': '2000-05',
-             'caseStudy': e.case_study.uuid}]:
+             'caseStudy': e.case_study.uuid},
+            {'startDate': '2000'},
+            {'endDate': '2000'},
+            {'startDate': '-500'},
+            {'endDate': '-500'},
+            {'startDate': '2000-02'},
+            {'startDate': '-500-02'},
+            {'endDate': '2000-02'},
+            {'endDate': '1900-02'},
+            {'endDate': '2004-02'},
+            {'endDate': '2001-02'},
+            {'endDate': '2020-04'},
+            {'endDate': '2020-01'},
+            {'startDate': '2000-02-29'},
+            {'startDate': '-400-02-28'},
+            {'endDate': '2004-02-29'},
+            {'endDate': '-500-03-15'},
+            {'startDate': '   '}]:
             rv = c.get(url_for(
                 'api_v1_lod.entities', entity_class='acquisition', **params))
             assert rv.status_code == 200
@@ -68,6 +85,37 @@ class ApiV1(ApiTestCase):
                 'api_v1_lod.entities', entity_class='acquisition', **params))
             assert rv.status_code == 422
             assert b'There is no year 0' in rv.data
+
+        for params in [
+            {'startDate': '2000-00'},
+            {'startDate': '2000-13'},
+            {'startDate': '2000-00-15'},
+            {'startDate': '2000-13-15'},
+            {'startDate': '2001-02-29'},
+            {'startDate': '1900-02-29'},
+            {'startDate': '2000-02-30'},
+            {'startDate': '2020-04-31'},
+            {'startDate': '2020-01-00'},
+            {'startDate': '2020-01-32'},
+            {'startDate': 'invalid'},
+            {'startDate': '-abc'},
+            {'startDate': '2020-01-01-01'},
+            {'endDate': '2020-00'},
+            {'endDate': '2020-13'},
+            {'endDate': '2020-00-15'},
+            {'endDate': '2020-13-15'},
+            {'endDate': '2001-02-29'},
+            {'endDate': '1900-02-29'},
+            {'endDate': '2000-02-30'},
+            {'endDate': '2020-04-31'},
+            {'endDate': '2020-01-00'},
+            {'endDate': '2020-01-32'},
+            {'endDate': 'invalid'},
+            {'endDate': '-abc'},
+            {'endDate': '2020-01-01-01'}]:
+            rv = c.get(url_for(
+                'api_v1_lod.entities', entity_class='acquisition', **params))
+            assert rv.status_code == 422
 
         rv = c.get(url_for(
             'api_v1_lod.entities', entity_class='acquisition',
