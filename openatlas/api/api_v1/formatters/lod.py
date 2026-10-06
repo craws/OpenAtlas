@@ -1,6 +1,7 @@
 from typing import Any, Final
 
-from openatlas.api.api_v1.formatters.lod_util import entity_uri
+from flask import url_for
+
 from openatlas.models.entity import Entity
 
 LOD_CONTEXT: Final[str] = 'https://linked.art/ns/v1/linked-art.json'
@@ -35,6 +36,11 @@ def format_lod_entities(
 
 def _stub(entity: Entity) -> dict[str, Any]:
     return {
-        'id': entity_uri(entity),
+        'id': url_for(
+            'api.entity_uuid',
+            uuid=entity.uuid,
+            _external=True),
         'type': entity.cidoc_class.i18n['en'],
         '_label': entity.name}
+
+

@@ -33,6 +33,7 @@ VALUES
   ('alias', 'The ring bearer', NULL, CURRENT_TIMESTAMP),
   ('activity', 'Travel to Mordor', NULL, CURRENT_TIMESTAMP),
   ('activity', 'Exchange of the one ring', NULL, CURRENT_TIMESTAMP),
+  ('move', 'Move of ring', NULL, CURRENT_TIMESTAMP),
   ('type', 'Lord of the rings', NULL, CURRENT_TIMESTAMP),
   ('type', 'Tavern', NULL, CURRENT_TIMESTAMP),
   ('type', 'Hills', NULL, CURRENT_TIMESTAMP),
@@ -88,6 +89,9 @@ VALUES
 
 INSERT INTO model.link (property_code, range_id, domain_id)
 VALUES
+  ('P25', (SELECT id FROM model.entity WHERE name='The One Ring'), (SELECT id FROM model.entity WHERE name='Move of ring')),
+  ('P26', (SELECT id FROM model.entity WHERE name='Location of Shire'), (SELECT id FROM model.entity WHERE name='Move of ring')),
+  ('P27', (SELECT id FROM model.entity WHERE name='Location of Shire'), (SELECT id FROM model.entity WHERE name='Move of ring')),
   ('P2', (SELECT id FROM model.entity WHERE name='Original Text'), (SELECT id FROM model.entity WHERE name='Silmarillion text')),
   ('P73', (SELECT id FROM model.entity WHERE name='Silmarillion text'), (SELECT id FROM model.entity WHERE name='Silmarillion')),
   ('P127', (SELECT id FROM model.entity WHERE name='Case study'), (SELECT id FROM model.entity WHERE name='Lord of the rings')),
@@ -232,3 +236,7 @@ VALUES
 UPDATE model.entity
 SET begin_from = CURRENT_DATE
 WHERE name = 'Economical';
+
+UPDATE model.entity
+SET begin_from = '2000-01-01', end_to = '2001-01-01'
+WHERE name = 'The One Ring';

@@ -75,7 +75,7 @@ class Api(ApiTestCase):
                 'api_04.network_visualisation',
                 exclude_system_classes='type'))
         rv = rv.get_json()
-        assert len(rv['results']) == 66
+        assert len(rv['results']) == 67
         rv = c.get(
             url_for(
                 'api_04.network_visualisation',
@@ -84,7 +84,7 @@ class Api(ApiTestCase):
         assert len(rv['results']) == 16
         rv = c.get(url_for('api_04.network_visualisation', download=True))
         rv = rv.get_json()
-        assert len(rv['results']) == 166
+        assert len(rv['results']) == 167
 
         rv = c.get(
             url_for(
@@ -92,7 +92,7 @@ class Api(ApiTestCase):
                 id_=e.place.id,
                 exclude_system_classes='type'))
         rv = rv.get_json()
-        assert len(rv['results']) == 14
+        assert len(rv['results']) == 15
         rv = c.get(
             url_for(
                 'api_04.ego_network_visualisation',
@@ -114,7 +114,7 @@ class Api(ApiTestCase):
                 id_=e.place.id,
                 download=True))
         rv = rv.get_json()
-        assert len(rv['results']) == 18
+        assert len(rv['results']) == 19
 
         for rv in [
             c.get(url_for('api_04.geometric_entities')),
@@ -609,7 +609,7 @@ class Api(ApiTestCase):
                     "operator": "greaterThanEqual",
                     "values": ["2019-03-01"],
                     "logicalOperator": "and"}]}, ]),
-            (4, [{
+            (5, [{
                 "beginFrom": [{
                     "operator": "lesserThan",
                     "values": ["2020-01-01"],
@@ -683,12 +683,12 @@ class Api(ApiTestCase):
                 "relationToID": [{
                     "operator": "equal",
                     "values": [e.place.id]}]}]),
-            (174, [{
+            (175, [{
                 "typeIDWithSubs": [{
                     "operator": "notEqual",
                     "values": [e.boundary_mark.id],
                     "logicalOperator": "and"}]}]),
-            (176, [{
+            (177, [{
                 "typeName": [{
                     "operator": "notEqual",
                     "values": ["Boundary Mark", "Height"],

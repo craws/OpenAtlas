@@ -99,6 +99,8 @@ class ApiTestCase(TestBaseCase):
                         entities.event = entity
                     case 'Exchange of the one ring':
                         entities.event2 = entity
+                    case 'Move of ring':
+                        entities.move = entity
                     case 'Economical':
                         entities.relation_sub = entity
                     case 'Austria':

@@ -75,4 +75,5 @@ def get_entities(
     return get_entities_response(
         path,
         query,
-        endpoint='api_v1_lod.entities')
+        endpoint='api_v1_lod.entities',
+        formatter=format_lod_entities)

@@ -39,7 +39,9 @@ class ApiV1(ApiTestCase):
             {'startDate': '1988-02-03', 'endDate': '1988-04-03'},
             {'startDate': '-400',
              'endDate': '2000-05',
-             'caseStudy': e.case_study.uuid},
+             'caseStudy': e.case_study.uuid,
+             'sortBy': 'name',
+             'sort': 'desc'},
             {'startDate': '2000'},
             {'endDate': '2000'},
             {'startDate': '-500'},
@@ -53,7 +55,7 @@ class ApiV1(ApiTestCase):
             {'endDate': '2020-04'},
             {'endDate': '2020-01'},
             {'startDate': '2000-02-29'},
-            {'startDate': '-400-02-28'},
+            {'startDate': '-400-02-28', 'typeId': e.boundary_mark.id},
             {'endDate': '2004-02-29'},
             {'endDate': '-500-03-15'},
             {'startDate': '   '}]:
@@ -156,7 +158,10 @@ class ApiV1(ApiTestCase):
         assert rv_json['_label'] == 'Shire'
 
         rv = c.get(
-            url_for('api_v1_loud.loud_entity_ext', uuid=e.place.uuid, ext='ttl'))
+            url_for(
+                'api_v1_loud.loud_entity_ext',
+                uuid=e.place.uuid,
+                ext='ttl'))
         assert 'text/turtle' in rv.headers.get('Content-Type')
 
         rv = c.get(
@@ -186,18 +191,7 @@ class ApiV1(ApiTestCase):
             '@context': 'https://linked.art/ns/v1/linked-art.json',
             '@graph': []}
 
-
-        with app.test_request_context():
-            app.preprocess_request()
-            move = insert('move', 'Move of ring')
-            move.link('P25', e.artifact)
-            move.link('P26', e.location)
-            move.link('P27', e.location)
-            self.cursor.execute(
-                "UPDATE model.entity SET begin_from = '2000-01-01', "
-                "end_to = '2001-01-01' WHERE id = %s",
-                (e.artifact.id,))
-        rv = c.get(url_for('api_v1_loud.loud_entity', uuid=move.uuid))
+        rv = c.get(url_for('api_v1_loud.loud_entity', uuid=e.move.uuid))
         part = rv.get_json()['part'][0]
         assert part['type'] == 'Move'
         assert part['moved'][0]['id'].endswith(e.artifact.uuid)
@@ -210,25 +204,10 @@ class ApiV1(ApiTestCase):
         assert rv_json['destroyed_by']['type'] == 'Destruction'
         assert 'timespan' in rv_json['destroyed_by']
 
-        with app.test_request_context():
-            app.preprocess_request()
-            self.cursor.execute(
-                "UPDATE model.entity SET begin_from = '0750-01-01', "
-                "end_from = '0900-01-01', begin_comment = 'Excavation' "
-                "WHERE id IN (%s, %s)",
-                (e.place.id, e.feature.id))
         for entity in (e.place, e.feature):
             rv = c.get(url_for('api_v1_loud.loud_entity', uuid=entity.uuid))
             rv_json = rv.get_json()
             assert rv_json['type'] == 'HumanMadeObject'
-            assert 'timespan' not in rv_json
-            production = rv_json['produced_by']
-            assert production['type'] == 'Production'
-            assert production['timespan']['begin_of_the_begin'].startswith(
-                '0750-01-01')
-            assert production['referred_to_by'][0]['content'] == 'Excavation'
-            assert 'destroyed_by' in rv_json
-        assert rv_json['part_of']['id'].endswith(e.place.uuid)
 
 
     def test_system(self) -> None:

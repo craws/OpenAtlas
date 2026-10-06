@@ -187,7 +187,8 @@ def get_entity_response(
 def get_entities_response(
         path: Any,
         query: Any,
-        endpoint: str) -> dict[str, Any] | Response:
+        endpoint: str,
+        formatter: Callable[..., dict[str, Any]]) -> dict[str, Any] | Response:
     entity_class_name = (
         path.entity_class.value
         if hasattr(path.entity_class, 'value') else str(path.entity_class))
@@ -218,6 +219,5 @@ def get_entities_response(
         page=query.page,
         limit=query.limit,
         entity_class=entity_class_name)
-    print(pagination)
     return make_lod_response(
-        format_lod_entities(entities, pagination=pagination))
+        formatter(entities, pagination=pagination))
