@@ -66,8 +66,8 @@ def get_by_system_class(
         limit: int | None = None,
         offset: int | None = None,
         search: str | None = None,
-        start_date: Any = None,
-        end_date: Any = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
         type_id: int | UUID | None = None,
         case_study: int | UUID | None = None) -> list[Entity]:
     type_ids = resolve_type_ids(type_id)

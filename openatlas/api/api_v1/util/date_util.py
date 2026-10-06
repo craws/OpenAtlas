@@ -55,7 +55,7 @@ def handle_date(value: Any, is_end_date: bool = False) -> str | None:
 
     if len(parts) == 2:
         month_int = int(parts[1])
-        if not (1 <= month_int <= 12):
+        if not 1 <= month_int <= 12:
             raise ValueError(f"Invalid month: {month_int} in date {value}")
         month_str = f"{month_int:02d}"
         if is_end_date:
@@ -66,10 +66,10 @@ def handle_date(value: Any, is_end_date: bool = False) -> str | None:
     if len(parts) == 3:
         month_int = int(parts[1])
         day_int = int(parts[2])
-        if not (1 <= month_int <= 12):
+        if not 1 <= month_int <= 12:
             raise ValueError(f"Invalid month: {month_int} in date {value}")
         last_day = get_last_day_of_month(year_int, month_int)
-        if not (1 <= day_int <= last_day):
+        if not 1 <= day_int <= last_day:
             raise ValueError(
                 f"Invalid day: {day_int} "
                 f"for month {month_int} in date {value}")

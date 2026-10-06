@@ -42,5 +42,3 @@ def _stub(entity: Entity) -> dict[str, Any]:
             _external=True),
         'type': entity.cidoc_class.i18n['en'],
         '_label': entity.name}
-
-

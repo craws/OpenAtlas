@@ -91,10 +91,9 @@ def get_entity_count(query: EntityCountQuery):
     """Retrieves system classes with a count of their instances, optionally
     filtered by case study."""
     valid_classes = [e.value for e in OpenAtlasClassEnum]
-
     counts = get_overview_counts_by_case_study(
         classes=valid_classes,
-        case_study_id=query.case_study)
+        case_study_id=query.case_study_id)
 
     return EntityCountResponse(counts=counts).model_dump(by_alias=True)
 

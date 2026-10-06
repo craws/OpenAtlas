@@ -9,10 +9,8 @@ from openatlas.database.entity import select_sql
 
 ### Entity ###
 
-def _format_date_for_sql(date: Any) -> str | None:
-    if date is None:
-        return None
-    date_string = str(date).strip()
+def _format_date_for_sql(date: str) -> str | None:
+    date_string = date.strip()
     if date_string.startswith('-'):
         return f"{date_string.lstrip('-')} BC"
     return date_string
@@ -26,8 +24,8 @@ def get_by_class_api(
         limit: int | None = None,
         offset: int | None = None,
         search_name: str | None = None,
-        start_date: Any = None,
-        end_date: Any = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
         type_ids: list[int] | None = None,
         case_study_ids: list[int] | None = None) -> list[dict[str, Any]]:
     inner_sql = ('SELECT e2.id FROM model.entity e2 WHERE '
@@ -51,8 +49,6 @@ def get_by_class_api(
         params['end_date'] = _format_date_for_sql(end_date)
 
     if type_ids is not None:
-        if not type_ids:
-            return []
         inner_sql += (
             ' AND EXISTS (SELECT 1 FROM model.link l_t '
             'WHERE l_t.domain_id = e2.id AND l_t.range_id IN %(type_ids)s '
@@ -60,8 +56,6 @@ def get_by_class_api(
         params['type_ids'] = tuple(type_ids)
 
     if case_study_ids is not None:
-        if not case_study_ids:
-            return []
         inner_sql += (
             ' AND EXISTS (SELECT 1 FROM model.link l_cs '
             'WHERE l_cs.domain_id = e2.id AND l_cs.range_id IN %('
@@ -133,8 +127,6 @@ def get_count_by_class_api(
         params['end_date'] = _format_date_for_sql(end_date)
 
     if type_ids is not None:
-        if not type_ids:
-            return 0
         sql += (
             ' AND EXISTS (SELECT 1 FROM model.link l_t '
             'WHERE l_t.domain_id = e.id AND l_t.range_id IN %(type_ids)s '
@@ -142,8 +134,6 @@ def get_count_by_class_api(
         params['type_ids'] = tuple(type_ids)
 
     if case_study_ids is not None:
-        if not case_study_ids:
-            return 0
         sql += (
             ' AND EXISTS (SELECT 1 FROM model.link l_cs '
             'WHERE l_cs.domain_id = e.id AND l_cs.range_id IN %('
@@ -199,8 +189,6 @@ def get_overview_counts_by_case_study(
 ### GIS ###
 
 def get_wkts_by_ids(ids: list[int]) -> dict[int, str]:
-    if not ids:
-        return {}
     g.cursor.execute(
         """
         SELECT place.id,
@@ -223,7 +211,7 @@ def get_wkts_by_ids(ids: list[int]) -> dict[int, str]:
     result = {}
     for id_, geoms in geometries.items():
         if not geoms:
-            result[id_] = ""
+            result[id_] = ""  # pragma: no cover
         elif len(geoms) == 1:
             result[id_] = geoms[0].wkt
         else:

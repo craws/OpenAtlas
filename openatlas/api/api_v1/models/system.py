@@ -41,13 +41,13 @@ class SystemInfoResponse(BaseSchema):
 
 
 class EntityCountQuery(BaseSchema):
-    case_study: int | None = Field(
+    case_study_id: int | None = Field(
         None,
         description="Filter entity counts by a specific case study ID.")
 
 
 class EntityCountResponse(BaseSchema):
-    counts: dict[OpenAtlasClassEnum, int] = Field(
+    counts: dict[str, int] = Field(
         description="Count of entities grouped by OpenAtlas system class.")
 
 

@@ -119,8 +119,8 @@ def get_links_for_entities(entities: list[Entity]) -> dict[int, EntityLinks]:
 
     if geom_ids:
         wkts = get_wkts_by_ids(list(geom_ids))
-        for id_ in entities_with_links:
-            entities_with_links[id_].geometries = wkts
+        for item in entities_with_links.values():
+            item.geometries = wkts
 
     return entities_with_links
 

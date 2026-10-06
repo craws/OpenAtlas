@@ -39,7 +39,7 @@ def handle_db_error(_e: Any = None) -> Response:
 
 
 def handle_db_data_error(_e: Any = None) -> Response:
-    return error_response(
+    return error_response(  # pragma: no cover
         400,
         'Bad Request',
         'Invalid value in request parameters, e.g. a date '

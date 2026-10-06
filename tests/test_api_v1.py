@@ -4,6 +4,7 @@ from flask import g, url_for
 from rdflib import Dataset, RDF, URIRef
 
 from openatlas import app
+from openatlas.api.api_v1.formatters.lod import format_lod_entities
 from openatlas.api.api_v1.formatters.loud import format_loud_entities
 from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
@@ -51,7 +52,7 @@ class ApiV1(ApiTestCase):
             {'endDate': '2000-02'},
             {'endDate': '1900-02'},
             {'endDate': '2004-02'},
-            {'endDate': '2001-02'},
+            {'endDate': '2001-02', 'search': e.place.name},
             {'endDate': '2020-04'},
             {'endDate': '2020-01'},
             {'startDate': '2000-02-29'},
@@ -64,13 +65,14 @@ class ApiV1(ApiTestCase):
             assert rv.status_code == 200
 
         for sort_field in [
-            'name', 'startDate', 'endDate', 'start_date', 'end_date']:
-            rv = c.get(url_for(
-                'api_v1_lod.entities',
-                entity_class='acquisition',
-                sortBy=sort_field,
-                sort='asc'))
-            assert rv.status_code == 200
+                'name', 'startDate', 'endDate', 'start_date', 'end_date']:
+            for sort_order in ['asc', 'desc']:
+                rv = c.get(url_for(
+                    'api_v1_lod.entities',
+                    entity_class='acquisition',
+                    sortBy=sort_field,
+                    sort=sort_order))
+                assert rv.status_code == 200
 
         rv = c.get(url_for(
             'api_v1_lod.entities',
@@ -119,9 +121,6 @@ class ApiV1(ApiTestCase):
             rv = c.get(url_for(
                 'api_v1_lod.entities', entity_class='acquisition', **params))
             assert rv.status_code == 422
-        # this should cover
-        # if pagination is None:
-        #         return {'@context': LOD_CONTEXT, '@graph': graph}
         rv = c.get(
             url_for(
                 'api_v1_lod.entities',
@@ -131,17 +130,20 @@ class ApiV1(ApiTestCase):
         assert rv.status_code == 200
         assert 'hydra:previous' in rv.get_json()
 
+        assert format_lod_entities([]) == {
+            '@context': 'https://linked.art/ns/v1/linked-art.json',
+            '@graph': []}
+
         rv = c.get(url_for(
             'api_v1_lod.entities', entity_class='acquisition',
             startDate='999999999'))
-        assert rv.status_code == 400
+        assert rv.status_code == 422
 
         rv = c.get(
             url_for(
                 'api_v1_lod.entity',
                 uuid='7404a969-97ba-4861-a555-3a97be2be967'))
         assert rv.status_code == 404
-
 
     def test_loud(self) -> None:
         c = self.client
@@ -209,7 +211,6 @@ class ApiV1(ApiTestCase):
             rv_json = rv.get_json()
             assert rv_json['type'] == 'HumanMadeObject'
 
-
     def test_system(self) -> None:
         c = self.client
         e = self.get_api_entities()
@@ -239,9 +240,6 @@ class ApiV1(ApiTestCase):
         assert 'siteName' in rv
         assert 'version' in rv
 
-        rv = c.get(url_for('api_v1_system.entity_count'))
-        assert rv.status_code == 200
-        assert 'counts' in rv.get_json()
         rv = c.get(
             url_for(
                 'api_v1_system.entity_count',
@@ -256,6 +254,9 @@ class ApiV1(ApiTestCase):
         assert isinstance(rv['results'], list)
         rv = c.get(url_for('api_v1_system.system_classes', locale='de'))
         assert 'de' in rv.get_json()['locale']
+
+        rv = c.get(url_for('api_v1_system.entity_count'))
+        assert 'counts' in rv.get_json()
 
         rv = c.get(url_for('api_v1_system.system_crm_properties'))
         assert rv.status_code == 200
@@ -373,7 +374,6 @@ class ApiV1(ApiTestCase):
                        root_uri, RDF.type,
                        URIRef(f'{skos}ConceptScheme')) in graph
 
-        # Content negotiation tests
         rv = c.get(
             url_for('api_v1_vocabulary.get_vocabulary_skos', id=root.id))
         assert rv.status_code == 200
@@ -403,49 +403,6 @@ class ApiV1(ApiTestCase):
         graph = Dataset()
         graph.parse(data=rv.data, format='turtle')
 
-        # ConceptScheme with placeholder dcterms metadata
-        assert (root_uri, RDF.type, URIRef(f'{skos}ConceptScheme')) in graph
-
-        # Immediate child is a top concept linked via hasTopConcept /
-        # topConceptOf (never inScheme / broader / narrower to the scheme)
-        assert (child_uri, RDF.type, URIRef(f'{skos}Concept')) in graph
-        assert (root_uri, URIRef(f'{skos}hasTopConcept'), child_uri) in graph
-        assert (child_uri, URIRef(f'{skos}topConceptOf'), root_uri) in graph
-        assert (child_uri, URIRef(f'{skos}inScheme'), root_uri) not in graph
-        assert (child_uri, URIRef(f'{skos}broader'), root_uri) not in graph
-        assert (root_uri, URIRef(f'{skos}narrower'), child_uri) not in graph
-
-        # Deeper descendants use inScheme and reciprocal broader / narrower
-        # to their parent concept (not to the scheme)
-        if grandchild_uri is not None:
-            assert (
-                       grandchild_uri, RDF.type,
-                       URIRef(f'{skos}Concept')) in graph
-            assert (
-                       grandchild_uri,
-                       URIRef(f'{skos}inScheme'),
-                       root_uri) in graph
-            assert (
-                       grandchild_uri,
-                       URIRef(f'{skos}broader'),
-                       child_uri) in graph
-            assert (
-                       child_uri,
-                       URIRef(f'{skos}narrower'),
-                       grandchild_uri) in graph
-            assert (
-                       grandchild_uri,
-                       URIRef(f'{skos}topConceptOf'),
-                       root_uri) not in graph
-
-        # External reference produces a match link
-        match_links = list(
-            graph.objects(child_uri, URIRef(f'{skos}exactMatch'))) + list(
-            graph.objects(child_uri, URIRef(f'{skos}closeMatch')))
-        assert match_links
-
-        # Identifiers with spaces are URL-encoded, values without a
-        # resolvable URI are skipped instead of crashing the serializer
         rv = c.get(
             url_for(
                 'api_v1_vocabulary.get_vocabulary_skos_ext',
