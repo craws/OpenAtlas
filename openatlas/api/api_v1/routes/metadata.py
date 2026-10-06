@@ -83,7 +83,7 @@ def get_agents():
 
 
 @api_v1_metadata.get(
-    '/agents/<int:id>',
+    '/agents/<id>',
     summary="Get information about an agent",
     tags=[metadata_tag],
     responses={200: AgentItem})

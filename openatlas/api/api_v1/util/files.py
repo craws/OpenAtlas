@@ -175,10 +175,12 @@ def get_file_path(file_id: int, upload_path: Path) -> Path | Any:
 #
 #     return results
 
+def get_mime_type(path: Path) -> str:
+    mimetype, _ = mimetypes.guess_type(path) if path else (None, None)
+    return mimetype
 
 def get_file_item(entity: Entity) -> FileItem:
     file_ = g.files.get(entity.id)
-    mimetype, _ = mimetypes.guess_type(file_) if file_ else (None, None)
     iiif = get_iiif_manifest_and_path(entity.id)
     return FileItem(
         id=entity.id,
@@ -186,7 +188,7 @@ def get_file_item(entity: Entity) -> FileItem:
         uuid=cast(UUID, entity.uuid),
         public_shareable=entity.public,
         license=get_license_item(g.types[get_license_id(entity)]),
-        mimetype=mimetype,
+        mimetype=get_mime_type(file_),
         extension=file_.suffix if file_ else None,
         file_url=url_for(
             'api_v1_files.display_file', id=entity.id, _external=True),

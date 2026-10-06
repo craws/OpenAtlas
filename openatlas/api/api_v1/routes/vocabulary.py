@@ -122,7 +122,7 @@ def get_vocabulary_list() -> dict[str, Any]:
 
 
 @api_v1_vocabulary.get(
-    '<int:id>',
+    '<id>',
     summary="Get information of one type",
     responses=vocabulary_flat_response,
     tags=[vocabulary_tag])
@@ -136,7 +136,7 @@ def get_vocabulary_item(path: VocabularyId) -> dict[str, Any]:
 
 
 @api_v1_vocabulary.get(
-    '/<int:id>/skos',
+    '/<id>/skos',
     summary="Export vocabulary hierarchy as SKOS",
     responses=vocabulary_skos_response,
     tags=[vocabulary_tag])
@@ -156,7 +156,7 @@ def get_vocabulary_skos(path: VocabularyId) -> Response:
 
 
 @api_v1_vocabulary.get(
-    '/<int:id>/skos.<ext>',
+    '/<id>/skos.<ext>',
     summary="Export vocabulary hierarchy as SKOS with format extension",
     responses=vocabulary_skos_response,
     tags=[vocabulary_tag])
@@ -234,7 +234,7 @@ def get_vocabulary_tree() -> dict[str, Any]:
 
 
 @api_v1_vocabulary.get(
-    '/tree/<string:openatlas_class>',
+    '/tree/<openatlas_class>',
     summary="Get types tree by OpenAtlas class",
     responses=vocabulary_tree_response,
     tags=[vocabulary_tag])
@@ -248,7 +248,7 @@ def get_vocabulary_tree_by_class(path: VocabularyTreePath) -> dict[str, Any]:
 
 
 @api_v1_vocabulary.get(
-    '/standard/<string:openatlas_class>',
+    '/standard/<openatlas_class>',
     summary="Get standard types tree by OpenAtlas class",
     responses=vocabulary_standard_by_class_response,
     tags=[vocabulary_tag])

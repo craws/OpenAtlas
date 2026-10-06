@@ -13,7 +13,7 @@ from openatlas.api.api_v1.responses.files import (
     display_file_response, public_files_response, thumbnail_response)
 from openatlas.api.api_v1.util.files import (
     check_file_access, get_file_entity, get_file_item, get_file_path,
-    has_file_access)
+    get_mime_type, has_file_access)
 from openatlas.display.image_processing import (
     check_iiif_activation, check_iiif_file_exist)
 from openatlas.models.entity import Entity
@@ -59,7 +59,7 @@ def display_file(path: FileIdPath, query: DownloadQuery):
     entity = get_file_entity(path.id)
     check_file_access(entity)
     actual_path = get_file_path(entity.id, app.config['UPLOAD_PATH'])
-    if not query.download:
+    if not query.download and check_iiif_activation():
         iiif_url = get_iiif_redirect_url(
             entity.id,
             actual_path,
@@ -69,6 +69,7 @@ def display_file(path: FileIdPath, query: DownloadQuery):
 
     return send_file(
         actual_path,
+        mimetype=get_mime_type(actual_path),
         as_attachment=bool(query.download),
         download_name=f"{entity.id}{actual_path.suffix}")
 
@@ -95,7 +96,10 @@ def display_thumbnail(path: FileIdPath, query: DownloadQuery):
         entity.id,
         app.config['RESIZED_IMAGES'] / app.config['IMAGE_SIZE']['thumbnail'])
 
-    return send_file(thumbnail_path, as_attachment=bool(query.download))
+    return send_file(
+        thumbnail_path,
+        mimetype=get_mime_type(original_path),
+        as_attachment=bool(query.download))
 
 
 # todo:

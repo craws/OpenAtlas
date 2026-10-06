@@ -24,7 +24,7 @@ def get_last_day_of_month(year: int, month: int) -> int:
 
 
 def handle_date(value: Any, is_end_date: bool = False) -> str | None:
-    if value is None:
+    if value in (None, "", "null", "undefined"):
         return None  # pragma: no cover
     value_str = str(value).strip()
     if not value_str:

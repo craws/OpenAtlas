@@ -83,6 +83,9 @@ class EntityCollectionPath(BaseSchema):
                     "value": "type"}}})
 
 
+HISTORICAL_DATE_REGEX = r"^-?\d{1,6}(-\d{2}-\d{2})?$"
+
+
 class EntityCollectionQuery(BaseSchema):
     search: str | None = Field(
         None,
@@ -105,11 +108,13 @@ class EntityCollectionQuery(BaseSchema):
         description="Page number (starting at 1).")
     start_date: str | None = Field(
         None,
+        pattern=HISTORICAL_DATE_REGEX,
         description="Filter entities with begin date on or after this date ("
                     "e.g. 0400-01-01, 400, -400). Negative years are BC, "
                     "year 0 does not exist.")
     end_date: str | None = Field(
         None,
+        pattern=HISTORICAL_DATE_REGEX,
         description="Filter entities with end date on or before this date ("
                     "e.g. 0400-12-31, 400, -400). Negative years are BC, "
                     "year 0 does not exist.")

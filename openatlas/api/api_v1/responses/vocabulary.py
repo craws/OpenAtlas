@@ -12,10 +12,19 @@ vocabulary_skos_response = {
         'description': 'Vocabulary hierarchy exported as a SKOS graph in '
                        'different RDF serialization formats.',
         'content': {
-            'text/turtle': {'schema': {'type': 'string'}},
-            'application/rdf+xml': {'schema': {'type': 'string'}},
-            'application/ld+json': {'schema': {'type': 'string'}},
-            'application/n-triples': {'schema': {'type': 'string'}}}},
+            'text/turtle': {
+                'schema': {'type': 'string'}},
+            'application/rdf+xml': {
+                'schema': {'type': 'string'}},
+            'application/ld+json': {
+                'schema': {
+                    'type': 'array',
+                    'items': {
+                        'type': 'object',
+                        'additionalProperties': True}}},
+            'application/n-triples': {
+                'schema': {'type': 'string'}}}},
+
     404: {
         'description': 'Type not found.',
         'content': {
