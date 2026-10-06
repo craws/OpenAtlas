@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import Any
 
 from flask import g
@@ -133,15 +134,14 @@ def get_entity_ids_by_rights_holder(rights_holder_id: int) -> list[int]:
     return [row['entity_id'] for row in g.cursor]
 
 
-def get_rights_holder_file_count() -> dict[int, int]:
-    g.cursor.execute("""
-        SELECT 
-            rights_holder_id, 
-            COUNT(DISTINCT entity_id) AS count
-        FROM 
-            model.rights_holder_file
-        GROUP BY 
-            rights_holder_id;
-    """)
-    return {
-        row['rights_holder_id']: row['count'] for row in g.cursor.fetchall()}
+def get_rights_holder_file_count() -> dict[int, Any]:
+    g.cursor.execute(
+        """
+        SELECT rights_holder_id, description, COUNT(*)
+        FROM model.rights_holder_file
+        GROUP BY description, rights_holder_id;
+        """)
+    result: dict[int, Any] = defaultdict(dict)
+    for row in g.cursor:
+        result[row['rights_holder_id']][row['description']] = row['count']
+    return result
