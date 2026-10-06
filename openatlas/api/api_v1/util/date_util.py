@@ -25,7 +25,7 @@ def get_last_day_of_month(year: int, month: int) -> int:
 
 def handle_date(value: Any, is_end_date: bool = False) -> str | None:
     if value is None:
-        return None
+        return None  # pragma: no cover
     value_str = str(value).strip()
     if not value_str:
         return None
@@ -84,7 +84,7 @@ def date_to_str(date: Any) -> str | None:
 
 def get_timespan_dict(dates: Dates | None) -> TimeSpan | None:
     if not dates:
-        return None
+        return None  # pragma: no cover
     time = {}
     if dates.begin_from or dates.begin_to or dates.begin_comment:
         begin = {

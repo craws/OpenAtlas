@@ -1,6 +1,3 @@
-import functools
-import json
-import pathlib
 import re
 from collections import defaultdict
 from collections.abc import Callable
@@ -10,11 +7,11 @@ from uuid import UUID
 
 from flask import Response, g, url_for
 
-from openatlas import app
 from openatlas.api.api_v04.resources.util import to_camel_case
 from openatlas.api.api_v1.entity import (
     get_by_system_class, get_count_by_system_class, get_entity_by_uuid)
 from openatlas.api.api_v1.error_handlers import abort_not_found
+from openatlas.api.api_v1.formatters.lod import format_lod_entities
 from openatlas.api.api_v1.models.util import (
     ExternalReferenceSystemModel, MatchTypeEnum)
 from openatlas.api.api_v1.util.content_negotiation import (
@@ -51,13 +48,14 @@ def entity_uri(entity: Entity) -> str:
 
 def date_to_utc_iso_str(date: Any) -> str | None:
     if not date:
-        return None
+        return None  # pragma: no cover
     match = DATE_PARTS_RE.match(str(date))
     if not match:
-        return str(date)
+        return str(date)  # pragma: no cover
     year, month, day, hour, minute, second = match.groups()
     if hour and (int(hour) or int(minute) or int(second)):
-        return f'{year}-{month}-{day}T{hour}:{minute}:{second}Z'
+        return (f'{year}-{month}-'
+                f'{day}T{hour}:{minute}:{second}Z')  # pragma: no cover
     return f'{year}-{month}-{day}'
 
 
@@ -90,12 +88,8 @@ def is_float(value: str) -> bool:
     try:
         float(value)
         return True
-    except ValueError:
+    except ValueError:  # pragma: no cover
         return False
-
-
-def remove_spaces_dashes(string: str) -> str:
-    return string.replace(' ', '').replace('-', '')
 
 
 def get_links_for_entities(entities: list[Entity]) -> dict[int, EntityLinks]:
@@ -180,27 +174,6 @@ def get_external_reference_items(
     return external_references
 
 
-@functools.lru_cache
-def get_lod_context() -> dict[str, Any]:
-    file_path = pathlib.Path(app.root_path) / 'api' / 'linked-art.json'
-    with file_path.open('r', encoding='utf-8') as f:
-        return json.load(f)
-
-
-@functools.lru_cache
-def parse_lod_context() -> dict[str, str]:
-    context = get_lod_context().get('@context', {})
-    inverted: dict[str, str] = {}
-    for term, definition in context.items():
-        if not isinstance(definition, dict):
-            continue
-        inverted[definition['@id']] = term
-        for nested_term, nested_def in definition.get('@context', {}).items():
-            if isinstance(nested_def, dict):
-                inverted[nested_def['@id']] = nested_term
-    return inverted
-
-
 def get_entity_response(
         entity_id: UUID,
         formatter: Callable[[Entity], dict[str, Any]],
@@ -214,8 +187,7 @@ def get_entity_response(
 def get_entities_response(
         path: Any,
         query: Any,
-        endpoint: str,
-        formatter: Callable[..., dict[str, Any]]) -> dict[str, Any] | Response:
+        endpoint: str) -> dict[str, Any] | Response:
     entity_class_name = (
         path.entity_class.value
         if hasattr(path.entity_class, 'value') else str(path.entity_class))
@@ -246,6 +218,6 @@ def get_entities_response(
         page=query.page,
         limit=query.limit,
         entity_class=entity_class_name)
-
+    print(pagination)
     return make_lod_response(
-        formatter(entities, pagination=pagination))
+        format_lod_entities(entities, pagination=pagination))

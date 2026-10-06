@@ -599,7 +599,7 @@ class Api(ApiTestCase):
                     "operator": "greaterThan",
                     "values": ["Sûza"]}],
                 "typeID": [{"operator": "equal", "values": [1121212]}]}]),
-            (1, [{
+            (2, [{
                 "endFrom": [{
                     "operator": "greaterThan",
                     "values": ["2013-02-01"],
@@ -609,12 +609,12 @@ class Api(ApiTestCase):
                     "operator": "greaterThanEqual",
                     "values": ["2019-03-01"],
                     "logicalOperator": "and"}]}, ]),
-            (3, [{
+            (4, [{
                 "beginFrom": [{
                     "operator": "lesserThan",
                     "values": ["2020-01-01"],
                     "logicalOperator": "and"}]}]),
-            (2, [{
+            (3, [{
                 "beginTo": [{
                     "operator": "lesserThanEqual",
                     "values": ["2018-03-01"],

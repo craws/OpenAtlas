@@ -29,14 +29,11 @@ def get_entity_by_uuid(
         types: bool = False,
         aliases: bool = False,
         with_location: bool = True) -> Entity | None:
-    try:
-        return Entity.get_by_uuid(
-            uuid,
-            types=types,
-            aliases=aliases,
-            with_location=with_location)
-    except ImATeapot:
-        abort_not_found(uuid)
+    return Entity.get_by_uuid(
+        uuid,
+        types=types,
+        aliases=aliases,
+        with_location=with_location)
 
 
 def get_rightsholder_by_id(id_: int) -> RightsHolder:

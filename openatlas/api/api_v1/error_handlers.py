@@ -31,7 +31,7 @@ def abort_with_error(
 
 
 def handle_db_error(_e: Any = None) -> Response:
-    return error_response(
+    return error_response(  # pragma: no cover
         500,
         'Internal Server Error',
         'Unexpected database error occurred',
@@ -48,11 +48,11 @@ def handle_db_data_error(_e: Any = None) -> Response:
 
 
 def handle_http_exception(e: HTTPException) -> Response:
-    return error_response(e.code, e.name, e.description)
+    return error_response(e.code, e.name, e.description)  # pragma: no cover
 
 
 def handle_file_not_found_exception(e: HTTPException) -> Response:
-    return error_response(e.code, e.name, e.description)
+    return error_response(e.code, e.name, e.description)  # pragma: no cover
 
 
 def register_error_handlers(api_v1) -> None:

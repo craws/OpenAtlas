@@ -28,8 +28,8 @@ def get_entity(path: EntityPath) -> dict[str, Any] | Response:
     """
     Retrieves a single entity formatted as Linked Open Data
     (OpenAtlas CIDOC-CRM graph).
-    
-    The response format defaults to `application/ld+json`. 
+
+    The response format defaults to `application/ld+json`.
     You can request other formats (like Turtle or RDF/XML) using the `Accept`
     HTTP header.
     """
@@ -45,9 +45,9 @@ def get_entity(path: EntityPath) -> dict[str, Any] | Response:
 def get_entity_ext(path: EntityPathExt) -> dict[str, Any] | Response:
     """
     Retrieves a single LOD entity with a specific format extension.
-    
-    This is an alternative to using the HTTP `Accept` header. 
-    By appending an extension like `.json`, `.ttl`, or `.xml` to the URL, 
+
+    This is an alternative to using the HTTP `Accept` header.
+    By appending an extension like `.json`, `.ttl`, or `.xml` to the URL,
     the API will automatically return the entity in the requested format.
     """
     ext_val = path.ext.value if hasattr(path.ext, 'value') else str(path.ext)
@@ -66,14 +66,13 @@ def get_entities(
         query: EntityCollectionQuery) -> dict[str, Any] | Response:
     """
     Retrieves a paginated collection of entities formatted as Linked Open Data.
-    
+
     This endpoint allows querying a specific system class
     (e.g. `person`, `place`).
-    Results are returned as a Hydra Collection and can be filtered by various 
+    Results are returned as a Hydra Collection and can be filtered by various
     query parameters such as search strings, dates, or case studies.
     """
     return get_entities_response(
         path,
         query,
-        endpoint='api_v1_lod.entities',
-        formatter=format_lod_entities)
+        endpoint='api_v1_lod.entities')

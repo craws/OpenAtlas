@@ -27,10 +27,7 @@ class ApiEntity(Entity):
             types: bool = False,
             aliases: bool = False,
             with_location: bool = True) -> Entity:
-        try:
-            entity = Entity.get_by_uuid(uuid, types=types, aliases=aliases)
-        except Exception as e:
-            raise EntityDoesNotExistError from e
+        entity = Entity.get_by_uuid(uuid, types=types, aliases=aliases)
         if not entity:
             raise EntityDoesNotExistError
         return entity

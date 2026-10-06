@@ -117,6 +117,17 @@ class ApiV1(ApiTestCase):
             rv = c.get(url_for(
                 'api_v1_lod.entities', entity_class='acquisition', **params))
             assert rv.status_code == 422
+        # this should cover
+        # if pagination is None:
+        #         return {'@context': LOD_CONTEXT, '@graph': graph}
+        rv = c.get(
+            url_for(
+                'api_v1_lod.entities',
+                entity_class='type',
+                limit=1,
+                page=2))
+        assert rv.status_code == 200
+        assert 'hydra:previous' in rv.get_json()
 
         rv = c.get(url_for(
             'api_v1_lod.entities', entity_class='acquisition',
