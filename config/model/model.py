@@ -13,6 +13,7 @@ model: dict[str, Any] = {
     'alias': {'attributes': {}},
     'artifact': item.artifact,
     'bibliography': reference.bibliography,
+    'creation': event.creation,
     'edition': reference.edition,
     'external_reference': reference.external_reference,
     'feature': place.feature,
