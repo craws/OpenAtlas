@@ -338,20 +338,6 @@ def add_case_study() -> Entity:
     return case
 
 
-def copy_files() -> None:
-    with os.scandir(FILES_PATH) as entries:
-        for entry in entries:
-            if entry.is_file(follow_symlinks=False) \
-                    and pathlib.Path(entry).stem.isdigit() \
-                    and int(pathlib.Path(entry).stem) in file_ids:
-                shutil.copy(
-                    entry,
-                    pathlib.Path(app.config['UPLOAD_PATH']) /
-                    f'{id_map[int(pathlib.Path(entry).stem)]}'
-                    f'{pathlib.Path(entry).suffix}')
-                print(f'File copy of: {entry.name}')
-
-
 def add_gis() -> None:
     cursor.execute(
         """
@@ -382,6 +368,34 @@ def add_gis() -> None:
         row['entity_id'] = id_map[row['entity_id']]
 
 
+def add_files() -> None:
+    if not pathlib.Path(FILES_PATH).is_dir():
+        print(f'Files path {FILES_PATH} is not available.')
+        return
+    with os.scandir(FILES_PATH) as entries:
+        for entry in entries:
+            if entry.is_file(follow_symlinks=False) \
+                    and pathlib.Path(entry).stem.isdigit() \
+                    and int(pathlib.Path(entry).stem) in file_ids:
+                shutil.copy(
+                    entry,
+                    pathlib.Path(app.config['UPLOAD_PATH']) /
+                    f'{id_map[int(pathlib.Path(entry).stem)]}'
+                    f'{pathlib.Path(entry).suffix}')
+                print(f'File copy of: {entry.name}')
+    # cursor.execute(
+    #    "SELECT name, class, description FROM model.rights_holder;")
+    # for row in list(cursor):
+    #    g.cursor.execute()
+    # cursor.execute(
+    #    """
+    #    SELECT entity_idm rights_holder_id, description
+    #    FROM model.rights_holder_file;
+    #    """)
+    # for row in list(cursor):
+    #    g.cursor.execute()
+
+
 with app.test_request_context():
     app.preprocess_request()
     project_id = insert_project()
@@ -392,11 +406,7 @@ with app.test_request_context():
     types()
     insert_entities()
     link_entities()
-    # add_gis()
     if FILES_PATH and file_ids:
-        if not pathlib.Path(FILES_PATH).is_dir():
-            print(f'Files path {FILES_PATH} is not available.')
-        else:
-            copy_files()
-            copy_files()
+        add_files()
+
 print(f'Execution time: {int(time.time() - start)} seconds')
