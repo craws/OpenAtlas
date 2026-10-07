@@ -1,7 +1,10 @@
 # Used to join data from OpenAtlas projects, see README.md
 # Before running the script make sure you have configured:
 # * The database to write to in instance/production.py
-# * The database to read from in this script
+# * The database to read from at the top of this script
+
+# To run the script from project root:
+# python3 install/import_scripts/openatlas/merge.py
 
 # Work in progress, to do:
 # * File information
@@ -167,7 +170,7 @@ def types() -> None:
     g.cursor = cursor_current
     for import_hierarchy in [
             type_ for type_ in import_types.values() if not type_.root]:
-        print(import_hierarchy.name)
+        # print(import_hierarchy.name)
         hierarchy = Entity.get_hierarchy(import_hierarchy.name)
         for id_ in import_hierarchy.subs:
             types_recursive(id_, hierarchy, import_types)
@@ -182,7 +185,7 @@ def types_recursive(
     for sub_id in super_.subs:
         if g.types[sub_id].name == import_types[id_].name:
             id_map[id_] = sub_id
-            print(f'exists: {import_types[id_].name}')
+            # print(f'exists: {import_types[id_].name}')
             for import_sub_id in import_types[id_].subs:
                 types_recursive(import_sub_id, g.types[sub_id], import_types)
             exists = True
@@ -244,16 +247,18 @@ def insert_entities() -> None:
         """)
     case_study_hierarchy = Entity.get_hierarchy('Case study')
     for row in list(cursor):
-        entity = insert({
-           'name': row['name'],
-           'description': row['description'],
-           'openatlas_class_name': row['openatlas_class_name'],
-           'begin_from': row['begin_from'],
-           'begin_to': row['begin_to'],
-           'begin_comment': row['begin_comment'],
-           'end_from': row['end_from'],
-           'end_to': row['end_to'],
-           'end_comment': row['end_comment']})
+        entity = Entity.get_by_id(
+            db.insert({
+               'name': row['name'],
+               'description': row['description'],
+               'openatlas_class_name': row['openatlas_class_name'],
+               'begin_from': row['begin_from'],
+               'begin_to': row['begin_to'],
+               'begin_comment': row['begin_comment'],
+               'end_from': row['end_from'],
+               'end_to': row['end_to'],
+               'end_comment': row['end_comment']}),
+            with_location=False)
         track(row['id'], entity.id)
         if row['openatlas_class_name'] in case_study_hierarchy.classes:
             entity.link('P2', case_study)
