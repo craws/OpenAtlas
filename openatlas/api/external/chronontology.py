@@ -14,8 +14,6 @@ class ChronOntology(ExternalApi):  # pylint: disable=too-few-public-methods
 
     @staticmethod
     def get_info(id_: str, system: Entity) -> dict[str, object]:
-        info: dict[str, object] = {}
-
         try:
             response = requests.get(
                 f'https://chronontology.dainst.org/data/period/{id_}',
@@ -27,28 +25,30 @@ class ChronOntology(ExternalApi):  # pylint: disable=too-few-public-methods
             response.raise_for_status()
             data = response.json()
         except Exception:  # pragma: no cover
-            return info
+            return {}
 
+        info: dict[str, object] = {}
         resource = data.get('resource', {})
 
         names = resource.get('names', {})
-        title = None
-        if 'en' in names and names['en']:
-            title = names['en'][0]
-        elif 'de' in names and names['de']:  # pragma: no cover
-            title = names['de'][0]
+        if en_names := names.get('en'):
+            info['title'] = en_names[0]
+        elif de_names := names.get('de'):  # pragma: no cover
+            info['title'] = de_names[0]
+        else:
+            info['title'] = f"ChronOntology Period {id_}"  # pragma: no cover
 
-        info['title'] = title or f"ChronOntology Period {id_}"
+        if definition := resource.get('definition'):
+            info['definition'] = definition
 
-        info['definition'] = resource.get('definition')
+        if (timespans := resource.get('hasTimespan')) \
+                and isinstance(timespans, list):
+            if time_orig := timespans[0].get('timeOriginal'):
+                info['timespan'] = time_orig
 
-        timespans = resource.get('hasTimespan', [])
-        if timespans and isinstance(timespans, list):
-            info['timespan'] = timespans[0]['timeOriginal']
-
-        types = resource.get('types', [])
-        if types:
-            info['period types'] = ', '.join(types)
+        if types := resource.get('types'):
+            info['period types'] = ', '.join(types) \
+                if isinstance(types,list) else str(types)
 
         if gazetteer := ChronOntology.get_gazetteer_links(data.get('related')):
             info['gazetteer'] = gazetteer
@@ -57,40 +57,39 @@ class ChronOntology(ExternalApi):  # pylint: disable=too-few-public-methods
 
     @staticmethod
     def get_gazetteer_links(related: Any) -> list[str]:
-        links: list[str] = []
         if not isinstance(related, dict):
-            return links  # pragma: no cover
+            return []  # pragma: no cover
 
+        links: list[str] = []
         for key, place in related.items():
-            if 'gazetteer.dainst.org/place/' not in str(key):
-                continue  # pragma: no cover
-            if not isinstance(place, dict):
+            if 'gazetteer.dainst.org/place/' not in str(key) \
+                    or not isinstance(place, dict):
                 continue  # pragma: no cover
 
             english_name = ''
+
             for name in place.get('names', []):
-                if not isinstance(name, dict):
-                    continue  # pragma: no cover
-                if name.get('language') == 'eng' and name.get('title'):
-                    english_name = str(name['title'])
+                if isinstance(name, dict) \
+                        and name.get('language') == 'eng' \
+                        and (title := name.get('title')):
+                    english_name = str(title)
                     break
 
-            if not english_name \
-                    and isinstance(place.get('prefName'), dict) \
-                    and place['prefName'].get('language') == 'eng' \
-                    and place['prefName'].get('title'):
-                english_name = str(place['prefName']['title'])
+            if not english_name:
+                pref = place.get('prefName', {})
+                if isinstance(pref, dict) \
+                        and pref.get('language') == 'eng' \
+                        and (title := pref.get('title')):
+                    english_name = str(title)
 
             if not english_name:
                 continue  # pragma: no cover
 
             place_id = str(key).rstrip('/').rsplit('/', maxsplit=1)[-1]
-            if not place_id:
-                continue  # pragma: no cover
-
-            links.append(link(
-                english_name,
-                f'https://gazetteer.dainst.org/place/{place_id}',
-                external=True))
+            if place_id:
+                links.append(link(
+                    english_name,
+                    f'https://gazetteer.dainst.org/place/{place_id}',
+                    external=True))
 
         return links

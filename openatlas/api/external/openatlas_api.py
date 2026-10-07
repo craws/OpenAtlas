@@ -11,7 +11,6 @@ class OpenAtlas(ExternalApi):  # pylint: disable=too-few-public-methods
 
     @staticmethod
     def get_info(id_: str, system: Entity) -> dict[str, object]:
-        info: dict[str, object] = {}
         try:
             api_url = f'{system.website_url}/api/entity_presentation_view/'
             data = requests.get(
@@ -20,20 +19,36 @@ class OpenAtlas(ExternalApi):  # pylint: disable=too-few-public-methods
                 proxies=app.config['PROXIES'],
                 timeout=10).json()
         except Exception:  # pragma: no cover
-            return info
+            return {}
 
-        info['name'] = data.get('title')
-        info['OpenAtlas class'] = data.get('systemClass')
-        info['aliases'] = '<br>'.join(data.get('aliases'))
+        info: dict[str, object] = {}
+
+        if title := data.get('title'):
+            info['name'] = title
+
+        if sys_class := data.get('systemClass'):
+            info['OpenAtlas class'] = sys_class
+
+        if aliases := data.get('aliases'):
+            info['aliases'] = '<br>'.join(aliases)  # pragma: no cover
+
         for type_ in data.get('types', []):
-            if type_.get('isStandard'):
-                info['type'] = type_.get('title')
-        info['begin from'] = data['when']['start'].get('earliest')
-        info['begin to'] = data['when']['start'].get('latest')
-        info['begin comment'] = data['when']['start'].get('comment')
-        info['end from'] = data['when']['end'].get('earliest')
-        info['end to'] = data['when']['end'].get('latest')
-        info['end comment'] = data['when']['end'].get('comment')
-        info['description'] = data.get('description')
+            if type_.get('isStandard') and type_.get('title'):
+                info['type'] = type_['title']
+                break
+
+        if when := data.get('when', {}):
+            start = when.get('start', {})
+            if earliest := start.get('earliest'): info['begin from'] = earliest
+            if latest := start.get('latest'): info['begin to'] = latest
+            if comment := start.get('comment'): info['begin comment'] = comment
+
+            end = when.get('end', {})
+            if earliest := end.get('earliest'): info['end from'] = earliest
+            if latest := end.get('latest'): info['end to'] = latest
+            if comment := end.get('comment'): info['end comment'] = comment
+
+        if desc := data.get('description'):
+            info['description'] = desc  # pragma: no cover
 
         return info

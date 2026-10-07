@@ -12,7 +12,6 @@ class DOI(ExternalApi):  # pylint: disable=too-few-public-methods
 
     @staticmethod
     def get_info(id_: str, system: Entity) -> dict[str, object]:
-        info: dict[str, object] = {}
         try:
             data = requests.get(
                 f'https://doi.org/{id_}',
@@ -22,59 +21,56 @@ class DOI(ExternalApi):  # pylint: disable=too-few-public-methods
                 proxies=app.config['PROXIES'],
                 timeout=10).json()
         except Exception:  # pragma: no cover
-            return info
+            return {}
 
-        if 'title' in data and data['title']:
-            info['title'] = data['title']
+        info: dict[str, object] = {}
 
-        if 'author' in data:
+        if title := data.get('title'):
+            info['title'] = title
+
+        if raw_authors := data.get('author', []):
             authors = []
-            for author in data['author']:
+            for author in raw_authors:
                 name = []
-                if 'family' in author:
-                    name.append(author['family'])
-                if 'given' in author:
-                    name.append(author['given'])
-                elif 'literal' in author:  # pragma: no cover
-                    name.append(author['literal'])
-                authors.append(', '.join(name))
-            info['authors'] = '; '.join(authors)
+                if family := author.get('family'):
+                    name.append(family)
+                if given := author.get('given'):
+                    name.append(given)
+                elif literal := author.get('literal'):  # pragma: no cover
+                    name.append(literal)
+                if name:
+                    authors.append(', '.join(name))
+            if authors:
+                info['authors'] = '; '.join(authors)
 
-        if 'container-title' in data and data['container-title']:
-            info['container'] = data['container-title']
+        if container := data.get('container-title'):
+            info['container'] = container
 
-        if 'publisher' in data:
-            info['publisher'] = data['publisher']
+        if publisher := data.get('publisher'):
+            info['publisher'] = publisher
 
-        year = None
         for date_field in [
-            'issued', 'published-print', 'published-online', 'published']:
-            if date_field in data and 'date-parts' in data[date_field]:
-                try:
-                    year = data[date_field]['date-parts'][0][0]
-                    if year:
+                'issued', 'published-print', 'published-online', 'published']:
+            if date_obj := data.get(date_field):
+                parts = date_obj.get('date-parts', [])
+                if parts and isinstance(parts[0], list) and parts[0]:
+                    if year := parts[0][0]:
+                        info['year'] = year
                         break
-                except (IndexError, TypeError):  # pragma: no cover
-                    continue
-        if year:
-            info['year'] = year
 
-        if 'DOI' in data:
-            info['DOI'] = link(
-                data['DOI'],
-                f'https://doi.org/{data["DOI"]}',
-                external=True)
+        if doi := data.get('DOI'):
+            info['DOI'] = link(doi, f'https://doi.org/{doi}', external=True)
 
-        if 'type' in data:
-            info['type'] = data['type'].replace('-', ' ').title()
+        if doc_type := data.get('type'):
+            info['type'] = doc_type.replace('-', ' ').title()
 
-        if 'page' in data:
-            info['page'] = data['page']
+        if page := data.get('page'):
+            info['page'] = page
 
-        if 'volume' in data:
-            info['volume'] = data['volume']
+        if volume := data.get('volume'):
+            info['volume'] = volume
 
-        if 'issue' in data:
-            info['issue'] = data['issue']
+        if issue := data.get('issue'):
+            info['issue'] = issue
 
         return info
