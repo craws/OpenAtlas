@@ -1,22 +1,15 @@
 #!/bin/bash
 # Container entrypoint — handles both normal startup and one-shot DB initialization ("initdb" mode)
 
-# shellcheck disable=SC1091
-
 set -o errexit
 set -o nounset
 set -o pipefail
-# set -o xtrace # Uncomment this line for debugging purposes
 
 export DB_URL="postgres://openatlas:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB"
 
-# initdb mode: initialize DB if needed, then exit
-# if there is a database: do nothing
-# if there is no database but a dump: import dump (don't stop on error because postgis already ships with some tables)
-# if there is neither a database nor a dump, create a new db from the scripts in ./install
 if [ "${1:-}" = "initdb" ]; then
   echo "Initdb mode: waiting for database..."
-  until psql "$DB_URL" -tAc "SELECT 1" >/dev/null 2>&1; do 
+  until psql "$DB_URL" -tAc "SELECT 1" >/dev/null 2>&1; do
     sleep 1
   done
   echo "Database reachable."
@@ -45,13 +38,10 @@ if [ "${1:-}" = "initdb" ]; then
   if [ "$has_data_post" = "1" ]; then
     echo "Initialization verified."
     exit 0
-  else
-    echo "Initialization failed (marker not found in web.settings)."
-    exit 1
   fi
+  echo "Initialization failed (marker not found in web.settings)."
+  exit 1
 fi
-
-source /etc/apache2/envvars
 
 cookie_key=$(python3 -c 'import secrets, string; print("".join(secrets.choice(string.ascii_letters + string.digits + "_") for _ in range(32)))')
 export COOKIE_KEY=${COOKIE_KEY:-$cookie_key}
@@ -71,9 +61,13 @@ SECRET_KEY='$COOKIE_KEY'  # Used for cookies
 CORS_ALLOWANCE='$CORS_ALLOWANCE'
 EOF
 
-
-
 python3 /var/www/openatlas/install/upgrade/database_upgrade.py
+
+if [ "${UV_DEV:-false}" = "true" ]; then
+  echo "Installing dev dependencies..."
+  cd /var/www/openatlas
+  uv pip install --system ".[dev]"
+fi
 
 echo ""
 exec "$@"
