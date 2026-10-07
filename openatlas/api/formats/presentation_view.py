@@ -289,7 +289,9 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
         'geometries': None,
         'when': get_presentation_time(entity.dates),
         'types': get_presentation_types(entity, links),
-        'externalReferenceSystems': get_reference_systems(links_inverse),
+        'externalReferenceSystems': get_reference_systems(
+            links_inverse,
+            entity.id),
         'references': get_presentation_references(
             links_inverse,
             [entity.id, *root_ids]),
@@ -299,6 +301,7 @@ def get_presentation_view(entity: Entity, parser: Parser) -> dict[str, Any]:
             parser,
             root_ids),
         'relations': relations}
+    print(data['externalReferenceSystems'])
     if entity.class_.group.get('name') in ['place', 'item']:
         data['geometries'] = geometry_to_feature_collection(
             geoms.get(entity.id))
