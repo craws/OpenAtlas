@@ -345,7 +345,7 @@ INSERT INTO model.openatlas_class (name, cidoc_class_code, new_types_allowed, wr
   ('alias',                'E41', false, 'contributor', NULL),
   ('artifact',             'E22', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Artifact' AND openatlas_class_name = 'type' ORDER BY id ASC LIMIT 1)),
   ('bibliography',         'E31', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Bibliography' AND openatlas_class_name = 'type' ORDER BY id ASC LIMIT 1)),
-  ('creation',             'E65', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+  ('creation',             'E65', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Event' AND openatlas_class_name = 'type' ORDER BY id ASC LIMIT 1)),
   ('edition',              'E31', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Edition' AND openatlas_class_name = 'type' ORDER BY id ASC LIMIT 1)),
   ('external_reference',   'E31', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'External reference' AND openatlas_class_name = 'type' ORDER BY id ASC LIMIT 1)),
   ('feature',              'E18', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Feature' AND openatlas_class_name = 'type' ORDER BY id ASC LIMIT 1)),
