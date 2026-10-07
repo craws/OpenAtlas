@@ -177,7 +177,7 @@ def get_all(extra_ids: list[int]) -> list[dict[str, Any]]:
         JOIN model.gis g ON place.id = g.entity_id
         LEFT JOIN model.link t ON object.id = t.domain_id
             AND t.property_code = 'P2'
-        WHERE place.cidoc_class_code = 'E53'
+        WHERE place.openatlas_class_name = 'object_location'
             AND l.property_code = 'P53'
             AND (object.openatlas_class_name = 'place'
                 OR object.id IN %(extra_ids)s)

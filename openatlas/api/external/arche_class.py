@@ -13,7 +13,7 @@ class ArcheFileMetadata:
     uri: str
     titles: list[tuple[str, str]]
     depositors: str | list[str] | None = None
-    license: str | None = None
+    license: list[str] | None = None
     licensors: list[Entity] | None = None
     rights_holders: list[Entity] | None = None
     creators: list[Entity] | None = None
@@ -38,7 +38,7 @@ class ArcheFileMetadata:
             type_name: str,
             relations: list[dict[str, Any]],
             publications: list[tuple[Entity, str]],
-            license_: str) -> 'ArcheFileMetadata':
+            license_: list[str] | str) -> 'ArcheFileMetadata':
         metadata = app.config['ARCHE_METADATA']
         part_of = 'https://id.acdh.oeaw.ac.at/' \
             f'{metadata['topCollection'].replace(' ', '_')}'
@@ -49,7 +49,7 @@ class ArcheFileMetadata:
             titles=[(entity.name, 'und')])
         obj.depositors = metadata['depositor']
         obj.language = metadata['language']
-        obj.license = license_
+        obj.license = [license_] if isinstance(license_, str) else license_
         obj.licensors = entity.license_holder
         obj.metadata_creators = metadata['hasMetadataCreator']
         obj.rights_holders = entity.license_holder

@@ -15,6 +15,14 @@ def index_changelog() -> str:
 
 
 versions = {
+    '9.5.0': ['TBA', {
+        'feature': {
+            '2875': 'Remove database field model.entity.cidoc_class_code',
+            '2861': 'API: Format selection strategy',
+            '2344': 'API: Replace python-flasgger',
+            '2883': 'Refactor and minor improvements'
+        }
+    }],
     '9.4.0': ['2026-08-01', {
         'feature': {
             '924': 'Multi instance capability',

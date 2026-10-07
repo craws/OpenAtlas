@@ -39,7 +39,6 @@ def ajax_add_type() -> str:
         data={
             'name': request.form['name'],
             'openatlas_class_name': root.class_.name,
-            'cidoc_class_code': root.cidoc_class.code,
             'description': request.form['description']})
     entity.link(link[root.cidoc_class.code], root)
     g.logger.log_user(entity.id, 'insert')

@@ -52,7 +52,6 @@ ALTER TABLE IF EXISTS ONLY model.gis DROP CONSTRAINT IF EXISTS gis_entity_id_fke
 ALTER TABLE IF EXISTS ONLY model.rights_holder_file DROP CONSTRAINT IF EXISTS fk_rights_holder;
 ALTER TABLE IF EXISTS ONLY model.rights_holder_file DROP CONSTRAINT IF EXISTS fk_entity;
 ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_openatlas_class_name_fkey;
-ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_class_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_sub_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_fkey;
@@ -94,7 +93,6 @@ DROP INDEX IF EXISTS model.link_property_code_idx;
 DROP INDEX IF EXISTS model.link_domain_id_idx;
 DROP INDEX IF EXISTS model.gis_entity_id_idx;
 DROP INDEX IF EXISTS model.entity_openatlas_class_name_idx;
-DROP INDEX IF EXISTS model.entity_cidoc_class_code_idx;
 DROP INDEX IF EXISTS model.cidoc_class_code_idx;
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_username_key;
 ALTER TABLE IF EXISTS ONLY web.user_tokens DROP CONSTRAINT IF EXISTS user_tokens_pkey;
@@ -308,18 +306,18 @@ CREATE FUNCTION model.delete_entity_related() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
         BEGIN
-            -- Delete aliases (P1, P131)
-            IF OLD.cidoc_class_code IN ('E18', 'E21', 'E40', 'E74') THEN
+            -- Delete aliases
+            IF OLD.openatlas_class_name IN ('place', 'person', 'group') THEN
                 DELETE FROM model.entity WHERE id IN (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code IN ('P1', 'P131'));
             END IF;
 
-            -- Delete location (E53) if it was an artifact, human remains or place
-            IF OLD.cidoc_class_code IN ('E18', 'E20', 'E22') THEN
+            -- Delete location if it was an artifact, human remains or place
+            IF OLD.openatlas_class_name IN ('place', 'human_remains', 'artifact') THEN
                 DELETE FROM model.entity WHERE id = (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code = 'P53');
             END IF;
 
-            -- Delete translations (E33) if it was a document
-            IF OLD.cidoc_class_code = 'E33' THEN
+            -- Delete text if it was a document not attached to a source anymore
+            IF OLD.openatlas_class_name = 'text' THEN
                 DELETE FROM model.entity WHERE id IN (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code = 'P73');
             END IF;
 
@@ -622,7 +620,6 @@ ALTER SEQUENCE model.cidoc_class_inheritance_id_seq OWNED BY model.cidoc_class_i
 
 CREATE TABLE model.entity (
     id integer NOT NULL,
-    cidoc_class_code text NOT NULL,
     name text NOT NULL,
     description text,
     created timestamp without time zone DEFAULT now() NOT NULL,
@@ -2295,13 +2292,6 @@ CREATE INDEX cidoc_class_code_idx ON model.cidoc_class USING btree (code);
 
 
 --
--- Name: entity_cidoc_class_code_idx; Type: INDEX; Schema: model; Owner: openatlas
---
-
-CREATE INDEX entity_cidoc_class_code_idx ON model.entity USING btree (cidoc_class_code);
-
-
---
 -- Name: entity_openatlas_class_name_idx; Type: INDEX; Schema: model; Owner: openatlas
 --
 
@@ -2596,14 +2586,6 @@ ALTER TABLE ONLY model.cidoc_class_inheritance
 
 ALTER TABLE ONLY model.cidoc_class_inheritance
     ADD CONSTRAINT class_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: entity entity_class_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
---
-
-ALTER TABLE ONLY model.entity
-    ADD CONSTRAINT entity_class_code_fkey FOREIGN KEY (cidoc_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

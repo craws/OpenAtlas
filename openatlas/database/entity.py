@@ -41,7 +41,6 @@ def get_by_project_id(project_id: int) -> list[dict[str, Any]]:
         SELECT
             e.id,
             ie.origin_id,
-            e.cidoc_class_code,
             e.name,
             e.description,
             e.created,
@@ -78,8 +77,10 @@ def get_by_cidoc_class(
         types: bool = False,
         aliases: bool = False) -> list[dict[str, Any]]:
     g.cursor.execute(
-        select_sql(types, aliases) +
-        'WHERE e.cidoc_class_code IN %(codes)s GROUP BY e.id;',
+        select_sql(types, aliases) + """
+            JOIN model.openatlas_class oa ON e.openatlas_class_name = oa.name
+            WHERE oa.cidoc_class_code IN %(codes)s GROUP BY e.id;
+            """,
         {'codes': tuple(code if isinstance(code, list) else [code])})
     return list(g.cursor)
 
@@ -130,7 +131,6 @@ def get_all_entities() -> list[dict[str, Any]]:
         """
         SELECT
             e.id,
-            e.cidoc_class_code,
             e.name,
             e.description,
             COALESCE(to_char(e.created, 'yyyy-mm-dd hh24:mi:ss BC'), '')
@@ -154,14 +154,11 @@ def get_all_entities() -> list[dict[str, Any]]:
 
 
 def insert(data: dict[str, Any]) -> int:
-    data['cidoc_class_code'] = \
-        g.classes[data['openatlas_class_name']].cidoc_class.code
     g.cursor.execute(
         """
         INSERT INTO model.entity (
             name,
             openatlas_class_name,
-            cidoc_class_code,
             description,
             begin_from,
             begin_to,
@@ -172,7 +169,6 @@ def insert(data: dict[str, Any]) -> int:
         ) VALUES (
             %(name)s,
             %(openatlas_class_name)s,
-            %(cidoc_class_code)s,
             %(description)s,
             %(begin_from)s,
             %(begin_to)s,
@@ -252,7 +248,6 @@ def select_sql(types: bool = False, aliases: bool = False) -> str:
         SELECT
             e.id,
             e.uuid,
-            e.cidoc_class_code,
             e.name,
             e.description,
             e.created,
@@ -531,7 +526,6 @@ def get_types(with_count: bool) -> list[dict[str, Any]]:
             e.id,
             e.uuid,
             e.name,
-            e.cidoc_class_code,
             e.description,
             e.openatlas_class_name,
             e.created,
@@ -798,7 +792,6 @@ def get_reference_systems() -> list[dict[str, Any]]:
             e.id,
             e.uuid,
             e.name,
-            e.cidoc_class_code,
             e.description,
             e.openatlas_class_name,
             e.created,
@@ -819,7 +812,6 @@ def get_reference_systems() -> list[dict[str, Any]]:
             e.id,
             e.uuid,
             e.name,
-            e.cidoc_class_code,
             e.description,
             e.openatlas_class_name,
             e.created,
