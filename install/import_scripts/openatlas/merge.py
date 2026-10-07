@@ -8,7 +8,6 @@
 
 # Work in progress, to do:
 # * File information
-# * Gis?
 # * Annotations?
 #
 # Later
@@ -110,7 +109,7 @@ def hierarchies() -> None:
             if existing := Entity.get_hierarchy(item['name']):
                 exists = True
                 id_map[item['id']] = existing.id
-                print(f'Hierarchy exists: {existing.name}')
+                # print(f'Hierarchy exists: {existing.name}')
         except IndexError:
             pass
         if not exists:
@@ -197,7 +196,7 @@ def types_recursive(
 def insert_type_recursive(
         import_type: Entity,
         import_types: dict[int, Entity]) -> None:
-    print(f'New type: {import_type.name}')
+    # print(f'New type: {import_type.name}')
     new_type = insert({
        'name': import_type.name,
        'description': import_type.description,
@@ -275,7 +274,7 @@ def reference_systems() -> None:
         exists = False
         for existing_system in g.reference_systems.values():
             if row['name'] == existing_system.name:
-                print(f'Reference system exists: {row['name']}')
+                # print(f'Reference system exists: {row['name']}')
                 exists = True
                 id_map[row['id']] = existing_system.id
         if not exists:
@@ -353,6 +352,36 @@ def copy_files() -> None:
                 print(f'File copy of: {entry.name}')
 
 
+def add_gis() -> None:
+    cursor.execute(
+        """
+        SELECT entity_id, name, description, type,
+            geom_point, geom_polygon, geom_linestring
+        FROM model.gis;
+        """)
+    for row in list(cursor):
+        g.cursor.execute(
+            f"""
+            INSERT INTO model.gis (
+                entity_id, name, description, type,
+                geom_point, geom_polygon, geom_linestring
+            ) VALUES (
+                %(entity_id)s, %(name)s, %(description)s, %(type)s,
+                %(geom_point)s, %(geom_polygon)s, %(geom_linestring)s
+            );
+            """,
+            {
+                'entity_id': id_map[row['entity_id']],
+                'name': row['name'],
+                'description': row['description'],
+                'type': row['type'],
+                'geom_point': row['geom_point'],
+                'geom_polygon': row['geom_polygon'],
+                'geom_linestring': row['geom_linestring']
+            })
+        row['entity_id'] = id_map[row['entity_id']]
+
+
 with app.test_request_context():
     app.preprocess_request()
     project_id = insert_project()
@@ -363,9 +392,11 @@ with app.test_request_context():
     types()
     insert_entities()
     link_entities()
+    # add_gis()
     if FILES_PATH and file_ids:
         if not pathlib.Path(FILES_PATH).is_dir():
             print(f'Files path {FILES_PATH} is not available.')
         else:
+            copy_files()
             copy_files()
 print(f'Execution time: {int(time.time() - start)} seconds')
