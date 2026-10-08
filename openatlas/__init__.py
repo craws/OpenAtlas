@@ -121,6 +121,9 @@ def before_request() -> Response | None:
 
 
 def setup_files() -> None:
+    if request.endpoint == 'api_v1_files.get_public_files':
+        g.file_info = {}
+        return
     if (request.endpoint or "") in 'display_file':
         return
     from openatlas.models.rights_holder import RightsHolder

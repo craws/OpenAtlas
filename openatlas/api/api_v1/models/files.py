@@ -67,9 +67,26 @@ class FileItem(BaseSchema):
         examples=[12345])
 
 
+class PublicFilesQuery(BaseSchema):
+    limit: int = Field(
+        100,
+        ge=1,
+        le=100,
+        description="Number of records to return (max 100).")
+    page: int = Field(
+        1,
+        ge=1,
+        description="Page number (starting at 1).")
+
+
 class PublicFileOverviewResponse(BaseSchema):
     data: list[FileItem] = Field(
-        description="Dictionary of licensed files, mapped by their ID")
+        description="Page of publicly shareable, licensed files.")
+    total_items: int
+    first: str
+    previous: str | None = None
+    next: str | None = None
+    last: str
 
 # Todo: implement
 class FilesByEntitiesQuery(BaseSchema):

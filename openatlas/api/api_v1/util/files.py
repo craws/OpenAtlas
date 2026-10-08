@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import mimetypes
+import os
 from collections import defaultdict
 from pathlib import Path
 from typing import Any, cast
@@ -138,50 +139,53 @@ def get_file_path(file_id: int, upload_path: Path) -> Path | Any:
 
     abort_file_not_found(file_id)
 
-### Maybe needed for some endpoints?
-# def get_multiple_file_paths(
-#         file_ids: list[int],
-#         upload_path: Path) -> dict[int, Path]:
-#     safe_extensions = {
-#         '.jpg', '.png', '.jpeg', '.pdf', '.tif', '.tiff', '.bmp', '.gif',
-#         '.svg', '.mp4', '.avi', '.mov', '.wmv', '.mp3'}
-#
-#     configured_exts = g.settings.get('file_upload_allowed_extension', [])
-#     extensions = safe_extensions | set(configured_exts)
-#
-#     results = {}
-#     missing_ids = set(file_ids)
-#
-#     for id_ in list(missing_ids):
-#         for ext in extensions:
-#             candidate = upload_path / f"{id_}{ext}"
-#             if candidate.is_file():
-#                 results[id_] = candidate
-#                 missing_ids.remove(id_)
-#                 break
-#
-#     if missing_ids:
-#         with os.scandir(upload_path) as entries:
-#             for entry in entries:
-#                 if entry.is_file():
-#                     name_parts = entry.name.split('.', 1)
-#                     if name_parts[0].isdigit():
-#                         id_ = int(name_parts[0])
-#                         if id_ in missing_ids:
-#                             results[id_] = Path(entry.path)
-#                             missing_ids.remove(id_)
-#                             if not missing_ids:
-#                                 break
-#
-#     return results
+
+def get_multiple_file_paths(
+        file_ids: list[int],
+        upload_path: Path) -> dict[int, Path]:
+    if not file_ids:
+        return {}
+    safe_extensions = {
+        '.jpg', '.png', '.jpeg', '.pdf', '.tif', '.tiff', '.bmp', '.gif',
+        '.svg', '.mp4', '.avi', '.mov', '.wmv', '.mp3'}
+    configured_exts = g.settings.get('file_upload_allowed_extension', [])
+    extensions = sorted(safe_extensions | set(configured_exts))
+    results = {}
+    missing_ids = set(file_ids)
+
+    for id_ in list(missing_ids):
+        for ext in extensions:
+            candidate = upload_path / f"{id_}{ext}"
+            if candidate.is_file():
+                results[id_] = candidate
+                missing_ids.remove(id_)
+                break
+
+    if missing_ids:
+        with os.scandir(upload_path) as entries:
+            for entry in entries:
+                name_parts = entry.name.split('.', 1)
+                if name_parts[0].isdigit():
+                    id_ = int(name_parts[0])
+                    if id_ in missing_ids and entry.is_file():
+                        results[id_] = Path(entry.path)
+                        missing_ids.remove(id_)
+                        if not missing_ids:
+                            break
+
+    return results
+
 
 def get_mime_type(path: Path) -> str:
     mimetype, _ = mimetypes.guess_type(path) if path else (None, None)
     return mimetype
 
-def get_file_item(entity: Entity) -> FileItem:
-    file_ = g.files.get(entity.id)
-    iiif = get_iiif_manifest_and_path(entity.id)
+
+def get_file_item(
+        entity: Entity,
+        file_paths: dict[int, Path] | None = None) -> FileItem:
+    file_ = (file_paths if file_paths is not None else g.files).get(entity.id)
+    iiif = get_iiif_manifest_and_path(entity.id, file_paths)
     return FileItem(
         id=entity.id,
         name=entity.name,

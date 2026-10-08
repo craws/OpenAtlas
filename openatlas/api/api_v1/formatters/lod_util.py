@@ -2,6 +2,7 @@ import re
 from collections import defaultdict
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Final, Optional
 from uuid import UUID
 
@@ -67,19 +68,29 @@ def get_license_type(entity: Entity) -> Optional[Entity]:
     return license_
 
 
-# todo: rewrite without using g.files!
-def get_iiif_manifest_and_path(img_id: int) -> dict[str, str]:
+def get_iiif_manifest_and_path(
+        img_id: int,
+        file_paths: dict[int, Path] | None = None) -> dict[str, str]:
     iiif_manifest = ''
     iiif_base_path = ''
-    if check_iiif_activation() and check_iiif_file_exist(img_id):
+    if not check_iiif_activation():
+        return {'IIIFManifest': iiif_manifest, 'IIIFBasePath': iiif_base_path}
+    file_ = (file_paths if file_paths is not None else g.files).get(img_id)
+    if file_paths is None:
+        exists = check_iiif_file_exist(img_id)
+    elif g.settings['iiif_conversion']:
+        exists = (Path(g.settings['iiif_path']) / f'{img_id}.tiff').is_file()
+    else:
+        exists = file_ is not None
+    if exists:
         iiif_manifest = url_for(
             'api.iiif_manifest',
             version=g.settings['iiif_version'],
             id_=img_id,
             _external=True)
-        if g.files.get(img_id):
+        if file_:
             iiif_base_path = (
-                f"{g.settings['iiif_url']}{img_id}{g.files[img_id].suffix}")
+                f"{g.settings['iiif_url']}{img_id}{file_.suffix}")
     return {'IIIFManifest': iiif_manifest, 'IIIFBasePath': iiif_base_path}
 
 

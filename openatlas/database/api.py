@@ -9,6 +9,42 @@ from openatlas.database.entity import select_sql
 
 ### Entity ###
 
+def get_public_files_api(
+        license_ids: set[int],
+        public_share_id: int | None,
+        limit: int,
+        offset: int) -> tuple[list[dict[str, Any]], int]:
+    if not license_ids or public_share_id is None:
+        return [], 0
+
+    where_sql = """
+        WHERE e.openatlas_class_name = 'file'
+        AND EXISTS (
+            SELECT 1 FROM model.link l
+            WHERE l.domain_id = e.id AND l.property_code = 'P2'
+                AND l.range_id IN %(license_ids)s)
+        AND EXISTS (
+            SELECT 1 FROM model.link l
+            WHERE l.domain_id = e.id AND l.property_code = 'P2'
+                AND l.range_id = %(public_share_id)s)
+        """
+    params = {
+        'license_ids': tuple(license_ids),
+        'public_share_id': public_share_id,
+        'limit': limit,
+        'offset': offset}
+    g.cursor.execute(
+        'SELECT COUNT(*) FROM model.entity e ' + where_sql, params)
+    total = g.cursor.fetchone()['count']
+    g.cursor.execute(
+        select_sql(types=True) +
+        ' JOIN (SELECT e.id FROM model.entity e ' + where_sql +
+        ' ORDER BY e.id LIMIT %(limit)s OFFSET %(offset)s) page '
+        'ON page.id = e.id GROUP BY e.id ORDER BY e.id;',
+        params)
+    return list(g.cursor), total
+
+
 def _format_date_for_sql(date: str) -> str | None:
     date_string = date.strip()
     if date_string.startswith('-'):

@@ -6,14 +6,17 @@ from flask_openapi3 import APIBlueprint
 from openatlas import app
 from openatlas.api.api_v1.error_handlers import register_error_handlers
 from openatlas.api.api_v1.models.files import (
-    FileIdPath, PublicFileOverviewResponse)
+    FileIdPath, PublicFileOverviewResponse, PublicFilesQuery)
 from openatlas.api.api_v1.models.util import DownloadQuery
 from openatlas.api.api_v1.openapi_tags import file_tag
 from openatlas.api.api_v1.responses.files import (
     display_file_response, public_files_response, thumbnail_response)
 from openatlas.api.api_v1.util.files import (
     check_file_access, get_file_entity, get_file_item, get_file_path,
-    get_mime_type, has_file_access)
+    get_mime_type, get_multiple_file_paths, get_public_share_yes_id,
+    get_valid_license_ids)
+from openatlas.api.api_v1.util.pagination import get_pagination_lod
+from openatlas.database.api import get_public_files_api
 from openatlas.display.image_processing import (
     check_iiif_activation, check_iiif_file_exist)
 from openatlas.models.entity import Entity
@@ -102,23 +105,23 @@ def display_thumbnail(path: FileIdPath, query: DownloadQuery):
         as_attachment=bool(query.download))
 
 
-# todo:
-#   Performance
-#   Try not to use g.files
-#   Pagination
 @api_v1_files.get(
     '/public',
     summary="Get licensed files overview",
     tags=[file_tag],
     responses=public_files_response)
-def get_public_files():
-    """Retrieves all existing files with a license, their display URLs,
-    and metadata."""
-    entities = Entity.get_by_class(['file'], types=True)
-    valid_files = [file for file in entities if has_file_access(file)]
-    #file_paths = get_multiple_file_paths(
-    #    [f.id for f in valid_files], app.config['UPLOAD_PATH'])
-    files = []
-    for file_ in valid_files:
-        files.append(get_file_item(file_))
-    return PublicFileOverviewResponse(data=files).model_dump(by_alias=True)
+def get_public_files(query: PublicFilesQuery):
+    """Retrieves a page of publicly shareable files with a license."""
+    rows, total = get_public_files_api(
+        get_valid_license_ids(),
+        get_public_share_yes_id(),
+        query.limit,
+        (query.page - 1) * query.limit)
+    entities = [Entity(row) for row in rows]
+    file_paths = get_multiple_file_paths(
+        [entity.id for entity in entities], app.config['UPLOAD_PATH'])
+    pagination = get_pagination_lod(
+        'api_v1_files.get_public_files', total, query.page, query.limit)
+    return PublicFileOverviewResponse(
+        data=[get_file_item(entity, file_paths) for entity in entities],
+        **pagination).model_dump(by_alias=True)
