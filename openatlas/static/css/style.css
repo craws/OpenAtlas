@@ -286,3 +286,16 @@ img.schema_image {
   align-content: center;
   text-align: center;
 }
+
+/* Tom Select autocomplete: keep selected id and text input in one line */
+.ts-wrapper.single .ts-control {
+  flex-wrap: nowrap;
+}
+
+.ts-wrapper.single.has-items .ts-control > input {
+  min-width: 0;
+}
+
+.ts-wrapper.single.is-typing .ts-control > .item {
+  display: none;
+}
