@@ -21,7 +21,7 @@ class ApiV1(ApiTestCase):
         c = self.client
         e = self.get_api_entities()
 
-        rv = c.get(url_for('api_v1_lod.entity', uuid=e.place.uuid))
+        rv = c.get(url_for('api_v1_lod.get_entity', uuid=e.place.uuid))
         assert 'application/ld+json' in rv.headers.get('Content-Type')
         rv_json = rv.get_json()
         assert rv_json[
@@ -31,7 +31,7 @@ class ApiV1(ApiTestCase):
         assert rv_json['_label'] == 'Shire'
 
         rv = c.get(
-            url_for('api_v1_lod.entity_ext', uuid=e.place.uuid, ext='ttl'))
+            url_for('api_v1_lod.get_entity_ext', uuid=e.place.uuid, ext='ttl'))
         assert 'text/turtle' in rv.headers.get('Content-Type')
 
         for params in [
@@ -61,21 +61,21 @@ class ApiV1(ApiTestCase):
             {'endDate': '-500-03-15'},
             {'startDate': '   '}]:
             rv = c.get(url_for(
-                'api_v1_lod.entities', entity_class='acquisition', **params))
+                'api_v1_lod.get_entities', entity_class='acquisition', **params))
             assert rv.status_code == 200
 
         for sort_field in [
                 'name', 'startDate', 'endDate', 'start_date', 'end_date']:
             for sort_order in ['asc', 'desc']:
                 rv = c.get(url_for(
-                    'api_v1_lod.entities',
+                    'api_v1_lod.get_entities',
                     entity_class='acquisition',
                     sortBy=sort_field,
                     sort=sort_order))
                 assert rv.status_code == 200
 
         rv = c.get(url_for(
-            'api_v1_lod.entities',
+            'api_v1_lod.get_entities',
             entity_class='acquisition',
             sortBy='invalid_field'))
         assert rv.status_code == 422
@@ -87,7 +87,7 @@ class ApiV1(ApiTestCase):
             {'endDate': '0'},
             {'endDate': '0-05'}]:
             rv = c.get(url_for(
-                'api_v1_lod.entities', entity_class='acquisition', **params))
+                'api_v1_lod.get_entities', entity_class='acquisition', **params))
             assert rv.status_code == 422
             assert b'There is no year 0' in rv.data
 
@@ -119,11 +119,11 @@ class ApiV1(ApiTestCase):
             {'endDate': '-abc'},
             {'endDate': '2020-01-01-01'}]:
             rv = c.get(url_for(
-                'api_v1_lod.entities', entity_class='acquisition', **params))
+                'api_v1_lod.get_entities', entity_class='acquisition', **params))
             assert rv.status_code == 422
         rv = c.get(
             url_for(
-                'api_v1_lod.entities',
+                'api_v1_lod.get_entities',
                 entity_class='type',
                 limit=1,
                 page=2))
@@ -135,13 +135,13 @@ class ApiV1(ApiTestCase):
             '@graph': []}
 
         rv = c.get(url_for(
-            'api_v1_lod.entities', entity_class='acquisition',
+            'api_v1_lod.get_entities', entity_class='acquisition',
             startDate='999999999'))
         assert rv.status_code == 422
 
         rv = c.get(
             url_for(
-                'api_v1_lod.entity',
+                'api_v1_lod.get_entity',
                 uuid='7404a969-97ba-4861-a555-3a97be2be967'))
         assert rv.status_code == 404
 
@@ -149,7 +149,7 @@ class ApiV1(ApiTestCase):
         c = self.client
         e = self.get_api_entities()
 
-        rv = c.get(url_for('api_v1_loud.loud_entity', uuid=e.place.uuid))
+        rv = c.get(url_for('api_v1_loud.get_entity', uuid=e.place.uuid))
         assert 'application/ld+json' in rv.headers.get('Content-Type')
         rv_json = rv.get_json()
         assert rv_json[
@@ -161,20 +161,20 @@ class ApiV1(ApiTestCase):
 
         rv = c.get(
             url_for(
-                'api_v1_loud.loud_entity_ext',
+                'api_v1_loud.get_entity_ext',
                 uuid=e.place.uuid,
                 ext='ttl'))
         assert 'text/turtle' in rv.headers.get('Content-Type')
 
         rv = c.get(
             url_for(
-                'api_v1_loud.loud_entity',
+                'api_v1_loud.get_entity',
                 uuid='7404a969-97ba-4861-a555-3a97be2be967'))
         assert rv.status_code == 404
 
         for class_ in ['place', 'person', 'artifact', 'file', 'type']:
             rv = c.get(
-                url_for('api_v1_loud.loud_entities', entity_class=class_))
+                url_for('api_v1_loud.get_entities', entity_class=class_))
             assert rv.status_code == 200
             rv_json = rv.get_json()
             assert rv_json['type'] == 'hydra:PartialCollectionView'
@@ -182,7 +182,7 @@ class ApiV1(ApiTestCase):
 
         rv = c.get(
             url_for(
-                'api_v1_loud.loud_entities',
+                'api_v1_loud.get_entities',
                 entity_class='type',
                 limit=1,
                 page=2))
@@ -193,21 +193,21 @@ class ApiV1(ApiTestCase):
             '@context': 'https://linked.art/ns/v1/linked-art.json',
             '@graph': []}
 
-        rv = c.get(url_for('api_v1_loud.loud_entity', uuid=e.move.uuid))
+        rv = c.get(url_for('api_v1_loud.get_entity', uuid=e.move.uuid))
         part = rv.get_json()['part'][0]
         assert part['type'] == 'Move'
         assert part['moved'][0]['id'].endswith(e.artifact.uuid)
         assert part['moved_to']['type'] == 'Place'
         assert part['moved_from']['type'] == 'Place'
 
-        rv = c.get(url_for('api_v1_loud.loud_entity', uuid=e.artifact.uuid))
+        rv = c.get(url_for('api_v1_loud.get_entity', uuid=e.artifact.uuid))
         rv_json = rv.get_json()
         assert rv_json['produced_by']['type'] == 'Production'
         assert rv_json['destroyed_by']['type'] == 'Destruction'
         assert 'timespan' in rv_json['destroyed_by']
 
         for entity in (e.place, e.feature):
-            rv = c.get(url_for('api_v1_loud.loud_entity', uuid=entity.uuid))
+            rv = c.get(url_for('api_v1_loud.get_entity', uuid=entity.uuid))
             rv_json = rv.get_json()
             assert rv_json['type'] == 'HumanMadeObject'
 
@@ -215,7 +215,7 @@ class ApiV1(ApiTestCase):
         c = self.client
         e = self.get_api_entities()
 
-        rv = c.get(url_for('api_v1_root.index'))
+        rv = c.get(url_for('api_v1_root.api_v1_index'))
         assert rv.status_code == 200
         rv = rv.get_json()
         assert rv['name'] == "OpenAtlas API"
@@ -224,7 +224,7 @@ class ApiV1(ApiTestCase):
         assert 'documentation' in rv
         assert 'manual' in rv
 
-        rv = c.get(url_for('api_v1_system.system_info'))
+        rv = c.get(url_for('api_v1_system.get_system_info'))
         assert rv.status_code == 200
         rv = rv.get_json()
         assert 'apiVersions' in rv
@@ -242,23 +242,23 @@ class ApiV1(ApiTestCase):
 
         rv = c.get(
             url_for(
-                'api_v1_system.entity_count',
+                'api_v1_system.get_entity_count',
                 case_study_id=e.case_study.id))
         assert 'counts' in rv.get_json()
 
-        rv = c.get(url_for('api_v1_system.system_classes'))
+        rv = c.get(url_for('api_v1_system.get_system_classes'))
         assert rv.status_code == 200
         rv = rv.get_json()
         assert 'locale' in rv
         assert 'results' in rv
         assert isinstance(rv['results'], list)
-        rv = c.get(url_for('api_v1_system.system_classes', locale='de'))
+        rv = c.get(url_for('api_v1_system.get_system_classes', locale='de'))
         assert 'de' in rv.get_json()['locale']
 
-        rv = c.get(url_for('api_v1_system.entity_count'))
+        rv = c.get(url_for('api_v1_system.get_entity_count'))
         assert 'counts' in rv.get_json()
 
-        rv = c.get(url_for('api_v1_system.system_crm_properties'))
+        rv = c.get(url_for('api_v1_system.get_system_properties'))
         assert rv.status_code == 200
         assert 'properties' in rv.get_json()
 
@@ -347,13 +347,6 @@ class ApiV1(ApiTestCase):
                 type_id=self.precision_type.subs[0])
             root_uri = URIRef(url_for(
                 'api.entity_uuid', uuid=root.uuid, _external=True))
-            child_uri = URIRef(url_for(
-                'api.entity_uuid', uuid=child.uuid, _external=True))
-            grandchild = g.types[child.subs[0]] if child.subs else None
-            grandchild_uri = URIRef(url_for(
-                'api.entity_uuid',
-                uuid=grandchild.uuid,
-                _external=True)) if grandchild else None
 
         format_map = {
             'ttl': ('turtle', 'text/turtle'),

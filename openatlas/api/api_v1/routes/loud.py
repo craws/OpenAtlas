@@ -20,7 +20,6 @@ register_error_handlers(api_v1_loud)
 
 @api_v1_loud.get(
     '/entity/<uuid:uuid>',
-    endpoint='loud_entity',
     summary='Get a strictly compliant Linked.Art LOUD entity by UUID',
     tags=[lod_tag],
     responses=lod_responses)
@@ -38,7 +37,6 @@ def get_entity(path: EntityPath) -> dict[str, Any] | Response:
 
 @api_v1_loud.get(
     '/entity/<uuid:uuid>.<ext>',
-    endpoint='loud_entity_ext',
     summary='Get a strictly compliant Linked.Art LOUD entity by UUID '
             'with extension',
     tags=[lod_tag],
@@ -54,7 +52,6 @@ def get_entity_ext(path: EntityPathExt) -> dict[str, Any] | Response:
 
 @api_v1_loud.get(
     '/entities/<string:entity_class>',
-    endpoint='loud_entities',
     summary='Get a polymorphic collection of Linked.Art LOUD entities',
     tags=[lod_tag],
     responses=lod_collection_responses)
@@ -68,5 +65,5 @@ def get_entities(
     return get_entities_response(
         path,
         query,
-        endpoint='api_v1_loud.loud_entities',
+        endpoint='api_v1_loud.get_entities',
         formatter=format_loud_entities)

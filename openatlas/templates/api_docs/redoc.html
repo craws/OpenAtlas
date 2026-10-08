@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>OpenAtlas V1 - ReDoc</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+      body {
+          margin: 0;
+          padding: 0;
+      }
+  </style>
+</head>
+<body>
+<redoc spec-url="/api/1/docs/openapi.json"></redoc>
+<script
+  src="{{ url_for('static', filename='node_modules/redoc/bundles/redoc.standalone.js', v=config.VERSION) }}"></script>
+</body>
+</html>

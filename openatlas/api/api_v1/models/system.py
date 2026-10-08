@@ -2,7 +2,7 @@ from typing import Dict
 
 from pydantic import Field
 
-from openatlas.api.api_v1.models.util import BaseSchema, OpenAtlasClassEnum
+from openatlas.api.api_v1.models.util import BaseSchema
 
 
 class ImageProcessingInfo(BaseSchema):

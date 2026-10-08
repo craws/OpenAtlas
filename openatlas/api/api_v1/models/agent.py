@@ -18,7 +18,6 @@ class AgentItem(BaseModel):
         description="The OpenAtlas entity class.")
     description: str | None = Field(
         description="Short description or biographical note.")
-    # todo: external_url: list[ExtRefSystem] | None
 
 
 class AgentListResponse(BaseSchema):

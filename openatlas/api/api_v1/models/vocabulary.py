@@ -1,11 +1,13 @@
 from typing import Dict
 from uuid import UUID
 
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from openatlas.api.api_v1.models.files import FileItem
 from openatlas.api.api_v1.models.util import BaseSchema, \
-    TimeSpan, ExternalReferenceSystemModel, ReferenceModel, TypeCategoryEnum
+    ExtensionsType, OpenAtlasClassEnum, TimeSpan, ExternalReferenceSystemModel, \
+    ReferenceModel, \
+    TypeCategoryEnum
 
 
 class VocabularyStandardQuery(BaseSchema):
@@ -104,3 +106,28 @@ class VocabularyTreeResponse(BaseSchema):
 
 class VocabularyStandardResponse(BaseSchema):
     data: list[VocabularyTreeItem] = Field(default_factory=list)
+
+
+class VocabularyTreePath(BaseModel):
+    openatlas_class: OpenAtlasClassEnum = Field(
+        ...,
+        description="Filter the tree by a specific OpenAtlas class.")
+
+
+class VocabularyId(BaseModel):
+    id: int = Field(
+        ...,
+        description="ID of a type")
+
+
+class VocabularySkosPath(BaseModel):
+    id: int = Field(
+        description="Root ID of the vocabulary hierarchy.")
+    ext: ExtensionsType = Field(
+        description="Serialization format (.ttl, .xml, .json, .nt).",
+        json_schema_extra={
+            "examples": {
+                "turtle": {"summary": "Turtle Format", "value": "ttl"},
+                "xml": {"summary": "RDF/XML Format", "value": "xml"},
+                "json": {"summary": "JSON-LD Format", "value": "json"},
+                "ntriples": {"summary": "N-Triples Format", "value": "nt"}}})

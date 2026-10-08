@@ -15,7 +15,6 @@ register_error_handlers(api_v1_root)
 
 @api_v1_root.get(
     '/',
-    endpoint='index',
     summary="API Index",
     responses=index_response,
     tags=[system_tag],
@@ -28,8 +27,7 @@ def api_v1_index() -> dict[str, Any]:
     response = ApiIndexResponse(
         name="OpenAtlas API",
         version=app.config['API_VERSIONS'].get('1', '1'),
-        # todo: only schema dynamic link
-        openapi_schema=url_for('api_v1_root.index', _external=True) \
+        openapi_schema=url_for('api_v1_root.api_v1_index', _external=True) \
                        + "docs/openapi.json",
         documentation=url_for('custom_swagger_ui', _external=True),
         manual=url_for(

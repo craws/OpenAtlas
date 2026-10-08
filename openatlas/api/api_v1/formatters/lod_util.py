@@ -11,7 +11,6 @@ from openatlas.api.api_v04.resources.util import to_camel_case
 from openatlas.api.api_v1.entity import (
     get_by_system_class, get_count_by_system_class, get_entity_by_uuid)
 from openatlas.api.api_v1.error_handlers import abort_not_found
-from openatlas.api.api_v1.formatters.lod import format_lod_entities
 from openatlas.api.api_v1.models.util import (
     ExternalReferenceSystemModel, MatchTypeEnum)
 from openatlas.api.api_v1.util.content_negotiation import (

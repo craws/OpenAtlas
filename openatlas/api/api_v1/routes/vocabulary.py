@@ -3,7 +3,6 @@ from uuid import UUID
 
 from flask import g, Response
 from flask_openapi3 import APIBlueprint
-from pydantic import BaseModel, Field
 
 from openatlas.api.api_v1.error_handlers import abort_not_found, \
     register_error_handlers
@@ -13,16 +12,17 @@ from openatlas.api.api_v1.formatters.skos import (
     build_skos_graph, serialize_skos)
 from openatlas.api.api_v1.openapi_tags import vocabulary_tag
 from openatlas.api.api_v1.models.util import (
-    ExtensionsType, OpenAtlasClassEnum, ReferenceModel, TypeCategoryEnum)
+    ReferenceModel, TypeCategoryEnum)
 from openatlas.api.api_v1.responses.vocabulary import \
     vocabulary_flat_response, vocabulary_list_response, \
     vocabulary_skos_response, vocabulary_standard_by_class_response, \
     vocabulary_tree_response
 from openatlas.api.api_v1.models.vocabulary import (
-    LinkedTypeItem, VocabularyFlatItem, VocabularyTreeItem,
+    LinkedTypeItem, VocabularyFlatItem, VocabularyId, VocabularySkosPath,
+    VocabularyTreeItem,
     VocabularyFlatResponse,
     VocabularyStandardQuery,
-    VocabularyTreeResponse, VocabularyStandardResponse)
+    VocabularyTreePath, VocabularyTreeResponse, VocabularyStandardResponse)
 from openatlas.api.api_v1.util.date_util import get_timespan_dict
 from openatlas.api.api_v1.util.files import get_file_item
 from openatlas.database.api import get_vocab_ids_for_case_study
@@ -33,31 +33,6 @@ api_v1_vocabulary = APIBlueprint(
     __name__,
     url_prefix='/api/1/vocabulary')
 register_error_handlers(api_v1_vocabulary)
-
-
-class VocabularyTreePath(BaseModel):
-    openatlas_class: OpenAtlasClassEnum = Field(
-        ...,
-        description="Filter the tree by a specific OpenAtlas class.")
-
-
-class VocabularyId(BaseModel):
-    id: int = Field(
-        ...,
-        description="ID of a type")
-
-
-class VocabularySkosPath(BaseModel):
-    id: int = Field(
-        description="Root ID of the vocabulary hierarchy.")
-    ext: ExtensionsType = Field(
-        description="Serialization format (.ttl, .xml, .json, .nt).",
-        json_schema_extra={
-            "examples": {
-                "turtle": {"summary": "Turtle Format", "value": "ttl"},
-                "xml": {"summary": "RDF/XML Format", "value": "xml"},
-                "json": {"summary": "JSON-LD Format", "value": "json"},
-                "ntriples": {"summary": "N-Triples Format", "value": "nt"}}})
 
 
 def _get_reference_item(link_: Link) -> ReferenceModel:

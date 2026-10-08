@@ -20,7 +20,6 @@ register_error_handlers(api_v1_lod)
 
 @api_v1_lod.get(
     '/entity/<uuid:uuid>',
-    endpoint='entity',
     summary='Get an LOD entity by UUID',
     tags=[lod_tag],
     responses=lod_responses)
@@ -38,7 +37,6 @@ def get_entity(path: EntityPath) -> dict[str, Any] | Response:
 
 @api_v1_lod.get(
     '/entity/<uuid:uuid>.<ext>',
-    endpoint='entity_ext',
     summary='Get an LOD entity by UUID with extension',
     tags=[lod_tag],
     responses=lod_responses)
@@ -57,7 +55,6 @@ def get_entity_ext(path: EntityPathExt) -> dict[str, Any] | Response:
 
 @api_v1_lod.get(
     '/entities/<string:entity_class>',
-    endpoint='entities',
     summary='Get a polymorphic collection of entities',
     tags=[lod_tag],
     responses=lod_collection_responses)
@@ -75,5 +72,5 @@ def get_entities(
     return get_entities_response(
         path,
         query,
-        endpoint='api_v1_lod.entities',
+        endpoint='api_v1_lod.get_entities',
         formatter=format_lod_entities)

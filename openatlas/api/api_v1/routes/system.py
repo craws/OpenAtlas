@@ -33,7 +33,6 @@ class LocaleQuery(BaseModel):
 
 @api_v1_system.get(
     '/info',
-    endpoint='system_info',
     summary="Get presentation frontend configuration",
     responses=system_info_response,
     tags=[system_tag])
@@ -83,7 +82,6 @@ def get_system_info() -> dict[str, Any]:
 
 @api_v1_system.get(
     '/count/entities',
-    endpoint='entity_count',
     summary="Get entity counts",
     responses=entity_count_response,
     tags=[system_tag])
@@ -100,7 +98,6 @@ def get_entity_count(query: EntityCountQuery):
 
 @api_v1_system.get(
     '/classes',
-    endpoint='system_classes',
     summary="Get system classes",
     responses=system_classes_response,
     tags=[system_tag])
@@ -124,7 +121,6 @@ def get_system_classes(query: LocaleQuery) -> dict[str, Any]:
 
 @api_v1_system.get(
     '/crm-properties',
-    endpoint='system_crm_properties',
     summary="Get CIDOC properties",
     responses=system_properties_response,
     tags=[system_tag])

@@ -17,7 +17,6 @@ class LicenseItem(BaseSchema):
         examples=["https://creativecommons.org/licenses/by/4.0/"])
 
 
-# todo: do we need width, height, size?
 class FileItem(BaseSchema):
     id: int
     uuid: UUID
@@ -66,20 +65,6 @@ class FileItem(BaseSchema):
         description="The ID of the parent entity in the archaeological "
                     "hierarchy from which this image is inherited.",
         examples=[12345])
-    #width: int | None = Field(
-    #    default=None,
-    #    description="Image or media width in pixels (null for non-raster "
-    #                "files).",
-    #    examples=[3840])
-    #height: int | None = Field(
-    #    default=None,
-    #    description="Image or media height in pixels (null for non-raster "
-    #                "files).",
-    #    examples=[2160])
-    #size: int | None = Field(
-    #    default=None,
-    #    description="File size in bytes.",
-    #    examples=[5242880])
 
 
 class PublicFileOverviewResponse(BaseSchema):
