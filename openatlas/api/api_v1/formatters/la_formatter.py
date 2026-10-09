@@ -6,7 +6,7 @@ import validators
 from flask import g, url_for
 
 from openatlas.api.api_v1.entity import get_entity_by_id
-from openatlas.api.api_v1.formatters.loud_helpers import (
+from openatlas.api.api_v1.formatters.la_helpers import (
     ACTORS, BIBLIOGRAPHY_AAT, CLASS_TYPES, DIMENSION_ROOTS,
     MIME_CLASSIFICATIONS, UNIT_MAP, alias_name, aat_type, category_aat,
     get_language, identifier, la_type, primary_name, statement,
@@ -145,7 +145,7 @@ def get_date_notes(dates: Dates) -> list[dict[str, Any]]:
         if comment]
 
 
-class LoudFormatter:
+class LaFormatter:
     def __init__(
             self,
             type_references: dict[int, list[Link]] | None = None) -> None:
@@ -790,8 +790,8 @@ class LoudFormatter:
         entity = self.entity
         if record['type'] == 'Activity':
             if timespan := get_timespan(
-                    entity.dates,
-                    f'Timespan of {entity.name}'):
+                entity.dates,
+                f'Timespan of {entity.name}'):
                 record['timespan'] = timespan
             for note in get_date_notes(entity.dates):
                 append(record, 'referred_to_by', note)
@@ -838,7 +838,7 @@ class LoudFormatter:
     def _add_description(self, record: dict[str, Any]) -> None:
         entity = self.entity
         append(record, 'referred_to_by', statement(
-            entity.description,
+            entity.description or '',
             'Description',
             [category_aat('300435416', 'description')]))
         for annotation in AnnotationText.get_by_source_id(entity.id) or []:

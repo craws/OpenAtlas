@@ -1,34 +1,34 @@
 from typing import Any, Final
 
-from openatlas.api.api_v1.formatters.loud_formatter import LoudFormatter
+from openatlas.api.api_v1.formatters.la_formatter import LaFormatter
 from openatlas.api.api_v1.formatters.lod_util import (
     EntityLinks, get_links_for_entities, get_type_references)
 from openatlas.api.api_v1.util.files import (
     resolve_file_paths, resolve_rights_holders)
 from openatlas.models.entity import Entity
 
-LOUD_CONTEXT: Final[str] = 'https://linked.art/ns/v1/linked-art.json'
+LA_CONTEXT: Final[str] = 'https://linked.art/ns/v1/linked-art.json'
 
 
-def format_loud_entity(entity: Entity) -> dict[str, Any]:
-    result = format_loud_entities([entity])
+def format_la_entity(entity: Entity) -> dict[str, Any]:
+    result = format_la_entities([entity])
     return {'@context': result['@context']} | result['@graph'][0]
 
 
-def format_loud_entities(
+def format_la_entities(
         entities: list[Entity],
         pagination: dict[str, Any] | None = None) -> dict[str, Any]:
     if not entities and pagination is None:
-        return {'@context': LOUD_CONTEXT, '@graph': []}
+        return {'@context': LA_CONTEXT, '@graph': []}
     links_data = get_links_for_entities(entities) if entities else {}
     _prefetch_files(links_data)
-    formatter = LoudFormatter(type_references=get_type_references())
+    formatter = LaFormatter(type_references=get_type_references())
     graph = [formatter.format_entity(item) for item in links_data.values()]
     if pagination is None:
-        return {'@context': LOUD_CONTEXT, '@graph': graph}
+        return {'@context': LA_CONTEXT, '@graph': graph}
     result: dict[str, Any] = {
         '@context': [
-            LOUD_CONTEXT,
+            LA_CONTEXT,
             {'hydra': 'http://www.w3.org/ns/hydra/core#'}],
         'id': pagination['id'],
         'type': 'hydra:PartialCollectionView',

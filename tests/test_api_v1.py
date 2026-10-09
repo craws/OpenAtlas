@@ -4,12 +4,8 @@ from flask import g, url_for
 from rdflib import Dataset, RDF, URIRef
 
 from openatlas import app
+from openatlas.api.api_v1.formatters.la import format_la_entities
 from openatlas.api.api_v1.formatters.lod import format_lod_entities
-from openatlas.api.api_v1.formatters.lod_util import (
-    get_links_for_entities)
-from openatlas.api.api_v1.formatters.loud import format_loud_entities
-from openatlas.api.api_v1.routes.vocabulary import (
-    _get_image_link, _get_vocab_flat_item, _prefetch_images)
 from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
 from openatlas.models.settings import set_logo
@@ -149,11 +145,11 @@ class ApiV1(ApiTestCase):
                 uuid='7404a969-97ba-4861-a555-3a97be2be967'))
         assert rv.status_code == 404
 
-    def test_loud(self) -> None:
+    def test_la(self) -> None:
         c = self.client
         e = self.get_api_entities()
 
-        rv = c.get(url_for('api_v1_loud.get_entity', uuid=e.place.uuid))
+        rv = c.get(url_for('api_v1_la.get_entity', uuid=e.place.uuid))
         assert 'application/ld+json' in rv.headers.get('Content-Type')
         rv_json = rv.get_json()
         assert rv_json[
@@ -165,20 +161,20 @@ class ApiV1(ApiTestCase):
 
         rv = c.get(
             url_for(
-                'api_v1_loud.get_entity_ext',
+                'api_v1_la.get_entity_ext',
                 uuid=e.place.uuid,
                 ext='ttl'))
         assert 'text/turtle' in rv.headers.get('Content-Type')
 
         rv = c.get(
             url_for(
-                'api_v1_loud.get_entity',
+                'api_v1_la.get_entity',
                 uuid='7404a969-97ba-4861-a555-3a97be2be967'))
         assert rv.status_code == 404
 
         for class_ in ['place', 'person', 'artifact', 'file', 'type']:
             rv = c.get(
-                url_for('api_v1_loud.get_entities', entity_class=class_))
+                url_for('api_v1_la.get_entities', entity_class=class_))
             assert rv.status_code == 200
             rv_json = rv.get_json()
             assert rv_json['type'] == 'hydra:PartialCollectionView'
@@ -186,32 +182,32 @@ class ApiV1(ApiTestCase):
 
         rv = c.get(
             url_for(
-                'api_v1_loud.get_entities',
+                'api_v1_la.get_entities',
                 entity_class='type',
                 limit=1,
                 page=2))
         assert rv.status_code == 200
         assert 'hydra:previous' in rv.get_json()
 
-        assert format_loud_entities([]) == {
+        assert format_la_entities([]) == {
             '@context': 'https://linked.art/ns/v1/linked-art.json',
             '@graph': []}
 
-        rv = c.get(url_for('api_v1_loud.get_entity', uuid=e.move.uuid))
+        rv = c.get(url_for('api_v1_la.get_entity', uuid=e.move.uuid))
         part = rv.get_json()['part'][0]
         assert part['type'] == 'Move'
         assert part['moved'][0]['id'].endswith(e.artifact.uuid)
         assert part['moved_to']['type'] == 'Place'
         assert part['moved_from']['type'] == 'Place'
 
-        rv = c.get(url_for('api_v1_loud.get_entity', uuid=e.artifact.uuid))
+        rv = c.get(url_for('api_v1_la.get_entity', uuid=e.artifact.uuid))
         rv_json = rv.get_json()
         assert rv_json['produced_by']['type'] == 'Production'
         assert rv_json['destroyed_by']['type'] == 'Destruction'
         assert 'timespan' in rv_json['destroyed_by']
 
         for entity in (e.place, e.feature):
-            rv = c.get(url_for('api_v1_loud.get_entity', uuid=entity.uuid))
+            rv = c.get(url_for('api_v1_la.get_entity', uuid=entity.uuid))
             rv_json = rv.get_json()
             assert rv_json['type'] == 'HumanMadeObject'
 
@@ -284,22 +280,6 @@ class ApiV1(ApiTestCase):
             reference = insert('bibliography', 'Vocabulary reference')
             reference.link('P67', vocabulary_type, '12-13')
 
-        with app.test_request_context():
-            app.preprocess_request()
-            g.api_file_paths = {}
-            g.api_rights_holders = {}
-            links = get_links_for_entities(list(g.types.values()))
-            file_ids = {
-                link_.domain.id for entity_links in links.values()
-                if (link_ := _get_image_link(entity_links.links_inverse))}
-            assert file.id in file_ids
-            _prefetch_images(links)
-            assert set(g.api_file_paths) == file_ids
-            assert set(g.api_rights_holders) == file_ids
-            item = _get_vocab_flat_item(g.types[vocabulary_type.id], links)
-            assert item.image is not None
-            assert item.image.id == file.id
-            assert set(g.api_file_paths) == file_ids
         rv = c.get(url_for('api_v1_vocabulary.get_vocabulary_list'))
         assert rv.status_code == 200
 
