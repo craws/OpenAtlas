@@ -2,8 +2,7 @@ import re
 from collections import defaultdict
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any, Final, Optional
+from typing import Any, Final
 from uuid import UUID
 
 from flask import Response, g, url_for
@@ -18,8 +17,6 @@ from openatlas.api.api_v1.util.content_negotiation import (
     make_lod_response)
 from openatlas.api.api_v1.util.pagination import get_pagination_lod
 from openatlas.database.api import get_wkts_by_ids
-from openatlas.display.image_processing import (
-    check_iiif_activation, check_iiif_file_exist)
 from openatlas.models.entity import Entity, Link
 
 DATE_PARTS_RE: Final = re.compile(
@@ -57,41 +54,6 @@ def date_to_utc_iso_str(date: Any) -> str | None:
         return (f'{year}-{month}-'
                 f'{day}T{hour}:{minute}:{second}Z')  # pragma: no cover
     return f'{year}-{month}-{day}'
-
-
-def get_license_type(entity: Entity) -> Optional[Entity]:
-    license_ = None
-    for type_ in entity.types:
-        if g.types[type_.root[0]].name == 'License':
-            license_ = type_
-            break
-    return license_
-
-
-def get_iiif_manifest_and_path(
-        img_id: int,
-        file_paths: dict[int, Path] | None = None) -> dict[str, str]:
-    iiif_manifest = ''
-    iiif_base_path = ''
-    if not check_iiif_activation():
-        return {'IIIFManifest': iiif_manifest, 'IIIFBasePath': iiif_base_path}
-    file_ = (file_paths if file_paths is not None else g.files).get(img_id)
-    if file_paths is None:
-        exists = check_iiif_file_exist(img_id)
-    elif g.settings['iiif_conversion']:
-        exists = (Path(g.settings['iiif_path']) / f'{img_id}.tiff').is_file()
-    else:
-        exists = file_ is not None
-    if exists:
-        iiif_manifest = url_for(
-            'api.iiif_manifest',
-            version=g.settings['iiif_version'],
-            id_=img_id,
-            _external=True)
-        if file_:
-            iiif_base_path = (
-                f"{g.settings['iiif_url']}{img_id}{file_.suffix}")
-    return {'IIIFManifest': iiif_manifest, 'IIIFBasePath': iiif_base_path}
 
 
 def is_float(value: str) -> bool:

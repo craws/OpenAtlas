@@ -12,13 +12,13 @@ from openatlas.api.api_v1.openapi_tags import file_tag
 from openatlas.api.api_v1.responses.files import (
     display_file_response, public_files_response, thumbnail_response)
 from openatlas.api.api_v1.util.files import (
-    check_file_access, get_file_entity, get_file_item, get_file_path,
-    get_mime_type, get_multiple_file_paths, get_public_share_yes_id,
-    get_valid_license_ids)
+    check_file_access, get_display_extensions, get_file_entity,
+    get_file_item, get_file_path, get_mime_type, get_public_share_yes_id,
+    get_valid_license_ids, iiif_file_exists, resolve_file_paths,
+    resolve_rights_holders)
 from openatlas.api.api_v1.util.pagination import get_pagination_lod
 from openatlas.database.api import get_public_files_api
-from openatlas.display.image_processing import (
-    check_iiif_activation, check_iiif_file_exist)
+from openatlas.display.image_processing import check_iiif_activation
 from openatlas.models.entity import Entity
 
 api_v1_files = APIBlueprint(
@@ -35,10 +35,10 @@ def get_iiif_redirect_url(
     if not g.settings.get('iiif') or not check_iiif_activation():
         return None  # pragma: no cover
 
-    if file_path.suffix.lower() not in g.display_file_ext:
+    if file_path.suffix.lower() not in get_display_extensions():
         return None # pragma: no cover
 
-    if not check_iiif_file_exist(file_id):
+    if not iiif_file_exists(file_id):
         return None # pragma: no cover
 
     iiif_ext = '.tiff' if g.settings.get('iiif_conversion') \
@@ -118,10 +118,10 @@ def get_public_files(query: PublicFilesQuery):
         query.limit,
         (query.page - 1) * query.limit)
     entities = [Entity(row) for row in rows]
-    file_paths = get_multiple_file_paths(
-        [entity.id for entity in entities], app.config['UPLOAD_PATH'])
+    resolve_file_paths([entity.id for entity in entities])
+    resolve_rights_holders([entity.id for entity in entities])
     pagination = get_pagination_lod(
         'api_v1_files.get_public_files', total, query.page, query.limit)
     return PublicFileOverviewResponse(
-        data=[get_file_item(entity, file_paths) for entity in entities],
+        data=[get_file_item(entity) for entity in entities],
         **pagination).model_dump(by_alias=True)

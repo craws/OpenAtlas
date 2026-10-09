@@ -1,6 +1,5 @@
 import ast
 import hashlib
-import mimetypes
 from typing import Any
 
 import validators
@@ -13,9 +12,11 @@ from openatlas.api.api_v1.formatters.loud_helpers import (
     get_language, identifier, la_type, primary_name, statement,
     unique_identifier)
 from openatlas.api.api_v1.formatters.lod_util import (
-    EntityLinks, date_to_utc_iso_str, entity_uri, get_iiif_manifest_and_path,
-    get_license_type, get_type_references, is_float)
-from openatlas.display.util2 import get_file_path
+    EntityLinks, date_to_utc_iso_str, entity_uri, get_type_references, is_float)
+from openatlas.api.api_v1.util.files import (
+    get_cached_file_path, get_file_size, get_iiif_manifest_and_path,
+    get_license_type, get_mime_type,
+    resolve_rights_holders)
 from openatlas.models.annotation import AnnotationText
 from openatlas.models.dates import Dates
 from openatlas.models.entity import Entity, Link
@@ -204,7 +205,7 @@ class LoudFormatter:
         for link_ in data.links_inverse:
             if link_.property.code == 'P67' \
                     and link_.domain.class_.name == 'file':
-                if g.files.get(link_.domain.id):
+                if get_cached_file_path(link_.domain.id):
                     file_links.append(link_)
                 continue
             self._process_link(link_, record, True)
@@ -650,7 +651,7 @@ class LoudFormatter:
             shown_by = []
             for link_ in file_links:
                 file_ = link_.domain
-                mime_type, _ = mimetypes.guess_type(g.files[file_.id])
+                mime_type = get_mime_type(get_cached_file_path(file_.id))
                 digital_object = {
                     'type': 'DigitalObject',
                     '_label': file_.name,
@@ -673,7 +674,7 @@ class LoudFormatter:
                     'digitally_shown_by': shown_by})
             for item in self._iiif_subject_of(file_links):
                 append(record, 'subject_of', item)
-        if entity.class_.name == 'file' and g.files.get(entity.id):
+        if entity.class_.name == 'file' and get_cached_file_path(entity.id):
             self._add_file_details(record)
 
     def _digital_details(
@@ -686,7 +687,7 @@ class LoudFormatter:
             for prefix, classification in MIME_CLASSIFICATIONS.items():
                 if prefix in mime_type:
                     details['classified_as'] = list(classification)
-        file_path = get_file_path(file_.id)
+        file_path = get_cached_file_path(file_.id)
         if file_path and file_path.stem:
             details['access_point'] = [{
                 'id': url_for(
@@ -699,7 +700,7 @@ class LoudFormatter:
         copyright_ = aat_type('300435434', 'copyright/licensing statement')
         referred_to_by.extend(
             statement(holder.name, 'Rights holder', [copyright_])
-            for holder in file_.license_holder or [])
+            for holder in self._rights_holders(file_.id, 'license_holder'))
         if referred_to_by:
             details['referred_to_by'] = referred_to_by
         return details
@@ -721,25 +722,26 @@ class LoudFormatter:
 
     def _add_file_details(self, record: dict[str, Any]) -> None:
         entity = self.entity
-        file_size = entity.get_file_size()
-        value, unit = file_size.split()
-        number = float(value)
-        append(record, 'dimension', {
-            'type': 'Dimension',
-            '_label': file_size,
-            'classified_as': [aat_type('300265863', 'File Size')],
-            'value': int(number) if number.is_integer() else number,
-            'unit': {
-                'id': 'https://vocab.getty.edu/aat/300265870',
-                'type': 'MeasurementUnit',
-                '_label': UNIT_MAP[unit]}})
-        mime_type, _ = mimetypes.guess_type(g.files[entity.id])
+        file_size = get_file_size(entity.id)
+        if file_size != 'N/A':
+            value, unit = file_size.split()
+            number = float(value)
+            append(record, 'dimension', {
+                'type': 'Dimension',
+                '_label': file_size,
+                'classified_as': [aat_type('300265863', 'File Size')],
+                'value': int(number) if number.is_integer() else number,
+                'unit': {
+                    'id': 'https://vocab.getty.edu/aat/300265870',
+                    'type': 'MeasurementUnit',
+                    '_label': UNIT_MAP[unit]}})
+        mime_type = get_mime_type(get_cached_file_path(entity.id))
         details = self._digital_details(entity, mime_type)
         for key in ('classified_as', 'referred_to_by'):
             for item in details.pop(key, []):
                 append(record, key, item)
         record.update(details)
-        if creators := entity.creator:
+        if creators := self._rights_holders(entity.id, 'creator'):
             record['created_by'] = {
                 'type': 'Creation',
                 '_label': f'Creation of {entity.name}',
@@ -748,6 +750,10 @@ class LoudFormatter:
                     'type':
                         'Person' if creator.class_ == 'person' else 'Group',
                     '_label': creator.name} for creator in creators]}
+
+    @staticmethod
+    def _rights_holders(id_: int, key: str) -> list[Any]:
+        return resolve_rights_holders([id_])[id_][key]
 
     @staticmethod
     def _iiif_subject_of(file_links: list[Link]) -> list[dict[str, Any]]:

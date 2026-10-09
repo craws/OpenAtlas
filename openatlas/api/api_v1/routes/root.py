@@ -27,9 +27,12 @@ def api_v1_index() -> dict[str, Any]:
     response = ApiIndexResponse(
         name="OpenAtlas API",
         version=app.config['API_VERSIONS'].get('1', '1'),
-        openapi_schema=url_for('api_v1_root.api_v1_index', _external=True) \
-                       + "docs/openapi.json",
-        documentation=url_for('custom_swagger_ui', _external=True),
+        openapi_schema=url_for(
+            'api_v1_root.api_v1_index', _external=True) + "docs/openapi.json",
+        documentation=url_for(
+            'api_reference',
+            doc_type='swagger',
+            _external=True),
         manual=url_for(
             'static',
             filename='manual/technical/api.html',

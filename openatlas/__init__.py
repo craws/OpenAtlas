@@ -121,10 +121,11 @@ def before_request() -> Response | None:
 
 
 def setup_files() -> None:
-    if request.endpoint == 'api_v1_files.get_public_files':
+    if request.path.startswith('/api/1/') or \
+            (request.endpoint or "") in 'display_file':
         g.file_info = {}
-        return
-    if (request.endpoint or "") in 'display_file':
+        g.api_file_paths = {}  # Per request caches, see api_v1/util/files.py
+        g.api_rights_holders = {}
         return
     from openatlas.models.rights_holder import RightsHolder
     g.files = {}

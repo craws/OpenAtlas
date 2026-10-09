@@ -50,15 +50,22 @@ class RightsHolder:
         db.rights_holder_delete(id_)
 
     @staticmethod
-    def get_rights_holder_links() -> dict[int, dict[str, list[int]]]:
-        return db.get_rights_holder_links()
+    def get_rights_holder_links(
+            entity_ids: list[int] | None = None) \
+            -> dict[int, dict[str, list[int]]]:
+        return db.get_rights_holder_links(entity_ids)
 
     @staticmethod
-    def get_rights_holder_information() -> dict[
+    def get_rights_holder_information(
+            entity_ids: list[int] | None = None) -> dict[
         int,
         dict[str, list[RightsHolder]]]:
-        rights_holder_dict = {rh.id: rh for rh in g.rights_holder}
-        rights_holder_links = RightsHolder.get_rights_holder_links()
+        if entity_ids is not None and not entity_ids:
+            return {}
+        rights_holders = g.rights_holder if hasattr(g, 'rights_holder') \
+            else RightsHolder.get_rights_holders()
+        rights_holder_dict = {rh.id: rh for rh in rights_holders}
+        rights_holder_links = RightsHolder.get_rights_holder_links(entity_ids)
         result: dict[int, dict[str, list[RightsHolder]]] = {}
         for entity_id, links in rights_holder_links.items():
             result[entity_id] = {

@@ -5,7 +5,11 @@ from rdflib import Dataset, RDF, URIRef
 
 from openatlas import app
 from openatlas.api.api_v1.formatters.lod import format_lod_entities
+from openatlas.api.api_v1.formatters.lod_util import (
+    get_links_for_entities)
 from openatlas.api.api_v1.formatters.loud import format_loud_entities
+from openatlas.api.api_v1.routes.vocabulary import (
+    _get_image_link, _get_vocab_flat_item, _prefetch_images)
 from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
 from openatlas.models.settings import set_logo
@@ -279,6 +283,23 @@ class ApiV1(ApiTestCase):
                 type_id=self.precision_type.subs[0])
             reference = insert('bibliography', 'Vocabulary reference')
             reference.link('P67', vocabulary_type, '12-13')
+
+        with app.test_request_context():
+            app.preprocess_request()
+            g.api_file_paths = {}
+            g.api_rights_holders = {}
+            links = get_links_for_entities(list(g.types.values()))
+            file_ids = {
+                link_.domain.id for entity_links in links.values()
+                if (link_ := _get_image_link(entity_links.links_inverse))}
+            assert file.id in file_ids
+            _prefetch_images(links)
+            assert set(g.api_file_paths) == file_ids
+            assert set(g.api_rights_holders) == file_ids
+            item = _get_vocab_flat_item(g.types[vocabulary_type.id], links)
+            assert item.image is not None
+            assert item.image.id == file.id
+            assert set(g.api_file_paths) == file_ids
         rv = c.get(url_for('api_v1_vocabulary.get_vocabulary_list'))
         assert rv.status_code == 200
 
@@ -554,6 +575,7 @@ class ApiV1(ApiTestCase):
         with app.test_request_context():
             app.preprocess_request()
             rights_holder_ids = [rh.id for rh in g.rights_holder]
+            holder_names = {rh.name for rh in g.rights_holder}
 
         logo_path = Path(app.root_path) / 'static' / 'images' / 'layout'
         public_type = get_hierarchy('Public sharing allowed')

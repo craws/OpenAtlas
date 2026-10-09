@@ -8,12 +8,11 @@ from flask_babel import gettext as _
 
 from openatlas.api.api_v1.entity import get_entity_by_id
 from openatlas.api.api_v1.error_handlers import abort_file_not_found
-from openatlas.api.api_v1.formatters.lod_util import get_license_type
 from openatlas.api.api_v1.models.files import LicenseItem
-from openatlas.api.api_v1.util.files import get_license_item
-from openatlas.display.image_processing import check_iiif_file_exist, \
-    get_actual_mime
-from openatlas.display.util2 import get_file_path
+from openatlas.api.api_v1.util.files import (
+    get_cached_file_path, get_license_item, get_license_type, iiif_file_exists,
+    resolve_rights_holders)
+from openatlas.display.image_processing import get_actual_mime
 from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
 
@@ -91,16 +90,17 @@ class IIIFBuilder:
             id=entity.id,
             version=version,
             _external=True)
+        self.file_path = get_cached_file_path(entity.id)
         self.image_url, self.image_api = self._get_image_metadata()
-        self.mime_type = get_actual_mime(get_file_path(entity.id))
+        self.mime_type = get_actual_mime(self.file_path)
         self.common_meta = self._get_common_metadata()
 
     def _get_image_metadata(self) -> Tuple[str, dict[str, Any]]:
         if self.entity.class_.group.get('name') != 'file' and \
-                not check_iiif_file_exist(self.entity.id):
+                not iiif_file_exists(self.entity.id):
             abort_file_not_found(self.entity.id)  # pragma: no cover
         ext = '.tiff' if g.settings.get('iiif_conversion') else \
-            self.entity.get_file_ext()
+            (self.file_path.suffix if self.file_path else 'N/A')
         image_url = f"{g.settings.get('iiif_url', '')}{self.entity.id}{ext}"
         try:
             resp = requests.get(f"{image_url}/info.json", timeout=30)
@@ -113,8 +113,9 @@ class IIIFBuilder:
         items = []
         lic = get_license_info(self.entity)
         attribution = lic.name if lic else ''
-        if self.entity.license_holder:
-            holders = ', '.join([lh.name for lh in self.entity.license_holder])
+        rights = resolve_rights_holders([self.entity.id])[self.entity.id]
+        if rights['license_holder']:
+            holders = ', '.join([lh.name for lh in rights['license_holder']])
             attribution = (
                 f"{attribution}, {holders}" if attribution else holders)
 
@@ -127,8 +128,8 @@ class IIIFBuilder:
                     "label": _('source').capitalize(),
                     "value": f"<a href={url} target=_blank>{text}</a>"})
 
-        if self.entity.creator:
-            for c in self.entity.creator:
+        if rights['creator']:
+            for c in rights['creator']:
                 items.append({
                     "label": _('creator').capitalize(),
                     "value": c.name})
