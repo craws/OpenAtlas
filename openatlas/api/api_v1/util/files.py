@@ -5,8 +5,11 @@ import os
 from collections import defaultdict
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Optional, cast
+from typing import TYPE_CHECKING, Any, Optional, cast
 from uuid import UUID
+
+if TYPE_CHECKING:
+    from openatlas.api.api_v1.formatters.lod_util import EntityLinks
 
 from flask import g, url_for
 
@@ -154,12 +157,11 @@ def get_multiple_file_paths(
         upload_path: Path) -> dict[int, Path]:
     if not file_ids:
         return {}
-    extensions = _file_extensions()
     results = {}
     missing_ids = set(file_ids)
 
     for id_ in list(missing_ids):
-        for ext in extensions:
+        for ext in _file_extensions():
             candidate = upload_path / f"{id_}{ext}"
             if candidate.is_file():
                 results[id_] = candidate
@@ -210,6 +212,20 @@ def resolve_rights_holders(
                 id_,
                 {'creator': [], 'license_holder': []})
     return {id_: cache[id_] for id_ in ids}
+
+
+def prefetch_files(links_data: dict[int, EntityLinks]) -> None:
+    file_ids = set()
+    for item in links_data.values():
+        if item.entity.class_.name == 'file':
+            file_ids.add(item.entity.id)
+        file_ids.update(
+            link_.domain.id for link_ in item.links_inverse
+            if link_.property.code == 'P67'
+            and link_.domain.class_.name == 'file')
+    if file_ids:
+        resolve_file_paths(file_ids)
+        resolve_rights_holders(file_ids)
 
 
 def get_display_extensions() -> list[str]:

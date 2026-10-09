@@ -2,9 +2,8 @@ from typing import Any, Final
 
 from openatlas.api.api_v1.formatters.la_formatter import LaFormatter
 from openatlas.api.api_v1.formatters.lod_util import (
-    EntityLinks, get_links_for_entities, get_type_references)
-from openatlas.api.api_v1.util.files import (
-    resolve_file_paths, resolve_rights_holders)
+    get_links_for_entities, get_type_references)
+from openatlas.api.api_v1.util.files import prefetch_files
 from openatlas.models.entity import Entity
 
 LA_CONTEXT: Final[str] = 'https://linked.art/ns/v1/linked-art.json'
@@ -21,7 +20,7 @@ def format_la_entities(
     if not entities and pagination is None:
         return {'@context': LA_CONTEXT, '@graph': []}
     links_data = get_links_for_entities(entities) if entities else {}
-    _prefetch_files(links_data)
+    prefetch_files(links_data)
     formatter = LaFormatter(type_references=get_type_references())
     graph = [formatter.format_entity(item) for item in links_data.values()]
     if pagination is None:
@@ -41,17 +40,3 @@ def format_la_entities(
     result['hydra:last'] = pagination['last']
     result['@graph'] = graph
     return result
-
-
-def _prefetch_files(links_data: dict[int, EntityLinks]) -> None:
-    file_ids = set()
-    for item in links_data.values():
-        if item.entity.class_.name == 'file':
-            file_ids.add(item.entity.id)
-        file_ids.update(
-            link_.domain.id for link_ in item.links_inverse
-            if link_.property.code == 'P67'
-            and link_.domain.class_.name == 'file')
-    if file_ids:
-        resolve_file_paths(file_ids)
-        resolve_rights_holders(file_ids)

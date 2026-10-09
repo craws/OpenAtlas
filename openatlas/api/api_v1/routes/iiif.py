@@ -1,26 +1,17 @@
 from flask_openapi3 import APIBlueprint
 
 from openatlas.api.api_v1.error_handlers import (
-    abort_id_does_not_exist,
-    register_error_handlers)
+    abort_id_does_not_exist, register_error_handlers)
 from openatlas.api.api_v1.models.iiif import (
-    AnnotationIiifPath,
-    FileIiifPath)
+    AnnotationIiifPath, FileIiifPath)
 from openatlas.api.api_v1.openapi_tags import iiif_tag
 from openatlas.api.api_v1.responses.iiif import (
-    iiif_annotation_list_response,
-    iiif_annotation_response,
-    iiif_canvas_response,
-    iiif_image_response,
-    iiif_manifest_response)
+    iiif_annotation_list_response, iiif_annotation_response,
+    iiif_canvas_response, iiif_image_response, iiif_manifest_response)
 from openatlas.api.api_v1.util.files import check_file_access, get_file_entity
 from openatlas.api.api_v1.util.iiif_manifest import (
-    build_annotation,
-    build_annotation_list,
-    build_canvas,
-    build_image,
-    build_manifest_v2,
-    build_manifest_v3)
+    build_annotation, build_annotation_list, build_canvas, build_image,
+    build_manifest_v2, build_manifest_v3)
 from openatlas.database.annotation import get_annotation_image_by_id
 from openatlas.models.annotation import AnnotationImage
 

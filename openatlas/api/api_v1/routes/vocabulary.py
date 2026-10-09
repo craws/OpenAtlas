@@ -19,13 +19,10 @@ from openatlas.api.api_v1.responses.vocabulary import \
     vocabulary_tree_response
 from openatlas.api.api_v1.models.vocabulary import (
     LinkedTypeItem, VocabularyFlatItem, VocabularyId, VocabularySkosPath,
-    VocabularyTreeItem,
-    VocabularyFlatResponse,
-    VocabularyStandardQuery,
+    VocabularyTreeItem, VocabularyFlatResponse, VocabularyStandardQuery,
     VocabularyTreePath, VocabularyTreeResponse, VocabularyStandardResponse)
 from openatlas.api.api_v1.util.date_util import get_timespan_dict
-from openatlas.api.api_v1.util.files import (
-    get_file_item, resolve_file_paths, resolve_rights_holders)
+from openatlas.api.api_v1.util.files import get_file_item, prefetch_files
 from openatlas.database.api import get_vocab_ids_for_case_study
 from openatlas.models.entity import Entity, Link
 
@@ -53,14 +50,6 @@ def _get_image_link(links: list[Link]) -> Link | None:
          if link_.domain.class_.name == 'file'
          and link_.property.code == 'P67'),
         None)
-
-
-def _prefetch_images(links: dict[int, EntityLinks]) -> None:
-    file_ids = [
-        link_.domain.id for entity_links in links.values()
-        if (link_ := _get_image_link(entity_links.links_inverse))]
-    resolve_file_paths(file_ids)
-    resolve_rights_holders(file_ids)
 
 
 def _get_vocab_flat_item(
@@ -105,7 +94,7 @@ def get_vocabulary_list() -> dict[str, Any]:
     """Retrieves a flat list of all OpenAtlas types."""
     vocab_dict: dict[str, VocabularyFlatItem] = {}
     links = get_links_for_entities(list(g.types.values()))
-    _prefetch_images(links)
+    prefetch_files(links)
     for id_, type_ in g.types.items():
         vocab_dict[str(id_)] = _get_vocab_flat_item(type_, links)
     return VocabularyFlatResponse(data=vocab_dict).model_dump(by_alias=True)
@@ -122,7 +111,7 @@ def get_vocabulary_item(path: VocabularyId) -> dict[str, Any]:
     if not type_:
         abort_not_found(path.id)
     links = get_links_for_entities([type_])
-    _prefetch_images(links)
+    prefetch_files(links)
     return _get_vocab_flat_item(type_, links).model_dump(by_alias=True)
 
 

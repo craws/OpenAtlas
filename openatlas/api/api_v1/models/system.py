@@ -1,6 +1,6 @@
 from typing import Dict
 
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from openatlas.api.api_v1.models.util import BaseSchema
 
@@ -88,3 +88,9 @@ class PropertyDetail(BaseSchema):
 
 class SystemPropertiesResponse(BaseSchema):
     properties: Dict[str, PropertyDetail]
+
+
+class LocaleQuery(BaseModel):
+    locale: str = Field(
+        "en",
+        description="Choose language for labels (e.g., 'en', 'de').")

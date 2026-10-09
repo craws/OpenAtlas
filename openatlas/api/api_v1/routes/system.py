@@ -2,20 +2,18 @@ from typing import Any
 
 from flask import g, session
 from flask_openapi3 import APIBlueprint
-from pydantic import BaseModel, Field
 
 from openatlas import app
 from openatlas.api.api_v1.error_handlers import register_error_handlers
 from openatlas.api.api_v1.models.system import EntityCountQuery, \
-    EntityCountResponse, IiifInfo, ImageProcessingInfo, MapConfig, \
-    PropertyDetail, SystemClassItem, SystemClassesResponse, \
+    EntityCountResponse, IiifInfo, ImageProcessingInfo, LocaleQuery, \
+    MapConfig, PropertyDetail, SystemClassItem, SystemClassesResponse, \
     SystemInfoResponse, SystemPropertiesResponse
 from openatlas.api.api_v1.models.util import OpenAtlasClassEnum
 from openatlas.api.api_v1.openapi_tags import system_tag
-from openatlas.api.api_v1.responses.system import (entity_count_response,
-                                                   system_classes_response,
-                                                   system_info_response,
-                                                   system_properties_response)
+from openatlas.api.api_v1.responses.system import (
+    entity_count_response, system_classes_response, system_info_response,
+    system_properties_response)
 from openatlas.database.api import get_overview_counts_by_case_study
 
 api_v1_system = APIBlueprint(
@@ -23,12 +21,6 @@ api_v1_system = APIBlueprint(
     __name__,
     url_prefix='/api/1/system')
 register_error_handlers(api_v1_system)
-
-
-class LocaleQuery(BaseModel):
-    locale: str = Field(
-        "en",
-        description="Choose language for labels (e.g., 'en', 'de').")
 
 
 @api_v1_system.get(
