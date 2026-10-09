@@ -6,13 +6,11 @@
 # To run the script from project root:
 # python3 install/import_scripts/openatlas/merge.py
 
-# Work in progress, to do:
+# Work in progress, works for MEDCON project but likely needed for others:
 # * Annotations
-#
-# Later
-# * Offer manual mapping for e.g. duplicates
 # * New reference systems, add possible additional classes
 # * New case studies (would have to be subs of import case study)
+# * Offer manual mapping for e.g. duplicates
 
 import os
 import pathlib
