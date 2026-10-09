@@ -7,8 +7,7 @@
 # python3 install/import_scripts/openatlas/merge.py
 
 # Work in progress, to do:
-# * File information
-# * Annotations?
+# * Annotations
 #
 # Later
 # * Offer manual mapping for e.g. duplicates
@@ -30,7 +29,10 @@ from openatlas.database import entity as db
 from openatlas.database.checks import delete_link_duplicates
 from openatlas.database.entity import set_required
 from openatlas.database.imports import import_data
+from openatlas.database.rights_holder import insert_rights_holder, \
+    insert_rights_holder_link
 from openatlas.models.entity import Entity, insert
+from openatlas.models.rights_holder import RightsHolder
 
 DATABASE_NAME = 'openatlas_demo'  # The database to fetch data from
 PROJECT_NAME = 'MEDCON'  # Will also be added as case study
@@ -56,6 +58,7 @@ cursor = connection.cursor(cursor_factory=extras.DictCursor)
 id_map: dict[int, int] = {}  # Map imported entity ids to existing ones
 id_added: list[int] = []  # Track already inserted entities
 file_ids: list[int] = []  # Track file ids for copying
+rights_holder_map: dict[int, int] = {}  # Map right holders ids
 
 
 def cleanup_before(id_: int) -> None:
@@ -383,17 +386,32 @@ def add_files() -> None:
                     f'{id_map[int(pathlib.Path(entry).stem)]}'
                     f'{pathlib.Path(entry).suffix}')
                 print(f'File copy of: {entry.name}')
-    # cursor.execute(
-    #    "SELECT name, class, description FROM model.rights_holder;")
-    # for row in list(cursor):
-    #    g.cursor.execute()
-    # cursor.execute(
-    #    """
-    #    SELECT entity_idm rights_holder_id, description
-    #    FROM model.rights_holder_file;
-    #    """)
-    # for row in list(cursor):
-    #    g.cursor.execute()
+    rights_holders = RightsHolder.get_rights_holder()
+    cursor.execute(
+        "SELECT id, name, class, description FROM model.rights_holder;")
+    for row in list(cursor):
+        exists = False
+        for holder in rights_holders:
+            if holder.name == row['name']:
+                rights_holder_map[row['id']] = holder.id
+                exists = True
+                break
+        if not exists:
+            id_ = insert_rights_holder({
+                'name': row['name'],
+                'role': row['class'],
+                'description': row['description']})
+            rights_holder_map[row['id']] = id_
+    cursor.execute(
+        """
+        SELECT entity_id, rights_holder_id, description
+        FROM model.rights_holder_file;
+        """)
+    for row in list(cursor):
+        insert_rights_holder_link(
+            entity_id=id_map[row['entity_id']],
+            rights_holder_id=rights_holder_map[row['rights_holder_id']],
+            role=row['description'])
 
 
 with app.test_request_context():
