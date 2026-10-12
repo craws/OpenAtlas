@@ -395,6 +395,9 @@ def add_files() -> None:
                 exists = True
                 break
         if not exists:
+            if not row['class']:
+                print(f'Missing rights holder class to person: {row['name']}')
+                row['class'] = 'person'
             id_ = insert_rights_holder({
                 'name': row['name'],
                 'role': row['class'],
