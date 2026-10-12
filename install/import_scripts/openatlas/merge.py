@@ -6,7 +6,8 @@
 # To run the script from project root:
 # python3 install/import_scripts/openatlas/merge.py
 
-# Work in progress, works for MEDCON project but likely needed for others:
+# Work in progress:
+# * Value types doesn't seem to be imported
 # * Annotations
 # * New reference systems, add possible additional classes
 # * New case studies (would have to be subs of import case study)
@@ -32,13 +33,14 @@ from openatlas.database.rights_holder import insert_rights_holder, \
 from openatlas.models.entity import Entity, insert
 from openatlas.models.rights_holder import RightsHolder
 
-DATABASE_NAME = 'openatlas_demo'  # The database to fetch data from
-PROJECT_NAME = 'MEDCON'  # Will also be added as case study
-PROJECT_DESCRIPTION = \
-    'Mapping Medieval Conflicts (MEDCON). A digital approach towards ' \
-    'political dynamics in the pre-modern period.'
+DATABASE_NAME = 'openatlas_demo_dev'  # The database to fetch data from
+PROJECT_NAME = 'THANADOS'  # Will also be added as case study
+PROJECT_DESCRIPTION = (
+    'THANADOS (The Anthropological and Archaeological Database of '
+    'Sepultures) deals with the digital collection and presentation of '
+    'Early Medieval cemeteries in the area of present day Austria.')
 IMPORT_USER_ID = 1
-FILES_PATH = pathlib.Path('/home/alex/Desktop/medcon_files')
+FILES_PATH = pathlib.Path('')
 
 
 def connect() -> Any:
