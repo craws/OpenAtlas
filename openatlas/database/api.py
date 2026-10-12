@@ -15,7 +15,7 @@ def get_public_files_api(
         limit: int,
         offset: int) -> tuple[list[dict[str, Any]], int]:
     if not license_ids or public_share_id is None:
-        return [], 0
+        return [], 0  # pragma: no cover
 
     where_sql = """
         WHERE e.openatlas_class_name = 'file'

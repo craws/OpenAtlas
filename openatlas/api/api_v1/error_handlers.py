@@ -64,7 +64,7 @@ def register_error_handlers(api_v1) -> None:
 def abort_not_found(uuid: UUID | str | int) -> NoReturn:
     details = {
         'provided_uuid': str(uuid),
-        'hint': 'Check if the UUID is correct '
+        'hint': 'Check if the UUID or ID is correct '
                 'and the entity has not been deleted.'}
     abort_with_error(
         404,

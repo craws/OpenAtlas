@@ -64,7 +64,15 @@ def is_float(value: str) -> bool:
         return False
 
 
-def get_links_for_entities(entities: list[Entity]) -> dict[int, EntityLinks]:
+def get_links_for_entities(
+        entities: list[Entity],
+        codes: str | list[str] | None = None,
+        classes: list[str] | None = None,
+        inverse_codes: str | list[str] | None = None,
+        inverse_classes: list[str] | None = None,
+        include_forward: bool = True,
+        include_inverse: bool = True,
+        include_geometries: bool = True) -> dict[int, EntityLinks]:
     entities_with_links: dict[int, EntityLinks] = {}
     preloaded = {e.id: e for e in entities}
     preloaded.update(g.types)
@@ -73,21 +81,29 @@ def get_links_for_entities(entities: list[Entity]) -> dict[int, EntityLinks]:
     for entity in entities:
         entities_with_links[entity.id] = EntityLinks(entity=entity)
 
-    geom_ids = set(e.id for e in entities)
-    for link_ in Entity.get_links_of_entities(
-            [entity.id for entity in entities],
-            preloaded_entities=preloaded):
-        entities_with_links[link_.domain.id].links.append(link_)
-        preloaded[link_.range.id] = link_.range
-        if link_.property.code == 'P53':
-            geom_ids.add(link_.range.id)
+    entity_ids = [entity.id for entity in entities]
+    geom_ids = set(entity_ids) if include_geometries else set()
 
-    for link_ in Entity.get_links_of_entities(
-            [entity.id for entity in entities],
-            inverse=True,
-            preloaded_entities=preloaded):
-        entities_with_links[link_.range.id].links_inverse.append(link_)
-        preloaded[link_.domain.id] = link_.domain
+    if include_forward:
+        for link_ in Entity.get_links_of_entities(
+                entity_ids,
+                codes=codes,
+                classes=classes,
+                preloaded_entities=preloaded):
+            entities_with_links[link_.domain.id].links.append(link_)
+            preloaded[link_.range.id] = link_.range
+            if include_geometries and link_.property.code == 'P53':
+                geom_ids.add(link_.range.id)
+
+    if include_inverse:
+        for link_ in Entity.get_links_of_entities(
+                entity_ids,
+                codes=inverse_codes or codes,
+                classes=inverse_classes or classes,
+                inverse=True,
+                preloaded_entities=preloaded):
+            entities_with_links[link_.range.id].links_inverse.append(link_)
+            preloaded[link_.domain.id] = link_.domain
 
     if geom_ids:
         wkts = get_wkts_by_ids(list(geom_ids))

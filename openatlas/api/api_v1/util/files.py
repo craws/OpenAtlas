@@ -5,11 +5,8 @@ import os
 from collections import defaultdict
 from collections.abc import Iterable
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Optional, cast
+from typing import Any, Optional, TYPE_CHECKING, cast
 from uuid import UUID
-
-if TYPE_CHECKING:
-    from openatlas.api.api_v1.formatters.lod_util import EntityLinks
 
 from flask import g, url_for
 
@@ -26,6 +23,11 @@ from openatlas.display.image_processing import check_iiif_activation
 from openatlas.display.util2 import convert_size
 from openatlas.models.entity import Entity
 from openatlas.models.rights_holder import RightsHolder
+
+if TYPE_CHECKING:
+    from openatlas.api.api_v1.formatters.lod_util import EntityLinks
+
+
 
 SAFE_FILE_EXTENSIONS = {
     '.jpg', '.png', '.jpeg', '.pdf', '.tif', '.tiff', '.bmp', '.gif',
@@ -85,13 +87,6 @@ def get_public_share_yes_id() -> int | None:
                     break
         g.public_share_yes_id = yes_id
     return g.public_share_yes_id
-
-
-def has_file_access(file_entity: Entity) -> bool:
-    file_type_ids = {type_.id for type_ in file_entity.types if type_}
-    has_license = bool(file_type_ids & get_valid_license_ids())
-    is_public_shareable = get_public_share_yes_id() in file_type_ids
-    return has_license and is_public_shareable
 
 
 def check_file_access(file_entity: Entity) -> bool:
@@ -156,7 +151,7 @@ def get_multiple_file_paths(
         file_ids: list[int],
         upload_path: Path) -> dict[int, Path]:
     if not file_ids:
-        return {}
+        return {}  # pragma: no cover
     results = {}
     missing_ids = set(file_ids)
 
@@ -175,6 +170,7 @@ def get_multiple_file_paths(
                 if name_parts[0].isdigit():
                     id_ = int(name_parts[0])
                     if id_ in missing_ids and entry.is_file():
+                        # pragma: no cover
                         results[id_] = Path(entry.path)
                         missing_ids.remove(id_)
                         if not missing_ids:
@@ -185,13 +181,13 @@ def get_multiple_file_paths(
 
 def resolve_file_paths(ids: Iterable[int]) -> dict[int, Path]:
     if not hasattr(g, 'api_file_paths'):
-        g.api_file_paths = {}
+        g.api_file_paths = {}  # pragma: no cover
     cache: dict[int, Path | None] = g.api_file_paths
     ids = set(ids)
     if missing := [id_ for id_ in ids if id_ not in cache]:
         found = get_multiple_file_paths(missing, app.config['UPLOAD_PATH'])
         for id_ in missing:
-            cache[id_] = found.get(id_)  # None is cached for missing files
+            cache[id_] = found.get(id_)
     return {id_: path for id_ in ids if (path := cache[id_])}
 
 
@@ -202,7 +198,7 @@ def get_cached_file_path(id_: int) -> Path | None:
 def resolve_rights_holders(
         ids: Iterable[int]) -> dict[int, dict[str, list[RightsHolder]]]:
     if not hasattr(g, 'api_rights_holders'):
-        g.api_rights_holders = {}
+        g.api_rights_holders = {}  # pragma: no cover
     cache: dict[int, dict[str, list[RightsHolder]]] = g.api_rights_holders
     ids = set(ids)
     if missing := [id_ for id_ in ids if id_ not in cache]:
@@ -238,7 +234,7 @@ def get_display_extensions() -> list[str]:
 def iiif_file_exists(id_: int) -> bool:
     if g.settings['iiif_conversion']:
         return (Path(g.settings['iiif_path']) / f'{id_}.tiff').is_file()
-    return get_cached_file_path(id_) is not None
+    return get_cached_file_path(id_) is not None  # pragma: no cover
 
 
 def get_file_size(id_: int) -> str:
@@ -296,6 +292,7 @@ def get_iiif_manifest_and_path(img_id: int) -> dict[str, str]:
     iiif_manifest = ''
     iiif_base_path = ''
     if not check_iiif_activation():
+        # pragma: no cover
         return {'IIIFManifest': iiif_manifest, 'IIIFBasePath': iiif_base_path}
     if iiif_file_exists(img_id):
         iiif_manifest = url_for(

@@ -55,18 +55,23 @@ def _get_image_link(links: list[Link]) -> Link | None:
 def _get_vocab_flat_item(
         type_: Entity,
         links: dict[int, EntityLinks]) -> VocabularyFlatItem:
-    root_enntities = [g.types[id_] for id_ in type_.root] if type_.root else []
+    root_entities = [g.types[id_] for id_ in type_.root] if type_.root else []
     root_entity = g.types[type_.root[0]] if type_.root else None
     type_classes = root_entity.classes if root_entity else type_.classes
     sub_entities = [g.types[id_] for id_ in type_.subs] if type_.subs else []
     inverse_links = links[type_.id].links_inverse
-    image_link = _get_image_link(inverse_links)
-    image = get_file_item(image_link.domain) if image_link else None
-    external_references = get_external_reference_items(inverse_links)
-    references = [
-        _get_reference_item(link_) for link_ in inverse_links
-        if link_.domain.class_.group.get('name') == 'reference'
-           and link_.property.code == 'P67']
+    if inverse_links:
+        image_link = _get_image_link(inverse_links)
+        image = get_file_item(image_link.domain) if image_link else None
+        external_references = get_external_reference_items(inverse_links)
+        references = [
+            _get_reference_item(link_) for link_ in inverse_links
+            if link_.domain.class_.group.get('name') == 'reference'
+               and link_.property.code == 'P67']
+    else:
+        image = None
+        external_references = []
+        references = []
     return VocabularyFlatItem(
         id=type_.id,
         uuid=cast(UUID, type_.uuid),
@@ -78,7 +83,7 @@ def _get_vocab_flat_item(
         external_references=external_references,
         references=references,
         timespan=get_timespan_dict(type_.dates),
-        parents=[LinkedTypeItem(id=e.id, name=e.name) for e in root_enntities],
+        parents=[LinkedTypeItem(id=e.id, name=e.name) for e in root_entities],
         sub_types=[LinkedTypeItem(id=e.id, name=e.name) for e in sub_entities],
         entity_count=type_.count,
         entity_count_subs=type_.count_subs,
@@ -93,7 +98,11 @@ def _get_vocab_flat_item(
 def get_vocabulary_list() -> dict[str, Any]:
     """Retrieves a flat list of all OpenAtlas types."""
     vocab_dict: dict[str, VocabularyFlatItem] = {}
-    links = get_links_for_entities(list(g.types.values()))
+    links = get_links_for_entities(
+        list(g.types.values()),
+        inverse_codes='P67',
+        include_forward=False,
+        include_geometries=False)
     prefetch_files(links)
     for id_, type_ in g.types.items():
         vocab_dict[str(id_)] = _get_vocab_flat_item(type_, links)
@@ -110,7 +119,11 @@ def get_vocabulary_item(path: VocabularyId) -> dict[str, Any]:
     type_ = g.types.get(path.id)
     if not type_:
         abort_not_found(path.id)
-    links = get_links_for_entities([type_])
+    links = get_links_for_entities(
+        [type_],
+        inverse_codes='P67',
+        include_forward=False,
+        include_geometries=False)
     prefetch_files(links)
     return _get_vocab_flat_item(type_, links).model_dump(by_alias=True)
 

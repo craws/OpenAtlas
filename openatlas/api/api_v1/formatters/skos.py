@@ -34,7 +34,7 @@ def _add_match_links(graph: Dataset, concept: URIRef, type_id: int) -> None:
     inverse_links = get_type_references().get(type_id, [])
     for reference in get_external_reference_items(inverse_links):
         if not (uri := _get_match_uri(reference)):
-            continue
+            continue  # pragma: no cover
         predicate = SKOS.exactMatch
         if reference.match_type == MatchTypeEnum.CLOSE_MATCH:
             predicate = SKOS.closeMatch

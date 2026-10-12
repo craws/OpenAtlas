@@ -83,7 +83,11 @@ class EntityCollectionPath(BaseSchema):
                     "value": "type"}}})
 
 
-HISTORICAL_DATE_REGEX = r"^-?\d{1,6}(-\d{2}-\d{2})?$"
+# Matches 1-6 digits (preventing all-zeros without using lookarounds),
+# optional BC (-), optional -MM-DD
+HISTORICAL_DATE_REGEX = \
+    (r"^-?([1-9]\d{0,5}|0[1-9]\d{0,4}|00[1-9]\d{0,3}"
+     r"|000[1-9]\d{0,2}|0000[1-9]\d?|00000[1-9])(-\d{2}-\d{2})?$")
 
 
 class EntityCollectionQuery(BaseSchema):

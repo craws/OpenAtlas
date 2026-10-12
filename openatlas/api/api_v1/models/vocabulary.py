@@ -5,7 +5,8 @@ from pydantic import BaseModel, Field
 
 from openatlas.api.api_v1.models.files import FileItem
 from openatlas.api.api_v1.models.util import BaseSchema, \
-    ExtensionsType, OpenAtlasClassEnum, TimeSpan, ExternalReferenceSystemModel, \
+    ExtensionsType, OpenAtlasClassEnum, TimeSpan,\
+    ExternalReferenceSystemModel, \
     ReferenceModel, \
     TypeCategoryEnum
 

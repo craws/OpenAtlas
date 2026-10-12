@@ -59,7 +59,8 @@ def update_rights_holder(id_: int, entry: dict[str, Any]) -> None:
 
 
 def get_rights_holder_links(
-        entity_ids: list[int] | None = None) -> dict[int, dict[str, list[int]]]:
+        entity_ids: list[int] | None = None) -> \
+        dict[int, dict[str, list[int]]]:
     g.cursor.execute(
         f"""
         SELECT

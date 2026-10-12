@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from pydantic import Field
+from pydantic import ConfigDict, Field
 
 from openatlas.api.api_v1.models.agent import AgentItem
 from openatlas.api.api_v1.models.util import BaseSchema
@@ -76,6 +76,7 @@ class PublicFilesQuery(BaseSchema):
     page: int = Field(
         1,
         ge=1,
+        le=100000,
         description="Page number (starting at 1).")
 
 

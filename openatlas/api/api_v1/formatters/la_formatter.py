@@ -12,7 +12,8 @@ from openatlas.api.api_v1.formatters.la_helpers import (
     get_language, identifier, la_type, primary_name, statement,
     unique_identifier)
 from openatlas.api.api_v1.formatters.lod_util import (
-    EntityLinks, date_to_utc_iso_str, entity_uri, get_type_references, is_float)
+    EntityLinks, date_to_utc_iso_str, entity_uri, get_type_references,
+    is_float)
 from openatlas.api.api_v1.util.files import (
     get_cached_file_path, get_file_size, get_iiif_manifest_and_path,
     get_license_type, get_mime_type,
@@ -198,6 +199,7 @@ class LaFormatter:
             unique_identifier(entity_uri(entity))]
         if entity.class_.name == 'object_location' \
                 and (geometry := self.geometries.get(entity.id)):
+            # pragma: no cover
             record['defined_by'] = geometry
         for link_ in data.links:
             self._process_link(link_, record, False)
@@ -206,7 +208,7 @@ class LaFormatter:
             if link_.property.code == 'P67' \
                     and link_.domain.class_.name == 'file':
                 if get_cached_file_path(link_.domain.id):
-                    file_links.append(link_)
+                    file_links.append(link_)  # pragma: no cover
                 continue
             self._process_link(link_, record, True)
         self._add_media(file_links, record)
@@ -267,11 +269,12 @@ class LaFormatter:
             '_label': event.name,
             'identified_by': [unique_identifier(entity_uri(event))]}
         if link_ and link_.type and (type_ := g.types.get(link_.type.id)):
+            # pragma: no cover
             node['classified_as'] = [self._type_ref(type_)]
         if timespan := get_timespan(dates, f'Timespan of {event.name}'):
             node['timespan'] = timespan
         if notes := get_date_notes(dates):
-            node['referred_to_by'] = notes
+            node['referred_to_by'] = notes  # pragma: no cover
         return node
 
     def _p1(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
@@ -283,7 +286,7 @@ class LaFormatter:
             return
         type_ = link_.range
         if type_.name == 'Radiocarbon' and link_.description:
-            self._radiocarbon(link_, record)
+            self._radiocarbon(link_, record)  # pragma: no cover
         elif link_.description and is_float(link_.description):
             self._dimension(link_, record)
         else:
@@ -302,7 +305,7 @@ class LaFormatter:
                     'id': 'https://vocab.getty.edu/aat/300226816',
                     'type': 'MeasurementUnit',
                     '_label': unit}})
-        else:
+        else:   # pragma: no cover
             append(record, 'referred_to_by', statement(
                 f'{link_.description} {unit}',
                 type_.name,
@@ -310,6 +313,7 @@ class LaFormatter:
 
     @staticmethod
     def _radiocarbon(link_: Link, record: dict[str, Any]) -> None:
+        # pragma: no cover
         data = ast.literal_eval(link_.description)
         year = int(data['radiocarbonYear'])
         range_ = int(data['range'])

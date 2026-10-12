@@ -1,131 +1,193 @@
 import sys
+from collections.abc import Iterator
 from functools import cache
 from pathlib import Path
 from typing import Any
+
+from flask import g
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import schemathesis
 from schemathesis.cli import schemathesis as schemathesis_cli
+from schemathesis.generation.modes import GenerationMode
 
 from openatlas import app
-from openatlas.api.api_v1.util.files import check_file_access
-from openatlas.display.image_processing import check_iiif_file_exist
-from openatlas.models.annotation import AnnotationImage
+from openatlas.api.api_v1.models.util import OpenAtlasClassEnum
+from openatlas.api.api_v1.util.files import (
+    get_display_extensions, get_multiple_file_paths, get_public_share_yes_id,
+    get_valid_license_ids, iiif_file_exists)
+from openatlas.display.image_processing import (
+    check_iiif_activation, is_supported_image, safe_resize_image)
 from openatlas.models.rights_holder import RightsHolder
 from openatlas.models.entity import Entity
 
-DEFAULT_IMAGE_ID = 1
-DEFAULT_CASE_STUDY_ID = 1
-DEFAULT_AGENT_ID = 1
-DEFAULT_ANNOTATION_ID = 1
-DEFAULT_PLACE_UUID = "00000000-0000-0000-0000-000000000001"
 SCHEMATHESIS_ARGUMENTS = (
     "run",
     "http://localhost:5000/api/1/docs/openapi.json",
     "--url",
     "http://localhost:5000",
     "--phases",
-    "examples,coverage,fuzzing")
+    "examples,coverage,fuzzing",
+    "--checks",
+    "not_a_server_error,status_code_conformance,content_type_conformance,response_headers_conformance,positive_data_acceptance"
+)
+
+
+def has_file_access(file_entity: Entity) -> bool:
+    file_type_ids = {type_.id for type_ in file_entity.types if type_}
+    has_license = bool(file_type_ids & get_valid_license_ids())
+    is_public_shareable = get_public_share_yes_id() in file_type_ids
+    return has_license and is_public_shareable
+
+
+def prepare_thumbnails(
+        files: list[Entity], paths: dict[int, Path],
+        thumbnail_dir: Path) -> list[int]:
+    thumbnails = []
+    extensions = get_display_extensions()
+    for file_ in files[:30]:
+        path = paths.get(file_.id)
+        if not path or path.suffix.lower() not in extensions \
+                or not is_supported_image(path):
+            continue
+        if safe_resize_image(
+                str(file_.id), path.suffix.lower(),
+                app.config['IMAGE_SIZE']['thumbnail'], True) \
+                and any(thumbnail_dir.glob(f'{file_.id}.*')):
+            thumbnails.append(file_.id)
+            if len(thumbnails) == 3:
+                break
+    return thumbnails
 
 
 @cache
-def get_place_uuid() -> str:
-    try:
-        with app.test_request_context():
-            app.preprocess_request()
-            places = Entity.get_by_class('place')
-            if places:
-                return str(places[0].uuid)
-    except Exception:
-        return DEFAULT_PLACE_UUID
+def get_database_examples() -> dict[str, Any]:
+    with app.test_request_context():
+        app.preprocess_request()
+        classes = {}
+        for class_ in OpenAtlasClassEnum:
+            if class_.value == 'type':
+                continue
+            entities = Entity.get_by_class(class_.value)
+            if entities:
+                classes[class_.value] = entities[0]
 
-    return DEFAULT_PLACE_UUID
+        case_studies = Entity.get_hierarchy('Case study').subs
+        files = Entity.get_by_class('file', types=True)
+        existing = get_multiple_file_paths(
+            [file_.id for file_ in files], app.config['UPLOAD_PATH'])
+        public_files = [
+            file_ for file_ in files
+            if file_.id in existing and has_file_access(file_)]
+        existing_thumbnails = get_multiple_file_paths(
+            [file_.id for file_ in public_files],
+            app.config['RESIZED_IMAGES'] /
+            app.config['IMAGE_SIZE']['thumbnail'])
+        thumbnails = [
+            file_.id for file_ in public_files
+            if file_.id in existing_thumbnails]
+        if not thumbnails and g.settings.get('iiif') and check_iiif_activation():
+            thumbnails = [
+                file_.id for file_ in public_files[:100]
+                if iiif_file_exists(file_.id)]
+        if not thumbnails:
+            thumbnails = prepare_thumbnails(
+                public_files, existing,
+                app.config['RESIZED_IMAGES'] /
+                app.config['IMAGE_SIZE']['thumbnail'])
+        annotations = []
+        files_by_id = {file_.id: file_ for file_ in files}
+        g.cursor.execute(
+            'SELECT id, image_id FROM model.annotation_image ORDER BY id;')
+        for row in g.cursor:
+            file_ = files_by_id.get(row['image_id'])
+            if file_ and has_file_access(file_):
+                annotations.append(row['id'])
+                if len(annotations) == 3:
+                    break
+        return {
+            'classes': classes,
+            'types': list(g.types),
+            'type_entities': list(g.types.values()),
+            'case_studies': case_studies,
+            'agents': [e.id for e in RightsHolder.get_rights_holders()],
+            'files': [e.id for e in public_files],
+            'thumbnails': thumbnails,
+            'annotations': annotations}
 
 
-@cache
-def get_case_study_id() -> int:
-    try:
-        with app.test_request_context():
-            app.preprocess_request()
-            case_study_hierarchy = Entity.get_hierarchy('Case study')
-            if case_study_hierarchy and case_study_hierarchy.subs:
-                return case_study_hierarchy.subs[0]
-    except Exception:
-        return DEFAULT_CASE_STUDY_ID
-
-    return DEFAULT_CASE_STUDY_ID
-
-
-@cache
-def get_agent_id() -> int:
-    try:
-        with app.test_request_context():
-            app.preprocess_request()
-            persons = RightsHolder.get_rights_holders()
-            if persons:
-                return persons[0].id
-    except Exception:
-        return DEFAULT_AGENT_ID
-
-    return DEFAULT_AGENT_ID
-
-
-@cache
-def get_annotation_id() -> int:
-    try:
-        with app.test_request_context():
-            app.preprocess_request()
-            annotations = AnnotationImage.get_orphaned_annotations()
-            if annotations:
-                return annotations[0].id
-    except Exception:
-        return DEFAULT_ANNOTATION_ID
-
-    return DEFAULT_ANNOTATION_ID
-
-
-@cache
-def get_image_id() -> int:
-    try:
-        with app.test_request_context():
-            app.preprocess_request()
-            files = Entity.get_by_class('file')
-            for file_ in files:
-                if (check_file_access(file_.id)
-                        and check_iiif_file_exist(file_.id)):
-                    return file_.id
-            if files:
-                return files[0].id
-    except Exception:
-        return DEFAULT_IMAGE_ID
-
-    return DEFAULT_IMAGE_ID
+def get_path_examples(path: str) -> Iterator[dict[str, Any]]:
+    if path.startswith('/api/1/iiif/'):
+        if path == '/api/1/iiif/{id}/annotation/{version}':
+            for id_ in get_database_examples()['annotations']:
+                yield {'id': id_, 'version': '2'}
+        return
+    data = get_database_examples()
+    if '{uuid}' in path:
+        for entity in [*data['classes'].values(), *data['type_entities'][:3]]:
+            if entity.uuid:
+                yield {'uuid': str(entity.uuid), **(
+                    {'ext': 'json'} if '{ext}' in path else {})}
+    elif '{entity_class}' in path:
+        for class_ in data['classes']:
+            yield {'entity_class': class_}
+    elif '{openatlas_class}' in path:
+        for class_ in data['classes']:
+            yield {'openatlas_class': class_}
+    elif '{id}' in path:
+        if path.startswith('/api/1/files/'):
+            ids = (data['thumbnails'] if path.endswith('/thumbnail')
+                   else data['files'])
+        elif path.startswith('/api/1/case-studies/'):
+            ids = data['case_studies']
+        elif path.startswith('/api/1/agents/'):
+            ids = data['agents']
+        elif path.startswith('/api/1/vocabulary/'):
+            ids = data['types']
+        else:
+            ids = []
+        for id_ in ids[:3]:
+            yield {'id': id_, **(
+                {'ext': 'json'} if '{ext}' in path else {})}
+    else:
+        yield {}
 
 
 @schemathesis.hook
-def before_generate_path_parameters(
-        context: Any, strategy: Any) -> Any:
+def before_add_examples(context: Any, examples: list[Any]) -> None:
     path = context.operation.path
+    if path.startswith('/api/1/iiif/') and path != \
+            '/api/1/iiif/{id}/annotation/{version}':
+        return
+    for params in get_path_examples(path):
+        kwargs: dict[str, Any] = {}
+        if params:
+            kwargs['path_parameters'] = params
+        if path.startswith('/api/1/entities/'):
+            kwargs['query'] = {'limit': 5, 'page': 1}
+        elif path == '/api/1/vocabulary/standard/{openatlas_class}':
+            case_studies = get_database_examples()['case_studies']
+            if case_studies:
+                kwargs['query'] = {'caseStudy': case_studies[0]}
+        elif path == '/api/1/system/count/entities':
+            case_studies = get_database_examples()['case_studies']
+            if case_studies:
+                kwargs['query'] = {'caseStudyId': case_studies[0]}
+        examples.append(context.operation.Case(**kwargs))
 
-    def inject_valid_ids(params: Any) -> Any:
-        if not isinstance(params, dict):
-            return params
-        if "id" in params:
-            if path.startswith("/api/1/files/annotation/"):
-                params["id"] = get_annotation_id()
-            elif path.startswith("/api/1/files/"):
-                params["id"] = get_image_id()
-            elif path.startswith("/api/1/case-studies/"):
-                params["id"] = get_case_study_id()
-            elif path.startswith("/api/1/agents/"):
-                params["id"] = get_agent_id()
-        if "uuid" in params and "/entity/" in path:
-            params["uuid"] = get_place_uuid()
-        return params
 
-    return strategy.map(inject_valid_ids)
+@schemathesis.hook
+def map_case(context: Any, case: Any) -> Any:
+    if case.meta and case.meta.generation.mode == GenerationMode.POSITIVE \
+            and case.path_parameters:
+        examples = list(get_path_examples(case.operation.path))
+        if examples:
+            for name, value in examples[0].items():
+                if name in case.path_parameters and name not in ('ext', 'version'):
+                    case.path_parameters[name] = value
+    return case
 
 
 def main() -> None:

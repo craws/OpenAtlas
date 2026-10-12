@@ -57,11 +57,8 @@ class RightsHolder:
 
     @staticmethod
     def get_rights_holder_information(
-            entity_ids: list[int] | None = None) -> dict[
-        int,
-        dict[str, list[RightsHolder]]]:
-        if entity_ids is not None and not entity_ids:
-            return {}
+            entity_ids: list[int] | None = None) -> \
+            dict[int, dict[str, list[RightsHolder]]]:
         rights_holders = g.rights_holder if hasattr(g, 'rights_holder') \
             else RightsHolder.get_rights_holders()
         rights_holder_dict = {rh.id: rh for rh in rights_holders}

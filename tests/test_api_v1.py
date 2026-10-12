@@ -717,3 +717,5 @@ class ApiV1(ApiTestCase):
             '/api/1/docs/']:
             rv = c.get(url)
             assert rv.status_code == 200
+        rv = c.get('/api/1/docs/Wrong!')
+        assert rv.status_code == 404

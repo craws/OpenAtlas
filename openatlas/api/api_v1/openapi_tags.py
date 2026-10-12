@@ -37,4 +37,3 @@ metadata_tag = Tag(
 
 # Thanados, PFP, CSV, and other
 # export_tag = Tag(name="Export", description="Different export formats")
-
