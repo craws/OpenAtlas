@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 
 from flask import g, redirect, send_file
 from flask_openapi3 import APIBlueprint
@@ -6,7 +7,7 @@ from flask_openapi3 import APIBlueprint
 from openatlas import app
 from openatlas.api.api_v1.error_handlers import register_error_handlers
 from openatlas.api.api_v1.models.files import (
-    FileIdPath, PublicFileOverviewResponse, PublicFilesQuery)
+    EntityFilesPath, FileIdPath, PublicFileOverviewResponse, PublicFilesQuery)
 from openatlas.api.api_v1.models.util import DownloadQuery
 from openatlas.api.api_v1.openapi_tags import file_tag
 from openatlas.api.api_v1.responses.files import (
@@ -16,7 +17,7 @@ from openatlas.api.api_v1.util.files import (
     get_file_item, get_file_path, get_mime_type, get_public_share_yes_id,
     get_valid_license_ids, iiif_file_exists, resolve_file_paths,
     resolve_rights_holders)
-from openatlas.api.api_v1.util.pagination import get_pagination_lod
+from openatlas.api.api_v1.util.pagination import get_pagination
 from openatlas.database.api import get_public_files_api
 from openatlas.display.image_processing import check_iiif_activation
 from openatlas.models.entity import Entity
@@ -105,23 +106,53 @@ def display_thumbnail(path: FileIdPath, query: DownloadQuery):
         as_attachment=bool(query.download))
 
 
+def _get_public_files_response(
+        endpoint: str,
+        query: PublicFilesQuery,
+        entity_id: int | None = None,
+        **endpoint_kwargs: Any) -> dict[str, Any]:
+    rows, total = get_public_files_api(
+        get_valid_license_ids(),
+        get_public_share_yes_id(),
+        query.limit,
+        (query.page - 1) * query.limit,
+        entity_id=entity_id)
+    entities = [Entity(row) for row in rows]
+    resolve_file_paths([entity.id for entity in entities])
+    resolve_rights_holders([entity.id for entity in entities])
+    pagination = get_pagination(
+        endpoint,
+        total,
+        query.page,
+        query.limit,
+        **endpoint_kwargs)
+    return PublicFileOverviewResponse(
+        data=[get_file_item(entity) for entity in entities],
+        **pagination).model_dump(by_alias=True)
+
+
 @api_v1_files.get(
     '/public',
     summary="Get licensed files overview",
     tags=[file_tag],
     responses=public_files_response)
-def get_public_files(query: PublicFilesQuery):
+def get_public_files(query: PublicFilesQuery) -> dict[str, Any]:
     """Retrieves a page of publicly shareable files with a license."""
-    rows, total = get_public_files_api(
-        get_valid_license_ids(),
-        get_public_share_yes_id(),
-        query.limit,
-        (query.page - 1) * query.limit)
-    entities = [Entity(row) for row in rows]
-    resolve_file_paths([entity.id for entity in entities])
-    resolve_rights_holders([entity.id for entity in entities])
-    pagination = get_pagination_lod(
-        'api_v1_files.get_public_files', total, query.page, query.limit)
-    return PublicFileOverviewResponse(
-        data=[get_file_item(entity) for entity in entities],
-        **pagination).model_dump(by_alias=True)
+    return _get_public_files_response('api_v1_files.get_public_files', query)
+
+
+@api_v1_files.get(
+    '/entity/<int:id>',
+    summary="Get licensed files overview for an entity",
+    tags=[file_tag],
+    responses=public_files_response)
+def get_public_files_by_entity(
+        path: EntityFilesPath,
+        query: PublicFilesQuery) -> dict[str, Any]:
+    """Retrieves a page of publicly shareable files with a license connected
+    to the given entity."""
+    return _get_public_files_response(
+        'api_v1_files.get_public_files_by_entity',
+        query,
+        entity_id=path.id,
+        id=path.id)

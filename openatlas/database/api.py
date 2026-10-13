@@ -13,7 +13,8 @@ def get_public_files_api(
         license_ids: set[int],
         public_share_id: int | None,
         limit: int,
-        offset: int) -> tuple[list[dict[str, Any]], int]:
+        offset: int,
+        entity_id: int | None = None) -> tuple[list[dict[str, Any]], int]:
     if not license_ids or public_share_id is None:
         return [], 0  # pragma: no cover
 
@@ -28,14 +29,25 @@ def get_public_files_api(
             WHERE l.domain_id = e.id AND l.property_code = 'P2'
                 AND l.range_id = %(public_share_id)s)
         """
-    params = {
+    params: dict[str, Any] = {
         'license_ids': tuple(license_ids),
         'public_share_id': public_share_id,
         'limit': limit,
         'offset': offset}
+
+    if entity_id is not None:
+        where_sql += """
+            AND EXISTS (
+                SELECT 1 FROM model.link l
+                WHERE l.domain_id = e.id AND l.property_code = 'P67'
+                    AND l.range_id = %(entity_id)s)
+            """
+        params['entity_id'] = entity_id
+
     g.cursor.execute(
         'SELECT COUNT(*) FROM model.entity e ' + where_sql, params)
     total = g.cursor.fetchone()['count']
+
     g.cursor.execute(
         select_sql(types=True) +
         ' JOIN (SELECT e.id FROM model.entity e ' + where_sql +

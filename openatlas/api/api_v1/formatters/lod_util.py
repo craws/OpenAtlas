@@ -15,7 +15,7 @@ from openatlas.api.api_v1.models.util import (
     ExternalReferenceSystemModel, MatchTypeEnum)
 from openatlas.api.api_v1.util.content_negotiation import (
     make_lod_response)
-from openatlas.api.api_v1.util.pagination import get_pagination_lod
+from openatlas.api.api_v1.util.pagination import get_pagination
 from openatlas.database.api import get_wkts_by_ids
 from openatlas.models.entity import Entity, Link
 
@@ -201,7 +201,7 @@ def get_entities_response(
         offset=offset,
         **filter_kwargs)
 
-    pagination = get_pagination_lod(
+    pagination = get_pagination(
         endpoint,
         total_items=total_items,
         page=query.page,

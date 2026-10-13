@@ -98,3 +98,7 @@ class FilesByEntitiesQuery(BaseSchema):
 
 class FileIdPath(BaseSchema):
     id: int = Field(..., description="The ID of the file.")
+
+
+class EntityFilesPath(BaseSchema):
+    id: int = Field(..., description="The ID of the entity.")

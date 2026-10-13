@@ -493,6 +493,9 @@ class ApiV1(ApiTestCase):
             lic_ext_ref = insert('external_reference', lic_url)
             lic_ext_ref.link('P67', e.open_license)
             e.file.link('P2', e.open_license)
+            e.file.link('P67', e.actor)
+            e.file_not_public.link('P67', e.actor)
+            e.file_without_licences.link('P67', e.actor)
 
         with c.get(
                 url_for('api_v1_files.display_file', id=e.file.id)) as rv:
@@ -549,6 +552,22 @@ class ApiV1(ApiTestCase):
         rv = c.get(url_for('api_v1_files.get_public_files'))
         assert rv.status_code == 200
         assert 'data' in rv.get_json()
+
+        rv = c.get(
+            url_for('api_v1_files.get_public_files_by_entity', id=e.actor.id))
+        assert rv.status_code == 200
+        json_data = rv.get_json()
+        assert 'data' in json_data
+        file_ids = [item['id'] for item in json_data['data']]
+        assert e.file.id in file_ids
+        assert e.file_not_public.id not in file_ids
+        assert e.file_without_licences.id not in file_ids
+
+        rv = c.get(
+            url_for('api_v1_files.get_public_files_by_entity', id=e.weight.id))
+        assert rv.status_code == 200
+        assert rv.get_json()['data'] == []
+        assert rv.get_json()['totalItems'] == 0
 
     def test_iiif(self) -> None:
         c = self.client

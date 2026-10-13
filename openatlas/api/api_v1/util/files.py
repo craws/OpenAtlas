@@ -24,7 +24,7 @@ from openatlas.display.util2 import convert_size
 from openatlas.models.entity import Entity
 from openatlas.models.rights_holder import RightsHolder
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from openatlas.api.api_v1.formatters.lod_util import EntityLinks
 
 
@@ -167,10 +167,9 @@ def get_multiple_file_paths(
         with os.scandir(upload_path) as entries:
             for entry in entries:
                 name_parts = entry.name.split('.', 1)
-                if name_parts[0].isdigit():
+                if name_parts[0].isdigit():  # pragma: no cover
                     id_ = int(name_parts[0])
                     if id_ in missing_ids and entry.is_file():
-                        # pragma: no cover
                         results[id_] = Path(entry.path)
                         missing_ids.remove(id_)
                         if not missing_ids:
@@ -179,7 +178,7 @@ def get_multiple_file_paths(
     return results
 
 
-def resolve_file_paths(ids: Iterable[int]) -> dict[int, Path]:
+def resolve_file_paths(ids: Iterable[int]) -> dict[int, Path | None]:
     if not hasattr(g, 'api_file_paths'):
         g.api_file_paths = {}  # pragma: no cover
     cache: dict[int, Path | None] = g.api_file_paths
@@ -291,8 +290,7 @@ def get_license_type(entity: Entity) -> Optional[Entity]:
 def get_iiif_manifest_and_path(img_id: int) -> dict[str, str]:
     iiif_manifest = ''
     iiif_base_path = ''
-    if not check_iiif_activation():
-        # pragma: no cover
+    if not check_iiif_activation():  # pragma: no cover
         return {'IIIFManifest': iiif_manifest, 'IIIFBasePath': iiif_base_path}
     if iiif_file_exists(img_id):
         iiif_manifest = url_for(
