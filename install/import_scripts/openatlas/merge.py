@@ -7,10 +7,9 @@
 # python3 install/import_scripts/openatlas/merge.py
 
 # Work in progress:
-# * Value types doesn't seem to be imported
-# * Annotations
-# * New reference systems, add possible additional classes
+# * Continue new reference systems, add classes to existing ones
 # * New case studies (would have to be subs of import case study)
+# * Annotations
 # * Offer manual mapping for e.g. duplicates
 
 import os
@@ -176,7 +175,7 @@ def types() -> None:
     g.types = Entity.get_all_types(False)
 
 
-def types_recursive(super_: Entity,import_types: dict[int, Entity]) -> None:
+def types_recursive(super_: Entity, import_types: dict[int, Entity]) -> None:
     for import_sub_id in super_.subs:
         exists = False
         g.types = Entity.get_all_types(False)
@@ -272,9 +271,8 @@ def insert_entities() -> None:
 def reference_systems() -> None:
     cursor_current = g.cursor
     g.cursor = cursor
-    system_rows = db.get_reference_systems()
     g.cursor = cursor_current
-    for row in system_rows:
+    for row in db.get_reference_systems():
         exists = False
         for existing_system in g.reference_systems.values():
             if row['name'] == existing_system.name:
@@ -282,8 +280,18 @@ def reference_systems() -> None:
                 exists = True
                 id_map[row['id']] = existing_system.id
         if not exists:
-            # Todo: implement adding reference systems
             print(f'New reference system: {row['name']}')
+            system = insert({
+                'name': row['name'],
+                'description': row['description'],
+                'openatlas_class_name': row['openatlas_class_name'],
+                'website_url': row['website_url'],
+                'resolver_url': row['resolver_url'],
+                'example_id': row['identifier_example'],
+                'system': row['system'],
+                'api': row['api'],
+                'types': row['types']})
+            id_map[row['id']] = system.id
         # Todo: add possible additional classes
 
 
