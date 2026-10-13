@@ -80,3 +80,12 @@ administrative_unit = {
         'form_buttons': ['insert_and_continue'],
         'additional_tabs': {'note': {}},
         'additional_information': {'type_information': {}}}}
+
+type_tools = {
+    'label': _('type tools'),
+    'attributes': {},
+    'relations': {
+        'super': {
+            'label': _('super'),
+            'classes': ['type'],
+            'property': 'P127'}}}
