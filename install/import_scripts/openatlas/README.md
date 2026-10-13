@@ -12,8 +12,10 @@ instance, so be sure to check the configuration in **instance/production.py**:
 The database and files to be imported from are configured at the top of the
 **merge.py** script.
 
-As always, be sure to make backups before. The script can be run, e.g.
-from the project root with:
+Both datasets should be at the same database version and as always,
+be sure to make backups before.
+
+The script can be run, e.g. from the project root with:
 
     python3 install/import_scripts/openatlas/merge.py
 

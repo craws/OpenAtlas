@@ -24,12 +24,13 @@ from flask import g
 from psycopg2 import extras
 
 from openatlas import app
+from openatlas.api.resources.util import date_to_utc_iso_str
 from openatlas.database import entity as db
 from openatlas.database.checks import delete_link_duplicates
 from openatlas.database.entity import set_required
 from openatlas.database.imports import import_data
-from openatlas.database.rights_holder import insert_rights_holder, \
-    insert_rights_holder_link
+from openatlas.database.rights_holder import (
+    insert_rights_holder, insert_rights_holder_link)
 from openatlas.models.entity import Entity, insert
 from openatlas.models.rights_holder import RightsHolder
 
@@ -170,46 +171,46 @@ def types() -> None:
     g.cursor = cursor
     import_types = Entity.get_all_types(False)
     g.cursor = cursor_current
-    for import_hierarchy in [
-            type_ for type_ in import_types.values() if not type_.root]:
-        # print(import_hierarchy.name)
-        hierarchy = Entity.get_hierarchy(import_hierarchy.name)
-        for id_ in import_hierarchy.subs:
-            types_recursive(id_, hierarchy, import_types)
+    for hierarchy in [x for x in import_types.values() if not x.root]:
+        types_recursive(hierarchy, import_types)
     g.types = Entity.get_all_types(False)
 
 
-def types_recursive(
-        id_: int,
-        super_: Entity,
-        import_types: dict[int, Entity]) -> None:
-    exists = False
-    for sub_id in super_.subs:
-        if g.types[sub_id].name == import_types[id_].name:
-            id_map[id_] = sub_id
-            # print(f'exists: {import_types[id_].name}')
-            for import_sub_id in import_types[id_].subs:
-                types_recursive(import_sub_id, g.types[sub_id], import_types)
-            exists = True
-            break
-    if not exists:
-        insert_type_recursive(import_types[id_], import_types)
+def types_recursive(super_: Entity,import_types: dict[int, Entity]) -> None:
+    for import_sub_id in super_.subs:
+        exists = False
+        g.types = Entity.get_all_types(False)
+        for type_id in g.types[id_map[super_.id]].subs:
+            if g.types[type_id].name == import_types[import_sub_id].name:
+                id_map[import_sub_id] = type_id
+                # print(f'exists: {import_types[id_].name}')
+                exists = True
+                break
+        if not exists:
+            insert_type_recursive(import_types[import_sub_id], import_types)
+        types_recursive(import_types[import_sub_id], import_types)
 
 
 def insert_type_recursive(
         import_type: Entity,
         import_types: dict[int, Entity]) -> None:
     # print(f'New type: {import_type.name}')
-    new_type = insert({
+    data = {
        'name': import_type.name,
        'description': import_type.description,
        'openatlas_class_name': import_type.class_.name,
-       'begin_from': import_type.dates.begin_from,
-       'begin_to': import_type.dates.begin_to,
+       'begin_from': date_to_utc_iso_str(import_type.dates.begin_from),
+       'begin_to': date_to_utc_iso_str(import_type.dates.begin_to),
        'begin_comment': import_type.dates.begin_comment,
-       'end_from': import_type.dates.end_from,
-       'end_to': import_type.dates.end_to,
-       'end_comment': import_type.dates.end_comment})
+       'end_from': date_to_utc_iso_str(import_type.dates.end_from),
+       'end_to': date_to_utc_iso_str(import_type.dates.end_to),
+       'end_comment': import_type.dates.end_comment}
+    try:
+        new_type = insert(data)
+    except Exception:
+        print(data)
+        raise
+
     track(import_type.id, new_type.id)
     super_id = id_map[import_type.root[-1]]
     new_type.link(
