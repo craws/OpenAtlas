@@ -200,7 +200,9 @@ VALUES
   ('P67', (SELECT id FROM model.entity WHERE name='Public domain'), (SELECT id FROM model.entity WHERE name='Wikidata'), 'Q19652', (SELECT id FROM model.entity WHERE name='exact match') ),
   ('P67', (SELECT id FROM model.entity WHERE name='Public domain'), (SELECT id FROM model.entity WHERE name='GND'), 'public', (SELECT id FROM model.entity WHERE name='close match') ),
   ('P67', (SELECT id FROM model.entity WHERE name='CC BY 4.0'), (SELECT id FROM model.entity WHERE name='https://en.wikipedia.org/wiki/Public_domain'), 'https://creativecommons.org/licenses/by/4.0/deed.de', NULL ),
-  ('P67', (SELECT id FROM model.entity WHERE name='CC BY-SA 4.0'), (SELECT id FROM model.entity WHERE name='https://en.wikipedia.org/wiki/Public_domain'), 'https://creativecommons.org/licenses/by-sa/4.0/deed.de', NULL );
+  ('P67', (SELECT id FROM model.entity WHERE name='CC BY-SA 4.0'), (SELECT id FROM model.entity WHERE name='https://en.wikipedia.org/wiki/Public_domain'), 'https://creativecommons.org/licenses/by-sa/4.0/deed.de', NULL ),
+  ('P67', (SELECT id FROM model.entity WHERE name='Public domain'), (SELECT id FROM model.entity WHERE name='Picture with a License'), NULL, NULL ),
+  ('P67', (SELECT id FROM model.entity WHERE name='Public domain'), (SELECT id FROM model.entity WHERE name='Frodo et. al.'), '12-13', NULL );
 
 INSERT INTO web.entity_profile_image (entity_id, image_id)
 VALUES ( (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Picture with a License') )
@@ -240,3 +242,7 @@ WHERE name = 'Economical';
 UPDATE model.entity
 SET begin_from = '2000-01-01', end_to = '2001-01-01'
 WHERE name = 'The One Ring';
+
+UPDATE model.entity
+SET description = 'Public domain description'
+WHERE name = 'Public domain';

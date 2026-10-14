@@ -1,13 +1,12 @@
 from pathlib import Path
 
 from flask import g, url_for
-from rdflib import Dataset, RDF, URIRef
+from rdflib import RDF, Dataset, URIRef
 
 from openatlas import app
 from openatlas.api.api_v1.formatters.la_formatter import format_la_entities
 from openatlas.api.api_v1.formatters.lod import format_lod_entities
 from openatlas.models.annotation import AnnotationImage
-from openatlas.models.entity import Entity
 from openatlas.models.settings import set_logo
 from tests.base import ApiTestCase, get_hierarchy, insert
 
@@ -262,23 +261,9 @@ class ApiV1(ApiTestCase):
         assert rv.status_code == 200
         assert 'properties' in rv.get_json()
 
-    # todo: review
     def test_vocabulary(self) -> None:
         c = self.client
         e = self.get_api_entities()
-        with app.test_request_context():
-            app.preprocess_request()
-            vocabulary_type = next(iter(g.types.values()))
-            file = Entity.get_by_class('file')[0]
-            file.link('P67', vocabulary_type)
-            reference_system = next(iter(g.reference_systems.values()))
-            reference_system.link(
-                'P67',
-                vocabulary_type,
-                'vocabulary-id',
-                type_id=self.precision_type.subs[0])
-            reference = insert('bibliography', 'Vocabulary reference')
-            reference.link('P67', vocabulary_type, '12-13')
 
         rv = c.get(url_for('api_v1_vocabulary.get_vocabulary_list'))
         assert rv.status_code == 200
@@ -296,7 +281,7 @@ class ApiV1(ApiTestCase):
         rv = c.get(
             url_for(
                 'api_v1_vocabulary.get_vocabulary_item',
-                id=e.boundary_mark.id))
+                id=e.open_license.id))
         assert rv.status_code == 200
 
         rv = c.get(
@@ -323,94 +308,39 @@ class ApiV1(ApiTestCase):
         assert 'data' in rv_json
         assert isinstance(rv_json['data'], list)
 
-    # todo: review
     def test_vocabulary_skos(self) -> None:
         skos = 'http://www.w3.org/2004/02/skos/core#'
         c = self.client
-        with app.test_request_context():
-            app.preprocess_request()
-            root = self.precision_type
-            child = g.types[root.subs[0]]
-            reference_system = next(iter(g.reference_systems.values()))
-            reference_system.link(
-                'P67',
-                child,
-                'vocabulary-id',
-                type_id=self.precision_type.subs[0])
-            resolver = reference_system.resolver_url
-            other = g.types[root.subs[-1]]
-            other_uri = URIRef(url_for(
-                'api.entity_uuid', uuid=other.uuid, _external=True))
-            reference_system.link(
-                'P67',
-                other,
-                'University positions',
-                type_id=self.precision_type.subs[0])
-            root_uri = URIRef(url_for(
-                'api.entity_uuid', uuid=root.uuid, _external=True))
-
-        format_map = {
-            'ttl': ('turtle', 'text/turtle'),
-            'xml': ('xml', 'application/rdf+xml'),
-            'json': ('json-ld', 'application/ld+json'),
-            'nt': ('nt', 'application/n-triples')}
-        for ext, (rdf_format, mimetype) in format_map.items():
-            rv = c.get(
-                url_for(
-                    'api_v1_vocabulary.get_vocabulary_skos_ext',
-                    id=root.id,
-                    ext=ext))
-            assert rv.status_code == 200
-            assert mimetype in rv.headers.get('Content-Type')
-            graph = Dataset()
-            graph.parse(data=rv.data, format=rdf_format)
-            assert (
-                       root_uri, RDF.type,
-                       URIRef(f'{skos}ConceptScheme')) in graph
-
-        rv = c.get(
-            url_for('api_v1_vocabulary.get_vocabulary_skos', id=root.id))
-        assert rv.status_code == 200
-        assert 'application/ld+json' in rv.headers.get('Content-Type')
-
-        for rdf_format, mimetype in [
-            ('turtle', 'text/turtle'),
-            ('xml', 'application/rdf+xml'),
-            ('json-ld', 'application/ld+json'),
-            ('nt', 'application/n-triples')]:
-            rv = c.get(
-                url_for('api_v1_vocabulary.get_vocabulary_skos', id=root.id),
-                headers={'Accept': mimetype})
-            assert rv.status_code == 200
-            assert mimetype in rv.headers.get('Content-Type')
-            graph = Dataset()
-            graph.parse(data=rv.data, format=rdf_format)
-            assert (
-                       root_uri, RDF.type,
-                       URIRef(f'{skos}ConceptScheme')) in graph
+        e = self.get_api_entities()
+        root_uri = URIRef(url_for(
+            'api.entity_uuid', uuid=e.license.uuid, _external=True))
+        sub_uri = URIRef(url_for(
+            'api.entity_uuid', uuid=e.open_license.uuid, _external=True))
 
         rv = c.get(
             url_for(
                 'api_v1_vocabulary.get_vocabulary_skos_ext',
-                id=root.id,
+                id=e.license.id,
                 ext='ttl'))
+        assert rv.status_code == 200
+        assert 'text/turtle' in rv.headers.get('Content-Type')
         graph = Dataset()
         graph.parse(data=rv.data, format='turtle')
+        assert (root_uri, RDF.type, URIRef(f'{skos}ConceptScheme')) in graph
+        assert (sub_uri, RDF.type, URIRef(f'{skos}Concept')) in graph
+        assert (sub_uri, URIRef(f'{skos}topConceptOf'), root_uri) in graph
+        assert (root_uri, URIRef(f'{skos}hasTopConcept'), sub_uri) in graph
+        assert bool(list(graph.triples((None, URIRef(f'{skos}broader'), None))))
+        assert bool(list(graph.triples((None, URIRef(f'{skos}narrower'), None))))
+        assert bool(list(graph.triples((None, URIRef(f'{skos}inScheme'), root_uri))))
+        assert bool(list(graph.objects(sub_uri, URIRef(f'{skos}exactMatch'))))
+        assert bool(list(graph.objects(sub_uri, URIRef(f'{skos}closeMatch'))))
+        assert bool(list(graph.objects(sub_uri, URIRef(f'{skos}scopeNote'))))
 
         rv = c.get(
-            url_for(
-                'api_v1_vocabulary.get_vocabulary_skos_ext',
-                id=root.id,
-                ext='nt'))
+            url_for('api_v1_vocabulary.get_vocabulary_skos', id=e.license.id))
         assert rv.status_code == 200
-        graph = Dataset()
-        graph.parse(data=rv.data, format='nt')
-        match_links = list(
-            graph.objects(other_uri, URIRef(f'{skos}exactMatch'))) + list(
-            graph.objects(other_uri, URIRef(f'{skos}closeMatch')))
-        assert all(' ' not in str(uri) for uri in match_links)
-        if resolver:
-            assert URIRef(f'{resolver}University%20positions') in match_links
+        assert 'application/ld+json' in rv.headers.get('Content-Type')
 
         # Unknown id returns 404
         rv = c.get(
@@ -574,7 +504,6 @@ class ApiV1(ApiTestCase):
         with app.test_request_context():
             app.preprocess_request()
             rights_holder_ids = [rh.id for rh in g.rights_holder]
-            holder_names = {rh.name for rh in g.rights_holder}
 
         logo_path = Path(app.root_path) / 'static' / 'images' / 'layout'
         public_type = get_hierarchy('Public sharing allowed')

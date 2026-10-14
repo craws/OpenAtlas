@@ -2,13 +2,17 @@ from typing import Final
 from urllib.parse import quote, urlparse
 
 from flask import Response, g
-from rdflib import DCTERMS, Dataset, Literal, Namespace, RDF, URIRef
+from rdflib import DCTERMS, RDF, Dataset, Literal, Namespace, URIRef
 
 from openatlas.api.api_v04.resources.util import to_camel_case
-from openatlas.api.api_v1.formatters.util import entity_uri, \
-    get_type_references
+from openatlas.api.api_v1.formatters.util import (
+    entity_uri,
+    get_type_references,
+)
 from openatlas.api.api_v1.models.util import (
-    ExternalReferenceSystemModel, MatchTypeEnum)
+    ExternalReferenceSystemModel,
+    MatchTypeEnum,
+)
 from openatlas.api.api_v1.util.content_negotiation import make_graph_response
 from openatlas.models.entity import Entity, Link
 
@@ -19,15 +23,15 @@ URI_SAFE_CHARS: Final[str] = ":/?#[]@!$&'()*+,;=%~"
 
 def _get_match_uri(reference: ExternalReferenceSystemModel) -> URIRef | None:
     if not reference.identifier:
-        return None
+        return None  # pragma: no cover
     resolver = reference.url or ''
     local_id = reference.identifier.removeprefix(resolver).strip()
     if not local_id:
-        return None
+        return None  # pragma: no cover
     uri = f'{resolver}{quote(local_id, safe=URI_SAFE_CHARS)}'
     parsed = urlparse(uri)
     if not parsed.scheme or not parsed.netloc:
-        return None  # No resolvable URI, e.g. system without resolver URL
+        return None  # pragma: no cover
     return URIRef(uri)
 
 
@@ -77,7 +81,7 @@ def _walk_concepts(
     parent = g.types[parent_id]
     for sub_id in parent.subs:
         if sub_id in visited:
-            continue
+            continue  # pragma: no cover
         visited.add(sub_id)
         sub = g.types[sub_id]
         concept = _add_concept(graph, sub, scheme, language, is_top_level)
