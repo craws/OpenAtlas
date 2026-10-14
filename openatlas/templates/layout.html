@@ -10,7 +10,6 @@
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json', v=config.VERSION) }}">
   {% endif %}
   <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/bootstrap/dist/css/bootstrap.min.css', v=config.VERSION) }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/tom-select/dist/css/tom-select.bootstrap5.min.css', v=config.VERSION) }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css', v=config.VERSION) }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css', v=config.VERSION) }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='node_modules/jstree/dist/themes/default/style.min.css', v=config.VERSION) }}">
@@ -26,7 +25,7 @@
   <script src="{{ url_for('static', filename='node_modules/datatables.net-bs4/js/dataTables.bootstrap4.min.js', v=config.VERSION) }}"></script>
   <script src="{{ url_for('static', filename='node_modules/jquery-ui-dist/jquery-ui.min.js', v=config.VERSION) }}"></script>
   <script src="{{ url_for('static', filename='node_modules/@fortawesome/fontawesome-free/js/all.min.js', v=config.VERSION) }}"></script>
-  <script src="{{ url_for('static', filename='node_modules/tom-select/dist/js/tom-select.complete.min.js', v=config.VERSION) }}"></script>
+  <script src="{{ url_for('static', filename='node_modules/@tarekraafat/autocomplete.js/dist/autoComplete.min.js', v=config.VERSION) }}"></script>
   {% include "util/translations.html" %}
   {% if gis_data %}
     {% include "map.html" %}

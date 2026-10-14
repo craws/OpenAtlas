@@ -1,6 +1,6 @@
 /**
- * Autocomplete for external reference systems based on Tom Select
- * Documentation: https://tom-select.js.org/
+ * Autocomplete for external reference systems based on autoComplete.js
+ * Documentation: https://tarekraafat.github.io/autoComplete.js/
  *
  * Usage:
  *   initReferenceAutocomplete(systemId, {
@@ -14,10 +14,20 @@
  * - info: additional short information shown next to the label
  * - detail: additional information shown in the second line
  */
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
 function initReferenceAutocomplete(systemId, options) {
   const input = document.querySelector(
     `input[data-reference-system="${systemId}"]`);
-  if (!input || input.tomselect) return null;
+  if (!input || input.autocomplete_instance) return null;
 
   const minLength = options.minLength || 1;
   let requestCounter = 0;
@@ -35,59 +45,63 @@ function initReferenceAutocomplete(systemId, options) {
       }));
   }
 
-  return new TomSelect(input, {
-    valueField: 'id',
-    labelField: 'id',
-    searchField: ['label', 'info', 'detail', 'id'],
-    maxItems: 1,
-    maxOptions: null,
-    create: value => ({id: value.trim(), label: value.trim()}),
-    createOnBlur: true,
-    persist: false,
-    addPrecedence: false,
-    hideSelected: true,
-    highlight: false,
-    refreshThrottle: 0,
-    loadThrottle: options.delay || 300,
-    plugins: ['restore_on_backspace'],
-    shouldLoad: query => query.length >= minLength,
-    score: () => () => 1,
-    onType: function (query) {
-      this.wrapper.classList.toggle('is-typing', query.length > 0);
-      requestCounter++;
-      this.clearOptions();
-      this.refreshOptions(false);
+  const autocomplete = new autoComplete({
+    selector: () => input,
+    placeHolder: input.placeholder || '',
+    threshold: minLength,
+    debounce: options.delay || 300,
+    wrapper: false,
+    searchEngine: () => true,
+    data: {
+      src: async (query) => {
+        const currentCounter = ++requestCounter;
+        if (query !== input.value.trim()) {
+          return [];
+        }
+        try {
+          const items = await Promise.resolve(options.search(query));
+          if (currentCounter !== requestCounter) {
+            return [];
+          }
+          return normalize(items);
+        } catch (err) {
+          return [];
+        }
+      },
+      cache: false
     },
-    onChange: function () {
-      this.wrapper.classList.remove('is-typing');
+    resultsList: {
+      tag: 'ul',
+      class: 'autoComplete_list',
+      maxResults: options.maxResults || 50
     },
-    onBlur: function () {
-      this.wrapper.classList.remove('is-typing');
-    },
-    load: function (query, callback) {
-      if (query !== this.inputValue()) return callback([]);
-      const requestId = ++requestCounter;
-      Promise.resolve(options.search(query)).then(
-        items => {
-          callback(requestId === requestCounter ? normalize(items) : []);
-        },
-        () => callback([])
-      );
-    },
-    render: {
-      option: (item, escape) => `
-        <div>
-          <strong>${escape(item.label)}</strong>
-          ${item.info ? `<span class="text-muted"> - ${escape(item.info)}</span>` : ''}
+    resultItem: {
+      tag: 'li',
+      class: 'autoComplete_result',
+      element: (item, data) => {
+        const record = data.value;
+        item.innerHTML = `
+          <div class="autocomplete-label">
+            <strong>${escapeHtml(record.label)}</strong>
+            ${record.info ? `<span class="text-muted"> - ${escapeHtml(record.info)}</span>` : ''}
+          </div>
           <small class="d-block text-muted">
-            ${escape(item.id)}${item.detail ? ` - ${escape(item.detail)}` : ''}
-          </small>
-        </div>`,
-      item: (item, escape) => `<div>${escape(item.id)}</div>`,
-      option_create: (data, escape) => `
-        <div class="create">
-          <i class="fas fa-plus"></i> <strong>${escape(data.input)}</strong>
-        </div>`
+            ${escapeHtml(record.id)}${record.detail ? ` - ${escapeHtml(record.detail)}` : ''}
+          </small>`;
+      }
+    },
+    events: {
+      input: {
+        selection: (event) => {
+          const selection = event.detail.selection.value;
+          input.value = selection.id;
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
     }
   });
+
+  input.autocomplete_instance = autocomplete;
+  return autocomplete;
 }
