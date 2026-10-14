@@ -31,4 +31,4 @@ model: dict[str, Any] = {
     'stratigraphic_unit': place.stratigraphic_unit,
     'text': source.text,
     'type': type_.type_,
-    'type_tools': {'label': _('type tools'), 'attributes': {}}}
+    'type_tools': type_.type_tools}
