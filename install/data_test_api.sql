@@ -37,6 +37,12 @@ VALUES
   ('type', 'Lord of the rings', NULL, CURRENT_TIMESTAMP),
   ('type', 'Tavern', NULL, CURRENT_TIMESTAMP),
   ('type', 'Hills', NULL, CURRENT_TIMESTAMP),
+  ('production', 'Forging of the One Ring', 'Forged by Sauron in Orodruin', CURRENT_TIMESTAMP),
+  ('acquisition', 'Acquisition of the One Ring', 'Frodo inherits the ring from Bilbo', CURRENT_TIMESTAMP),
+  ('modification', 'Reforging of Narsil', 'The blade that was broken is forged anew as Andúril', CURRENT_TIMESTAMP),
+  ('administrative_unit', 'Gondor', 'South-kingdom of the Dúnedain', CURRENT_TIMESTAMP),
+  ('move', 'Empty march to Mordor', 'March of the Host of the West without cargo', CURRENT_TIMESTAMP),
+  ('type', 'Ring-bearer', 'Bearer of the One Ring', CURRENT_TIMESTAMP),
   ('external_reference', 'https://en.wikipedia.org/wiki/Public_domain', NULL, CURRENT_TIMESTAMP),
   ('external_reference', 'https://doi.org/10.2307/j.ctv1vtz8mq.3', NULL, CURRENT_TIMESTAMP);
 
@@ -135,6 +141,15 @@ VALUES
   ('P2', (SELECT id FROM model.entity WHERE name='Link'), (SELECT id FROM model.entity WHERE name='https://en.wikipedia.org/wiki/Public_domain')),
   ('P1', (SELECT id FROM model.entity WHERE name='Sûza'), (SELECT id FROM model.entity WHERE name='Shire')),
   ('P1', (SELECT id FROM model.entity WHERE name='The ring bearer'), (SELECT id FROM model.entity WHERE name='Frodo')),
+  ('P127', (SELECT id FROM model.entity WHERE name='Involvement'), (SELECT id FROM model.entity WHERE name='Ring-bearer')),
+  ('P108', (SELECT id FROM model.entity WHERE name='The One Ring'), (SELECT id FROM model.entity WHERE name='Forging of the One Ring')),
+  ('P24', (SELECT id FROM model.entity WHERE name='The One Ring'), (SELECT id FROM model.entity WHERE name='Acquisition of the One Ring')),
+  ('P31', (SELECT id FROM model.entity WHERE name='The One Ring'), (SELECT id FROM model.entity WHERE name='Reforging of Narsil')),
+  ('P9', (SELECT id FROM model.entity WHERE name='Exchange of the one ring'), (SELECT id FROM model.entity WHERE name='Travel to Mordor')),
+  ('P11', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Move of ring')),
+  ('P89', (SELECT id FROM model.entity WHERE name='Administrative unit'), (SELECT id FROM model.entity WHERE name='Gondor')),
+  ('P53', (SELECT id FROM model.entity WHERE name='Location of Shire'), (SELECT id FROM model.entity WHERE name='Gondor')),
+  ('P26', (SELECT id FROM model.entity WHERE name='Location of Mordor'), (SELECT id FROM model.entity WHERE name='Empty march to Mordor')),
   ('P46', (SELECT id FROM model.entity WHERE name='Home of Baggins'), (SELECT id FROM model.entity WHERE name='Shire')),
   ('P2', (SELECT id FROM model.entity WHERE name='Hills'), (SELECT id FROM model.entity WHERE name='Home of Baggins')),
   ('P46', (SELECT id FROM model.entity WHERE name='Bar'), (SELECT id FROM model.entity WHERE name='Home of Baggins')),
@@ -158,7 +173,6 @@ VALUES
   ('P74', (SELECT id FROM model.entity WHERE name='Location of Shire'), (SELECT id FROM model.entity WHERE name='Sam') ),
   ('OA8', (SELECT id FROM model.entity WHERE name='Location of Shire'), (SELECT id FROM model.entity WHERE name='Sam') ),
   ('OA9', (SELECT id FROM model.entity WHERE name='Location of Shire'), (SELECT id FROM model.entity WHERE name='Sam') ),
-  ('P11', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Travel to Mordor') ),
   ('P134', (SELECT id FROM model.entity WHERE name='Travel to Mordor'), (SELECT id FROM model.entity WHERE name='Exchange of the one ring') ),
   ('P7', (SELECT id FROM model.entity WHERE name='Location of Mordor'), (SELECT id FROM model.entity WHERE name='Travel to Mordor') );
 
@@ -202,7 +216,9 @@ VALUES
   ('P67', (SELECT id FROM model.entity WHERE name='CC BY 4.0'), (SELECT id FROM model.entity WHERE name='https://en.wikipedia.org/wiki/Public_domain'), 'https://creativecommons.org/licenses/by/4.0/deed.de', NULL ),
   ('P67', (SELECT id FROM model.entity WHERE name='CC BY-SA 4.0'), (SELECT id FROM model.entity WHERE name='https://en.wikipedia.org/wiki/Public_domain'), 'https://creativecommons.org/licenses/by-sa/4.0/deed.de', NULL ),
   ('P67', (SELECT id FROM model.entity WHERE name='Public domain'), (SELECT id FROM model.entity WHERE name='Picture with a License'), NULL, NULL ),
-  ('P67', (SELECT id FROM model.entity WHERE name='Public domain'), (SELECT id FROM model.entity WHERE name='Frodo et. al.'), '12-13', NULL );
+  ('P67', (SELECT id FROM model.entity WHERE name='Public domain'), (SELECT id FROM model.entity WHERE name='Frodo et. al.'), '12-13', NULL ),
+  ('P11', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Travel to Mordor'), NULL, (SELECT id FROM model.entity WHERE name='Ring-bearer') ),
+  ('P2', (SELECT id FROM model.entity WHERE name='Height'), (SELECT id FROM model.entity WHERE name='Frodo'), '1.06', NULL );
 
 INSERT INTO web.entity_profile_image (entity_id, image_id)
 VALUES ( (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Picture with a License') )
@@ -234,6 +250,17 @@ VALUES
     ((SELECT id FROM model.entity WHERE name='Picture with a License'), (SELECT id FROM model.rights_holder WHERE name='Sauron'), 'license_holder'),
     ((SELECT id FROM model.entity WHERE name='Picture with a License'), (SELECT id FROM model.rights_holder WHERE name='Sam'), 'license_holder'),
     ((SELECT id FROM model.entity WHERE name='File not public'), (SELECT id FROM model.rights_holder WHERE name='Sauron'), 'creator');
+
+INSERT INTO model.annotation_text (source_id, entity_id, link_start, link_end, text)
+VALUES (
+  (SELECT id FROM model.entity WHERE name='Silmarillion'),
+  (SELECT id FROM model.entity WHERE name='Frodo'),
+  4, 16, 'Tales of the First Age'
+);
+
+UPDATE model.entity
+SET begin_from = '3018-09-23', begin_to = '3018-10-25', begin_comment = 'Departure from Bag End', end_from = '3019-03-25', end_to = '3019-03-25', end_comment = 'Destruction of the Ring'
+WHERE name = 'Travel to Mordor';
 
 UPDATE model.entity
 SET begin_from = CURRENT_DATE

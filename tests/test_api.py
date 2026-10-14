@@ -75,7 +75,7 @@ class Api(ApiTestCase):
                 'api_04.network_visualisation',
                 exclude_system_classes='type'))
         rv = rv.get_json()
-        assert len(rv['results']) == 67
+        assert len(rv['results']) == 72
         rv = c.get(
             url_for(
                 'api_04.network_visualisation',
@@ -84,7 +84,7 @@ class Api(ApiTestCase):
         assert len(rv['results']) == 16
         rv = c.get(url_for('api_04.network_visualisation', download=True))
         rv = rv.get_json()
-        assert len(rv['results']) == 167
+        assert len(rv['results']) == 172
 
         rv = c.get(
             url_for(
@@ -92,7 +92,7 @@ class Api(ApiTestCase):
                 id_=e.place.id,
                 exclude_system_classes='type'))
         rv = rv.get_json()
-        assert len(rv['results']) == 15
+        assert len(rv['results']) == 16
         rv = c.get(
             url_for(
                 'api_04.ego_network_visualisation',
@@ -114,7 +114,7 @@ class Api(ApiTestCase):
                 id_=e.place.id,
                 download=True))
         rv = rv.get_json()
-        assert len(rv['results']) == 19
+        assert len(rv['results']) == 20
 
         for rv in [
             c.get(url_for('api_04.geometric_entities')),
@@ -599,12 +599,12 @@ class Api(ApiTestCase):
                     "operator": "greaterThan",
                     "values": ["Sûza"]}],
                 "typeID": [{"operator": "equal", "values": [1121212]}]}]),
-            (2, [{
+            (3, [{
                 "endFrom": [{
                     "operator": "greaterThan",
                     "values": ["2013-02-01"],
                     "logicalOperator": "and"}]}]),
-            (1, [{
+            (2, [{
                 "endTo": [{
                     "operator": "greaterThanEqual",
                     "values": ["2019-03-01"],
@@ -671,7 +671,7 @@ class Api(ApiTestCase):
                     "operator": "equal",
                     "values": [e.boundary_mark.id, e.height.id]}]}]),
             (6, [{"entityName": [{"operator": "like", "values": ["Fr"]}]}]),
-            (8, [{
+            (9, [{
                 "typeIDWithSubs": [{
                     "operator": "equal",
                     "values": [e.boundary_mark.id, e.height.id,
@@ -683,12 +683,12 @@ class Api(ApiTestCase):
                 "relationToID": [{
                     "operator": "equal",
                     "values": [e.place.id]}]}]),
-            (175, [{
+            (181, [{
                 "typeIDWithSubs": [{
                     "operator": "notEqual",
                     "values": [e.boundary_mark.id],
                     "logicalOperator": "and"}]}]),
-            (177, [{
+            (183, [{
                 "typeName": [{
                     "operator": "notEqual",
                     "values": ["Boundary Mark", "Height"],
@@ -799,7 +799,7 @@ class Api(ApiTestCase):
         assert rv.get_json()['pagination']['entities'] == 2
 
         rv = c.get(url_for('api_04.search', class_='type', term='i'))
-        assert rv.get_json()['pagination']['entities'] == 50
+        assert rv.get_json()['pagination']['entities'] == 51
 
         rv = c.get(url_for('api_04.search', class_='person'))
         assert rv.get_json()['pagination']['entities'] == 3

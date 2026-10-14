@@ -7,17 +7,39 @@ from flask import g, url_for
 
 from openatlas.api.api_v1.entity import get_entity_by_id
 from openatlas.api.api_v1.formatters.la_helpers import (
-    ACTORS, BIBLIOGRAPHY_AAT, CLASS_TYPES, DIMENSION_ROOTS,
-    MIME_CLASSIFICATIONS, UNIT_MAP, alias_name, aat_type, category_aat,
-    date_to_utc_iso_str, get_language, identifier, is_float, la_type,
-    primary_name, statement,
-    unique_identifier)
-from openatlas.api.api_v1.formatters.util import EntityLinks, entity_uri, \
-    get_links_for_entities, get_type_references
+    ACTORS,
+    BIBLIOGRAPHY_AAT,
+    CLASS_TYPES,
+    DIMENSION_ROOTS,
+    MIME_CLASSIFICATIONS,
+    UNIT_MAP,
+    aat_type,
+    alias_name,
+    category_aat,
+    date_to_utc_iso_str,
+    get_language,
+    identifier,
+    is_float,
+    la_type,
+    primary_name,
+    statement,
+    unique_identifier,
+)
+from openatlas.api.api_v1.formatters.util import (
+    EntityLinks,
+    entity_uri,
+    get_links_for_entities,
+    get_type_references,
+)
 from openatlas.api.api_v1.util.files import (
-    get_cached_file_path, get_file_size, get_iiif_manifest_and_path,
-    get_license_type, get_mime_type,
-    prefetch_files, resolve_rights_holders)
+    get_cached_file_path,
+    get_file_size,
+    get_iiif_manifest_and_path,
+    get_license_type,
+    get_mime_type,
+    prefetch_files,
+    resolve_rights_holders,
+)
 from openatlas.models.annotation import AnnotationText
 from openatlas.models.dates import Dates
 from openatlas.models.entity import Entity, Link
@@ -79,7 +101,7 @@ def is_close_match(link_: Link) -> bool:
 
 
 def generate_skolem_id(id_: int, type_name: str) -> str:
-    seed = f"{id_}_{type_name}".encode('utf-8')
+    seed = f"{id_}_{type_name}".encode()
     identifier_hash = hashlib.sha256(seed).hexdigest()[:16]
     base = getattr(g, 'skolem_base_url', None)
     if base is None:
@@ -199,7 +221,6 @@ class LaFormatter:
             unique_identifier(entity_uri(entity))]
         if entity.class_.name == 'object_location' \
                 and (geometry := self.geometries.get(entity.id)):
-            # pragma: no cover
             record['defined_by'] = geometry
         for link_ in data.links:
             self._process_link(link_, record, False)
@@ -269,7 +290,6 @@ class LaFormatter:
             '_label': event.name,
             'identified_by': [unique_identifier(entity_uri(event))]}
         if link_ and link_.type and (type_ := g.types.get(link_.type.id)):
-            # pragma: no cover
             node['classified_as'] = [self._type_ref(type_)]
         if timespan := get_timespan(dates, f'Timespan of {event.name}'):
             node['timespan'] = timespan
@@ -286,7 +306,7 @@ class LaFormatter:
             return
         type_ = link_.range
         if type_.name == 'Radiocarbon' and link_.description:
-            self._radiocarbon(link_, record)  # pragma: no cover
+            self._radiocarbon(link_, record)
         elif link_.description and is_float(link_.description):
             self._dimension(link_, record)
         else:
@@ -305,7 +325,7 @@ class LaFormatter:
                     'id': 'https://vocab.getty.edu/aat/300226816',
                     'type': 'MeasurementUnit',
                     '_label': unit}})
-        else:   # pragma: no cover
+        else:
             la_append(record, 'referred_to_by', statement(
                 f'{link_.description} {unit}',
                 type_.name,
@@ -313,7 +333,6 @@ class LaFormatter:
 
     @staticmethod
     def _radiocarbon(link_: Link, record: dict[str, Any]) -> None:
-        # pragma: no cover
         data = ast.literal_eval(link_.description)
         year = int(data['radiocarbonYear'])
         range_ = int(data['range'])
@@ -489,7 +508,7 @@ class LaFormatter:
         group = link_.domain
         group_ref = self._typed_ref(group, {'Group'})
         if not group_ref:
-            return
+            return  # pragma: no cover
         la_append(record, 'member_of', group_ref)
         if not (link_.type or link_.dates.dates_available()):
             return  # pragma: no cover
@@ -508,7 +527,7 @@ class LaFormatter:
 
     def _oa7(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if record['type'] not in ACTORS:
-            return
+            return  # pragma: no cover
         other = link_.domain if inverse else link_.range
         if not (ref := self._typed_ref(other, ACTORS)):
             return  # pragma: no cover
@@ -850,7 +869,7 @@ class LaFormatter:
 
     def _annotation(
             self,
-            annotation: AnnotationText) -> dict[str, Any]:  # pragma: no cover
+            annotation: AnnotationText) -> dict[str, Any]:
         text = self.entity.description or ''
         inner_text = text[annotation.link_start:annotation.link_end]
         result = statement(

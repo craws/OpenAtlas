@@ -237,7 +237,7 @@ def iiif_file_exists(id_: int) -> bool:
 def get_file_size(id_: int) -> str:
     if path := get_cached_file_path(id_):
         return convert_size(path.stat().st_size)
-    return 'N/A'
+    return 'N/A'  # pragma: no cover
 
 
 def get_agent_item(rights_holder: RightsHolder) -> AgentItem:

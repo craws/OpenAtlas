@@ -146,7 +146,29 @@ class ApiV1(ApiTestCase):
 
     def test_la(self) -> None:
         c = self.client
+        with app.test_request_context():
+            app.preprocess_request()
+            rights_holder_ids = [rh.id for rh in g.rights_holder]
+
+        logo_path = Path(app.root_path) / 'static' / 'images' / 'layout'
+        public_type = get_hierarchy('Public sharing allowed')
+        with open(logo_path / 'logo.png', 'rb') as img:
+            c.post(
+                url_for('insert', class_='file'),
+                data={
+                    'name': 'OpenAtlas logo',
+                    'file': img,
+                    'description': 'OpenAtlas logo',
+                    'creator': f'{rights_holder_ids}',
+                    'license_holder': f'{rights_holder_ids}',
+                    str(public_type.id): public_type.subs[1]},
+                follow_redirects=True)
+
         e = self.get_api_entities()
+        with app.test_request_context():
+            app.preprocess_request()
+            e.file.link('P67', e.place)
+            e.file.link('P2', e.open_license)
 
         rv = c.get(url_for('api_v1_la.get_entity', uuid=e.place.uuid))
         assert 'application/ld+json' in rv.headers.get('Content-Type')
@@ -198,12 +220,72 @@ class ApiV1(ApiTestCase):
         assert part['moved'][0]['id'].endswith(e.artifact.uuid)
         assert part['moved_to']['type'] == 'Place'
         assert part['moved_from']['type'] == 'Place'
+        assert 'influenced_by' in rv.get_json()
+
+        rv = c.get(url_for('api_v1_la.get_entity', uuid=e.empty_move.uuid))
+        assert 'part' not in rv.get_json()
 
         rv = c.get(url_for('api_v1_la.get_entity', uuid=e.artifact.uuid))
         rv_json = rv.get_json()
         assert rv_json['produced_by']['type'] == 'Production'
         assert rv_json['destroyed_by']['type'] == 'Destruction'
         assert 'timespan' in rv_json['destroyed_by']
+        assert 'changed_ownership_through' in rv_json
+        assert 'modified_by' in rv_json
+
+        rv = c.get(url_for('api_v1_la.get_entity', uuid=e.event.uuid))
+        rv_json = rv.get_json()
+        assert rv_json['type'] == 'Activity'
+        assert 'took_place_at' in rv_json
+        assert 'carried_out_by' in rv_json
+        assert 'participant' in rv_json
+        assert 'before' in rv_json
+        assert 'timespan' in rv_json
+        assert 'referred_to_by' in rv_json
+
+        rv = c.get(url_for('api_v1_la.get_entity', uuid=e.event2.uuid))
+        rv_json = rv.get_json()
+        assert rv_json['part_of']['type'] == 'Activity'
+        assert 'after' in rv_json
+
+        rv = c.get(url_for('api_v1_la.get_entity', uuid=e.actor.uuid))
+        rv_json = rv.get_json()
+        assert rv_json['type'] == 'Person'
+        assert 'member_of' in rv_json
+        assert 'participated_in' in rv_json
+        assert 'residence' in rv_json
+        assert 'referred_to_by' in rv_json
+
+        rv = c.get(url_for('api_v1_la.get_entity', uuid=e.file.uuid))
+        rv_json = rv.get_json()
+        assert rv_json['type'] == 'DigitalObject'
+        assert 'dimension' in rv_json
+        assert 'access_point' in rv_json
+        assert 'created_by' in rv_json
+
+        rv = c.get(url_for('api_v1_la.get_entity', uuid=e.source.uuid))
+        rv_json = rv.get_json()
+        assert rv_json['type'] == 'LinguisticObject'
+        assert 'referred_to_by' in rv_json
+
+        rv = c.get(url_for('api_v1_la.get_entity', uuid=e.bibliography.uuid))
+        rv_json = rv.get_json()
+        assert 'about' in rv_json
+
+        rv = c.get(url_for(
+            'api_v1_la.get_entity', uuid=e.stratigraphic_unit.uuid))
+        assert 'attributed_by' in rv.get_json()
+
+        rv = c.get(url_for('api_v1_la.get_entity', uuid=e.location.uuid))
+        assert 'defined_by' in rv.get_json()
+
+        rv = c.get(
+            url_for('api_v1_la.get_entity', uuid=e.administrative_unit.uuid))
+        assert 'defined_by' in rv.get_json()
+
+        for entity in (e.group, e.production, e.translation):
+            rv = c.get(url_for('api_v1_la.get_entity', uuid=entity.uuid))
+            assert rv.status_code == 200
 
         for entity in (e.place, e.feature):
             rv = c.get(url_for('api_v1_la.get_entity', uuid=entity.uuid))
