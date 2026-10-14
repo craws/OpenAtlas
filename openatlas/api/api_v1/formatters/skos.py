@@ -4,12 +4,13 @@ from urllib.parse import quote, urlparse
 from flask import Response, g
 from rdflib import DCTERMS, Dataset, Literal, Namespace, RDF, URIRef
 
-from openatlas.api.api_v1.formatters.lod_util import (
-    entity_uri, get_external_reference_items, get_type_references)
+from openatlas.api.api_v04.resources.util import to_camel_case
+from openatlas.api.api_v1.formatters.util import entity_uri, \
+    get_type_references
 from openatlas.api.api_v1.models.util import (
     ExternalReferenceSystemModel, MatchTypeEnum)
 from openatlas.api.api_v1.util.content_negotiation import make_graph_response
-from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity, Link
 
 SKOS: Final[Namespace] = Namespace('http://www.w3.org/2004/02/skos/core#')
 
@@ -107,3 +108,32 @@ def build_skos_graph(root: Entity) -> Dataset:
 
 def serialize_skos(graph: Dataset, ext: str | None = None) -> Response:
     return make_graph_response(graph, ext=ext)
+
+
+def _get_match_type(link_: Link) -> MatchTypeEnum:
+    assert link_.type
+    return MatchTypeEnum(to_camel_case(g.types[link_.type.id].name))
+
+
+def _get_external_reference_item(
+        link_: Link,
+        entity: Entity) -> ExternalReferenceSystemModel:
+    return ExternalReferenceSystemModel(
+        id=entity.id,
+        name=entity.name,
+        match_type=_get_match_type(link_),
+        identifier=f'{entity.resolver_url or ""}{link_.description}',
+        description=entity.description,
+        system_url=entity.website_url,
+        url=entity.resolver_url)
+
+
+def get_external_reference_items(
+        inverse_links: list[Link]) -> list[ExternalReferenceSystemModel]:
+    external_references = []
+    for link_ in inverse_links:
+        if link_.type and \
+                (entity := g.reference_systems.get(link_.domain.id)):
+            external_references.append(
+                _get_external_reference_item(link_, entity))
+    return external_references

@@ -24,6 +24,7 @@ def get_entity_by_id(
     except ImATeapot:
         abort_not_found(id_)
 
+
 def get_entity_by_uuid(
         uuid: UUID,
         types: bool = False,
@@ -72,9 +73,7 @@ def get_by_system_class(
         case_study: int | UUID | None = None) -> list[Entity]:
     type_ids = resolve_type_ids(type_id)
     case_study_ids = resolve_type_ids(case_study)
-    aliases = True
-    if not g.classes[class_name].attributes.get('alias'):
-        aliases = False
+    aliases = bool(g.classes[class_name].attributes.get('alias'))
     return [
         Entity(row) for row in get_by_class_api(
             class_name,
@@ -93,10 +92,10 @@ def get_by_system_class(
 def get_count_by_system_class(
         class_name: str,
         search: str | None = None,
-        start_date: Any = None,
-        end_date: Any = None,
-        type_id: int | str | UUID | None = None,
-        case_study: int | str | UUID | None = None) -> int:
+        start_date: str | None = None,
+        end_date: str | None = None,
+        type_id: int | UUID | None = None,
+        case_study: int | UUID | None = None) -> int:
     type_ids = resolve_type_ids(type_id)
     case_study_ids = resolve_type_ids(case_study)
     return get_count_by_class_api(

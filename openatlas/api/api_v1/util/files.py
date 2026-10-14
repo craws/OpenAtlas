@@ -25,9 +25,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.rights_holder import RightsHolder
 
 if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.api.api_v1.formatters.lod_util import EntityLinks
-
-
+    from openatlas.api.api_v1.formatters.util import EntityLinks
 
 SAFE_FILE_EXTENSIONS = {
     '.jpg', '.png', '.jpeg', '.pdf', '.tif', '.tiff', '.bmp', '.gif',

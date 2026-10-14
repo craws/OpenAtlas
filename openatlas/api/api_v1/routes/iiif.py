@@ -1,7 +1,7 @@
 from flask_openapi3 import APIBlueprint
 
 from openatlas.api.api_v1.error_handlers import (
-    abort_id_does_not_exist, register_error_handlers)
+    abort_not_found, register_error_handlers)
 from openatlas.api.api_v1.models.iiif import (
     AnnotationIiifPath, FileIiifPath)
 from openatlas.api.api_v1.openapi_tags import iiif_tag
@@ -80,7 +80,7 @@ def get_iiif_annotation_list(path: FileIiifPath):
 def get_iiif_annotation(path: AnnotationIiifPath):
     """Returns a specific IIIF annotation."""
     if not (data := get_annotation_image_by_id(path.id)):
-        abort_id_does_not_exist(path.id)
+        abort_not_found(path.id)
     annotation = AnnotationImage(data)
     image_entity = get_file_entity(annotation.image_id)
     check_file_access(image_entity)

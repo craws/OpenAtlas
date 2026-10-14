@@ -1,3 +1,4 @@
+import re
 from typing import Any, Final
 
 from openatlas import app
@@ -198,3 +199,29 @@ def statement(
     if identified_by:
         result['identified_by'] = identified_by
     return result
+
+
+def is_float(value: str) -> bool:
+    try:
+        float(value)
+        return True
+    except ValueError:  # pragma: no cover
+        return False
+
+
+DATE_PARTS_RE: Final = re.compile(
+    r'^(-?\d{4,})-(\d{2})-(\d{2})'
+    r'(?:[T ](\d{2}):(\d{2}):(\d{2})(?:\.\d+)?)?Z?$')
+
+
+def date_to_utc_iso_str(date: Any) -> str | None:
+    if not date:
+        return None  # pragma: no cover
+    match = DATE_PARTS_RE.match(str(date))
+    if not match:
+        return str(date)  # pragma: no cover
+    year, month, day, hour, minute, second = match.groups()
+    if hour and (int(hour) or int(minute) or int(second)):
+        return (f'{year}-{month}-'
+                f'{day}T{hour}:{minute}:{second}Z')  # pragma: no cover
+    return f'{year}-{month}-{day}'

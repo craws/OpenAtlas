@@ -4,6 +4,7 @@ from uuid import UUID
 
 import psycopg2
 from flask import Response, abort, jsonify, make_response, request
+from flask_openapi3 import APIBlueprint
 from werkzeug.exceptions import HTTPException
 
 
@@ -34,7 +35,7 @@ def handle_db_error(_e: Any = None) -> Response:
     return error_response(  # pragma: no cover
         500,
         'Internal Server Error',
-        'Unexpected database error occurred',
+        'An unexpected database error occurred.',
         {'hint': 'Please try again later or contact the project members.'})
 
 
@@ -48,22 +49,21 @@ def handle_db_data_error(_e: Any = None) -> Response:
 
 
 def handle_http_exception(e: HTTPException) -> Response:
-    return error_response(e.code, e.name, e.description)  # pragma: no cover
+    return error_response(  # pragma: no cover
+        e.code or 500,
+        e.name,
+        e.description or 'An HTTP error occurred.')
 
 
-def handle_file_not_found_exception(e: HTTPException) -> Response:
-    return error_response(e.code, e.name, e.description)  # pragma: no cover
-
-
-def register_error_handlers(api_v1) -> None:
+def register_error_handlers(api_v1: APIBlueprint) -> None:
     api_v1.register_error_handler(psycopg2.DataError, handle_db_data_error)
     api_v1.register_error_handler(psycopg2.Error, handle_db_error)
     api_v1.register_error_handler(HTTPException, handle_http_exception)
 
 
-def abort_not_found(uuid: UUID | str | int) -> NoReturn:
+def abort_not_found(identifier: UUID | str | int) -> NoReturn:
     details = {
-        'provided_uuid': str(uuid),
+        'provided_id': str(identifier),
         'hint': 'Check if the UUID or ID is correct '
                 'and the entity has not been deleted.'}
     abort_with_error(
@@ -76,23 +76,12 @@ def abort_not_found(uuid: UUID | str | int) -> NoReturn:
 def abort_id_not_a_file(id_: int) -> NoReturn:
     details = {
         'provided_id': str(id_),
-        'hint': 'Find more details of that entity via an /entity endpoint'}
+        'hint': 'Find more details about this entity via an /entity endpoint.'}
     abort_with_error(
         404,
-        'ID is not a file',
-        f"The requested entity id {id_} is not a file. ",
-        details)
-
-
-def abort_id_does_not_exist(id_: int) -> NoReturn:
-    details = {
-        'provided_id': str(id_),
-        'hint': 'Try searching for the entity by its name using a '
-                'search endpoint.'}
-    abort_with_error(
-        404,
-        'ID does not exist',
-        f"The requested entity id {id_} is not in the database.",
+        'Entity is not a file',
+        f'The requested entity ID {id_} exists, '
+        'but is not a file entity.',
         details)
 
 
@@ -102,8 +91,8 @@ def abort_file_without_license(id_: int) -> NoReturn:
         'hint': 'Please contact the project members for more details.'}
     abort_with_error(
         403,
-        'No Licenser',
-        "The requested file has no license and can't be displayed.",
+        'No license',
+        'The requested file has no open license and cannot be displayed.',
         details)
 
 
@@ -113,17 +102,19 @@ def abort_file_not_public(id_: int) -> NoReturn:
         'hint': 'Please contact the project members for more details.'}
     abort_with_error(
         403,
-        'Not shareable',
-        "This file is not public shareable.",
+        'Not publicly shareable',
+        'This file is not marked as publicly shareable.',
         details)
 
 
 def abort_file_not_found(id_: int) -> NoReturn:
     details = {
         'provided_id': str(id_),
-        'hint': 'Find more details of that entity via an /entity endpoint'}
+        'hint': 'The entity metadata exists, '
+                'but the physical file is missing. '
+                'See /entity endpoint for metadata.'}
     abort_with_error(
         404,
-        'File not found',
-        f"No file was found for the requested ID {id_}.",
+        'File not found on disk',
+        f'No physical file was found for the requested ID {id_}.',
         details)

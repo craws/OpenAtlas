@@ -106,7 +106,7 @@ def display_thumbnail(path: FileIdPath, query: DownloadQuery):
         as_attachment=bool(query.download))
 
 
-def _get_public_files_response(
+def get_public_files_response(
         endpoint: str,
         query: PublicFilesQuery,
         entity_id: int | None = None,
@@ -138,7 +138,7 @@ def _get_public_files_response(
     responses=public_files_response)
 def get_public_files(query: PublicFilesQuery) -> dict[str, Any]:
     """Retrieves a page of publicly shareable files with a license."""
-    return _get_public_files_response('api_v1_files.get_public_files', query)
+    return get_public_files_response('api_v1_files.get_public_files', query)
 
 
 @api_v1_files.get(
@@ -151,7 +151,7 @@ def get_public_files_by_entity(
         query: PublicFilesQuery) -> dict[str, Any]:
     """Retrieves a page of publicly shareable files with a license connected
     to the given entity."""
-    return _get_public_files_response(
+    return get_public_files_response(
         'api_v1_files.get_public_files_by_entity',
         query,
         entity_id=path.id,

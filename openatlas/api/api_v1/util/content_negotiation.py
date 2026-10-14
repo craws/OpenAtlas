@@ -1,7 +1,7 @@
 from typing import Any, Final
 
 from flask import Response, request
-from rdflib import Dataset
+from rdflib import Dataset, Graph
 
 from openatlas import app
 
@@ -12,46 +12,38 @@ EXTENSION_MIME_MAP: Final[dict[str, str]] = {
     'nt': 'application/n-triples'}
 
 MIME_FORMAT_MAP: Final[dict[str, str]] = {
+    'application/ld+json': 'json-ld',
     'text/turtle': 'turtle',
     'application/rdf+xml': 'xml',
-    'application/n-triples': 'nt',
-    'application/ld+json': 'json-ld'}
-
-LOD_HEADER: Final[list[str]] = [
-    'application/ld+json',
-    'text/turtle',
-    'application/rdf+xml',
-    'application/n-triples']
+    'application/n-triples': 'nt'}
 
 
-def set_accept_header(extension: str | None = None) -> None:
-    if not extension:
-        return
-    if extension in EXTENSION_MIME_MAP:
-        request.environ['HTTP_ACCEPT'] = EXTENSION_MIME_MAP[extension]
+def get_accepted_mimetype(ext: str | None = None) -> str:
+    if ext and ext in EXTENSION_MIME_MAP:
+        return EXTENSION_MIME_MAP[ext]
+    return request.accept_mimetypes.best_match(
+        MIME_FORMAT_MAP.keys(),
+        default='application/ld+json')
 
 
 def make_graph_response(
-        graph: Dataset,
+        graph: Graph,
         ext: str | None = None) -> Response:
-    set_accept_header(ext)
-    accepted = request.accept_mimetypes.best_match(LOD_HEADER)
-    rdf_format = MIME_FORMAT_MAP.get(accepted, 'json-ld')
-    mimetype = accepted if accepted in MIME_FORMAT_MAP \
-        else 'application/ld+json'
+    mimetype = get_accepted_mimetype(ext)
+    rdf_format = MIME_FORMAT_MAP[mimetype]
     return Response(graph.serialize(format=rdf_format), mimetype=mimetype)
 
 
 def make_lod_response(
         data: dict[str, Any],
         ext: str | None = None) -> Response:
-    set_accept_header(ext)
-    accepted = request.accept_mimetypes.best_match(LOD_HEADER)
+    mimetype = get_accepted_mimetype(ext)
     json_str = app.json.dumps(data)
-    if accepted not in [
-        'text/turtle', 'application/rdf+xml', 'application/n-triples']:
-        return Response(json_str, mimetype='application/ld+json')
+    if mimetype == 'application/ld+json':
+        return Response(json_str, mimetype=mimetype)
 
     graph = Dataset()
     graph.parse(data=json_str, format='json-ld')
-    return make_graph_response(graph)
+    return Response(
+        graph.serialize(format=MIME_FORMAT_MAP[mimetype]),
+        mimetype=mimetype)

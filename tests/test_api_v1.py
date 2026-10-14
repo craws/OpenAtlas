@@ -4,7 +4,7 @@ from flask import g, url_for
 from rdflib import Dataset, RDF, URIRef
 
 from openatlas import app
-from openatlas.api.api_v1.formatters.la import format_la_entities
+from openatlas.api.api_v1.formatters.la_formatter import format_la_entities
 from openatlas.api.api_v1.formatters.lod import format_lod_entities
 from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
@@ -458,7 +458,7 @@ class ApiV1(ApiTestCase):
         # Agent by ID
         rv = c.get(url_for('api_v1_metadata.get_agent_by_id', id=999999))
         assert rv.status_code == 404
-        assert rv.get_json()['details']['provided_uuid'] == '999999'
+        assert rv.get_json()['details']['provided_id'] == '999999'
 
         rv = c.get(url_for('api_v1_metadata.get_agent_by_id', id=1))
         assert rv.status_code == 200
@@ -719,7 +719,7 @@ class ApiV1(ApiTestCase):
 
         rv = c.get('/api/1/iiif/999999/manifest/2')
         assert rv.status_code == 404
-        assert rv.get_json()['details']['provided_uuid'] == '999999'
+        assert rv.get_json()['details']['provided_id'] == '999999'
 
         for id_ in [0, 999999]:
             rv = c.get(f'/api/1/iiif/{id_}/annotation/3')

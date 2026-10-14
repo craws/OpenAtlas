@@ -44,8 +44,8 @@ def _walk_case_studies(ids: list[int]) -> list[CaseStudyItem]:
 def get_case_studies():
     case_study_ids = g.types[g.case_study_type.id].subs
     case_studies = _walk_case_studies(case_study_ids)
-    return CaseStudyListResponse(data=case_studies).model_dump(
-        by_alias=True)
+    return CaseStudyListResponse(
+        data=case_studies).model_dump(by_alias=True)
 
 
 @api_v1_metadata.get(

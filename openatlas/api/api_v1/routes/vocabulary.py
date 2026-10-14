@@ -6,10 +6,10 @@ from flask_openapi3 import APIBlueprint
 
 from openatlas.api.api_v1.error_handlers import abort_not_found, \
     register_error_handlers
-from openatlas.api.api_v1.formatters.lod_util import (
-    EntityLinks, get_external_reference_items, get_links_for_entities)
+from openatlas.api.api_v1.formatters.util import EntityLinks, \
+    get_links_for_entities
 from openatlas.api.api_v1.formatters.skos import (
-    build_skos_graph, serialize_skos)
+    build_skos_graph, get_external_reference_items, serialize_skos)
 from openatlas.api.api_v1.openapi_tags import vocabulary_tag
 from openatlas.api.api_v1.models.util import (
     ReferenceModel, TypeCategoryEnum)

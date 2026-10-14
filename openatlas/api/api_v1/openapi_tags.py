@@ -1,39 +1,41 @@
 from flask_openapi3 import Tag
 
 lod_tag = Tag(
-    name="LOD",
-    description="Linked Open Data Endpoints")
+    name='LOD',
+    description='Linked Open Data endpoints (e.g. Linked.Art).')
 
 system_tag = Tag(
-    name="System",
-    description="System information and configuration")
+    name='System',
+    description='System information, classes, and configuration.')
 
 vocabulary_tag = Tag(
-    name="Vocabulary",
-    description="Types and Vocabularies")
+    name='Vocabulary',
+    description='Controlled vocabularies, type hierarchies, and SKOS exports.')
 
 file_tag = Tag(
-    name="Files",
-    description="Display and licenses")
+    name='Files',
+    description='File display, thumbnails, and public license overviews.')
 
 iiif_tag = Tag(
-    name="IIIF",
-    description="IIIF endpoints")
+    name='IIIF',
+    description='IIIF Presentation and Image API endpoints.')
 
 metadata_tag = Tag(
-    name="Metadata",
-    description="Project metadata and case studies")
+    name='Metadata',
+    description='Project metadata, agents, and case studies.')
 
-# All geographic entites, filter with bbox, search nearest entities, g
-# pkg export, etc.
-# geographic_tag = Tag(name="Geographic", description="Geographic endpoints")
+# Planned future tags:
+# All geographic entities, filter with bbox, search nearest entities,
+# gpkg export, etc.
+# geographic_tag = Tag(name='Geographic', description='Geographic endpoints.')
 
-# presentation view, table, search
-# frontend_tag = Tag(name="Frontend", description="Frontend endpoints")
+# Presentation view, table, search
+# frontend_tag = Tag(name='Frontend', description='Frontend endpoints.')
 
-# Network analysis
 # Network, ego network, SNA with special person connections
-# network_tag = Tag(name="Network", description="Network analysis endpoints")
+# network_tag = Tag(
+#     name='Network',
+#     description='Network analysis endpoints.')
 
 # Thanados, PFP, CSV, and other
-# export_tag = Tag(name="Export", description="Different export formats")
+# export_tag = Tag(name='Export', description='Different export formats.')

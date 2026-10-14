@@ -1,165 +1,16 @@
-import re
-from collections import defaultdict
 from collections.abc import Callable
-from dataclasses import dataclass, field
-from typing import Any, Final
+from typing import Any
 from uuid import UUID
 
-from flask import Response, g, url_for
+from flask import Response
 
-from openatlas.api.api_v04.resources.util import to_camel_case
 from openatlas.api.api_v1.entity import (
     get_by_system_class, get_count_by_system_class, get_entity_by_uuid)
 from openatlas.api.api_v1.error_handlers import abort_not_found
-from openatlas.api.api_v1.models.util import (
-    ExternalReferenceSystemModel, MatchTypeEnum)
 from openatlas.api.api_v1.util.content_negotiation import (
     make_lod_response)
 from openatlas.api.api_v1.util.pagination import get_pagination
-from openatlas.database.api import get_wkts_by_ids
-from openatlas.models.entity import Entity, Link
-
-DATE_PARTS_RE: Final = re.compile(
-    r'^(-?\d{4,})-(\d{2})-(\d{2})'
-    r'(?:[T ](\d{2}):(\d{2}):(\d{2})(?:\.\d+)?)?Z?$')
-
-
-@dataclass
-class EntityLinks:
-    entity: Entity
-    links: list[Link] = field(default_factory=list)
-    links_inverse: list[Link] = field(default_factory=list)
-    geometries: dict[int, Any] = field(default_factory=dict)
-
-
-def entity_uri(entity: Entity) -> str:
-    base = getattr(g, 'entity_base_url', None)
-    if base is None:
-        base = url_for(
-            'api.entity_uuid',
-            uuid='00000000-0000-0000-0000-000000000000',
-            _external=True).replace('00000000-0000-0000-0000-000000000000', '')
-        g.entity_base_url = base
-    return f"{base}{entity.uuid}"
-
-
-def date_to_utc_iso_str(date: Any) -> str | None:
-    if not date:
-        return None  # pragma: no cover
-    match = DATE_PARTS_RE.match(str(date))
-    if not match:
-        return str(date)  # pragma: no cover
-    year, month, day, hour, minute, second = match.groups()
-    if hour and (int(hour) or int(minute) or int(second)):
-        return (f'{year}-{month}-'
-                f'{day}T{hour}:{minute}:{second}Z')  # pragma: no cover
-    return f'{year}-{month}-{day}'
-
-
-def is_float(value: str) -> bool:
-    try:
-        float(value)
-        return True
-    except ValueError:  # pragma: no cover
-        return False
-
-
-def get_links_for_entities(
-        entities: list[Entity],
-        codes: str | list[str] | None = None,
-        classes: list[str] | None = None,
-        inverse_codes: str | list[str] | None = None,
-        inverse_classes: list[str] | None = None,
-        include_forward: bool = True,
-        include_inverse: bool = True,
-        include_geometries: bool = True) -> dict[int, EntityLinks]:
-    entities_with_links: dict[int, EntityLinks] = {}
-    preloaded = {e.id: e for e in entities}
-    preloaded.update(g.types)
-    preloaded.update(g.reference_systems)
-
-    for entity in entities:
-        entities_with_links[entity.id] = EntityLinks(entity=entity)
-
-    entity_ids = [entity.id for entity in entities]
-    geom_ids = set(entity_ids) if include_geometries else set()
-
-    if include_forward:
-        for link_ in Entity.get_links_of_entities(
-                entity_ids,
-                codes=codes,
-                classes=classes,
-                preloaded_entities=preloaded):
-            entities_with_links[link_.domain.id].links.append(link_)
-            preloaded[link_.range.id] = link_.range
-            if include_geometries and link_.property.code == 'P53':
-                geom_ids.add(link_.range.id)
-
-    if include_inverse:
-        for link_ in Entity.get_links_of_entities(
-                entity_ids,
-                codes=inverse_codes or codes,
-                classes=inverse_classes or classes,
-                inverse=True,
-                preloaded_entities=preloaded):
-            entities_with_links[link_.range.id].links_inverse.append(link_)
-            preloaded[link_.domain.id] = link_.domain
-
-    if geom_ids:
-        wkts = get_wkts_by_ids(list(geom_ids))
-        for item in entities_with_links.values():
-            item.geometries = wkts
-
-    return entities_with_links
-
-
-def get_type_references() -> dict[int, list[Link]]:
-    if hasattr(g, 'type_references'):
-        return g.type_references
-
-    type_links = Entity.get_links_of_entities(
-        list(g.types.keys()),
-        'P67',
-        inverse=True,
-        preloaded_entities=g.types)
-
-    out: dict[int, list[Link]] = defaultdict(list)
-    for link_ in type_links:
-        if link_.domain.class_.name in \
-                ['external_reference', 'reference_system']:
-            out[link_.range.id].append(link_)
-
-    g.type_references = out
-    return out
-
-
-def _get_match_type(link_: Link) -> MatchTypeEnum:
-    assert link_.type
-    return MatchTypeEnum(to_camel_case(g.types[link_.type.id].name))
-
-
-def _get_external_reference_item(
-        link_: Link,
-        entity: Entity) -> ExternalReferenceSystemModel:
-    return ExternalReferenceSystemModel(
-        id=entity.id,
-        name=entity.name,
-        match_type=_get_match_type(link_),
-        identifier=f'{entity.resolver_url or ""}{link_.description}',
-        description=entity.description,
-        system_url=entity.website_url,
-        url=entity.resolver_url)
-
-
-def get_external_reference_items(
-        inverse_links: list[Link]) -> list[ExternalReferenceSystemModel]:
-    external_references = []
-    for link_ in inverse_links:
-        if link_.type and \
-                (entity := g.reference_systems.get(link_.domain.id)):
-            external_references.append(
-                _get_external_reference_item(link_, entity))
-    return external_references
+from openatlas.models.entity import Entity
 
 
 def get_entity_response(
