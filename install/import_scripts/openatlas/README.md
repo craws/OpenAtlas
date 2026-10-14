@@ -50,8 +50,8 @@ So it is a good idea to compare the type hierarchies and adapt these if needed
 in the database that is to be imported before.
 
 ## Reference systems
-Currently new ones won't be added but existing ones with the same name will
-be mapped accordingly.
+Existing ones with the same name will be "re-used" and possible additional
+classes are added. New ones will be added.
 
 ## Entities
 All entities (except types and reference systems) will be imported. Currently,

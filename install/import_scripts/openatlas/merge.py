@@ -7,7 +7,6 @@
 # python3 install/import_scripts/openatlas/merge.py
 
 # Work in progress:
-# * Add classes to existing reference systems
 # * New case studies (would have to be subs of import case study)
 # * Annotations
 # * Offer manual mapping for e.g. duplicates
@@ -288,10 +287,11 @@ def reference_systems() -> None:
                 print(f'Reference system exists: {existing_system.name}')
                 exists = True
                 id_map[system.id] = existing_system.id
-                # Todo: add possible additional classes
-                print('--begin--')
-                print(system.classes)
-                print('--end--')
+                for class_ in system.classes:
+                    if class_ not in existing_system.classes:
+                        db.add_reference_system_classes(
+                            existing_system.id,
+                            [class_])
         if not exists:
             print(f'New reference system: {system.name}')
             imported_system = insert({
