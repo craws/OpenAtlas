@@ -71,3 +71,4 @@ and save them with their new id.
 # What is not imported
 * Users and their information
 * Site settings, e.g. the site name and intro text
+* UUIDs

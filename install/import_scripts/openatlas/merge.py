@@ -7,7 +7,7 @@
 # python3 install/import_scripts/openatlas/merge.py
 
 # Work in progress:
-# * Continue new reference systems, add classes to existing ones
+# * Add classes to existing reference systems
 # * New case studies (would have to be subs of import case study)
 # * Annotations
 # * Offer manual mapping for e.g. duplicates
@@ -22,7 +22,7 @@ import psycopg2
 from flask import g
 from psycopg2 import extras
 
-from openatlas import app
+from openatlas import app, get_classes
 from openatlas.api.resources.util import date_to_utc_iso_str
 from openatlas.database import entity as db
 from openatlas.database.checks import delete_link_duplicates
@@ -62,6 +62,7 @@ rights_holder_map: dict[int, int] = {}  # Map right holders ids
 
 
 def cleanup_before(id_: int) -> None:
+    print('Cleanup')
     g.cursor.execute(
         'ALTER TABLE model.entity DISABLE TRIGGER on_delete_entity;')
     g.cursor.execute(
@@ -76,7 +77,7 @@ def cleanup_before(id_: int) -> None:
     g.cursor.execute(
         'DELETE FROM import.entity WHERE project_id = %(project_id)s;',
         {'project_id': id_})
-    g.types = Entity.get_all_types(False)  # Reload type hierarchies
+    g.types = Entity.get_all_types(False)
 
 
 def insert_project() -> int:
@@ -92,6 +93,7 @@ def insert_project() -> int:
 
 
 def hierarchies() -> None:
+    print('Import hierarchies')
     cursor.execute(
         """
         SELECT
@@ -166,6 +168,7 @@ def insert_hierarchy(item: dict[str, Any]) -> None:
 
 
 def types() -> None:
+    print('Import types')
     cursor_current = g.cursor
     g.cursor = cursor
     import_types = Entity.get_all_types(False)
@@ -226,7 +229,7 @@ def track(import_id: int, new_id: int) -> None:
 
 
 def insert_entities() -> None:
-    print('Insert entities')
+    print('Import entities')
     cursor.execute(
         """
         SELECT
@@ -269,34 +272,44 @@ def insert_entities() -> None:
 
 
 def reference_systems() -> None:
+    print('Import reference systems')
     cursor_current = g.cursor
     g.cursor = cursor
+    get_classes()
+    g.types = Entity.get_all_types(False)
+    systems = Entity.get_reference_systems()
     g.cursor = cursor_current
-    for row in db.get_reference_systems():
+    g.types = Entity.get_all_types(False)
+    get_classes()
+    for system in systems.values():
         exists = False
         for existing_system in g.reference_systems.values():
-            if row['name'] == existing_system.name:
-                # print(f'Reference system exists: {row['name']}')
+            if system.name == existing_system.name:
+                print(f'Reference system exists: {existing_system.name}')
                 exists = True
-                id_map[row['id']] = existing_system.id
+                id_map[system.id] = existing_system.id
+                # Todo: add possible additional classes
+                print('--begin--')
+                print(system.classes)
+                print('--end--')
         if not exists:
-            print(f'New reference system: {row['name']}')
-            system = insert({
-                'name': row['name'],
-                'description': row['description'],
-                'openatlas_class_name': row['openatlas_class_name'],
-                'website_url': row['website_url'],
-                'resolver_url': row['resolver_url'],
-                'example_id': row['identifier_example'],
-                'system': row['system'],
-                'api': row['api'],
-                'types': row['types']})
-            id_map[row['id']] = system.id
-        # Todo: add possible additional classes
+            print(f'New reference system: {system.name}')
+            imported_system = insert({
+                'name': system.name,
+                'description': system.description,
+                'openatlas_class_name': system.class_.name,
+                'website_url': system.website_url,
+                'resolver_url': system.resolver_url,
+                'example_id': system.example_id,
+                'system': system.system,
+                'api': system.api,
+                'types': system.types,
+                'reference_system_classes': system.classes})
+            track(system.id, imported_system.id)
 
 
 def link_entities() -> None:
-    print('Insert links')
+    print('Import links')
     cursor.execute(
         """
         SELECT
@@ -351,6 +364,7 @@ def add_case_study() -> Entity:
 
 
 def add_gis() -> None:
+    print('Import GIS')
     cursor.execute(
         """
         SELECT entity_id, name, description, type,
@@ -381,6 +395,7 @@ def add_gis() -> None:
 
 
 def add_files() -> None:
+    print('Import files')
     if not pathlib.Path(FILES_PATH).is_dir():
         print(f'Files path {FILES_PATH} is not available.')
         return
