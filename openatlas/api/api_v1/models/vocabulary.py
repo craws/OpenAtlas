@@ -1,14 +1,11 @@
-from typing import Dict
 from uuid import UUID
 
 from pydantic import BaseModel, Field
 
 from openatlas.api.api_v1.models.files import FileItem
-from openatlas.api.api_v1.models.util import BaseSchema, \
-    ExtensionsType, OpenAtlasClassEnum, TimeSpan,\
-    ExternalReferenceSystemModel, \
-    ReferenceModel, \
-    TypeCategoryEnum
+from openatlas.api.api_v1.models.util import (
+    BaseSchema, ExtensionsType, ExternalReferenceSystemModel,
+    OpenAtlasClassEnum, ReferenceModel, TimeSpan, TypeCategoryEnum)
 
 
 class VocabularyStandardQuery(BaseSchema):
@@ -71,7 +68,8 @@ class VocabularyFlatItem(BaseSchema):
 
 
 class VocabularyFlatResponse(BaseSchema):
-    data: Dict[str, VocabularyFlatItem]
+    data: dict[str, VocabularyFlatItem] = Field(
+        description="Mapping of type IDs (as strings) to their full details.")
 
 
 class VocabularyTreeItem(BaseSchema):
@@ -111,14 +109,11 @@ class VocabularyStandardResponse(BaseSchema):
 
 class VocabularyTreePath(BaseModel):
     openatlas_class: OpenAtlasClassEnum = Field(
-        ...,
         description="Filter the tree by a specific OpenAtlas class.")
 
 
 class VocabularyId(BaseModel):
-    id: int = Field(
-        ...,
-        description="ID of a type")
+    id: int = Field(description="ID of a type")
 
 
 class VocabularySkosPath(BaseModel):

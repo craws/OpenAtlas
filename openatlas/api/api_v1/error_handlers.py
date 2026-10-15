@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any, NoReturn
 from uuid import UUID
 
@@ -18,7 +18,7 @@ def error_response(
         'message': message,
         'details': details or {},
         'url': request.url,
-        'timestamp': datetime.now().isoformat(),
+        'timestamp': datetime.now(UTC).isoformat(),
         'status': status}
     return make_response(jsonify(error_payload), status)
 

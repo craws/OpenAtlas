@@ -11,14 +11,22 @@ class AgentPath(BaseModel):
 
 
 class AgentItem(BaseModel):
-    id: int
-    name: str
+    id: int = Field(
+        description="Unique ID of the agent.",
+        examples=[123])
+    name: str = Field(
+        description="Full name or organizational label of the agent.",
+        examples=["Jane Doe"])
     class_name: str | None = Field(
+        None,
         serialization_alias="class",
-        description="The OpenAtlas entity class.")
+        description="The OpenAtlas entity class (e.g. 'person', 'group').",
+        examples=["person"])
     description: str | None = Field(
-        description="Short description or biographical note.")
+        None,
+        description="Short description or biographical note.",
+        examples=["Senior Archaeologist and Excavation Director"])
 
 
 class AgentListResponse(BaseSchema):
-    data: list[AgentItem]
+    data: list[AgentItem] = Field(description="List of registered agents and rights holders.")

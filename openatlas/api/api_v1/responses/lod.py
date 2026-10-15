@@ -1,5 +1,8 @@
 from openatlas.api.api_v1.models.lod import (
-    LinkedArtCollectionResponse, LinkedArtResponse)
+    LinkedArtCollectionResponse,
+    LinkedArtResponse,
+)
+from openatlas.api.api_v1.models.util import ErrorResponse
 
 lod_responses = {
     200: {
@@ -14,12 +17,7 @@ lod_responses = {
         'description': 'Entity not found.',
         'content': {
             'application/json': {
-                'schema': {
-                    'type': 'object',
-                    'properties': {
-                        'error': {
-                            'type': 'string',
-                            'example': 'Entity not found'}}}}}}}
+                'schema': ErrorResponse.model_json_schema()}}}}
 
 lod_collection_responses = {
     200: {
@@ -35,9 +33,4 @@ lod_collection_responses = {
         'description': 'Entity class not found',
         'content': {
             'application/json': {
-                'schema': {
-                    'type': 'object',
-                    'properties': {
-                        'error': {
-                            'type': 'string',
-                            'example': 'Entity class not found'}}}}}}}
+                'schema': ErrorResponse.model_json_schema()}}}}

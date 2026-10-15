@@ -1,12 +1,16 @@
+from openatlas.api.api_v1.models.util import ErrorResponse
 from openatlas.api.api_v1.models.vocabulary import (
-    VocabularyFlatItem, VocabularyFlatResponse, VocabularyTreeResponse,
-    VocabularyStandardResponse)
+    VocabularyFlatItem, VocabularyFlatResponse, VocabularyStandardResponse,
+    VocabularyTreeResponse)
 
 vocabulary_list_response = {200: VocabularyFlatResponse}
 vocabulary_flat_response = {
     200: VocabularyFlatItem,
     404: {
-        'description': 'ID not found.'}}
+        'description': 'Type not found.',
+        'content': {
+            'application/json': {
+                'schema': ErrorResponse.model_json_schema()}}}}
 vocabulary_tree_response = {200: VocabularyTreeResponse}
 vocabulary_standard_by_class_response = {200: VocabularyStandardResponse}
 
@@ -32,9 +36,4 @@ vocabulary_skos_response = {
         'description': 'Type not found.',
         'content': {
             'application/json': {
-                'schema': {
-                    'type': 'object',
-                    'properties': {
-                        'error': {
-                            'type': 'string',
-                            'example': 'Entity not found'}}}}}}}
+                'schema': ErrorResponse.model_json_schema()}}}}

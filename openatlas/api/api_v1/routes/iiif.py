@@ -1,3 +1,5 @@
+from typing import Any
+
 from flask_openapi3 import APIBlueprint
 
 from openatlas.api.api_v1.error_handlers import (
@@ -27,7 +29,7 @@ register_error_handlers(api_v1_iiif)
     summary="Get IIIF Manifest",
     tags=[iiif_tag],
     responses=iiif_manifest_response)
-def get_iiif_manifest(path: FileIiifPath):
+def get_iiif_manifest(path: FileIiifPath) -> dict[str, Any]:
     """Returns the IIIF manifest for a specific file and IIIF version."""
     entity = get_file_entity(path.id)
     check_file_access(entity)
@@ -41,7 +43,7 @@ def get_iiif_manifest(path: FileIiifPath):
     summary="Get IIIF Canvas",
     tags=[iiif_tag],
     responses=iiif_canvas_response)
-def get_iiif_canvas(path: FileIiifPath):
+def get_iiif_canvas(path: FileIiifPath) -> dict[str, Any]:
     """Returns the IIIF canvas for a specific file and IIIF version."""
     entity = get_file_entity(path.id)
     check_file_access(entity)
@@ -53,7 +55,7 @@ def get_iiif_canvas(path: FileIiifPath):
     summary="Get IIIF Image",
     tags=[iiif_tag],
     responses=iiif_image_response)
-def get_iiif_image(path: FileIiifPath):
+def get_iiif_image(path: FileIiifPath) -> dict[str, Any]:
     """Returns the IIIF image (annotation) for a specific file and version."""
     entity = get_file_entity(path.id)
     check_file_access(entity)
@@ -65,7 +67,7 @@ def get_iiif_image(path: FileIiifPath):
     summary="Get IIIF Annotation List/Page",
     tags=[iiif_tag],
     responses=iiif_annotation_list_response)
-def get_iiif_annotation_list(path: FileIiifPath):
+def get_iiif_annotation_list(path: FileIiifPath) -> dict[str, Any]:
     """Returns the IIIF annotation list (v2) or page (v3)."""
     entity = get_file_entity(path.id)
     check_file_access(entity)
@@ -77,7 +79,7 @@ def get_iiif_annotation_list(path: FileIiifPath):
     summary="Get IIIF Annotation",
     tags=[iiif_tag],
     responses=iiif_annotation_response)
-def get_iiif_annotation(path: AnnotationIiifPath):
+def get_iiif_annotation(path: AnnotationIiifPath) -> dict[str, Any]:
     """Returns a specific IIIF annotation."""
     if not (data := get_annotation_image_by_id(path.id)):
         abort_not_found(path.id)

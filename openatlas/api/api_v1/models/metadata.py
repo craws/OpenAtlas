@@ -8,20 +8,25 @@ from openatlas.api.api_v1.models.util import BaseSchema
 
 
 class CaseStudyItem(BaseSchema):
-    id: int
-    uuid: UUID
-    name: str
-    description: str | None = None
-    sub_case_studies: list[CaseStudyItem] = Field(default_factory=list)
-    # profile_image: FileItem
-    # principal_investigators: list[str] = Field(default_factory=list)
-    # employees: list[str] = Field(default_factory=list)
-    # references: list[ReferenceItem] = Field(default_factory=list)
-    # ext_references: list[ExtReferenceItem] = Field(default_factory=list)
+    id: int = Field(
+        description="Unique ID of the case study.",
+        examples=[42])
+    uuid: UUID = Field(
+        description="Universally unique identifier of the case study.")
+    name: str = Field(
+        description="Name or title of the case study.",
+        examples=["Cemetery Excavation 2024"])
+    description: str | None = Field(
+        None,
+        description="Detailed description or abstract of the case study.")
+    sub_case_studies: list[CaseStudyItem] = Field(
+        default_factory=list,
+        description="Nested child case studies or sub-projects.")
 
 
 class CaseStudyListResponse(BaseSchema):
-    data: list[CaseStudyItem]
+    data: list[CaseStudyItem] = Field(
+        description="Hierarchical list of top-level case studies.")
 
 
 class CaseStudyPath(BaseModel):

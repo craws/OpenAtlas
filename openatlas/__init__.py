@@ -34,7 +34,13 @@ app.config.from_object('config.api')
 
 app.info = Info(
     title="OpenAtlas API",
-    version=app.config['API_VERSIONS'].get('1', '1'))
+    version=app.config['API_VERSIONS'].get('1', '1'),
+    description=(
+        "OpenAtlas REST and Linked Open Data (LOD) API v1. Provides "
+        "endpoints for entities, CIDOC CRM mapping, Linked Art profiles, "
+        "controlled vocabularies (SKOS), digital assets (IIIF), and "
+        "system metadata."),
+    termsOfService="https://openatlas.eu/") # todo: add a ToS in Github?!
 
 CONFIG_PATH = ''
 if 'INSTANCE_PATH' in os.environ:  # Used for multi instance

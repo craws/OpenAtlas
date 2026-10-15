@@ -1,26 +1,25 @@
 from typing import Any, cast
 from uuid import UUID
 
-from flask import g, Response
+from flask import Response, g
 from flask_openapi3 import APIBlueprint
 
-from openatlas.api.api_v1.error_handlers import abort_not_found, \
-    register_error_handlers
-from openatlas.api.api_v1.formatters.util import EntityLinks, \
-    get_links_for_entities
+from openatlas.api.api_v1.error_handlers import (
+    abort_not_found, register_error_handlers)
 from openatlas.api.api_v1.formatters.skos import (
     build_skos_graph, get_external_reference_items, serialize_skos)
-from openatlas.api.api_v1.openapi_tags import vocabulary_tag
-from openatlas.api.api_v1.models.util import (
-    ReferenceModel, TypeCategoryEnum)
-from openatlas.api.api_v1.responses.vocabulary import \
-    vocabulary_flat_response, vocabulary_list_response, \
-    vocabulary_skos_response, vocabulary_standard_by_class_response, \
-    vocabulary_tree_response
+from openatlas.api.api_v1.formatters.util import (
+    EntityLinks, get_links_for_entities)
+from openatlas.api.api_v1.models.util import ReferenceModel, TypeCategoryEnum
 from openatlas.api.api_v1.models.vocabulary import (
-    LinkedTypeItem, VocabularyFlatItem, VocabularyId, VocabularySkosPath,
-    VocabularyTreeItem, VocabularyFlatResponse, VocabularyStandardQuery,
-    VocabularyTreePath, VocabularyTreeResponse, VocabularyStandardResponse)
+    LinkedTypeItem, VocabularyFlatItem, VocabularyFlatResponse, VocabularyId,
+    VocabularySkosPath, VocabularyStandardQuery, VocabularyStandardResponse,
+    VocabularyTreeItem, VocabularyTreePath, VocabularyTreeResponse)
+from openatlas.api.api_v1.openapi_tags import vocabulary_tag
+from openatlas.api.api_v1.responses.vocabulary import (
+    vocabulary_flat_response, vocabulary_list_response,
+    vocabulary_skos_response, vocabulary_standard_by_class_response,
+    vocabulary_tree_response)
 from openatlas.api.api_v1.util.date_util import get_timespan_dict
 from openatlas.api.api_v1.util.files import get_file_item, prefetch_files
 from openatlas.database.api import get_vocab_ids_for_case_study
@@ -94,7 +93,8 @@ def _get_vocab_flat_item(
     '',
     summary="Get flat types list",
     responses=vocabulary_list_response,
-    tags=[vocabulary_tag])
+    tags=[vocabulary_tag],
+    strict_slashes=False)
 def get_vocabulary_list() -> dict[str, Any]:
     """Retrieves a flat list of all OpenAtlas types."""
     vocab_dict: dict[str, VocabularyFlatItem] = {}
@@ -110,12 +110,12 @@ def get_vocabulary_list() -> dict[str, Any]:
 
 
 @api_v1_vocabulary.get(
-    '<id>',
-    summary="Get information of one type",
+    '/<int:id>',
+    summary="Get vocabulary type by ID",
     responses=vocabulary_flat_response,
     tags=[vocabulary_tag])
 def get_vocabulary_item(path: VocabularyId) -> dict[str, Any]:
-    """Retrieves information of one types."""
+    """Retrieves information for a single vocabulary type."""
     type_ = g.types.get(path.id)
     if not type_:
         abort_not_found(path.id)
@@ -129,7 +129,7 @@ def get_vocabulary_item(path: VocabularyId) -> dict[str, Any]:
 
 
 @api_v1_vocabulary.get(
-    '/<id>/skos',
+    '/<int:id>/skos',
     summary="Export vocabulary hierarchy as SKOS",
     responses=vocabulary_skos_response,
     tags=[vocabulary_tag])
@@ -149,7 +149,7 @@ def get_vocabulary_skos(path: VocabularyId) -> Response:
 
 
 @api_v1_vocabulary.get(
-    '/<id>/skos.<ext>',
+    '/<int:id>/skos.<ext>',
     summary="Export vocabulary hierarchy as SKOS with format extension",
     responses=vocabulary_skos_response,
     tags=[vocabulary_tag])
@@ -179,14 +179,14 @@ def _walk_tree(
         item = g.types[id_]
         children = _walk_tree(item.subs, used_vocab_ids)
 
-        if used_vocab_ids is not None:
-            if id_ not in used_vocab_ids and not children:
-                continue
+        if used_vocab_ids is not None \
+                and id_ not in used_vocab_ids and not children:
+            continue
 
         items.append(VocabularyTreeItem(
             id=item.id,
             uuid=item.uuid,
-            name=item.name.replace("'", "&apos;"),
+            name=item.name,
             selectable=item.selectable,
             classes=item.classes,
             entity_count=item.count,
@@ -233,11 +233,12 @@ def get_vocabulary_tree() -> dict[str, Any]:
     tags=[vocabulary_tag])
 def get_vocabulary_tree_by_class(path: VocabularyTreePath) -> dict[str, Any]:
     """Retrieves all OpenAtlas types filtered by a specific OpenAtlas class."""
-    class_ = path.openatlas_class
-    if hasattr(path.openatlas_class, 'value'):
-        class_ = path.openatlas_class.value
+    class_name = (
+        path.openatlas_class.value
+        if hasattr(path.openatlas_class, 'value')
+        else str(path.openatlas_class))
 
-    return _generate_vocabulary_tree(openatlas_class=class_)
+    return _generate_vocabulary_tree(openatlas_class=class_name)
 
 
 @api_v1_vocabulary.get(
@@ -251,9 +252,10 @@ def get_vocabulary_standard_by_class(
     """Retrieves standard OpenAtlas types filtered by a specific
     OpenAtlas class, formatted for hierarchical UI components."""
 
-    class_ = path.openatlas_class
-    if hasattr(path.openatlas_class, 'value'):
-        class_ = path.openatlas_class.value
+    class_name = (
+        path.openatlas_class.value
+        if hasattr(path.openatlas_class, 'value')
+        else str(path.openatlas_class))
 
     used_vocab_ids = None
     if query.case_study:
@@ -262,7 +264,8 @@ def get_vocabulary_standard_by_class(
     root_ids = []
     for type_ in g.types.values():
         if not type_.root and getattr(type_, 'category', None) == 'standard':
-            if class_ and type_.classes and class_ not in type_.classes:
+            if class_name and type_.classes \
+                    and class_name not in type_.classes:
                 continue
             root_ids.append(type_.id)
 

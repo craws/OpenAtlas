@@ -7,9 +7,10 @@ from openatlas.api.api_v1.error_handlers import register_error_handlers
 from openatlas.api.api_v1.formatters.lod import (
     format_lod_entities, format_lod_entity)
 from openatlas.api.api_v1.formatters.lod_util import (
-    get_entities_response, get_entity_response)
+    get_entities_response, get_entity_response,)
 from openatlas.api.api_v1.models.lod import (
-    EntityCollectionPath, EntityCollectionQuery, EntityPath, EntityPathExt)
+    EntityCollectionPath, EntityCollectionQuery, EntityPath,
+    EntityPathExt)
 from openatlas.api.api_v1.openapi_tags import lod_tag
 from openatlas.api.api_v1.responses.lod import (
     lod_collection_responses, lod_responses)

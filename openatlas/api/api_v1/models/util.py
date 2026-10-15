@@ -28,6 +28,31 @@ class BaseSchema(BaseModel):
         return data  # pragma: no cover
 
 
+class ErrorResponse(BaseSchema):
+    title: str = Field(
+        description="Short summary of the error type.",
+        examples=["Entity does not exist"])
+    message: str = Field(
+        description="Detailed explanation of the error.",
+        examples=["The requested entity could not be found in the database."])
+    details: dict[str, Any] = Field(
+        default_factory=dict,
+        description="Additional debug context or resolution hints.",
+        examples=[{
+            "provided_id": "123",
+            "hint": "Check if ID is correct and "
+                    "entity has not been deleted."}])
+    url: str = Field(
+        description="The URL that caused the error.",
+        examples=["https://example.org/api/1/vocabulary/99999"])
+    timestamp: str = Field(
+        description="ISO 8601 timestamp when the error occurred.",
+        examples=["2026-10-15T12:00:00Z"])
+    status: int = Field(
+        description="HTTP status code.",
+        examples=[404])
+
+
 class DownloadQuery(BaseModel):
     download: bool = Field(
         False,
@@ -122,9 +147,10 @@ class ExternalReferenceSystemModel(BaseModel):
     description: str | None = Field(
         None,
         description="Description or scope note of the reference system.",
-        examples=["A free and open knowledge base and common source of open "
-                  "data providing persistent identifier and links to other "
-                  "sources."])
+        examples=[(
+            "A free and open knowledge base and common source of open "
+            "data providing persistent identifier and links to other "
+            "sources.")])
     url: str | None = Field(
         None,
         description="Direct link to the external entity.",
@@ -158,6 +184,6 @@ class ReferenceModel(BaseModel):
         examples=["45-48", "fol. 12r", "Taf. 3, Abb. 2"])
     citation: str | None = Field(
         description="Full bibliographic citation text.",
-        examples=[
+        examples=[(
             "Eichert, S. (2012). Frühmittelalterliche Strukturen im "
-            "Ostalpenraum. Wien."])
+            "Ostalpenraum. Wien.")])

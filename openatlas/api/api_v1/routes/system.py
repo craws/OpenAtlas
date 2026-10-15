@@ -5,10 +5,10 @@ from flask_openapi3 import APIBlueprint
 
 from openatlas import app
 from openatlas.api.api_v1.error_handlers import register_error_handlers
-from openatlas.api.api_v1.models.system import EntityCountQuery, \
-    EntityCountResponse, IiifInfo, ImageProcessingInfo, LocaleQuery, \
-    MapConfig, PropertyDetail, SystemClassItem, SystemClassesResponse, \
-    SystemInfoResponse, SystemPropertiesResponse
+from openatlas.api.api_v1.models.system import (
+    EntityCountQuery, EntityCountResponse, IiifInfo, ImageProcessingInfo,
+    LocaleQuery, MapConfig, PropertyDetail, SystemClassesResponse,
+    SystemClassItem, SystemInfoResponse, SystemPropertiesResponse)
 from openatlas.api.api_v1.models.util import OpenAtlasClassEnum
 from openatlas.api.api_v1.openapi_tags import system_tag
 from openatlas.api.api_v1.responses.system import (
@@ -77,7 +77,7 @@ def get_system_info() -> dict[str, Any]:
     summary="Get entity counts",
     responses=entity_count_response,
     tags=[system_tag])
-def get_entity_count(query: EntityCountQuery):
+def get_entity_count(query: EntityCountQuery) -> dict[str, Any]:
     """Retrieves system classes with a count of their instances, optionally
     filtered by case study."""
     valid_classes = [e.value for e in OpenAtlasClassEnum]

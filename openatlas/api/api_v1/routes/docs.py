@@ -1,4 +1,5 @@
-from flask import render_template, abort
+from flask import abort, render_template
+
 from openatlas import app
 
 

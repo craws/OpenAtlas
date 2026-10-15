@@ -10,9 +10,7 @@ def is_leap_year(year: int) -> bool:
         return True
     if abs_year % 100 == 0:
         return False
-    if abs_year % 4 == 0:
-        return True
-    return False
+    return abs_year % 4 == 0
 
 
 def get_last_day_of_month(year: int, month: int) -> int:

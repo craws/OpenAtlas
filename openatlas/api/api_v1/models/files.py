@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from pydantic import ConfigDict, Field
+from pydantic import Field
 
 from openatlas.api.api_v1.models.agent import AgentItem
 from openatlas.api.api_v1.models.util import BaseSchema
@@ -83,22 +83,21 @@ class PublicFilesQuery(BaseSchema):
 class PublicFileOverviewResponse(BaseSchema):
     data: list[FileItem] = Field(
         description="Page of publicly shareable, licensed files.")
-    total_items: int
-    first: str
-    previous: str | None = None
-    next: str | None = None
-    last: str
-
-# Todo: implement
-class FilesByEntitiesQuery(BaseSchema):
-    entity_ids: list[int] = Field(
-        alias="entityIds",
-        description="List of entity IDs to fetch files for")
+    total_items: int = Field(
+        description="Total number of matching licensed files.")
+    first: str = Field(description="URL to the first page of results.")
+    previous: str | None = Field(
+        None,
+        description="URL to the previous page of results, if available.")
+    next: str | None = Field(
+        None,
+        description="URL to the next page of results, if available.")
+    last: str = Field(description="URL to the last page of results.")
 
 
 class FileIdPath(BaseSchema):
-    id: int = Field(..., description="The ID of the file.")
+    id: int = Field(description="The ID of the file.")
 
 
 class EntityFilesPath(BaseSchema):
-    id: int = Field(..., description="The ID of the entity.")
+    id: int = Field(description="The ID of the entity.")

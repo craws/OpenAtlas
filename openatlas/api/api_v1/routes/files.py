@@ -3,18 +3,20 @@ from typing import Any
 
 from flask import g, redirect, send_file
 from flask_openapi3 import APIBlueprint
+from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.api.api_v1.error_handlers import register_error_handlers
 from openatlas.api.api_v1.models.files import (
-    EntityFilesPath, FileIdPath, PublicFileOverviewResponse, PublicFilesQuery)
+    EntityFilesPath, FileIdPath, PublicFileOverviewResponse,
+    PublicFilesQuery)
 from openatlas.api.api_v1.models.util import DownloadQuery
 from openatlas.api.api_v1.openapi_tags import file_tag
 from openatlas.api.api_v1.responses.files import (
     display_file_response, public_files_response, thumbnail_response)
 from openatlas.api.api_v1.util.files import (
-    check_file_access, get_display_extensions, get_file_entity,
-    get_file_item, get_file_path, get_mime_type, get_public_share_yes_id,
+    check_file_access, get_display_extensions, get_file_entity, get_file_item,
+    get_file_path, get_mime_type, get_public_share_yes_id,
     get_valid_license_ids, iiif_file_exists, resolve_file_paths,
     resolve_rights_holders)
 from openatlas.api.api_v1.util.pagination import get_pagination
@@ -37,10 +39,10 @@ def get_iiif_redirect_url(
         return None  # pragma: no cover
 
     if file_path.suffix.lower() not in get_display_extensions():
-        return None # pragma: no cover
+        return None  # pragma: no cover
 
     if not iiif_file_exists(file_id):
-        return None # pragma: no cover
+        return None  # pragma: no cover
 
     iiif_ext = '.tiff' if g.settings.get('iiif_conversion') \
         else file_path.suffix
@@ -58,8 +60,15 @@ def get_iiif_redirect_url(
     summary="Get image file",
     tags=[file_tag],
     responses=display_file_response)
-def display_file(path: FileIdPath, query: DownloadQuery):
-    """Serves the binary image file."""
+def display_file(path: FileIdPath, query: DownloadQuery) -> Response:
+    """Serves the binary image file.
+
+    If IIIF is enabled on the server and `download=false`, the client is
+    redirected (HTTP 302) to the high-performance IIIF image URL. If
+    `download=true`, the file is sent as a browser attachment download.
+    Access requires that the file has an open license and is marked as
+    publicly shareable.
+    """
     entity = get_file_entity(path.id)
     check_file_access(entity)
     actual_path = get_file_path(entity.id, app.config['UPLOAD_PATH'])
@@ -83,8 +92,14 @@ def display_file(path: FileIdPath, query: DownloadQuery):
     summary="Get thumbnail image",
     tags=[file_tag],
     responses=thumbnail_response)
-def display_thumbnail(path: FileIdPath, query: DownloadQuery):
-    """Serves the static, pre-calculated thumbnail image."""
+def display_thumbnail(path: FileIdPath, query: DownloadQuery) -> Response:
+    """Serves the static, pre-calculated thumbnail image.
+
+    If IIIF is enabled on the server and `download=false`, the client is
+    redirected (HTTP 302) to the pre-scaled IIIF thumbnail URL.
+    Access requires that the file has an open license and is marked as
+    publicly shareable.
+    """
     entity = get_file_entity(path.id)
     check_file_access(entity)
     original_path = get_file_path(entity.id, app.config['UPLOAD_PATH'])

@@ -1,6 +1,6 @@
 from openatlas.api.api_v1.models.system import (
-    EntityCountResponse, SystemClassesResponse,
-    SystemInfoResponse, SystemPropertiesResponse)
+    EntityCountResponse, SystemClassesResponse, SystemInfoResponse,
+    SystemPropertiesResponse)
 
 system_info_response = {200: SystemInfoResponse}
 entity_count_response = {200: EntityCountResponse}

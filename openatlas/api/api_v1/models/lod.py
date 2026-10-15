@@ -3,8 +3,8 @@ from uuid import UUID
 
 from pydantic import ConfigDict, Field, field_validator
 
-from openatlas.api.api_v1.models.util import BaseSchema, ExtensionsType, \
-    OpenAtlasClassEnum
+from openatlas.api.api_v1.models.util import (
+    BaseSchema, ExtensionsType, OpenAtlasClassEnum)
 from openatlas.api.api_v1.util.date_util import handle_date
 
 
@@ -66,9 +66,6 @@ class EntityCollectionPath(BaseSchema):
                 "file": {
                     "summary": "File (E31 Document)",
                     "value": "file"},
-                "administrative_unit": {
-                    "summary": "Admin Unit (E53 Place)",
-                    "value": "administrative_unit"},
                 "feature": {
                     "summary": "Feature (E18 Physical Thing)",
                     "value": "feature"},

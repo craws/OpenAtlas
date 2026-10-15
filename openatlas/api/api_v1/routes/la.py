@@ -4,8 +4,8 @@ from flask import Response
 from flask_openapi3 import APIBlueprint
 
 from openatlas.api.api_v1.error_handlers import register_error_handlers
-from openatlas.api.api_v1.formatters.la_formatter import format_la_entities, \
-    format_la_entity
+from openatlas.api.api_v1.formatters.la_formatter import (
+    format_la_entities, format_la_entity)
 from openatlas.api.api_v1.formatters.lod_util import (
     get_entities_response, get_entity_response)
 from openatlas.api.api_v1.models.lod import (

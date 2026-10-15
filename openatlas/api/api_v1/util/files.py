@@ -5,7 +5,7 @@ import os
 from collections import defaultdict
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Optional, TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 from uuid import UUID
 
 from flask import g, url_for
@@ -13,9 +13,7 @@ from flask import g, url_for
 from openatlas import app
 from openatlas.api.api_v1.entity import get_entity_by_id
 from openatlas.api.api_v1.error_handlers import (
-    abort_file_not_found,
-    abort_file_not_public,
-    abort_file_without_license,
+    abort_file_not_found, abort_file_not_public, abort_file_without_license,
     abort_id_not_a_file)
 from openatlas.api.api_v1.models.agent import AgentItem
 from openatlas.api.api_v1.models.files import FileItem, LicenseItem
@@ -276,7 +274,7 @@ def get_file_item(entity: Entity) -> FileItem:
             get_agent_item(rh) for rh in rights['license_holder']])
 
 
-def get_license_type(entity: Entity) -> Optional[Entity]:
+def get_license_type(entity: Entity) -> Entity | None:
     license_ = None
     for type_ in entity.types:
         if g.types[type_.root[0]].name == 'License':
