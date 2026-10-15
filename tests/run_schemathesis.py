@@ -6,7 +6,6 @@ from typing import Any
 
 from flask import g
 
-
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import schemathesis
@@ -20,19 +19,19 @@ from openatlas.api.api_v1.util.files import (
     get_valid_license_ids, iiif_file_exists)
 from openatlas.display.image_processing import (
     check_iiif_activation, is_supported_image, safe_resize_image)
-from openatlas.models.rights_holder import RightsHolder
 from openatlas.models.entity import Entity
+from openatlas.models.rights_holder import RightsHolder
 
 SCHEMATHESIS_ARGUMENTS = (
-    "run",
-    "http://localhost:5000/api/1/docs/openapi.json",
-    "--url",
-    "http://localhost:5000",
-    "--phases",
-    "examples,coverage,fuzzing",
-    "--checks",
-    "not_a_server_error,status_code_conformance,content_type_conformance,response_headers_conformance,positive_data_acceptance"
-)
+    'run',
+    'http://localhost:5000/api/1/docs/openapi.json',
+    '--url',
+    'http://localhost:5000',
+    '--phases',
+    'examples,coverage,fuzzing',
+    '--checks',
+    'not_a_server_error,status_code_conformance,content_type_conformance,'
+    'response_headers_conformance,positive_data_acceptance')
 
 
 def has_file_access(file_entity: Entity) -> bool:
@@ -43,19 +42,23 @@ def has_file_access(file_entity: Entity) -> bool:
 
 
 def prepare_thumbnails(
-        files: list[Entity], paths: dict[int, Path],
+        files: list[Entity],
+        paths: dict[int, Path],
         thumbnail_dir: Path) -> list[int]:
     thumbnails = []
     extensions = get_display_extensions()
     for file_ in files[:30]:
         path = paths.get(file_.id)
-        if not path or path.suffix.lower() not in extensions \
-                or not is_supported_image(path):
+        if (not path
+                or path.suffix.lower() not in extensions
+                or not is_supported_image(path)):
             continue
-        if safe_resize_image(
-                str(file_.id), path.suffix.lower(),
-                app.config['IMAGE_SIZE']['thumbnail'], True) \
-                and any(thumbnail_dir.glob(f'{file_.id}.*')):
+        resized = safe_resize_image(
+            str(file_.id),
+            path.suffix.lower(),
+            app.config['IMAGE_SIZE']['thumbnail'],
+            True)
+        if resized and any(thumbnail_dir.glob(f'{file_.id}.*')):
             thumbnails.append(file_.id)
             if len(thumbnails) == 3:
                 break
@@ -70,21 +73,24 @@ def get_database_examples() -> dict[str, Any]:
         for class_ in OpenAtlasClassEnum:
             if class_.value == 'type':
                 continue
-            entities = Entity.get_by_class(class_.value)
-            if entities:
+            if entities := Entity.get_by_class(class_.value):
                 classes[class_.value] = entities[0]
 
         case_studies = Entity.get_hierarchy('Case study').subs
         files = Entity.get_by_class('file', types=True)
         existing = get_multiple_file_paths(
-            [file_.id for file_ in files], app.config['UPLOAD_PATH'])
+            [file_.id for file_ in files],
+            app.config['UPLOAD_PATH'])
         public_files = [
             file_ for file_ in files
             if file_.id in existing and has_file_access(file_)]
+
+        thumbnail_dir = (
+            app.config['RESIZED_IMAGES']
+            / app.config['IMAGE_SIZE']['thumbnail'])
         existing_thumbnails = get_multiple_file_paths(
             [file_.id for file_ in public_files],
-            app.config['RESIZED_IMAGES'] /
-            app.config['IMAGE_SIZE']['thumbnail'])
+            thumbnail_dir)
         thumbnails = [
             file_.id for file_ in public_files
             if file_.id in existing_thumbnails]
@@ -94,9 +100,10 @@ def get_database_examples() -> dict[str, Any]:
                 if iiif_file_exists(file_.id)]
         if not thumbnails:
             thumbnails = prepare_thumbnails(
-                public_files, existing,
-                app.config['RESIZED_IMAGES'] /
-                app.config['IMAGE_SIZE']['thumbnail'])
+                public_files,
+                existing,
+                thumbnail_dir)
+
         annotations = []
         files_by_id = {file_.id: file_ for file_ in files}
         g.cursor.execute(
@@ -107,6 +114,7 @@ def get_database_examples() -> dict[str, Any]:
                 annotations.append(row['id'])
                 if len(annotations) == 3:
                     break
+
         return {
             'classes': classes,
             'types': list(g.types),
@@ -124,12 +132,14 @@ def get_path_examples(path: str) -> Iterator[dict[str, Any]]:
             for id_ in get_database_examples()['annotations']:
                 yield {'id': id_, 'version': '2'}
         return
+
     data = get_database_examples()
+    ext_param = {'ext': 'json'} if '{ext}' in path else {}
+
     if '{uuid}' in path:
         for entity in [*data['classes'].values(), *data['type_entities'][:3]]:
             if entity.uuid:
-                yield {'uuid': str(entity.uuid), **(
-                    {'ext': 'json'} if '{ext}' in path else {})}
+                yield {'uuid': str(entity.uuid), **ext_param}
     elif '{entity_class}' in path:
         for class_ in data['classes']:
             yield {'entity_class': class_}
@@ -138,8 +148,9 @@ def get_path_examples(path: str) -> Iterator[dict[str, Any]]:
             yield {'openatlas_class': class_}
     elif '{id}' in path:
         if path.startswith('/api/1/files/'):
-            ids = (data['thumbnails'] if path.endswith('/thumbnail')
-                   else data['files'])
+            ids = (
+                data['thumbnails'] if path.endswith('/thumbnail')
+                else data['files'])
         elif path.startswith('/api/1/case-studies/'):
             ids = data['case_studies']
         elif path.startswith('/api/1/agents/'):
@@ -149,8 +160,7 @@ def get_path_examples(path: str) -> Iterator[dict[str, Any]]:
         else:
             ids = []
         for id_ in ids[:3]:
-            yield {'id': id_, **(
-                {'ext': 'json'} if '{ext}' in path else {})}
+            yield {'id': id_, **ext_param}
     else:
         yield {}
 
@@ -158,9 +168,10 @@ def get_path_examples(path: str) -> Iterator[dict[str, Any]]:
 @schemathesis.hook
 def before_add_examples(context: Any, examples: list[Any]) -> None:
     path = context.operation.path
-    if path.startswith('/api/1/iiif/') and path != \
-            '/api/1/iiif/{id}/annotation/{version}':
+    if (path.startswith('/api/1/iiif/')
+            and path != '/api/1/iiif/{id}/annotation/{version}'):
         return
+    case_studies = get_database_examples()['case_studies']
     for params in get_path_examples(path):
         kwargs: dict[str, Any] = {}
         if params:
@@ -168,24 +179,23 @@ def before_add_examples(context: Any, examples: list[Any]) -> None:
         if path.startswith('/api/1/entities/'):
             kwargs['query'] = {'limit': 5, 'page': 1}
         elif path == '/api/1/vocabulary/standard/{openatlas_class}':
-            case_studies = get_database_examples()['case_studies']
             if case_studies:
                 kwargs['query'] = {'caseStudy': case_studies[0]}
         elif path == '/api/1/system/count/entities':
-            case_studies = get_database_examples()['case_studies']
             if case_studies:
                 kwargs['query'] = {'caseStudyId': case_studies[0]}
         examples.append(context.operation.Case(**kwargs))
 
 
 @schemathesis.hook
-def map_case(context: Any, case: Any) -> Any:
-    if case.meta and case.meta.generation.mode == GenerationMode.POSITIVE \
-            and case.path_parameters:
-        examples = list(get_path_examples(case.operation.path))
-        if examples:
+def map_case(_context: Any, case: Any) -> Any:
+    if (case.meta
+            and case.meta.generation.mode == GenerationMode.POSITIVE
+            and case.path_parameters):
+        if examples := list(get_path_examples(case.operation.path)):
             for name, value in examples[0].items():
-                if name in case.path_parameters and name not in ('ext', 'version'):
+                if (name in case.path_parameters
+                        and name not in ('ext', 'version')):
                     case.path_parameters[name] = value
     return case
 
@@ -193,8 +203,8 @@ def map_case(context: Any, case: Any) -> Any:
 def main() -> None:
     schemathesis_cli.main(
         args=SCHEMATHESIS_ARGUMENTS,
-        prog_name="schemathesis")
+        prog_name='schemathesis')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
