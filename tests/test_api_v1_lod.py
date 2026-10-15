@@ -1,8 +1,19 @@
+import json
+import tempfile
+from pathlib import Path
+
+import pytest
 from flask import url_for
-from rdflib import RDF, Graph, Namespace
+from rdflib import OWL, RDF, Graph, Namespace
+from werkzeug.exceptions import HTTPException
 
 from openatlas import app
 from openatlas.api.api_v1.context.lod_context import get_oa_ontology_uri
+from openatlas.api.api_v1.formatters.la_export import export_la_dump_to_file
+from openatlas.api.api_v1.formatters.lod_export import export_lod_dump_to_file
+from openatlas.api.api_v1.util.auth import (
+    api_auth_required, api_group_required, get_authenticated_role,
+    is_authenticated, is_authorized_role, require_auth, require_group)
 from tests.base import ApiTestCase
 
 
@@ -55,8 +66,11 @@ class ApiV1LodTest(ApiTestCase):
         g_ont.parse(data=rv_ttl.data.decode('utf-8'), format='turtle')
         oa = Namespace(get_oa_ontology_uri())
         assert (oa.has_relationship_to, RDF.type, None) in g_ont
+        assert (oa.has_relationship_to, OWL.propertyChainAxiom, None) in g_ont
         assert (oa.begins_in, RDF.type, None) in g_ont
+        assert (oa.begins_in, OWL.propertyChainAxiom, None) in g_ont
         assert (oa.ends_in, RDF.type, None) in g_ont
+        assert (oa.ends_in, OWL.propertyChainAxiom, None) in g_ont
 
     def test_lod_entity_formats(self) -> None:
         c = self.client
@@ -151,3 +165,133 @@ class ApiV1LodTest(ApiTestCase):
         assert len(col['orderedItems']) <= 2
         assert 'first' in col['partOf']
         assert 'last' in col['partOf']
+
+    def test_lod_export_dump(self) -> None:
+        c = self.client
+
+        # 1. Authenticated client -> 200 streamed N-Triples
+        rv = c.get(url_for('api_v1_lod.get_lod_dump', limit=3))
+        assert rv.status_code == 200
+        assert 'application/n-triples' in rv.headers.get('Content-Type')
+        assert b'<http://' in rv.data or b'<https://' in rv.data
+        assert b' .\n' in rv.data or b' .' in rv.data
+
+        # 2. Filter by class
+        rv_place = c.get(url_for('api_v1_lod.get_lod_dump', entity_class='place', limit=2))
+        assert rv_place.status_code == 200
+        assert rv_place.data
+
+    def test_lod_export_dump_unauthorized(self) -> None:
+        unauth = app.test_client()
+        rv = unauth.get(url_for('api_v1_lod.get_lod_dump'))
+        assert rv.status_code == 401
+        assert 'Unauthorized' in rv.get_json()['title']
+
+    def test_la_export_dump(self) -> None:
+        c = self.client
+
+        # 1. Authenticated client -> 200 streamed JSONL
+        rv = c.get(url_for('api_v1_la.get_la_dump', limit=3))
+        assert rv.status_code == 200
+        assert 'application/x-ndjson' in rv.headers.get('Content-Type')
+        assert 'attachment' in rv.headers.get('Content-Disposition')
+        lines = [line for line in rv.data.decode('utf-8').strip().split('\n')
+                 if line]
+        assert len(lines) <= 3
+        for line in lines:
+            parsed = json.loads(line)
+            assert '@context' in parsed
+            assert 'id' in parsed
+            assert 'type' in parsed
+
+        # 2. Authenticated client -> format=nt
+        rv_nt = c.get(url_for('api_v1_la.get_la_dump', limit=2, format='nt'))
+        assert rv_nt.status_code == 200
+        assert 'application/n-triples' in rv_nt.headers.get('Content-Type')
+        assert b'<http' in rv_nt.data
+
+        # 3. Filter by class
+        rv_place = c.get(
+            url_for('api_v1_la.get_la_dump', entity_class='place', limit=2))
+        assert rv_place.status_code == 200
+        assert rv_place.data
+
+        # 4. File export helpers
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            tmp_path = Path(tmp_dir)
+            with app.test_request_context():
+                app.preprocess_request()
+                out_gz = export_la_dump_to_file(
+                    tmp_path / 'la_dump.jsonl', limit=2, compress=True)
+                assert out_gz.exists()
+                assert out_gz.name.endswith('.jsonl.gz')
+
+                out_raw = export_la_dump_to_file(
+                    tmp_path / 'la_dump.nt', limit=2, output_format='nt',
+                    compress=False)
+                assert out_raw.exists()
+
+                out_lod = export_lod_dump_to_file(
+                    tmp_path / 'lod_dump.nt', limit=2, compress=True)
+                assert out_lod.exists()
+
+                out_lod_raw = export_lod_dump_to_file(
+                    tmp_path / 'lod_dump_raw.nt', limit=2, compress=False)
+                assert out_lod_raw.exists()
+
+    def test_la_export_dump_unauthorized(self) -> None:
+        unauth = app.test_client()
+        rv = unauth.get(url_for('api_v1_la.get_la_dump'))
+        assert rv.status_code == 401
+        assert 'Unauthorized' in rv.get_json()['title']
+
+    def test_api_auth_helpers(self) -> None:
+        # 1. Without authenticated user
+        with app.test_request_context():
+            app.preprocess_request()
+            assert not is_authenticated()
+            assert get_authenticated_role() is None
+            assert not is_authorized_role('admin')
+
+            with pytest.raises(HTTPException) as exc:
+                require_auth()
+            assert exc.value.response.status_code == 401
+
+            with pytest.raises(HTTPException) as exc:
+                require_group('admin')
+            assert exc.value.response.status_code == 401
+
+        # 2. With authenticated user (Alice)
+        from flask_login import login_user
+        from openatlas.models.user import User
+
+        with app.test_request_context():
+            app.preprocess_request()
+            user = User.get_by_id(self.alice_id)
+            login_user(user)
+            assert is_authenticated()
+            assert get_authenticated_role() == 'admin'
+            assert is_authorized_role('admin')
+            assert is_authorized_role('readonly')
+            require_auth()
+            require_group('admin')
+
+            # Non-admin user -> 403 when admin required
+            user.group = 'readonly'
+            assert not is_authorized_role('admin')
+            with pytest.raises(HTTPException) as exc:
+                require_group('admin')
+            assert exc.value.response.status_code == 403
+
+            user.group = 'admin'
+
+            @api_auth_required
+            def dummy_auth() -> str:
+                return 'ok'
+
+            @api_group_required('admin')
+            def dummy_group() -> str:
+                return 'ok'
+
+            assert dummy_auth() == 'ok'
+            assert dummy_group() == 'ok'

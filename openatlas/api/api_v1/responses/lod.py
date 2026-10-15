@@ -49,3 +49,26 @@ ontology_responses = {
             'text/turtle': {'schema': {'type': 'string'}},
             'application/n-triples': {'schema': {'type': 'string'}},
             'application/rdf+xml': {'schema': {'type': 'string'}}}}}
+
+dump_responses = {
+    200: {
+        'description': 'Full Linked Open Data dump in N-Triples format (streamed)',
+        'content': {
+            'application/n-triples': {'schema': {'type': 'string'}}}},
+    401: {
+        'description': 'Authentication required. Provide a valid Bearer token or log in.',
+        'content': {
+            'application/json': {
+                'schema': ErrorResponse.model_json_schema()}}}}
+
+la_dump_responses = {
+    200: {
+        'description': 'Full Linked Art dump (streamed as JSON Lines or N-Triples)',
+        'content': {
+            'application/x-ndjson': {'schema': {'type': 'string'}},
+            'application/n-triples': {'schema': {'type': 'string'}}}},
+    401: {
+        'description': 'Authentication required. Provide a valid Bearer token or log in.',
+        'content': {
+            'application/json': {
+                'schema': ErrorResponse.model_json_schema()}}}}

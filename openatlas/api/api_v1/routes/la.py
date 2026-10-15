@@ -1,18 +1,21 @@
 from typing import Any
 
-from flask import Response
+from flask import Response, stream_with_context
 from flask_openapi3 import APIBlueprint
 
 from openatlas.api.api_v1.error_handlers import register_error_handlers
+from openatlas.api.api_v1.formatters.la_export import stream_la_dump
 from openatlas.api.api_v1.formatters.la_formatter import (
     format_la_entities, format_la_entity)
 from openatlas.api.api_v1.formatters.lod_util import (
     get_entities_response, get_entity_response)
 from openatlas.api.api_v1.models.lod import (
-    EntityCollectionPath, EntityCollectionQuery, EntityPath, EntityPathExt)
+    EntityCollectionPath, EntityCollectionQuery, EntityPath, EntityPathExt,
+    LaDumpQuery)
 from openatlas.api.api_v1.openapi_tags import lod_tag
 from openatlas.api.api_v1.responses.lod import (
-    lod_collection_responses, lod_responses)
+    la_dump_responses, lod_collection_responses, lod_responses)
+from openatlas.api.api_v1.util.auth import require_auth
 
 api_v1_la = APIBlueprint('api_v1_la', __name__, url_prefix='/api/1/linked-art')
 register_error_handlers(api_v1_la)
@@ -68,3 +71,35 @@ def get_entities(
         query,
         endpoint='api_v1_la.get_entities',
         formatter=format_la_entities)
+
+
+@api_v1_la.get(
+    '/export/dump',
+    summary='Stream full Linked Art dump in JSON Lines or N-Triples format',
+    tags=[lod_tag],
+    responses=la_dump_responses)
+def get_la_dump(query: LaDumpQuery) -> Response:
+    """
+    Streams a full Linked Art export.
+    Defaults to JSON Lines (`.jsonl` / `application/x-ndjson`), where each line
+    is a complete, valid Linked Art JSON-LD document.
+    Can also stream N-Triples (`.nt`) by setting `format=nt`.
+
+    Requires user authentication (Flask session cookie or JWT Bearer token).
+    """
+    require_auth()
+    ext = 'jsonl' if query.format == 'jsonl' else 'nt'
+    mimetype = (
+        'application/x-ndjson' if query.format == 'jsonl'
+        else 'application/n-triples')
+    filename = f'openatlas_linked_art_dump.{ext}'
+    if query.entity_class:
+        filename = f'openatlas_linked_art_{query.entity_class}.{ext}'
+    return Response(
+        stream_with_context(
+            stream_la_dump(
+                class_name=query.entity_class,
+                limit=query.limit,
+                output_format=query.format)),
+        mimetype=mimetype,
+        headers={'Content-Disposition': f'attachment; filename="{filename}"'})

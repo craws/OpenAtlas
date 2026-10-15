@@ -1,36 +1,25 @@
 from typing import Any
 
-from flask import Response
+from flask import Response, stream_with_context
 from flask_openapi3 import APIBlueprint
 
 from openatlas import app
 from openatlas.api.api_v1.context.lod_context import (
-    get_lod_context,
-    get_oa_ontology_graph,
-)
+    get_lod_context, get_oa_ontology_graph)
 from openatlas.api.api_v1.error_handlers import register_error_handlers
 from openatlas.api.api_v1.formatters.lod import (
-    format_lod_entities,
-    format_lod_entity,
-)
+    format_lod_entities, format_lod_entity)
+from openatlas.api.api_v1.formatters.lod_export import stream_lod_nt
 from openatlas.api.api_v1.formatters.lod_util import (
-    get_entities_response,
-    get_entity_response,
-)
+    get_entities_response, get_entity_response)
 from openatlas.api.api_v1.models.lod import (
-    EntityCollectionPath,
-    EntityCollectionQuery,
-    EntityPath,
-    EntityPathExt,
-    ExtensionPath,
-)
+    EntityCollectionPath, EntityCollectionQuery, EntityPath, EntityPathExt,
+    ExtensionPath, LodDumpQuery)
 from openatlas.api.api_v1.openapi_tags import lod_tag
 from openatlas.api.api_v1.responses.lod import (
-    context_responses,
-    lod_collection_responses,
-    lod_responses,
-    ontology_responses,
-)
+    context_responses, dump_responses, lod_collection_responses, lod_responses,
+    ontology_responses)
+from openatlas.api.api_v1.util.auth import require_auth
 from openatlas.api.api_v1.util.content_negotiation import make_graph_response
 
 api_v1_lod = APIBlueprint('api_v1_lod', __name__, url_prefix='/api/1')
@@ -136,3 +125,29 @@ def get_ontology_ext(path: ExtensionPath) -> Response:
     """
     ext_val = path.ext.value if hasattr(path.ext, 'value') else str(path.ext)
     return make_graph_response(get_oa_ontology_graph(), ext=ext_val)
+
+
+@api_v1_lod.get(
+    '/export/dump',
+    summary='Stream full Linked Open Data dump in N-Triples format',
+    tags=[lod_tag],
+    responses=dump_responses)
+def get_lod_dump(query: LodDumpQuery) -> Response:
+    """
+    Streams a full Linked Open Data export in N-Triples (.nt) format.
+    Requires user authentication (Flask session cookie or JWT Bearer token).
+
+    Supports keyset streaming with low memory footprint. Optional query
+    parameters allow limiting the exported entities or filtering by entity class.
+    """
+    require_auth()
+    filename = 'openatlas_lod_dump.nt'
+    if query.entity_class:
+        filename = f'openatlas_{query.entity_class}_lod.nt'
+    return Response(
+        stream_with_context(
+            stream_lod_nt(
+                class_name=query.entity_class,
+                limit=query.limit)),
+        mimetype='application/n-triples',
+        headers={'Content-Disposition': f'attachment; filename="{filename}"'})

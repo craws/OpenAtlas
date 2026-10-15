@@ -200,3 +200,26 @@ class LinkedArtCollectionResponse(BaseSchema):
     prev: OrderedCollectionPageRef | None = None
     next: OrderedCollectionPageRef | None = None
     ordered_items: list[dict[str, Any]] = Field(alias='orderedItems')
+
+
+class LodDumpQuery(BaseSchema):
+    limit: int | None = Field(
+        default=None,
+        description="Limit the number of entities exported (useful for testing or partial dumps).",
+        ge=1)
+    entity_class: str | None = Field(
+        default=None,
+        description="Filter export by specific OpenAtlas class (e.g. 'place', 'feature', 'artifact', or 'all').")
+
+
+class LaDumpQuery(BaseSchema):
+    limit: int | None = Field(
+        default=None,
+        description="Limit the number of entities exported (useful for testing or partial dumps).",
+        ge=1)
+    entity_class: str | None = Field(
+        default=None,
+        description="Filter export by specific OpenAtlas class (e.g. 'place', 'feature', 'artifact', or 'all').")
+    format: Literal['jsonl', 'nt'] = Field(
+        default='jsonl',
+        description="Export format: 'jsonl' (JSON Lines / NDJSON, recommended for Linked Art) or 'nt' (N-Triples).")

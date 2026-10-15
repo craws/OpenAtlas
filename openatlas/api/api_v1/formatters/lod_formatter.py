@@ -3,15 +3,9 @@ from typing import Any, Final
 from flask import url_for
 
 from openatlas.api.api_v1.formatters.la_helpers import (
-    date_to_utc_iso_str,
-    is_float,
-)
+    date_to_utc_iso_str, is_float)
 from openatlas.api.api_v1.formatters.util import (
-    EntityLinks,
-    entity_uri,
-    get_links_for_entities,
-    get_type_references,
-)
+    EntityLinks, entity_uri, get_links_for_entities, get_type_references)
 from openatlas.models.dates import Dates
 from openatlas.models.entity import Entity, Link
 

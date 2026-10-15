@@ -118,3 +118,16 @@ def abort_file_not_found(id_: int) -> NoReturn:
         'File not found on disk',
         f'No physical file was found for the requested ID {id_}.',
         details)
+
+
+def abort_unauthorized(message: str = 'Authentication required.') -> NoReturn:
+    details = {
+        'hint': 'Provide a valid Bearer token in the Authorization header '
+                'or log in via the web interface.'}
+    abort_with_error(401, 'Unauthorized', message, details)
+
+
+def abort_forbidden(message: str = 'Insufficient permissions.') -> NoReturn:
+    details = {
+        'hint': 'Your user account or API token does not have the required role.'}
+    abort_with_error(403, 'Forbidden', message, details)
