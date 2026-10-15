@@ -34,3 +34,18 @@ lod_collection_responses = {
         'content': {
             'application/json': {
                 'schema': ErrorResponse.model_json_schema()}}}}
+
+context_responses = {
+    200: {
+        'description': 'OpenAtlas JSON-LD @context definition',
+        'content': {
+            'application/ld+json': {'schema': {'type': 'object'}}}}}
+
+ontology_responses = {
+    200: {
+        'description': 'OpenAtlas Extension Ontology in RDF formats',
+        'content': {
+            'application/ld+json': {'schema': {'type': 'object'}},
+            'text/turtle': {'schema': {'type': 'string'}},
+            'application/n-triples': {'schema': {'type': 'string'}},
+            'application/rdf+xml': {'schema': {'type': 'string'}}}}}

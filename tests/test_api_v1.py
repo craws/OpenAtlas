@@ -24,10 +24,10 @@ class ApiV1(ApiTestCase):
         assert 'application/ld+json' in rv.headers.get('Content-Type')
         rv_json = rv.get_json()
         assert rv_json[
-                   '@context'] == 'https://linked.art/ns/v1/linked-art.json'
+                   '@context'] == url_for('api_v1_lod.get_context', _external=True)
         assert '@graph' not in rv_json
-        assert rv_json['type'] == 'Physical Thing'
-        assert rv_json['_label'] == 'Shire'
+        assert rv_json['type'] == 'Place'
+        assert rv_json['label'] == 'Shire'
 
         rv = c.get(
             url_for('api_v1_lod.get_entity_ext', uuid=e.place.uuid, ext='ttl'))
@@ -130,12 +130,29 @@ class ApiV1(ApiTestCase):
         assert 'prev' in rv.get_json()
 
         assert format_lod_entities([]) == {
-            '@context': [
-                'https://linked.art/ns/v1/linked-art.json',
-                'https://linked.art/ns/v1/search.json'],
+            '@context': url_for('api_v1_lod.get_context', _external=True),
             'type': 'OrderedCollection',
             'totalItems': 0,
             'orderedItems': []}
+
+        # Context endpoint test
+        rv = c.get(url_for('api_v1_lod.get_context'))
+        assert rv.status_code == 200
+        assert 'application/ld+json' in rv.headers.get('Content-Type')
+        ctx = rv.get_json()
+        assert '@context' in ctx
+        assert 'crm' in ctx['@context']
+        assert 'archaeo' in ctx['@context']
+        assert 'geo' in ctx['@context']
+        assert ctx['@context']['Feature'] == 'archaeo:A6_Feature'
+
+        # Ontology endpoint test
+        rv = c.get(url_for('api_v1_lod.get_ontology'))
+        assert rv.status_code == 200
+        rv_ttl = c.get(url_for('api_v1_lod.get_ontology_ext', ext='ttl'))
+        assert rv_ttl.status_code == 200
+        assert 'text/turtle' in rv_ttl.headers.get('Content-Type')
+        assert b'has_relationship_to' in rv_ttl.data
 
         rv = c.get(url_for(
             'api_v1_lod.get_entities', entity_class='acquisition',

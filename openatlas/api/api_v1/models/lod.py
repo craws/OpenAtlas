@@ -4,7 +4,10 @@ from uuid import UUID
 from pydantic import ConfigDict, Field, field_validator
 
 from openatlas.api.api_v1.models.util import (
-    BaseSchema, ExtensionsType, OpenAtlasClassEnum)
+    BaseSchema,
+    ExtensionsType,
+    OpenAtlasClassEnum,
+)
 from openatlas.api.api_v1.util.date_util import handle_date
 
 
@@ -14,6 +17,17 @@ class EntityPath(BaseSchema):
 
 class EntityPathExt(BaseSchema):
     uuid: UUID = Field(description="Unique identifier of the entity")
+    ext: ExtensionsType = Field(
+        description="File extension (.json, .ttl, .xml, .nt)",
+        json_schema_extra={
+            "examples": {
+                "json": {"summary": "JSON-LD Format", "value": "json"},
+                "turtle": {"summary": "Turtle Format", "value": "ttl"},
+                "xml": {"summary": "RDF/XML Format", "value": "xml"},
+                "ntriples": {"summary": "N-Triples Format", "value": "nt"}}})
+
+
+class ExtensionPath(BaseSchema):
     ext: ExtensionsType = Field(
         description="File extension (.json, .ttl, .xml, .nt)",
         json_schema_extra={

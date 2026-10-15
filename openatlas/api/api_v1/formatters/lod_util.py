@@ -5,7 +5,10 @@ from uuid import UUID
 from flask import Response
 
 from openatlas.api.api_v1.entity import (
-    get_by_system_class, get_count_by_system_class, get_entity_by_uuid)
+    get_by_system_class,
+    get_count_by_system_class,
+    get_entity_by_uuid,
+)
 from openatlas.api.api_v1.error_handlers import abort_not_found
 from openatlas.api.api_v1.util.content_negotiation import make_lod_response
 from openatlas.api.api_v1.util.pagination import get_pagination
