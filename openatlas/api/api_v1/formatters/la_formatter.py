@@ -893,36 +893,55 @@ class LaFormatter:
 
 
 LA_CONTEXT: Final[str] = 'https://linked.art/ns/v1/linked-art.json'
+LA_SEARCH_CONTEXT: Final[str] = 'https://linked.art/ns/v1/search.json'
 
 
 def format_la_entity(entity: Entity) -> dict[str, Any]:
     result = format_la_entities([entity])
-    return {'@context': result['@context']} | result['@graph'][0]
+    return {'@context': LA_CONTEXT} | result['orderedItems'][0]
 
 
 def format_la_entities(
         entities: list[Entity],
         pagination: dict[str, Any] | None = None) -> dict[str, Any]:
     if not entities and pagination is None:
-        return {'@context': LA_CONTEXT, '@graph': []}
+        return {
+            '@context': [LA_CONTEXT, LA_SEARCH_CONTEXT],
+            'type': 'OrderedCollection',
+            'totalItems': 0,
+            'orderedItems': []}
     links_data = get_links_for_entities(entities) if entities else {}
     prefetch_files(links_data)
     formatter = LaFormatter(type_references=get_type_references())
-    graph = [formatter.format_entity(item) for item in links_data.values()]
+    items = [formatter.format_entity(item) for item in links_data.values()]
     if pagination is None:
-        return {'@context': LA_CONTEXT, '@graph': graph}
+        return {
+            '@context': [LA_CONTEXT, LA_SEARCH_CONTEXT],
+            'type': 'OrderedCollection',
+            'totalItems': len(items),
+            'orderedItems': items}
     result: dict[str, Any] = {
-        '@context': [
-            LA_CONTEXT,
-            {'hydra': 'http://www.w3.org/ns/hydra/core#'}],
+        '@context': [LA_CONTEXT, LA_SEARCH_CONTEXT],
         'id': pagination['id'],
-        'type': 'hydra:PartialCollectionView',
-        'hydra:totalItems': pagination['total_items'],
-        'hydra:first': pagination['first']}
+        'type': 'OrderedCollectionPage',
+        'partOf': {
+            'id': pagination['collection_url'],
+            'type': 'OrderedCollection',
+            'totalItems': pagination['total_items'],
+            'first': {
+                'id': pagination['first'],
+                'type': 'OrderedCollectionPage'},
+            'last': {
+                'id': pagination['last'],
+                'type': 'OrderedCollectionPage'}},
+        'startIndex': pagination['start_index'],
+        'orderedItems': items}
     if 'previous' in pagination:
-        result['hydra:previous'] = pagination['previous']
+        result['prev'] = {
+            'id': pagination['previous'],
+            'type': 'OrderedCollectionPage'}
     if 'next' in pagination:
-        result['hydra:next'] = pagination['next']
-    result['hydra:last'] = pagination['last']
-    result['@graph'] = graph
+        result['next'] = {
+            'id': pagination['next'],
+            'type': 'OrderedCollectionPage'}
     return result

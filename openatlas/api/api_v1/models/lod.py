@@ -158,19 +158,31 @@ class LinkedArtResponse(BaseSchema):
     _label: str
 
 
+class OrderedCollectionPageRef(BaseSchema):
+    id: str
+    type: str = 'OrderedCollectionPage'
+
+
+class ParentOrderedCollection(BaseSchema):
+    id: str
+    type: str = 'OrderedCollection'
+    total_items: int = Field(alias='totalItems')
+    first: OrderedCollectionPageRef
+    last: OrderedCollectionPageRef
+
+
 class LinkedArtCollectionResponse(BaseSchema):
     model_config = ConfigDict(extra='allow')
 
-    context: list[str | dict[str, str]] = Field(
+    context: list[str] = Field(
         default=[
-            "https://linked.art/ns/v1/linked-art.json",
-            {"hydra": "http://www.w3.org/ns/hydra/core#"}],
-        alias="@context")
+            'https://linked.art/ns/v1/linked-art.json',
+            'https://linked.art/ns/v1/search.json'],
+        alias='@context')
     id: str
-    type: str = "hydra:PartialCollectionView"
-    total_items: int = Field(alias="hydra:totalItems")
-    first: str = Field(alias="hydra:first")
-    previous: str | None = Field(default=None, alias="hydra:previous")
-    next: str | None = Field(default=None, alias="hydra:next")
-    last: str = Field(alias="hydra:last")
-    graph: list[dict[str, Any]] = Field(alias="@graph")
+    type: str = 'OrderedCollectionPage'
+    part_of: ParentOrderedCollection = Field(alias='partOf')
+    start_index: int = Field(alias='startIndex')
+    prev: OrderedCollectionPageRef | None = None
+    next: OrderedCollectionPageRef | None = None
+    ordered_items: list[dict[str, Any]] = Field(alias='orderedItems')

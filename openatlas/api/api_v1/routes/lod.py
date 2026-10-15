@@ -67,8 +67,8 @@ def get_entities(
 
     This endpoint allows querying a specific system class
     (e.g. `person`, `place`).
-    Results are returned as a Hydra Collection and can be filtered by various
-    query parameters such as search strings, dates, or case studies.
+    Results are returned as an OrderedCollectionPage and can be filtered by
+    various query parameters such as search strings, dates, or case studies.
     """
     return get_entities_response(
         path,

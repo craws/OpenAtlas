@@ -5,6 +5,7 @@ from flask import url_for
 from openatlas.models.entity import Entity
 
 LOD_CONTEXT: Final[str] = 'https://linked.art/ns/v1/linked-art.json'
+LOD_SEARCH_CONTEXT: Final[str] = 'https://linked.art/ns/v1/search.json'
 
 
 def format_lod_entity(entity: Entity) -> dict[str, Any]:
@@ -14,23 +15,37 @@ def format_lod_entity(entity: Entity) -> dict[str, Any]:
 def format_lod_entities(
         entities: list[Entity],
         pagination: dict[str, Any] | None = None) -> dict[str, Any]:
-    graph = [_stub(entity) for entity in entities]
+    items = [_stub(entity) for entity in entities]
     if pagination is None:
-        return {'@context': LOD_CONTEXT, '@graph': graph}
+        return {
+            '@context': [LOD_CONTEXT, LOD_SEARCH_CONTEXT],
+            'type': 'OrderedCollection',
+            'totalItems': len(items),
+            'orderedItems': items}
     result: dict[str, Any] = {
-        '@context': [
-            LOD_CONTEXT,
-            {'hydra': 'http://www.w3.org/ns/hydra/core#'}],
+        '@context': [LOD_CONTEXT, LOD_SEARCH_CONTEXT],
         'id': pagination['id'],
-        'type': 'hydra:PartialCollectionView',
-        'hydra:totalItems': pagination['total_items'],
-        'hydra:first': pagination['first']}
+        'type': 'OrderedCollectionPage',
+        'partOf': {
+            'id': pagination['collection_url'],
+            'type': 'OrderedCollection',
+            'totalItems': pagination['total_items'],
+            'first': {
+                'id': pagination['first'],
+                'type': 'OrderedCollectionPage'},
+            'last': {
+                'id': pagination['last'],
+                'type': 'OrderedCollectionPage'}},
+        'startIndex': pagination['start_index'],
+        'orderedItems': items}
     if 'previous' in pagination:
-        result['hydra:previous'] = pagination['previous']
+        result['prev'] = {
+            'id': pagination['previous'],
+            'type': 'OrderedCollectionPage'}
     if 'next' in pagination:
-        result['hydra:next'] = pagination['next']
-    result['hydra:last'] = pagination['last']
-    result['@graph'] = graph
+        result['next'] = {
+            'id': pagination['next'],
+            'type': 'OrderedCollectionPage'}
     return result
 
 

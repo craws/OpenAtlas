@@ -127,11 +127,15 @@ class ApiV1(ApiTestCase):
                 limit=1,
                 page=2))
         assert rv.status_code == 200
-        assert 'hydra:previous' in rv.get_json()
+        assert 'prev' in rv.get_json()
 
         assert format_lod_entities([]) == {
-            '@context': 'https://linked.art/ns/v1/linked-art.json',
-            '@graph': []}
+            '@context': [
+                'https://linked.art/ns/v1/linked-art.json',
+                'https://linked.art/ns/v1/search.json'],
+            'type': 'OrderedCollection',
+            'totalItems': 0,
+            'orderedItems': []}
 
         rv = c.get(url_for(
             'api_v1_lod.get_entities', entity_class='acquisition',
@@ -198,8 +202,9 @@ class ApiV1(ApiTestCase):
                 url_for('api_v1_la.get_entities', entity_class=class_))
             assert rv.status_code == 200
             rv_json = rv.get_json()
-            assert rv_json['type'] == 'hydra:PartialCollectionView'
-            assert rv_json['@graph']
+            assert rv_json['type'] == 'OrderedCollectionPage'
+            assert rv_json['orderedItems']
+            assert rv_json['partOf']['type'] == 'OrderedCollection'
 
         rv = c.get(
             url_for(
@@ -208,11 +213,15 @@ class ApiV1(ApiTestCase):
                 limit=1,
                 page=2))
         assert rv.status_code == 200
-        assert 'hydra:previous' in rv.get_json()
+        assert 'prev' in rv.get_json()
 
         assert format_la_entities([]) == {
-            '@context': 'https://linked.art/ns/v1/linked-art.json',
-            '@graph': []}
+            '@context': [
+                'https://linked.art/ns/v1/linked-art.json',
+                'https://linked.art/ns/v1/search.json'],
+            'type': 'OrderedCollection',
+            'totalItems': 0,
+            'orderedItems': []}
 
         rv = c.get(url_for('api_v1_la.get_entity', uuid=e.move.uuid))
         part = rv.get_json()['part'][0]

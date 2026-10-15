@@ -22,7 +22,7 @@ lod_responses = {
 lod_collection_responses = {
     200: {
         'description': 'Collection response in different LOD '
-                       'formats with Hydra pagination',
+                       'formats with OrderedCollectionPage pagination',
         'content': {
             'application/ld+json': {
                 'schema': LinkedArtCollectionResponse.model_json_schema()},
