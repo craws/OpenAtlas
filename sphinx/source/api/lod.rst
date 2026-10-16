@@ -1,5 +1,5 @@
-Linked Open Data (LOD) Guide
-=============================
+Linked Open Data
+================
 
 This guide explains how OpenAtlas handles **Linked Open Data (LOD)** in Version 1,
 which ontologies are employed, and how research data is structured and serialized.

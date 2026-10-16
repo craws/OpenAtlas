@@ -1,5 +1,5 @@
-Getting Started & Authentication
-================================
+Getting Started
+===============
 
 This guide explains how to connect to the OpenAtlas API, configure access
 permissions, obtain an API token, and make your first requests.

@@ -1,5 +1,5 @@
-Cookbook for Non-Programmers
-=============================
+Cookbook
+========
 
 This cookbook is designed for researchers, archaeologists, historians, and
 students who want to work with OpenAtlas data without having a background in

@@ -1,5 +1,5 @@
-API v1 Reference & Endpoints
-==============================
+API v1 (Beta)
+=============
 
 This section provides a quick-reference index of all 36 endpoints available in
 OpenAtlas API v1, organized by feature area.
