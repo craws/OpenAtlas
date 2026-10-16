@@ -17,10 +17,14 @@ def index_changelog() -> str:
 versions = {
     '9.5.0': ['TBA', {
         'feature': {
-            '2875': 'Remove database field model.entity.cidoc_class_code',
+            '2743': 'Add creation event for sources',
             '2861': 'API: Format selection strategy',
             '2344': 'API: Replace python-flasgger',
-            '2883': 'Refactor and minor improvements'
+            '2875': 'Remove database field model.entity.cidoc_class_code',
+            '2866':	'Refactor get_info() functions',
+            '2883': 'Refactor and minor improvements'},
+        'fix': {
+            '2889': 'Annotation moves'
         }
     }],
     '9.4.0': ['2026-08-01', {
@@ -874,7 +878,7 @@ versions = {
             '1175': 'Additional date checks',
             '1066': 'Package Manager for JavaScript Libraries'},
         'fix': {
-            '1134': 'Overlay maps: not enabled if Geonames disabled',
+            '1134': 'Overlay maps: not enabled if GeoNames disabled',
             '1139': 'Breadcrumbs show place twice',
             '1140': 'HTML Code is showing in description text Actions',
             '1152': "Menu item isn't marked as active in entity view"}}],
@@ -1214,7 +1218,7 @@ versions = {
             '337': 'CRM - new OpenAtlas shortcuts'}}],
     '0.1.0': ['2014-12-30', {
         'feature': {
-            '318': 'Import definitions from CIDOC rdfs'}}],
+            '318': 'Import definitions from CIDOC RDFs'}}],
     '0.0.1': ['2014-11-05', {
         'feature': {
             '': 'Initial version based on the Zend Base project from craws.net'

@@ -42,7 +42,7 @@ class OpenAtlas(ExternalApi):  # pylint: disable=too-few-public-methods
             if earliest := start.get('earliest'):
                 info['begin from'] = earliest
             if latest := start.get('latest'):
-                info['begin to'] = latest
+                info['begin to'] = latest  # pragma: no cover
             if comment := start.get('comment'):
                 info['begin comment'] = comment
 
@@ -50,9 +50,9 @@ class OpenAtlas(ExternalApi):  # pylint: disable=too-few-public-methods
             if earliest := end.get('earliest'):
                 info['end from'] = earliest
             if latest := end.get('latest'):
-                info['end to'] = latest
+                info['end to'] = latest  # pragma: no cover
             if comment := end.get('comment'):
-                info['end comment'] = comment
+                info['end comment'] = comment  # pragma: no cover
 
         if desc := data.get('description'):
             info['description'] = desc  # pragma: no cover
