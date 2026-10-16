@@ -60,7 +60,7 @@ function initReferenceAutocomplete(systemId, options) {
         }
         try {
           const items = await Promise.resolve(options.search(query));
-          if (currentCounter !== requestCounter) {
+          if (currentCounter !== requestCounter || query !== input.value.trim()) {
             return [];
           }
           return normalize(items);
@@ -95,7 +95,7 @@ function initReferenceAutocomplete(systemId, options) {
         selection: (event) => {
           const selection = event.detail.selection.value;
           input.value = selection.id;
-          input.dispatchEvent(new Event('input', { bubbles: true }));
+          requestCounter++;
           input.dispatchEvent(new Event('change', { bubbles: true }));
         }
       }
