@@ -34,6 +34,6 @@ def api_v1_index() -> dict[str, Any]:
             _external=True),
         manual=url_for(
             'static',
-            filename='manual/technical/api.html',
+            filename='manual/api/index.html',
             _external=True))
     return response.model_dump(by_alias=True)

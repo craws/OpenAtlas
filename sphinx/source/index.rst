@@ -21,12 +21,18 @@ development specific documentation in our Redmine
 
 .. toctree::
    :maxdepth: 2
+   :caption: API
+
+   api/index
+
+.. toctree::
+   :maxdepth: 2
    :caption: Documentation
 
    model/index
-   technical/api
    technical/database_structure
    technical/application_structure
+   technical/api
 
 .. toctree::
    :maxdepth: 2
