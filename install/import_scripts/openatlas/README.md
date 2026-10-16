@@ -70,6 +70,8 @@ If a source directory
 script, the script tries to copy entries according to imported file entities
 and save them with their new id.
 
+Possible IIIF images are not imported and have to be created again (if needed).
+
 # What can be problematic
 
 ## Case studies

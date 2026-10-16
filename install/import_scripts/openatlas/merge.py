@@ -41,7 +41,7 @@ PROJECT_DESCRIPTION = (
     'Sepultures) deals with the digital collection and presentation of '
     'Early Medieval cemeteries in the area of present day Austria.')
 IMPORT_USER_ID = 1
-FILES_PATH = pathlib.Path('')
+FILES_PATH = pathlib.Path('/home/alex/Desktop/demo_dev_files')
 
 
 def connect() -> Any:
@@ -478,7 +478,23 @@ def annotations() -> None:
                 'link_start': row['link_start'],
                 'link_end': row['link_end'],
                 'text': row['text']})
-
+    cursor.execute(
+        """
+        SELECT image_id, entity_id, coordinates, text
+        FROM model.annotation_image;
+        """)
+    for row in list(cursor):
+        g.cursor.execute(
+            """
+            INSERT INTO model.annotation_image (
+                image_id, entity_id, coordinates, text)
+            VALUES (%(image_id)s, %(entity_id)s, %(coordinates)s, %(text)s);
+            """, {
+                'image_id': id_map[row['image_id']],
+                'entity_id': id_map[row['entity_id']]
+                if row['entity_id'] else None,
+                'coordinates': row['coordinates'],
+                'text': row['text']})
 
 with app.test_request_context():
     app.preprocess_request()
