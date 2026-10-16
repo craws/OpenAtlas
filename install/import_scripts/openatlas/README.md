@@ -1,8 +1,8 @@
 # About
 This script can be used to merge an OpenAtlas instance into an existing one.
 
-The script is still very basic but will be expanded on a need to basis, feel
-free to add feature request at our
+The script is very basic but will be expanded on a need to basis, feel free
+to add feature request at our
 [Redmine](https://redmine.openatlas.eu/projects/uni/wiki)
 
 # Preparation and usage
@@ -30,21 +30,23 @@ script.
 
 ## Database logs
 In the import schema of the database imported entities are logged with their
-project and former id. This information can be configured at the profile to be
-also shown in the user interface.
+project and former id. This information can be configured at your profile to 
+be displayed in the user interface.
    
 # Clean up
 At the start of the script possible entries from the last run will be
 removed. This can be useful in case you have to run the script more often to
-get it right. Copied files are not cleaned up will be overridden when the
-script is run again.
+get it right.
+
+But there are exceptions, e.g. external references systems and copied files are
+ not deleted. The files will be overridden when the script is run again.
 
 # What is imported
 
 ## Types
 The script compares the new types with existing ones. In case there are types
 with the same name in the same hierarchy the existing ones will be used and
-their classes extended, in case there were more configured.
+their classes ex tended, in case there were more configured.
 
 So it is a good idea to compare the type hierarchies and adapt these if needed
 in the database that is to be imported before.
@@ -67,6 +69,16 @@ If a source directory
 (the fiels/upload directory of the project to be imported) is configured in the
 script, the script tries to copy entries according to imported file entities
 and save them with their new id.
+
+# What can be problematic
+
+## Case studies
+They are imported and linked but than have to be moved as sub case studies
+afterward manually via the user interface. Also, there might be duplication
+because every entity is also linked to the "super" case study that gets
+imported.
+
+We might take a look at that when the need arises.
 
 # What is not imported
 * Users and their information

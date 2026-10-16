@@ -7,9 +7,11 @@
 # python3 install/import_scripts/openatlas/merge.py
 
 # Work in progress:
-# * New case studies (would have to be subs of import case study)
 # * Annotations
+
+# Possible improvements
 # * Offer manual mapping for e.g. duplicates
+# * New case studies (would have to be subs of import case study)
 
 import os
 import pathlib
@@ -227,7 +229,7 @@ def track(import_id: int, new_id: int) -> None:
     id_map[import_id] = new_id
 
 
-def insert_entities() -> None:
+def entities() -> None:
     print('Import entities')
     cursor.execute(
         """
@@ -308,7 +310,7 @@ def reference_systems() -> None:
             track(system.id, imported_system.id)
 
 
-def link_entities() -> None:
+def links() -> None:
     print('Import links')
     cursor.execute(
         """
@@ -338,18 +340,24 @@ def link_entities() -> None:
         if row['range_id'] not in id_map:
             print(f'Missing range_id in id_map: {row['range_id']}')
             continue
-        db.link({
-            'property_code': row['property_code'],
-            'domain_id': id_map[row['domain_id']],
-            'range_id': id_map[row['range_id']],
-            'description': row['description'],
-            'type_id': id_map[row['type_id']] if row['type_id'] else None,
-            'begin_from': row['begin_from'] or None,
-            'begin_to': row['begin_to'] or None,
-            'begin_comment': row['begin_comment'] or None,
-            'end_from': row['end_from'] or None,
-            'end_to': row['end_to'] or None,
-            'end_comment': row['end_comment'] or None})
+        if id_map[row['domain_id']] == '161':
+            print(f'non existing: {row['domain_id']}')
+            continue
+        try:
+            db.link({
+                'property_code': row['property_code'],
+                'domain_id': id_map[row['domain_id']],
+                'range_id': id_map[row['range_id']],
+                'description': row['description'],
+                'type_id': id_map[row['type_id']] if row['type_id'] else None,
+                'begin_from': row['begin_from'] or None,
+                'begin_to': row['begin_to'] or None,
+                'begin_comment': row['begin_comment'] or None,
+                'end_from': row['end_from'] or None,
+                'end_to': row['end_to'] or None,
+                'end_comment': row['end_comment'] or None})
+        except Exception as e:
+            print(e)
     delete_link_duplicates()
 
 
@@ -441,6 +449,37 @@ def add_files() -> None:
             role=row['description'])
 
 
+def annotations() -> None:
+    print('Import annotations')
+    cursor.execute(
+        """
+        SELECT source_id, entity_id, link_start, link_end, text
+        FROM model.annotation_text;
+        """)
+    for row in list(cursor):
+        g.cursor.execute(
+            """
+            INSERT INTO model.annotation_text (
+                source_id,
+                entity_id,
+                link_start,
+                link_end,
+                text)
+            VALUES (
+                %(source_id)s,
+                %(entity_id)s,
+                %(link_start)s,
+                %(link_end)s,
+                %(text)s);
+            """, {
+                'source_id': id_map[row['source_id']],
+                'entity_id': id_map[row['entity_id']]
+                if row['entity_id'] else None,
+                'link_start': row['link_start'],
+                'link_end': row['link_end'],
+                'text': row['text']})
+
+
 with app.test_request_context():
     app.preprocess_request()
     project_id = insert_project()
@@ -449,8 +488,10 @@ with app.test_request_context():
     hierarchies()
     reference_systems()
     types()
-    insert_entities()
-    link_entities()
+    entities()
+    links()
+    annotations()
+
     if FILES_PATH and file_ids:
         add_files()
 
