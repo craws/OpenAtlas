@@ -191,14 +191,21 @@ def get_newsletter_button(users: list[User]) -> str:
 
 
 def get_rights_holder_table() -> Table:
-    table = Table(['name', 'class', 'count', 'description'])
+    table = Table(
+        ['name', 'class', 'creator', 'license_holder', 'description'])
     file_count = RightsHolder.get_rights_holder_file_count()
     for holder in RightsHolder.get_rights_holder():
         row = [
             link(holder, url_for('rights_holder_view', id_=holder.id)),
             uc_first(f'{_(holder.class_) if holder.class_ else ''}'),
             link(
-                str(file_count.get(holder.id, '')),
+                str(file_count[holder.id].get('creator', '')),
+                url_for(
+                    'rights_holder_view',
+                    id_=holder.id,
+                    _anchor='tab-files')),
+            link(
+                str(file_count[holder.id].get('license_holder', '')),
                 url_for(
                     'rights_holder_view',
                     id_=holder.id,

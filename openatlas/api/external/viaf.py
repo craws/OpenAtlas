@@ -12,7 +12,6 @@ class VIAF(ExternalApi):  # pylint: disable=too-few-public-methods
 
     @staticmethod
     def get_info(id_: str, system: Entity) -> dict[str, object]:
-        info: dict[str, object] = {}
         try:
             data = requests.get(
                 f'https://viaf.org/viaf/{id_}',
@@ -22,34 +21,37 @@ class VIAF(ExternalApi):  # pylint: disable=too-few-public-methods
                 proxies=app.config['PROXIES'],
                 timeout=10).json()
         except Exception:  # pragma: no cover
-            return info
+            return {}
 
-        if 'ns1:VIAFCluster' in data:
-            viaf_data = data['ns1:VIAFCluster']
+        viaf_data = data.get('ns1:VIAFCluster', {})
+        if not viaf_data:
+            return {}  # pragma: no cover
 
-            if 'ns1:viafID' in viaf_data:
-                viaf_id = str(viaf_data['ns1:viafID'])
-                info['VIAF ID'] = link(
-                    viaf_id,
-                    f'https://viaf.org/viaf/{str(viaf_data['ns1:viafID'])}',
-                    external=True)
+        info: dict[str, object] = {}
 
-            headings = viaf_data.get(
-                'ns1:mainHeadings', {}).get('ns1:data', [])
-            if isinstance(headings, list) and headings:
-                info['title'] = headings[0].get('ns1:text', '')
-            elif isinstance(headings, dict):  # pragma: no cover
-                info['title'] = headings.get('ns1:text', '')
+        if viaf_id := viaf_data.get('ns1:viafID'):
+            info['VIAF ID'] = link(
+                str(viaf_id),
+                f'https://viaf.org/viaf/{viaf_id}',
+                external=True)
 
-            if 'ns1:nameType' in viaf_data:
-                info['type'] = viaf_data['ns1:nameType']
+        headings = viaf_data.get('ns1:mainHeadings', {}).get('ns1:data', [])
+        if isinstance(headings, list) and headings:
+            if text := headings[0].get('ns1:text'):
+                info['title'] = text
+        elif isinstance(headings, dict):  # pragma: no cover
+            if text := headings.get('ns1:text'):
+                info['title'] = text
 
-            if 'ns1:birthDate' in viaf_data \
-                    and str(viaf_data['ns1:birthDate']) != '0':
-                info['birth date'] = str(viaf_data['ns1:birthDate'])
-            if 'ns1:deathDate' in viaf_data \
-                    and str(viaf_data['ns1:deathDate']) != '0':
-                info['death date'] = str(viaf_data['ns1:deathDate'])
+        if name_type := viaf_data.get('ns1:nameType'):
+            info['type'] = name_type
 
+        if (birth_date := viaf_data.get('ns1:birthDate')) is not None \
+                and str(birth_date) != '0':
+            info['birth date'] = str(birth_date)
+
+        if (death_date := viaf_data.get('ns1:deathDate')) is not None \
+                and str(death_date) != '0':
+            info['death date'] = str(death_date)
 
         return info

@@ -3,10 +3,15 @@ BEGIN;
 -- Raise database version
 UPDATE web.settings SET value = '9.5.0' WHERE name = 'database_version';
 
--- Remove cidoc_class_code FROM model.entity
+-- Add creation event for sources (#2743)
+INSERT INTO model.openatlas_class (name, cidoc_class_code, new_types_allowed, write_access_group_name, standard_type_id) VALUES
+  ('creation', 'E65', true, 'contributor', (SELECT id FROM model.entity WHERE name = 'Event' AND openatlas_class_name = 'type' ORDER BY id ASC LIMIT 1));
+
+INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) VALUES
+  ((SELECT id FROM web.hierarchy WHERE name='Event'), 'creation');
+
+-- Remove cidoc_class_code FROM model.entity (#2875)
 ALTER TABLE model.entity DROP COLUMN IF EXISTS cidoc_class_code;
-
-
 DROP FUNCTION IF EXISTS model.delete_entity_related() CASCADE;
 
 CREATE FUNCTION model.delete_entity_related() RETURNS trigger

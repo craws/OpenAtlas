@@ -1,0 +1,31 @@
+FROM debian:13
+
+ARG CANTALOUPE_VERSION=5.0.7
+ENV CANTALOUPE_HOME=/opt/cantaloupe
+
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    export DEBIAN_FRONTEND=noninteractive && \
+    apt update && apt dist-upgrade -y --no-install-recommends && \
+    apt install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        unzip \
+        openjdk-21-jre-headless \
+        locales-all && \
+    rm -rf /var/lib/apt/lists/* && \
+    mkdir -p /opt /etc/cantaloupe /var/www/iipsrv/tests && \
+    curl -fsSL -o /tmp/cantaloupe.zip \
+      "https://github.com/cantaloupe-project/cantaloupe/releases/download/v${CANTALOUPE_VERSION}/cantaloupe-${CANTALOUPE_VERSION}.zip" && \
+    unzip /tmp/cantaloupe.zip -d /opt && \
+    mv "/opt/cantaloupe-${CANTALOUPE_VERSION}" "${CANTALOUPE_HOME}" && \
+    rm -f /tmp/cantaloupe.zip && \
+    chown -R www-data:www-data /var/www/iipsrv
+
+COPY /install/container/cantaloupe.properties /etc/cantaloupe/cantaloupe.properties
+
+EXPOSE 8182
+ENV LC_ALL=en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US.UTF-8
+
+CMD ["sh", "-c", "exec java -Djava.net.preferIPv4Stack=true -Dcantaloupe.config=/etc/cantaloupe/cantaloupe.properties -Xmx512m -jar /opt/cantaloupe/cantaloupe-*.jar"]

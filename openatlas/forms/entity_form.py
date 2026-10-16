@@ -1,3 +1,4 @@
+import html
 import subprocess
 from pathlib import Path
 from typing import Any, Optional
@@ -12,8 +13,8 @@ from wtforms import (
 from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.image_processing import (
-    check_iiif_activation, convert_image_to_iiif,
-    get_binary_path, resize_image)
+    check_iiif_activation, convert_image_to_iiif, get_binary_path,
+    resize_image)
 from openatlas.forms.add_fields import (
     add_buttons, add_class_types, add_date_fields, add_description,
     add_name_fields, add_reference_systems, add_relations, get_validators)
@@ -136,6 +137,8 @@ def process_form_data(
         match attr:
             case 'dates':
                 data.update(process_dates(form))
+            case 'description' if form['description'].data:
+                data['description'] = html.unescape(form['description'].data)
             case 'location':
                 data['gis'] = {
                     shape: getattr(form, f'gis_{shape}s').data

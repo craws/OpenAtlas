@@ -18,7 +18,8 @@ class_groups = {
         'name': 'event',
         'label': _('event'),
         'classes': [
-            'activity', 'acquisition', 'modification', 'move', 'production'],
+            'activity', 'acquisition', 'creation', 'modification', 'move',
+            'production'],
         'table_columns':
             ['name', 'class', 'type', 'begin', 'end', 'description'],
         'icon': 'mdi-calendar'},
