@@ -1,5 +1,5 @@
-API
-===
+Overview
+========
 
 Welcome to the OpenAtlas API documentation. OpenAtlas provides programmatic
 access to archaeological, historical, and geospatial data stored in an
@@ -81,11 +81,8 @@ The complete OpenAPI 3.1 specification for API v1 is dynamically generated at:
 
 Guide Contents
 --------------
-.. toctree::
-   :maxdepth: 1
-
-   getting_started
-   lod
-   cookbook
-   reference
-   api_04
+* :doc:`getting_started` - Access modes, JWT Bearer tokens, and first requests.
+* :doc:`lod` - Semantic Web concepts, CIDOC CRM, CRMarchaeo, Linked Art, and SKOS.
+* :doc:`cookbook` - Step-by-step practical recipes for non-programmers (QGIS, OpenRefine, dates, IIIF, Python/R).
+* :doc:`reference` - Complete index of all 36 endpoints, parameters, and error codes.
+* :doc:`api_04` - Documentation for the current stable API v0.4.

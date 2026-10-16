@@ -24,6 +24,11 @@ development specific documentation in our Redmine
    :caption: API
 
    api/index
+   api/getting_started
+   api/lod
+   api/cookbook
+   api/reference
+   api/api_04
 
 .. toctree::
    :maxdepth: 2
