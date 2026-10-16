@@ -127,6 +127,17 @@ class EntityCollectionQuery(BaseSchema):
         description="Filter entities by case study ID (integer) or case "
                     "study UUID.")
 
+    @field_validator('search', mode='before')
+    @classmethod
+    def validate_search(cls, value: Any) -> str | None:
+        if value is None:
+            return None
+        value_str = str(value)
+        if '\x00' in value_str:
+            raise ValueError(
+                "Search string must not contain NUL (0x00) characters.")
+        return value_str
+
     @field_validator('sort_by', mode='before')
     @classmethod
     def validate_sort_by(cls, value: Any) -> str:

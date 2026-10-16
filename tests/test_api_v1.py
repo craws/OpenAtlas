@@ -116,7 +116,8 @@ class ApiV1(ApiTestCase):
             {'endDate': '2020-01-32'},
             {'endDate': 'invalid'},
             {'endDate': '-abc'},
-            {'endDate': '2020-01-01-01'}]:
+            {'endDate': '2020-01-01-01'},
+            {'search': 'bad\x00search'}]:
             rv = c.get(url_for(
                 'api_v1_lod.get_entities', entity_class='acquisition', **params))
             assert rv.status_code == 422
