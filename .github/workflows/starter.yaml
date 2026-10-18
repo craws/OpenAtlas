@@ -382,7 +382,7 @@ jobs:
         run: |
           docker exec -i openatlas-openatlas-gunicorn-1 /bin/bash -c "cd /var/www/openatlas/tests && python3 -m pytest" || \
           (echo "Retry with direct pytest command"; docker exec -i openatlas-openatlas-gunicorn-1 /bin/bash -c "cd /var/www/openatlas/tests && pytest")
-  _3:
+  deploy_review:
     needs: [setup_workflow_env, test_openatlas]
     uses: acdh-oeaw/gl-autodevops-minimal-port/.github/workflows/deploy.yml@main
     secrets: inherit
@@ -391,18 +391,6 @@ jobs:
       environment: ${{ needs.setup_workflow_env.outputs.environment}}
       DOCKER_TAG: ${{ needs.setup_workflow_env.outputs.registry_root }}${{ needs.setup_workflow_env.outputs.image_name }}
       APP_NAME: ${{ needs.setup_workflow_env.outputs.APP_NAME }}-${{ needs.setup_workflow_env.outputs.environment_short }}
-      APP_ROOT: ${{ needs.setup_workflow_env.outputs.APP_ROOT }}
-      default_port: ${{ needs.setup_workflow_env.outputs.default_port}}
-  with_db_demo_deploy:
-    needs: [setup_workflow_env, test_openatlas]
-    uses: acdh-oeaw/gl-autodevops-minimal-port/.github/workflows/deploy.yml@main
-    secrets: inherit
-    if: contains(github.ref, 'tags') != true && github.repository_owner == 'acdh-oeaw'
-    with:
-      environment: review/with_db_demo_deploy
-      do_deploy: ${{ github.ref_name == 'develop' }}
-      DOCKER_TAG: ${{ needs.setup_workflow_env.outputs.registry_root }}${{ needs.setup_workflow_env.outputs.image_name }}
-      APP_NAME: ${{ needs.setup_workflow_env.outputs.APP_NAME }}-with_db_demo_deploy
       APP_ROOT: ${{ needs.setup_workflow_env.outputs.APP_ROOT }}
       default_port: ${{ needs.setup_workflow_env.outputs.default_port}}
   openatlas_demo:
