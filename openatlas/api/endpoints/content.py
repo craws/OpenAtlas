@@ -4,7 +4,7 @@ import yaml
 from flask import Response, g, make_response, session
 from flask_restful import Resource, marshal
 
-from openatlas import app
+from openatlas import app, write_openapi_instance
 from openatlas.api.resources.api_entity import ApiEntity
 from openatlas.api.resources.error import NotATypeError
 from openatlas.api.resources.parser import default, entity_, locale, openapi
@@ -104,6 +104,8 @@ class SystemClassCount(Resource):
 class GetOpenAPISchema(Resource):
     @staticmethod
     def get() -> tuple[Resource, int] | Response:
+        if not app.config['OPENAPI_INSTANCE_FILE'].exists():
+            write_openapi_instance()
         with open(
                 app.config['OPENAPI_INSTANCE_FILE'],
                 'r',

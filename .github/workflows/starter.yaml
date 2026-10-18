@@ -213,6 +213,7 @@ jobs:
           docker exec -i openatlas-openatlas-1 /bin/bash -c "cd /var/www/openatlas/tests && python3 -m pytest" || \
           (echo "Retry with direct pytest command"; docker exec -i openatlas-openatlas-1 /bin/bash -c "cd /var/www/openatlas/tests && pytest")
   build_openatlas_modern:
+    if: false  # Postponed: To be enabled when modern container deployment is ready
     needs: [setup_workflow_env]
     environment: ${{ needs.setup_workflow_env.outputs.environment }}
     permissions:
@@ -259,6 +260,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   test_openatlas_modern:
+    if: false  # Postponed: To be enabled when modern container deployment is ready
     env:
       POSTGRES_PASSWORD: verysecret
       POSTGRES_DB: openatlas_test
