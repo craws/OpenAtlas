@@ -398,7 +398,7 @@ jobs:
     if: contains(github.ref, 'tags') != true && github.repository_owner == 'acdh-oeaw'
     with:
       environment: review/with_db_demo_deploy
-      do_deploy: ${{ needs.setup_workflow_env.outputs.environment == 'review/develop' }}
+      do_deploy: ${{ github.ref_name == 'develop' }}
       DOCKER_TAG: ${{ needs.setup_workflow_env.outputs.registry_root }}${{ needs.setup_workflow_env.outputs.image_name }}
       APP_NAME: ${{ needs.setup_workflow_env.outputs.APP_NAME }}-with_db_demo_deploy
       APP_ROOT: ${{ needs.setup_workflow_env.outputs.APP_ROOT }}
@@ -410,7 +410,7 @@ jobs:
     if: contains(github.ref, 'tags') != true && github.repository_owner == 'acdh-oeaw'
     with:
       environment: openatlas-demo
-      do_deploy: ${{ needs.setup_workflow_env.outputs.environment == 'review/develop' }}
+      do_deploy: ${{ github.ref_name == 'develop' }}
       DOCKER_TAG: ${{ needs.setup_workflow_env.outputs.registry_root }}${{ needs.setup_workflow_env.outputs.image_name }}
       APP_NAME: ${{ needs.setup_workflow_env.outputs.APP_NAME }}-openatlas-demo
       APP_ROOT: ${{ needs.setup_workflow_env.outputs.APP_ROOT }}
