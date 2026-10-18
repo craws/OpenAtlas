@@ -121,21 +121,21 @@ jobs:
           docker compose up --detach
           echo "Waiting for openatlas to be healthy..."
           for i in {1..30}; do
-            STATUS=$(docker inspect --format='{{.State.Status}}' openatlas-openatlas-1 || echo "missing")
-            if [ "$STATUS" != "running" ]; then
-              echo "Container is in status: $STATUS"
-              docker compose logs
-              exit 1
-            fi
-            HEALTH=$(docker inspect --format='{{.State.Health.Status}}' openatlas-openatlas-1 || echo "unknown")
-            if [ "$HEALTH" == "healthy" ]; then
+            STATUS=$(docker inspect --format='{{.State.Status}}' openatlas-openatlas-1 2>/dev/null || echo "missing")
+            HEALTH=$(docker inspect --format='{{.State.Health.Status}}' openatlas-openatlas-1 2>/dev/null || echo "unknown")
+            echo "Waiting... ($i/30) - Status: $STATUS, Health: $HEALTH"
+            if [ "$HEALTH" = "healthy" ]; then
               echo "Service is healthy!"
               break
             fi
-            echo "Waiting... ($i/30) - Status: $STATUS, Health: $HEALTH"
+            if [ "$STATUS" = "exited" ] || [ "$STATUS" = "dead" ]; then
+              echo "Container failed with status: $STATUS"
+              docker compose logs
+              exit 1
+            fi
             sleep 10
           done
-          if [ "$(docker inspect --format='{{.State.Health.Status}}' openatlas-openatlas-1)" != "healthy" ]; then
+          if [ "$(docker inspect --format='{{.State.Health.Status}}' openatlas-openatlas-1 2>/dev/null)" != "healthy" ]; then
             echo "Healthcheck timed out!"
             docker compose logs
             exit 1
@@ -291,21 +291,21 @@ jobs:
           docker compose -f compose-gunicorn.yaml up --detach
           echo "Waiting for openatlas-gunicorn to be healthy..."
           for i in {1..30}; do
-            STATUS=$(docker inspect --format='{{.State.Status}}' openatlas-openatlas-gunicorn-1 || echo "missing")
-            if [ "$STATUS" != "running" ]; then
-              echo "Container is in status: $STATUS"
-              docker compose -f compose-gunicorn.yaml logs
-              exit 1
-            fi
-            HEALTH=$(docker inspect --format='{{.State.Health.Status}}' openatlas-openatlas-gunicorn-1 || echo "unknown")
-            if [ "$HEALTH" == "healthy" ]; then
+            STATUS=$(docker inspect --format='{{.State.Status}}' openatlas-openatlas-gunicorn-1 2>/dev/null || echo "missing")
+            HEALTH=$(docker inspect --format='{{.State.Health.Status}}' openatlas-openatlas-gunicorn-1 2>/dev/null || echo "unknown")
+            echo "Waiting... ($i/30) - Status: $STATUS, Health: $HEALTH"
+            if [ "$HEALTH" = "healthy" ]; then
               echo "Service is healthy!"
               break
             fi
-            echo "Waiting... ($i/30) - Status: $STATUS, Health: $HEALTH"
+            if [ "$STATUS" = "exited" ] || [ "$STATUS" = "dead" ]; then
+              echo "Container failed with status: $STATUS"
+              docker compose -f compose-gunicorn.yaml logs
+              exit 1
+            fi
             sleep 10
           done
-          if [ "$(docker inspect --format='{{.State.Health.Status}}' openatlas-openatlas-gunicorn-1)" != "healthy" ]; then
+          if [ "$(docker inspect --format='{{.State.Health.Status}}' openatlas-openatlas-gunicorn-1 2>/dev/null)" != "healthy" ]; then
             echo "Healthcheck timed out!"
             docker compose -f compose-gunicorn.yaml logs
             exit 1
