@@ -97,7 +97,7 @@ class IIIFBuilder:
         self.mime_type = get_actual_mime(self.file_path)
 
     @cached_property
-    def _image_metadata(self) -> tuple[str, dict[str, Any]]:
+    def image_metadata(self) -> tuple[str, dict[str, Any]]:
         if (self.entity.class_.group.get('name') != 'file'
                 and not iiif_file_exists(self.entity.id)):
             abort_file_not_found(self.entity.id)  # pragma: no cover
@@ -114,11 +114,11 @@ class IIIFBuilder:
 
     @property
     def image_url(self) -> str:
-        return self._image_metadata[0]
+        return self.image_metadata[0]
 
     @property
     def image_api(self) -> dict[str, Any]:
-        return self._image_metadata[1]
+        return self.image_metadata[1]
 
     @cached_property
     def common_meta(self) -> ManifestMetadata:
@@ -162,7 +162,7 @@ class IIIFBuilder:
             license=lic,
             attribution=attribution)
 
-    def _get_annotation_details(
+    def get_annotation_details(
             self,
             annotation: AnnotationImage) -> tuple[str, str]:
         entity_link = ''
@@ -288,7 +288,7 @@ class V2Builder(IIIFBuilder):
     def build_annotation(
             self,
             annotation: AnnotationImage) -> dict[str, Any]:
-        annotation_url, entity_link = self._get_annotation_details(annotation)
+        annotation_url, entity_link = self.get_annotation_details(annotation)
         return {
             '@id': annotation_url,
             '@type': 'oa:Annotation',
@@ -411,7 +411,7 @@ class V3Builder(IIIFBuilder):
     def build_annotation(
             self,
             annotation: AnnotationImage) -> dict[str, Any]:
-        annotation_url, entity_link = self._get_annotation_details(annotation)
+        annotation_url, entity_link = self.get_annotation_details(annotation)
         return {
             'id': annotation_url,
             'type': 'Annotation',

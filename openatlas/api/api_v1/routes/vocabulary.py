@@ -32,7 +32,7 @@ api_v1_vocabulary = APIBlueprint(
 register_error_handlers(api_v1_vocabulary)
 
 
-def _get_reference_item(link_: Link) -> ReferenceModel:
+def get_reference_item(link_: Link) -> ReferenceModel:
     entity = link_.domain
     return ReferenceModel(
         id=entity.id,
@@ -43,7 +43,7 @@ def _get_reference_item(link_: Link) -> ReferenceModel:
         citation=entity.description)
 
 
-def _get_image_link(links: list[Link]) -> Link | None:
+def get_image_link(links: list[Link]) -> Link | None:
     return next(
         (link_ for link_ in links
          if link_.domain.class_.name == 'file'
@@ -51,7 +51,7 @@ def _get_image_link(links: list[Link]) -> Link | None:
         None)
 
 
-def _get_vocab_flat_item(
+def get_vocab_flat_item(
         type_: Entity,
         links: dict[int, EntityLinks]) -> VocabularyFlatItem:
     root_entities = [g.types[id_] for id_ in type_.root] if type_.root else []
@@ -60,11 +60,11 @@ def _get_vocab_flat_item(
     sub_entities = [g.types[id_] for id_ in type_.subs] if type_.subs else []
     inverse_links = links[type_.id].links_inverse
     if inverse_links:
-        image_link = _get_image_link(inverse_links)
+        image_link = get_image_link(inverse_links)
         image = get_file_item(image_link.domain) if image_link else None
         external_references = get_external_reference_items(inverse_links)
         references = [
-            _get_reference_item(link_) for link_ in inverse_links
+            get_reference_item(link_) for link_ in inverse_links
             if link_.domain.class_.group.get('name') == 'reference'
                and link_.property.code == 'P67']
     else:
@@ -105,7 +105,7 @@ def get_vocabulary_list() -> dict[str, Any]:
         include_geometries=False)
     prefetch_files(links)
     for id_, type_ in g.types.items():
-        vocab_dict[str(id_)] = _get_vocab_flat_item(type_, links)
+        vocab_dict[str(id_)] = get_vocab_flat_item(type_, links)
     return VocabularyFlatResponse(data=vocab_dict).model_dump(by_alias=True)
 
 
@@ -125,7 +125,7 @@ def get_vocabulary_item(path: VocabularyId) -> dict[str, Any]:
         include_forward=False,
         include_geometries=False)
     prefetch_files(links)
-    return _get_vocab_flat_item(type_, links).model_dump(by_alias=True)
+    return get_vocab_flat_item(type_, links).model_dump(by_alias=True)
 
 
 @api_v1_vocabulary.get(
@@ -169,7 +169,7 @@ def get_vocabulary_skos_ext(path: VocabularySkosPath) -> Response:
     return serialize_skos(build_skos_graph(root), ext)
 
 
-def _walk_tree(
+def walk_tree(
         vocab_ids: list[int],
         used_vocab_ids: set[int] | None = None) -> list[VocabularyTreeItem]:
     """Recursively builds the type tree from a list of type IDs. Prunes
@@ -177,7 +177,7 @@ def _walk_tree(
     items = []
     for id_ in vocab_ids:
         item = g.types[id_]
-        children = _walk_tree(item.subs, used_vocab_ids)
+        children = walk_tree(item.subs, used_vocab_ids)
 
         if used_vocab_ids is not None \
                 and id_ not in used_vocab_ids and not children:
@@ -195,7 +195,7 @@ def _walk_tree(
     return items
 
 
-def _generate_vocabulary_tree(
+def generate_vocabulary_tree(
         openatlas_class: str | None = None) -> dict[str, Any]:
     vocab_tree_dict: dict[str, list[VocabularyTreeItem]] = {
         'standard': [], 'custom': [], 'place': [],
@@ -210,7 +210,7 @@ def _generate_vocabulary_tree(
                     continue
                 root_ids.append(type_.id)
 
-        vocab_tree_dict[category] = _walk_tree(root_ids)
+        vocab_tree_dict[category] = walk_tree(root_ids)
 
     return VocabularyTreeResponse(**vocab_tree_dict).model_dump(by_alias=True)
 
@@ -223,7 +223,7 @@ def _generate_vocabulary_tree(
 def get_vocabulary_tree() -> dict[str, Any]:
     """Retrieves all OpenAtlas types sorted hierarchically into standard,
     place, custom, value, and system categories."""
-    return _generate_vocabulary_tree()
+    return generate_vocabulary_tree()
 
 
 @api_v1_vocabulary.get(
@@ -238,7 +238,7 @@ def get_vocabulary_tree_by_class(path: VocabularyTreePath) -> dict[str, Any]:
         if hasattr(path.openatlas_class, 'value')
         else str(path.openatlas_class))
 
-    return _generate_vocabulary_tree(openatlas_class=class_name)
+    return generate_vocabulary_tree(openatlas_class=class_name)
 
 
 @api_v1_vocabulary.get(
@@ -269,7 +269,7 @@ def get_vocabulary_standard_by_class(
                 continue
             root_ids.append(type_.id)
 
-    standard_vocab = _walk_tree(root_ids, used_vocab_ids)
+    standard_vocab = walk_tree(root_ids, used_vocab_ids)
 
     return VocabularyStandardResponse(
         data=standard_vocab).model_dump(by_alias=True)

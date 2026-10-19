@@ -121,7 +121,7 @@ def get_license_id(file_entity: Entity) -> int | None:
     return next(iter(licenses), None)
 
 
-def _file_extensions() -> list[str]:
+def file_extensions() -> list[str]:
     configured = g.settings.get('file_upload_allowed_extension', [])
     extensions = {
         extension if extension.startswith('.') else f'.{extension}'
@@ -130,7 +130,7 @@ def _file_extensions() -> list[str]:
 
 
 def get_file_path(file_id: int, upload_path: Path) -> Path | Any:
-    for ext in _file_extensions():
+    for ext in file_extensions():
         candidate = upload_path / f"{file_id}{ext}"
         if candidate.is_file():
             return candidate
@@ -152,7 +152,7 @@ def get_multiple_file_paths(
     missing_ids = set(file_ids)
 
     for id_ in list(missing_ids):
-        for ext in _file_extensions():
+        for ext in file_extensions():
             candidate = upload_path / f"{id_}{ext}"
             if candidate.is_file():
                 results[id_] = candidate

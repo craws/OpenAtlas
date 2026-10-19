@@ -9,13 +9,13 @@ LOD_SEARCH_CONTEXT: Final[str] = 'https://linked.art/ns/v1/search.json'
 
 
 def format_lod_entity(entity: Entity) -> dict[str, Any]:
-    return {'@context': LOD_CONTEXT} | _stub(entity)
+    return {'@context': LOD_CONTEXT} | stub(entity)
 
 
 def format_lod_entities(
         entities: list[Entity],
         pagination: dict[str, Any] | None = None) -> dict[str, Any]:
-    items = [_stub(entity) for entity in entities]
+    items = [stub(entity) for entity in entities]
     if pagination is None:
         return {
             '@context': [LOD_CONTEXT, LOD_SEARCH_CONTEXT],
@@ -49,7 +49,7 @@ def format_lod_entities(
     return result
 
 
-def _stub(entity: Entity) -> dict[str, Any]:
+def stub(entity: Entity) -> dict[str, Any]:
     return {
         'id': url_for(
             'api.entity_uuid',
