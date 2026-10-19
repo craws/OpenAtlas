@@ -43,6 +43,5 @@ development specific documentation in our Redmine
    api/index
    api/getting_started
    api/lod
-   api/cookbook
    api/reference
    api/api_04

@@ -57,7 +57,7 @@ class SystemInfoResponse(BaseSchema):
 
 
 class EntityCountQuery(BaseSchema):
-    case_study_id: int | None = Field(
+    case_study: int | None = Field(
         None,
         description="Filter entity counts by a specific case study ID.")
 

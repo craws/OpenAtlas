@@ -714,7 +714,7 @@ class LaFormatter:
         if file_path and file_path.stem:
             details['access_point'] = [{
                 'id': url_for(
-                    'api.display', filename=file_path.stem, _external=True),
+                    'api_v1_files.display_file', id=file_.id, _external=True),
                 'type': 'DigitalObject',
                 '_label': file_path.stem}]
         referred_to_by = []

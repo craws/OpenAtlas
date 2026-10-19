@@ -59,7 +59,7 @@ def get_case_study_by_id(path: CaseStudyPath) -> dict[str, Any]:
     """Retrieves a single case study by its ID, including its nested sub-case
     studies."""
     case_study = g.types.get(path.id)
-    if not case_study:
+    if not case_study or g.case_study_type.id not in case_study.root:
         abort_not_found(path.id)
     return CaseStudyItem(
         id=case_study.id,

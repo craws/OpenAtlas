@@ -83,6 +83,5 @@ Guide Contents
 --------------
 * :doc:`getting_started` - Access modes, JWT Bearer tokens, and first requests.
 * :doc:`lod` - Semantic Web concepts, CIDOC CRM, CRMarchaeo, Linked Art, and SKOS.
-* :doc:`cookbook` - Step-by-step practical recipes for non-programmers (QGIS, OpenRefine, dates, IIIF, Python/R).
 * :doc:`reference` - Complete index of all 31 endpoints, parameters, and error codes.
 * :doc:`api_04` - Documentation for the current stable API v0.4.

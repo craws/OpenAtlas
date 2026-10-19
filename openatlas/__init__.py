@@ -24,7 +24,6 @@ from openatlas.models.openatlas_class import get_classes
 
 app: OpenAPI = OpenAPI(
     __name__,
-    security_schemes={},
     instance_relative_config=True,
     doc_prefix="/api/1/docs")
 

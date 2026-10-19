@@ -60,7 +60,7 @@ class DownloadQuery(BaseModel):
                     "instead of displaying it inline.")
 
 
-class DateModel(BaseModel):
+class DateModel(BaseSchema):
     earliest: str | None = Field(
         default=None,
         description="Earliest possible date (terminus post quem), "
@@ -78,7 +78,7 @@ class DateModel(BaseModel):
         examples=["15. cent."])
 
 
-class TimeSpan(BaseModel):
+class TimeSpan(BaseSchema):
     start: DateModel | None = Field(
         default=None,
         description="Beginning of the timespan.")
@@ -141,7 +141,7 @@ class TypeCategoryEnum(str, Enum):
     TOOLS = "tools"
 
 
-class ExternalReferenceSystemModel(BaseModel):
+class ExternalReferenceSystemModel(BaseSchema):
     id: int
     name: str = Field(examples=["Wikidata", "Getty AAT"])
     description: str | None = Field(
@@ -169,7 +169,7 @@ class ExternalReferenceSystemModel(BaseModel):
         examples=["https://www.wikidata.org"])
 
 
-class ReferenceModel(BaseModel):
+class ReferenceModel(BaseSchema):
     id: int
     name: str
     class_name: str = Field(

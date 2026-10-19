@@ -29,4 +29,5 @@ class AgentItem(BaseModel):
 
 
 class AgentListResponse(BaseSchema):
-    data: list[AgentItem] = Field(description="List of registered agents and rights holders.")
+    data: list[AgentItem] = Field(
+        description="List of registered agents and rights holders.")

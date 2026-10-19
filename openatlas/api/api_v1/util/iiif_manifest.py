@@ -4,7 +4,7 @@ from typing import Any
 
 import requests
 import svgwrite
-from flask import g, request, url_for
+from flask import g, url_for
 from flask_babel import gettext as _
 
 from openatlas.api.api_v1.entity import get_entity_by_id
@@ -26,13 +26,13 @@ class ManifestMetadata:
     attribution: str = ''
 
 
-def get_url(entity_id: int) -> str:
+def get_url(entity: Entity) -> str:
     if resolver := g.settings.get('frontend_resolver_url'):
-        return f'{resolver}{entity_id}'
-    try:  # pragma: no cover
-        return url_for('api_v1_lod.get_entity', id=entity_id, _external=True)
-    except Exception:  # pragma: no cover
-        return f'{request.url_root}api/1/entity/{entity_id}'
+        return f'{resolver}{entity.id}'
+    return url_for(  # pragma: no cover
+        'api_v1_lod.get_entity',
+        uuid=entity.uuid,
+        _external=True)
 
 
 def get_license_info(entity: Entity) -> LicenseItem | None:
@@ -133,7 +133,7 @@ class IIIFBuilder:
 
         if references := self.entity.get_links('P67', inverse=True):
             for reference in references:
-                url = get_url(reference.domain.id)
+                url = get_url(reference.domain)
                 name = reference.domain.description or reference.domain.name
                 text = (
                     f'{name}, {reference.description}'
@@ -152,7 +152,7 @@ class IIIFBuilder:
         if related_entities := self.entity.get_links('P67'):
             for related_entity in related_entities:
                 see_also.append({
-                    'id': get_url(related_entity.range.id),
+                    'id': get_url(related_entity.range),
                     'label': related_entity.range.name.capitalize(),
                     'format': related_entity.range.class_.name.capitalize()})
 
@@ -168,7 +168,7 @@ class IIIFBuilder:
         entity_link = ''
         if annotation.entity_id:
             entity = get_entity_by_id(annotation.entity_id)
-            url = get_url(entity.id)
+            url = get_url(entity)
             entity_link = f'<a href={url} target=_blank>{entity.name}</a>'
         annotation_url = url_for(
             'api_v1_iiif.get_iiif_annotation',

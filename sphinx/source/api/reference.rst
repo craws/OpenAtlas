@@ -240,8 +240,8 @@ codes:
 .. code-block:: json
 
    {
-     "title": "Not Found",
-     "message": "Entity not found",
+     "title": "Entity does not exist",
+     "message": "The requested entity could not be found in the database.",
      "details": {
        "provided_id": "913322f4-a3cf-2e90-bfd1-cecc8e523b56",
        "hint": "Check if the UUID or ID is correct and the entity has not been deleted."

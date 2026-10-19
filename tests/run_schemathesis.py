@@ -30,8 +30,8 @@ SCHEMATHESIS_ARGUMENTS = (
     '--phases',
     'examples,coverage,fuzzing',
     '--checks',
-    'not_a_server_error,status_code_conformance,content_type_conformance,'
-    'response_headers_conformance,positive_data_acceptance')
+    ('not_a_server_error,status_code_conformance,content_type_conformance,'
+     'response_headers_conformance,positive_data_acceptance'))
 
 
 def has_file_access(file_entity: Entity) -> bool:
@@ -115,6 +115,18 @@ def get_database_examples() -> dict[str, Any]:
                 if len(annotations) == 3:
                     break
 
+        file_entities = [e.id for e in classes.values()]
+        if public_files:
+            g.cursor.execute(
+                """
+                SELECT DISTINCT range_id FROM model.link
+                WHERE domain_id IN %(file_ids)s AND property_code = 'P67'
+                ORDER BY range_id LIMIT 3;
+                """,
+                {'file_ids': tuple(e.id for e in public_files)})
+            if linked_ids := [row['range_id'] for row in g.cursor]:
+                file_entities = linked_ids
+
         return {
             'classes': classes,
             'types': list(g.types),
@@ -122,6 +134,7 @@ def get_database_examples() -> dict[str, Any]:
             'case_studies': case_studies,
             'agents': [e.id for e in RightsHolder.get_rights_holders()],
             'files': [e.id for e in public_files],
+            'file_entities': file_entities,
             'thumbnails': thumbnails,
             'annotations': annotations}
 
@@ -147,7 +160,9 @@ def get_path_examples(path: str) -> Iterator[dict[str, Any]]:
         for class_ in data['classes']:
             yield {'openatlas_class': class_}
     elif '{id}' in path:
-        if path.startswith('/api/1/files/'):
+        if path == '/api/1/files/entity/{id}':
+            ids = data['file_entities']
+        elif path.startswith('/api/1/files/'):
             ids = (
                 data['thumbnails'] if path.endswith('/thumbnail')
                 else data['files'])
@@ -178,12 +193,11 @@ def before_add_examples(context: Any, examples: list[Any]) -> None:
             kwargs['path_parameters'] = params
         if path.startswith('/api/1/entities/'):
             kwargs['query'] = {'limit': 5, 'page': 1}
-        elif path == '/api/1/vocabulary/standard/{openatlas_class}':
-            if case_studies:
-                kwargs['query'] = {'caseStudy': case_studies[0]}
-        elif path == '/api/1/system/count/entities':
-            if case_studies:
-                kwargs['query'] = {'caseStudyId': case_studies[0]}
+        elif (path in (
+                '/api/1/vocabulary/standard/{openatlas_class}',
+                '/api/1/system/count/entities')
+                and case_studies):
+            kwargs['query'] = {'caseStudy': case_studies[0]}
         examples.append(context.operation.Case(**kwargs))
 
 
@@ -191,11 +205,13 @@ def before_add_examples(context: Any, examples: list[Any]) -> None:
 def map_case(_context: Any, case: Any) -> Any:
     if (case.meta
             and case.meta.generation.mode == GenerationMode.POSITIVE
-            and case.path_parameters):
-        if examples := list(get_path_examples(case.operation.path)):
-            for name, value in examples[0].items():
-                if (name in case.path_parameters
-                        and name not in ('ext', 'version')):
+            and case.path_parameters
+            and (examples := list(get_path_examples(case.operation.path)))):
+        skip = {'ext', 'version', 'entity_class', 'openatlas_class'}
+        for name, value in examples[0].items():
+            if name in case.path_parameters and name not in skip:
+                valid = {ex[name] for ex in examples if name in ex}
+                if case.path_parameters[name] not in valid:
                     case.path_parameters[name] = value
     return case
 

@@ -255,12 +255,13 @@ def get_file_item(entity: Entity) -> FileItem:
     file_ = get_cached_file_path(entity.id)
     iiif = get_iiif_manifest_and_path(entity.id)
     rights = resolve_rights_holders([entity.id])[entity.id]
+    license_id = get_license_id(entity)
     return FileItem(
         id=entity.id,
         name=entity.name,
         uuid=cast(UUID, entity.uuid),
         public_shareable=entity.public,
-        license=get_license_item(g.types[get_license_id(entity)]),
+        license=get_license_item(g.types[license_id]) if license_id else None,
         mimetype=get_mime_type(file_),
         extension=file_.suffix if file_ else None,
         file_url=url_for(
@@ -290,11 +291,13 @@ def get_iiif_manifest_and_path(img_id: int) -> dict[str, str]:
         return {'IIIFManifest': iiif_manifest, 'IIIFBasePath': iiif_base_path}
     if iiif_file_exists(img_id):
         iiif_manifest = url_for(
-            'api.iiif_manifest',
+            'api_v1_iiif.get_iiif_manifest',
             version=g.settings['iiif_version'],
-            id_=img_id,
+            id=img_id,
             _external=True)
         if file_ := get_cached_file_path(img_id):
-            iiif_base_path = (
-                f"{g.settings['iiif_url']}{img_id}{file_.suffix}")
+            iiif_ext = (
+                '.tiff' if g.settings.get('iiif_conversion')
+                else file_.suffix)
+            iiif_base_path = f"{g.settings['iiif_url']}{img_id}{iiif_ext}"
     return {'IIIFManifest': iiif_manifest, 'IIIFBasePath': iiif_base_path}

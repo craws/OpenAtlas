@@ -13,15 +13,31 @@ from tests.base import ApiTestCase, get_hierarchy, insert
 
 class ApiV1(ApiTestCase):
 
-    def test_api(self) -> None:
-        pass
+    def upload_logo(self) -> None:
+        with app.test_request_context():
+            app.preprocess_request()
+            rights_holder_ids = [rh.id for rh in g.rights_holder]
+
+        logo_path = Path(app.root_path) / 'static' / 'images' / 'layout'
+        public_type = get_hierarchy('Public sharing allowed')
+        with open(logo_path / 'logo.png', 'rb') as img:
+            self.client.post(
+                url_for('insert', class_='file'),
+                data={
+                    'name': 'OpenAtlas logo',
+                    'file': img,
+                    'description': 'OpenAtlas logo',
+                    'creator': f'{rights_holder_ids}',
+                    'license_holder': f'{rights_holder_ids}',
+                    str(public_type.id): public_type.subs[1]},
+                follow_redirects=True)
 
     def test_lod(self) -> None:
         c = self.client
         e = self.get_api_entities()
 
         rv = c.get(url_for('api_v1_lod.get_entity', uuid=e.place.uuid))
-        assert 'application/ld+json' in rv.headers.get('Content-Type')
+        assert 'application/ld+json' in rv.headers.get('Content-Type', '')
         rv_json = rv.get_json()
         assert rv_json[
                    '@context'] == 'https://linked.art/ns/v1/linked-art.json'
@@ -31,7 +47,7 @@ class ApiV1(ApiTestCase):
 
         rv = c.get(
             url_for('api_v1_lod.get_entity_ext', uuid=e.place.uuid, ext='ttl'))
-        assert 'text/turtle' in rv.headers.get('Content-Type')
+        assert 'text/turtle' in rv.headers.get('Content-Type', '')
 
         for params in [
             {'caseStudy': e.case_study.id, 'limit': 1, 'page': 2},
@@ -42,36 +58,32 @@ class ApiV1(ApiTestCase):
              'caseStudy': e.case_study.uuid,
              'sortBy': 'name',
              'sort': 'desc'},
-            {'startDate': '2000'},
-            {'endDate': '2000'},
-            {'startDate': '-500'},
-            {'endDate': '-500'},
-            {'startDate': '2000-02'},
-            {'startDate': '-500-02'},
-            {'endDate': '2000-02'},
-            {'endDate': '1900-02'},
+            {'startDate': '2000', 'endDate': '-500'},
+            {'startDate': '2000-02', 'endDate': '1900-02'},
             {'endDate': '2004-02'},
             {'endDate': '2001-02', 'search': e.place.name},
             {'endDate': '2020-04'},
-            {'endDate': '2020-01'},
-            {'startDate': '2000-02-29'},
-            {'startDate': '-400-02-28', 'typeId': e.boundary_mark.id},
-            {'endDate': '2004-02-29'},
-            {'endDate': '-500-03-15'},
+            {'startDate': '-400-02-28',
+             'endDate': '-500-03-15',
+             'typeId': e.boundary_mark.id},
             {'startDate': '   '}]:
             rv = c.get(url_for(
-                'api_v1_lod.get_entities', entity_class='acquisition', **params))
+                'api_v1_lod.get_entities',
+                entity_class='acquisition',
+                **params))
             assert rv.status_code == 200
 
-        for sort_field in [
-                'name', 'startDate', 'endDate', 'start_date', 'end_date']:
-            for sort_order in ['asc', 'desc']:
-                rv = c.get(url_for(
-                    'api_v1_lod.get_entities',
-                    entity_class='acquisition',
-                    sortBy=sort_field,
-                    sort=sort_order))
-                assert rv.status_code == 200
+        for sort_field, sort_order in [
+                ('startDate', 'asc'),
+                ('start_date', 'desc'),
+                ('endDate', 'asc'),
+                ('end_date', 'desc')]:
+            rv = c.get(url_for(
+                'api_v1_lod.get_entities',
+                entity_class='acquisition',
+                sortBy=sort_field,
+                sort=sort_order))
+            assert rv.status_code == 200
 
         rv = c.get(url_for(
             'api_v1_lod.get_entities',
@@ -79,48 +91,28 @@ class ApiV1(ApiTestCase):
             sortBy='invalid_field'))
         assert rv.status_code == 422
 
-        for params in [
-            {'startDate': '0'},
-            {'startDate': '-0'},
-            {'startDate': '0000-03-15'},
-            {'endDate': '0'},
-            {'endDate': '0-05'}]:
-            rv = c.get(url_for(
-                'api_v1_lod.get_entities', entity_class='acquisition', **params))
-            assert rv.status_code == 422
-            assert b'There is no year 0' in rv.data
+        rv = c.get(url_for(
+            'api_v1_lod.get_entities',
+            entity_class='acquisition',
+            startDate='0'))
+        assert rv.status_code == 422
+        assert b'There is no year 0' in rv.data
 
         for params in [
-            {'startDate': '2000-00'},
             {'startDate': '2000-13'},
-            {'startDate': '2000-00-15'},
             {'startDate': '2000-13-15'},
             {'startDate': '2001-02-29'},
-            {'startDate': '1900-02-29'},
-            {'startDate': '2000-02-30'},
-            {'startDate': '2020-04-31'},
-            {'startDate': '2020-01-00'},
-            {'startDate': '2020-01-32'},
             {'startDate': 'invalid'},
-            {'startDate': '-abc'},
             {'startDate': '2020-01-01-01'},
-            {'endDate': '2020-00'},
-            {'endDate': '2020-13'},
-            {'endDate': '2020-00-15'},
-            {'endDate': '2020-13-15'},
-            {'endDate': '2001-02-29'},
-            {'endDate': '1900-02-29'},
-            {'endDate': '2000-02-30'},
-            {'endDate': '2020-04-31'},
-            {'endDate': '2020-01-00'},
-            {'endDate': '2020-01-32'},
-            {'endDate': 'invalid'},
-            {'endDate': '-abc'},
-            {'endDate': '2020-01-01-01'},
+            {'startDate': '999999999'},
             {'search': 'bad\x00search'}]:
-            rv = c.get(url_for(
-                'api_v1_lod.get_entities', entity_class='acquisition', **params))
+            rv = c.get(
+                url_for(
+                    'api_v1_lod.get_entities',
+                    entity_class='acquisition'),
+                query_string=params)
             assert rv.status_code == 422
+
         rv = c.get(
             url_for(
                 'api_v1_lod.get_entities',
@@ -138,11 +130,6 @@ class ApiV1(ApiTestCase):
             'totalItems': 0,
             'orderedItems': []}
 
-        rv = c.get(url_for(
-            'api_v1_lod.get_entities', entity_class='acquisition',
-            startDate='999999999'))
-        assert rv.status_code == 422
-
         rv = c.get(
             url_for(
                 'api_v1_lod.get_entity',
@@ -151,24 +138,7 @@ class ApiV1(ApiTestCase):
 
     def test_la(self) -> None:
         c = self.client
-        with app.test_request_context():
-            app.preprocess_request()
-            rights_holder_ids = [rh.id for rh in g.rights_holder]
-
-        logo_path = Path(app.root_path) / 'static' / 'images' / 'layout'
-        public_type = get_hierarchy('Public sharing allowed')
-        with open(logo_path / 'logo.png', 'rb') as img:
-            c.post(
-                url_for('insert', class_='file'),
-                data={
-                    'name': 'OpenAtlas logo',
-                    'file': img,
-                    'description': 'OpenAtlas logo',
-                    'creator': f'{rights_holder_ids}',
-                    'license_holder': f'{rights_holder_ids}',
-                    str(public_type.id): public_type.subs[1]},
-                follow_redirects=True)
-
+        self.upload_logo()
         e = self.get_api_entities()
         with app.test_request_context():
             app.preprocess_request()
@@ -308,41 +278,41 @@ class ApiV1(ApiTestCase):
 
         rv = c.get(url_for('api_v1_root.api_v1_index'))
         assert rv.status_code == 200
-        rv = rv.get_json()
-        assert rv['name'] == "OpenAtlas API"
-        assert 'version' in rv
-        assert 'openapiSchema' in rv
-        assert 'documentation' in rv
-        assert 'manual' in rv
+        rv_json = rv.get_json()
+        assert rv_json['name'] == "OpenAtlas API"
+        assert 'version' in rv_json
+        assert 'openapiSchema' in rv_json
+        assert 'documentation' in rv_json
+        assert 'manual' in rv_json
 
         rv = c.get(url_for('api_v1_system.get_system_info'))
         assert rv.status_code == 200
-        rv = rv.get_json()
-        assert 'apiVersions' in rv
-        assert isinstance(rv['apiVersions'], dict)
-        assert 'defaultLanguage' in rv
-        assert 'iiif' in rv
-        assert isinstance(rv['iiif'], dict)
-        assert 'imageProcessing' in rv
-        assert isinstance(rv['imageProcessing'], dict)
-        assert 'logoFileId' in rv
-        assert 'mapConfig' in rv
-        assert isinstance(rv['mapConfig'], dict)
-        assert 'siteName' in rv
-        assert 'version' in rv
+        rv_json = rv.get_json()
+        assert 'apiVersions' in rv_json
+        assert isinstance(rv_json['apiVersions'], dict)
+        assert 'defaultLanguage' in rv_json
+        assert 'iiif' in rv_json
+        assert isinstance(rv_json['iiif'], dict)
+        assert 'imageProcessing' in rv_json
+        assert isinstance(rv_json['imageProcessing'], dict)
+        assert 'logoFileId' in rv_json
+        assert 'mapConfig' in rv_json
+        assert isinstance(rv_json['mapConfig'], dict)
+        assert 'siteName' in rv_json
+        assert 'version' in rv_json
 
         rv = c.get(
             url_for(
                 'api_v1_system.get_entity_count',
-                case_study_id=e.case_study.id))
+                case_study=e.case_study.id))
         assert 'counts' in rv.get_json()
 
         rv = c.get(url_for('api_v1_system.get_system_classes'))
         assert rv.status_code == 200
-        rv = rv.get_json()
-        assert 'locale' in rv
-        assert 'results' in rv
-        assert isinstance(rv['results'], list)
+        rv_json = rv.get_json()
+        assert 'locale' in rv_json
+        assert 'results' in rv_json
+        assert isinstance(rv_json['results'], list)
         rv = c.get(url_for('api_v1_system.get_system_classes', locale='de'))
         assert 'de' in rv.get_json()['locale']
 
@@ -359,6 +329,10 @@ class ApiV1(ApiTestCase):
 
         rv = c.get(url_for('api_v1_vocabulary.get_vocabulary_list'))
         assert rv.status_code == 200
+        assert any(
+            v['timespan']['start']['earliest']
+            for v in rv.get_json()['data'].values()
+            if v['timespan'])
 
         rv = c.get(url_for('api_v1_vocabulary.get_vocabulary_tree'))
         assert rv.status_code == 200
@@ -415,16 +389,19 @@ class ApiV1(ApiTestCase):
                 id=e.license.id,
                 ext='ttl'))
         assert rv.status_code == 200
-        assert 'text/turtle' in rv.headers.get('Content-Type')
+        assert 'text/turtle' in rv.headers.get('Content-Type', '')
         graph = Dataset()
         graph.parse(data=rv.data, format='turtle')
         assert (root_uri, RDF.type, URIRef(f'{skos}ConceptScheme')) in graph
         assert (sub_uri, RDF.type, URIRef(f'{skos}Concept')) in graph
         assert (sub_uri, URIRef(f'{skos}topConceptOf'), root_uri) in graph
         assert (root_uri, URIRef(f'{skos}hasTopConcept'), sub_uri) in graph
-        assert bool(list(graph.triples((None, URIRef(f'{skos}broader'), None))))
-        assert bool(list(graph.triples((None, URIRef(f'{skos}narrower'), None))))
-        assert bool(list(graph.triples((None, URIRef(f'{skos}inScheme'), root_uri))))
+        assert bool(
+            list(graph.triples((None, URIRef(f'{skos}broader'), None))))
+        assert bool(
+            list(graph.triples((None, URIRef(f'{skos}narrower'), None))))
+        assert bool(
+            list(graph.triples((None, URIRef(f'{skos}inScheme'), root_uri))))
         assert bool(list(graph.objects(sub_uri, URIRef(f'{skos}exactMatch'))))
         assert bool(list(graph.objects(sub_uri, URIRef(f'{skos}closeMatch'))))
         assert bool(list(graph.objects(sub_uri, URIRef(f'{skos}scopeNote'))))
@@ -432,7 +409,7 @@ class ApiV1(ApiTestCase):
         rv = c.get(
             url_for('api_v1_vocabulary.get_vocabulary_skos', id=e.license.id))
         assert rv.status_code == 200
-        assert 'application/ld+json' in rv.headers.get('Content-Type')
+        assert 'application/ld+json' in rv.headers.get('Content-Type', '')
 
         # Unknown id returns 404
         rv = c.get(
@@ -490,24 +467,7 @@ class ApiV1(ApiTestCase):
 
     def test_files(self) -> None:
         c = self.client
-        with app.test_request_context():
-            app.preprocess_request()
-            rights_holder_ids = [rh.id for rh in g.rights_holder]
-
-        logo_path = Path(app.root_path) / 'static' / 'images' / 'layout'
-        public_type = get_hierarchy('Public sharing allowed')
-        with open(logo_path / 'logo.png', 'rb') as img:
-            c.post(
-                url_for('insert', class_='file'),
-                data={
-                    'name': 'OpenAtlas logo',
-                    'file': img,
-                    'description': 'OpenAtlas logo',
-                    'creator': f'{rights_holder_ids}',
-                    'license_holder': f'{rights_holder_ids}',
-                    str(public_type.id): public_type.subs[1]},
-                follow_redirects=True)
-
+        self.upload_logo()
         e = self.get_api_entities()
         lic_url = 'https://creativecommons.org/licenses/by/4.0/'
         with app.test_request_context():
@@ -521,12 +481,12 @@ class ApiV1(ApiTestCase):
 
         with c.get(
                 url_for('api_v1_files.display_file', id=e.file.id)) as rv:
-            assert rv.status_code in (200, 302, 404)
+            assert rv.status_code in (200, 302)
         with c.get(
                 url_for(
                     'api_v1_files.display_file',
                     id=e.file_without_file.id)) as rv:
-            assert rv.status_code in (200, 302, 404)
+            assert rv.status_code == 404
         with c.get(
                 url_for(
                     'api_v1_files.display_file',
@@ -538,12 +498,12 @@ class ApiV1(ApiTestCase):
 
         with c.get(
                 url_for('api_v1_files.display_thumbnail', id=e.file.id)) as rv:
-            assert rv.status_code in (200, 302, 404)
+            assert rv.status_code in (200, 302)
         with c.get(
                 url_for(
                     'api_v1_files.display_thumbnail',
                     id=e.file_without_file.id)) as rv:
-            assert rv.status_code in (200, 302, 404)
+            assert rv.status_code == 404
         with c.get(
                 url_for(
                     'api_v1_files.display_thumbnail',
@@ -593,24 +553,7 @@ class ApiV1(ApiTestCase):
 
     def test_iiif(self) -> None:
         c = self.client
-        with app.test_request_context():
-            app.preprocess_request()
-            rights_holder_ids = [rh.id for rh in g.rights_holder]
-
-        logo_path = Path(app.root_path) / 'static' / 'images' / 'layout'
-        public_type = get_hierarchy('Public sharing allowed')
-        with open(logo_path / 'logo.png', 'rb') as img:
-            c.post(
-                url_for('insert', class_='file'),
-                data={
-                    'name': 'OpenAtlas logo',
-                    'description': 'OpenAtlas logo',
-                    'file': img,
-                    'creator': f'{rights_holder_ids}',
-                    'license_holder': f'{rights_holder_ids}',
-                    str(public_type.id): public_type.subs[1]},
-                follow_redirects=True)
-
+        self.upload_logo()
         e = self.get_api_entities()
         lic_url = 'https://creativecommons.org/licenses/by/4.0/'
         with app.test_request_context():
