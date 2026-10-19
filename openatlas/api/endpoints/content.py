@@ -104,9 +104,6 @@ class SystemClassCount(Resource):
 class GetOpenAPISchema(Resource):
     @staticmethod
     def get() -> tuple[Resource, int] | Response:
-        if not app.config['OPENAPI_INSTANCE_FILE'].exists():
-            from openatlas import write_openapi_instance
-            write_openapi_instance()
         with open(
                 app.config['OPENAPI_INSTANCE_FILE'],
                 'r',
