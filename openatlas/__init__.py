@@ -74,8 +74,10 @@ def before_request() -> Response | None:
     if request.path.startswith('/display'):
         return None  # Avoid overheads for file display
 
-    if request.path.startswith('/swagger') or \
-            request.path.startswith('/openapi.json'):
+    if request.path.startswith((
+            '/swagger',
+            '/openapi.json',
+            '/api/0.4/openapi_schema/')):
         write_openapi_instance()
         return None  # Avoid overheads for swagger
 
@@ -141,8 +143,8 @@ def setup_api() -> None:
                 and not g.settings['api_public'] \
                 and ip not in app.config['ALLOWED_IPS'] \
                 and not verify_jwt_in_request(
-                    optional=True,
-                    locations='headers'):
+            optional=True,
+            locations='headers'):
             raise AccessDeniedError
 
 

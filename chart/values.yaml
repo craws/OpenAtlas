@@ -4,7 +4,7 @@
 
 postgis:
   deploy: true
-  version: "15-3.4"
+  version: "17-3.5"
   # Set host, name if database is external. The user has to be openatlas.
   # host: postgres
   # name: openatlas-test
@@ -21,9 +21,9 @@ service:
 
 ingress:
   enabled: false
+  className: "traefik"
   path: "/"
   annotations:
-    spec.ingressClassName: "nginx"
     nginx.ingress.kubernetes.io/proxy-body-size: 1m
     nginx.ingress.kubernetes.io/proxy-connect-timeout: "30"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "30"
