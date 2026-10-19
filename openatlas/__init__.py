@@ -90,7 +90,10 @@ def before_request() -> Response | None:
     if request.path.startswith('/display'):
         return None  # Avoid overheads for file display
 
-    if request.path.startswith(('/swagger', '/openapi.json')):
+    if request.path.startswith((
+            '/swagger',
+            '/openapi.json',
+            '/api/0.4/openapi_schema/')):
         write_openapi_instance()
         return None  # Avoid overheads for swagger and docs
 
