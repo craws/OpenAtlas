@@ -7,7 +7,7 @@ from shapely import GeometryCollection, from_wkt
 from openatlas.database.entity import select_sql
 
 
-### Entity ###
+### File ###
 
 def get_public_files_api(
         license_ids: set[int],
@@ -63,6 +63,7 @@ def _format_date_for_sql(date: str) -> str | None:
         return f"{date_string.lstrip('-')} BC"
     return date_string
 
+## Entity ##
 
 def get_by_class_api(
         class_: str,
@@ -75,62 +76,60 @@ def get_by_class_api(
         start_date: str | None = None,
         end_date: str | None = None,
         type_ids: list[int] | None = None,
-        case_study_ids: list[int] | None = None) -> list[dict[str, Any]]:
-    inner_sql = ('SELECT e2.id FROM model.entity e2 WHERE '
-                 'e2.openatlas_class_name = %(class)s')
+        case_study_ids: list[int] | None = None) \
+        -> tuple[list[dict[str, Any]], int]:
+    where_sql = 'WHERE e.openatlas_class_name = %(class)s'
     params: dict[str, Any] = {'class': class_}
+    end_coalesce = 'COALESCE(e.end_to, e.end_from, e.begin_to, e.begin_from)'
 
     if search_name:
-        inner_sql += ' AND e2.name ILIKE %(search)s'
+        where_sql += ' AND e.name ILIKE %(search)s'
         params['search'] = f'%{search_name}%'
 
     if start_date:
-        inner_sql += (' AND COALESCE(e2.begin_from, e2.begin_to) >= %('
-                      'start_date)s')
+        where_sql += (
+            ' AND COALESCE(e.begin_from, e.begin_to) >= %(start_date)s')
         params['start_date'] = _format_date_for_sql(start_date)
 
     if end_date:
-        inner_sql += (
-            ' AND COALESCE(e2.end_to, e2.end_from, e2.begin_to, '
-            'e2.begin_from) '
-            '<= %(end_date)s')
+        where_sql += f' AND {end_coalesce} <= %(end_date)s'
         params['end_date'] = _format_date_for_sql(end_date)
 
-    if type_ids is not None:
-        inner_sql += (
+    if type_ids:
+        where_sql += (
             ' AND EXISTS (SELECT 1 FROM model.link l_t '
-            'WHERE l_t.domain_id = e2.id AND l_t.range_id IN %(type_ids)s '
+            'WHERE l_t.domain_id = e.id AND l_t.range_id IN %(type_ids)s '
             "AND l_t.property_code IN ('P2', 'P89'))")
         params['type_ids'] = tuple(type_ids)
 
-    if case_study_ids is not None:
-        inner_sql += (
+    if case_study_ids:
+        where_sql += (
             ' AND EXISTS (SELECT 1 FROM model.link l_cs '
-            'WHERE l_cs.domain_id = e2.id AND l_cs.range_id IN %('
-            'case_study_ids)s '
+            'WHERE l_cs.domain_id = e.id AND l_cs.range_id IN '
+            '%(case_study_ids)s '
             "AND l_cs.property_code IN ('P2', 'P89'))")
         params['case_study_ids'] = tuple(case_study_ids)
 
-    order_sql = ''
+    g.cursor.execute(
+        f'SELECT COUNT(*) FROM model.entity e {where_sql};',
+        params)
+    total = g.cursor.fetchone()['count']
+
     match order_by:
         case 'name_desc':
-            order_sql = ' ORDER BY e2.name DESC, e2.id DESC'
+            order_sql = ' ORDER BY e.name DESC, e.id DESC'
         case 'start_date_asc':
-            order_sql = ' ORDER BY e2.begin_from ASC NULLS LAST, e2.id ASC'
+            order_sql = ' ORDER BY e.begin_from ASC NULLS LAST, e.id ASC'
         case 'start_date_desc':
-            order_sql = ' ORDER BY e2.begin_from DESC NULLS LAST, e2.id DESC'
+            order_sql = ' ORDER BY e.begin_from DESC NULLS LAST, e.id DESC'
         case 'end_date_asc':
-            order_sql = (
-                ' ORDER BY COALESCE(e2.end_to, e2.end_from, e2.begin_to, '
-                'e2.begin_from) ASC NULLS LAST, e2.id ASC')
+            order_sql = f' ORDER BY {end_coalesce} ASC NULLS LAST, e.id ASC'
         case 'end_date_desc':
-            order_sql = (
-                ' ORDER BY COALESCE(e2.end_to, e2.end_from, e2.begin_to, '
-                'e2.begin_from) DESC NULLS LAST, e2.id DESC')
+            order_sql = f' ORDER BY {end_coalesce} DESC NULLS LAST, e.id DESC'
         case _:
-            order_sql = ' ORDER BY e2.name ASC, e2.id ASC'
+            order_sql = ' ORDER BY e.name ASC, e.id ASC'
 
-    inner_sql += order_sql
+    inner_sql = f'SELECT e.id FROM model.entity e {where_sql}{order_sql}'
 
     if limit is not None:
         inner_sql += ' LIMIT %(limit)s'
@@ -139,60 +138,15 @@ def get_by_class_api(
         inner_sql += ' OFFSET %(offset)s'
         params['offset'] = offset
 
-    sql = select_sql(types, aliases)
-    sql += f' JOIN ({inner_sql}) AS le ON e.id = le.id GROUP BY e.id'
-    sql += order_sql.replace('e2.', 'e.')
-    sql += ';'
-
-    g.cursor.execute(sql, params)
-    return list(g.cursor)
-
-
-def get_count_by_class_api(
-        class_: str,
-        search_name: str | None = None,
-        start_date: Any = None,
-        end_date: Any = None,
-        type_ids: list[int] | None = None,
-        case_study_ids: list[int] | None = None) -> int:
     sql = (
-        'SELECT COUNT(*) FROM model.entity e '
-        'WHERE e.openatlas_class_name = %(class)s')
-    params: dict[str, Any] = {'class': class_}
+        f'{select_sql(types, aliases)} '
+        f'JOIN ({inner_sql}) AS le ON e.id = le.id '
+        f'GROUP BY e.id{order_sql};')
 
-    if search_name:
-        sql += ' AND e.name ILIKE %(search)s'
-        params['search'] = f'%{search_name}%'
-
-    if start_date:
-        sql += ' AND COALESCE(e.begin_from, e.begin_to) >= %(start_date)s'
-        params['start_date'] = _format_date_for_sql(start_date)
-
-    if end_date:
-        sql += (
-            ' AND COALESCE(e.end_to, e.end_from, e.begin_to, e.begin_from) '
-            '<= %(end_date)s')
-        params['end_date'] = _format_date_for_sql(end_date)
-
-    if type_ids is not None:
-        sql += (
-            ' AND EXISTS (SELECT 1 FROM model.link l_t '
-            'WHERE l_t.domain_id = e.id AND l_t.range_id IN %(type_ids)s '
-            "AND l_t.property_code IN ('P2', 'P89'))")
-        params['type_ids'] = tuple(type_ids)
-
-    if case_study_ids is not None:
-        sql += (
-            ' AND EXISTS (SELECT 1 FROM model.link l_cs '
-            'WHERE l_cs.domain_id = e.id AND l_cs.range_id IN %('
-            'case_study_ids)s '
-            "AND l_cs.property_code IN ('P2', 'P89'))")
-        params['case_study_ids'] = tuple(case_study_ids)
-
-    sql += ';'
     g.cursor.execute(sql, params)
-    return g.cursor.fetchone()['count']
+    return list(g.cursor), total
 
+## Vocabulary ##
 
 def get_vocab_ids_for_case_study(case_study_id: int) -> set[int]:
     sql = """
@@ -206,6 +160,7 @@ def get_vocab_ids_for_case_study(case_study_id: int) -> set[int]:
     g.cursor.execute(sql, {'case_study_id': case_study_id})
     return {row['range_id'] for row in g.cursor.fetchall()}
 
+## Case study ##
 
 def get_overview_counts_by_case_study(
         classes: list[str],

@@ -4,7 +4,7 @@ from flask import g
 from werkzeug.exceptions import ImATeapot
 
 from openatlas.api.api_v1.error_handlers import abort_not_found
-from openatlas.database.api import get_by_class_api, get_count_by_class_api
+from openatlas.database.api import get_by_class_api
 from openatlas.models.entity import Entity
 from openatlas.models.rights_holder import RightsHolder
 
@@ -69,38 +69,20 @@ def get_by_system_class(
         start_date: str | None = None,
         end_date: str | None = None,
         type_id: int | UUID | None = None,
-        case_study: int | UUID | None = None) -> list[Entity]:
+        case_study: int | UUID | None = None) -> tuple[list[Entity], int]:
     type_ids = resolve_type_ids(type_id)
     case_study_ids = resolve_type_ids(case_study)
     aliases = bool(g.classes[class_name].attributes.get('alias'))
-    return [
-        Entity(row) for row in get_by_class_api(
-            class_name,
-            types=True,
-            aliases=aliases,
-            order_by=order_by,
-            limit=limit,
-            offset=offset,
-            search_name=search,
-            start_date=start_date,
-            end_date=end_date,
-            type_ids=type_ids,
-            case_study_ids=case_study_ids)]
-
-
-def get_count_by_system_class(
-        class_name: str,
-        search: str | None = None,
-        start_date: str | None = None,
-        end_date: str | None = None,
-        type_id: int | UUID | None = None,
-        case_study: int | UUID | None = None) -> int:
-    type_ids = resolve_type_ids(type_id)
-    case_study_ids = resolve_type_ids(case_study)
-    return get_count_by_class_api(
+    rows, total = get_by_class_api(
         class_name,
+        types=True,
+        aliases=aliases,
+        order_by=order_by,
+        limit=limit,
+        offset=offset,
         search_name=search,
         start_date=start_date,
         end_date=end_date,
         type_ids=type_ids,
         case_study_ids=case_study_ids)
+    return [Entity(row) for row in rows], total
