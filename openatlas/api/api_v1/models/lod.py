@@ -131,7 +131,7 @@ class EntityCollectionQuery(BaseSchema):
     @classmethod
     def validate_search(cls, value: Any) -> str | None:
         if value is None:
-            return None
+            return None  # pragma: no cover
         value_str = str(value)
         if '\x00' in value_str:
             raise ValueError(
