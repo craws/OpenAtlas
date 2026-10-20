@@ -28,7 +28,8 @@ from openatlas.models.entity import Entity, Link
 api_v1_vocabulary = APIBlueprint(
     'api_v1_vocabulary',
     __name__,
-    url_prefix='/api/1/vocabulary')
+    url_prefix='/api/1/vocabulary',
+    abp_security=[{'bearerAuth': []}])
 register_error_handlers(api_v1_vocabulary)
 
 

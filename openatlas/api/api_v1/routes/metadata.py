@@ -19,7 +19,8 @@ from openatlas.models.rights_holder import RightsHolder
 api_v1_metadata = APIBlueprint(
     'api_v1_metadata',
     __name__,
-    url_prefix='/api/1')
+    url_prefix='/api/1',
+    abp_security=[{'bearerAuth': []}])
 register_error_handlers(api_v1_metadata)
 
 

@@ -19,7 +19,8 @@ from openatlas.database.api import get_overview_counts_by_case_study
 api_v1_system = APIBlueprint(
     'api_v1_system',
     __name__,
-    url_prefix='/api/1/system')
+    url_prefix='/api/1/system',
+    abp_security=[{'bearerAuth': []}])
 register_error_handlers(api_v1_system)
 
 

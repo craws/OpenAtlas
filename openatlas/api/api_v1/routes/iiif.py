@@ -20,7 +20,8 @@ from openatlas.models.annotation import AnnotationImage
 api_v1_iiif = APIBlueprint(
     'api_v1_iiif',
     __name__,
-    url_prefix='/api/1/iiif')
+    url_prefix='/api/1/iiif',
+    abp_security=[{'bearerAuth': []}])
 register_error_handlers(api_v1_iiif)
 
 

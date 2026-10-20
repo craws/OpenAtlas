@@ -15,7 +15,11 @@ from openatlas.api.api_v1.openapi_tags import lod_tag
 from openatlas.api.api_v1.responses.lod import (
     lod_collection_responses, lod_responses)
 
-api_v1_lod = APIBlueprint('api_v1_lod', __name__, url_prefix='/api/1')
+api_v1_lod = APIBlueprint(
+    'api_v1_lod',
+    __name__,
+    url_prefix='/api/1',
+    abp_security=[{'bearerAuth': []}])
 register_error_handlers(api_v1_lod)
 
 

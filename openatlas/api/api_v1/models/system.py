@@ -126,9 +126,11 @@ class PropertyDetail(BaseSchema):
                     "property inherits from.")
     i18n: PropertyI18n | None = Field(
         None,
+        serialization_alias="i18n",
         description="Internationalized forward labels.")
     i18n_inverse: PropertyI18n | None = Field(
         None,
+        serialization_alias="i18nInverse",
         description="Internationalized inverse labels.")
 
 
