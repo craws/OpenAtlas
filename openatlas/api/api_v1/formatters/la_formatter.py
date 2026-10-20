@@ -56,7 +56,6 @@ LIFE_EVENTS |= dict.fromkeys(
     ['artifact', 'feature', 'human_remains', 'place', 'stratigraphic_unit'],
     OBJECT_LIFE_EVENTS)
 
-# Property code -> key of the Move part
 MOVE_KEYS = {'P25': 'moved', 'P26': 'moved_to', 'P27': 'moved_from'}
 
 
@@ -419,9 +418,8 @@ class LaFormatter:
         if 'part' not in record:
             return
         if 'moved' not in record['part'][0]:
-            del record['part']  # A Move without moved objects is invalid
+            del record['part']
         elif 'participant' in record:
-            # Records with parts have no participant property
             for ref in record.pop('participant'):
                 la_append(record, 'influenced_by', ref)
 
