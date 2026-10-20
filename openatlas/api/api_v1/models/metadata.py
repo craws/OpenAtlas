@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 from openatlas.api.api_v1.models.util import BaseSchema
 
@@ -29,5 +29,5 @@ class CaseStudyListResponse(BaseSchema):
         description="Hierarchical list of top-level case studies.")
 
 
-class CaseStudyPath(BaseModel):
+class CaseStudyPath(BaseSchema):
     id: int = Field(description="Filter by a specific Case Study ID")

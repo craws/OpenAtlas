@@ -46,7 +46,7 @@ two major generations:
 Interactive Documentation UIs
 -----------------------------
 For API v1, OpenAtlas provides three interactive browser interfaces that let
-you explore, inspect, and test all 36 endpoints directly without writing a
+you explore, inspect, and test all 31 endpoints directly without writing a
 single line of code:
 
 .. grid:: 1 3 3 3

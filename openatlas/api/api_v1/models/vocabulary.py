@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 from openatlas.api.api_v1.models.files import FileItem
 from openatlas.api.api_v1.models.util import (
@@ -107,16 +107,17 @@ class VocabularyStandardResponse(BaseSchema):
     data: list[VocabularyTreeItem] = Field(default_factory=list)
 
 
-class VocabularyTreePath(BaseModel):
+class VocabularyTreePath(BaseSchema):
     openatlas_class: OpenAtlasClassEnum = Field(
+        alias="openatlas_class",
         description="Filter the tree by a specific OpenAtlas class.")
 
 
-class VocabularyId(BaseModel):
+class VocabularyId(BaseSchema):
     id: int = Field(description="ID of a type")
 
 
-class VocabularySkosPath(BaseModel):
+class VocabularySkosPath(BaseSchema):
     id: int = Field(
         description="Root ID of the vocabulary hierarchy.")
     ext: ExtensionsType = Field(

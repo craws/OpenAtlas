@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 from openatlas.api.api_v1.models.util import BaseSchema
 
@@ -57,7 +57,7 @@ class SystemInfoResponse(BaseSchema):
 
 
 class EntityCountQuery(BaseSchema):
-    case_study_id: int | None = Field(
+    case_study: int | None = Field(
         None,
         description="Filter entity counts by a specific case study ID.")
 
@@ -126,9 +126,11 @@ class PropertyDetail(BaseSchema):
                     "property inherits from.")
     i18n: PropertyI18n | None = Field(
         None,
+        serialization_alias="i18n",
         description="Internationalized forward labels.")
     i18n_inverse: PropertyI18n | None = Field(
         None,
+        serialization_alias="i18nInverse",
         description="Internationalized inverse labels.")
 
 
@@ -138,7 +140,7 @@ class SystemPropertiesResponse(BaseSchema):
                     "to their details.")
 
 
-class LocaleQuery(BaseModel):
+class LocaleQuery(BaseSchema):
     locale: str = Field(
         "en",
         description="Choose language for labels (e.g., 'en', 'de').")

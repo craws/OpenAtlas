@@ -1,8 +1,6 @@
 from openatlas.api.api_v1.models.agent import AgentItem, AgentListResponse
-from openatlas.api.api_v1.models.metadata import (
-    CaseStudyItem,
-    CaseStudyListResponse,
-)
+from openatlas.api.api_v1.models.metadata import \
+    CaseStudyItem, CaseStudyListResponse
 from openatlas.api.api_v1.models.util import ErrorResponse
 
 case_studies_response = {200: CaseStudyListResponse}

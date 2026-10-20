@@ -33,6 +33,17 @@ def forbidden(e: Exception) -> tuple[str, int]:
 
 @app.errorhandler(404)
 def page_not_found(e: Exception) -> tuple[Any, int]:
+    if request.path.startswith('/api/1/'):
+        return jsonify({
+            'title': 'Endpoint not found',
+            'message':
+                'The requested endpoint does not exist. '
+                'Please consult the manual or the Swagger documentation: '
+                f'{request.url_root}api/1/docs/swagger',
+            'details': {},
+            'url': request.url,
+            'timestamp': datetime.now(),
+            'status': 404}), 404
     if request.path.startswith('/api/'):
         return jsonify({
             'title': 'Endpoint not found',

@@ -19,4 +19,4 @@ class ApiIndexResponse(BaseSchema):
         examples=["https://example.org/api/1/docs/swagger"])
     manual: str = Field(
         description="Full URL to the technical reference manual.",
-        examples=["https://example.org/static/manual/technical/api.html"])
+        examples=["https://example.org/static/manual/api/index.html"])

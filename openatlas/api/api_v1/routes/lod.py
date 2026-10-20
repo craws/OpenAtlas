@@ -22,7 +22,11 @@ from openatlas.api.api_v1.responses.lod import (
 from openatlas.api.api_v1.util.auth import require_auth
 from openatlas.api.api_v1.util.content_negotiation import make_graph_response
 
-api_v1_lod = APIBlueprint('api_v1_lod', __name__, url_prefix='/api/1')
+api_v1_lod = APIBlueprint(
+    'api_v1_lod',
+    __name__,
+    url_prefix='/api/1',
+    abp_security=[{'bearerAuth': []}])
 register_error_handlers(api_v1_lod)
 
 

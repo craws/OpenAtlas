@@ -19,11 +19,12 @@ from openatlas.models.rights_holder import RightsHolder
 api_v1_metadata = APIBlueprint(
     'api_v1_metadata',
     __name__,
-    url_prefix='/api/1')
+    url_prefix='/api/1',
+    abp_security=[{'bearerAuth': []}])
 register_error_handlers(api_v1_metadata)
 
 
-def _walk_case_studies(ids: list[int]) -> list[CaseStudyItem]:
+def walk_case_studies(ids: list[int]) -> list[CaseStudyItem]:
     items = []
     for id_ in ids:
         item = g.types.get(id_)
@@ -33,7 +34,7 @@ def _walk_case_studies(ids: list[int]) -> list[CaseStudyItem]:
                 uuid=item.uuid,
                 name=item.name,
                 description=item.description,
-                sub_case_studies=_walk_case_studies(item.subs)))
+                sub_case_studies=walk_case_studies(item.subs)))
     return items
 
 
@@ -45,7 +46,7 @@ def _walk_case_studies(ids: list[int]) -> list[CaseStudyItem]:
 def get_case_studies() -> dict[str, Any]:
     """Retrieves the hierarchical list of all project case studies."""
     case_study_ids = g.types[g.case_study_type.id].subs
-    case_studies = _walk_case_studies(case_study_ids)
+    case_studies = walk_case_studies(case_study_ids)
     return CaseStudyListResponse(
         data=case_studies).model_dump(by_alias=True)
 
@@ -59,14 +60,14 @@ def get_case_study_by_id(path: CaseStudyPath) -> dict[str, Any]:
     """Retrieves a single case study by its ID, including its nested sub-case
     studies."""
     case_study = g.types.get(path.id)
-    if not case_study:
+    if not case_study or g.case_study_type.id not in case_study.root:
         abort_not_found(path.id)
     return CaseStudyItem(
         id=case_study.id,
         uuid=case_study.uuid,
         name=case_study.name,
         description=case_study.description,
-        sub_case_studies=_walk_case_studies(case_study.subs)
+        sub_case_studies=walk_case_studies(case_study.subs)
     ).model_dump(by_alias=True)
 
 

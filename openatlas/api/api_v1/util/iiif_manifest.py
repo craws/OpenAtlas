@@ -4,7 +4,7 @@ from typing import Any
 
 import requests
 import svgwrite
-from flask import g, request, url_for
+from flask import g, url_for
 from flask_babel import gettext as _
 
 from openatlas.api.api_v1.entity import get_entity_by_id
@@ -26,13 +26,13 @@ class ManifestMetadata:
     attribution: str = ''
 
 
-def get_url(entity_id: int) -> str:
+def get_url(entity: Entity) -> str:
     if resolver := g.settings.get('frontend_resolver_url'):
-        return f'{resolver}{entity_id}'
-    try:  # pragma: no cover
-        return url_for('api_v1_lod.get_entity', id=entity_id, _external=True)
-    except Exception:  # pragma: no cover
-        return f'{request.url_root}api/1/entity/{entity_id}'
+        return f'{resolver}{entity.id}'
+    return url_for(  # pragma: no cover
+        'api_v1_lod.get_entity',
+        uuid=entity.uuid,
+        _external=True)
 
 
 def get_license_info(entity: Entity) -> LicenseItem | None:
@@ -97,7 +97,7 @@ class IIIFBuilder:
         self.mime_type = get_actual_mime(self.file_path)
 
     @cached_property
-    def _image_metadata(self) -> tuple[str, dict[str, Any]]:
+    def image_metadata(self) -> tuple[str, dict[str, Any]]:
         if (self.entity.class_.group.get('name') != 'file'
                 and not iiif_file_exists(self.entity.id)):
             abort_file_not_found(self.entity.id)  # pragma: no cover
@@ -114,11 +114,11 @@ class IIIFBuilder:
 
     @property
     def image_url(self) -> str:
-        return self._image_metadata[0]
+        return self.image_metadata[0]
 
     @property
     def image_api(self) -> dict[str, Any]:
-        return self._image_metadata[1]
+        return self.image_metadata[1]
 
     @cached_property
     def common_meta(self) -> ManifestMetadata:
@@ -133,7 +133,7 @@ class IIIFBuilder:
 
         if references := self.entity.get_links('P67', inverse=True):
             for reference in references:
-                url = get_url(reference.domain.id)
+                url = get_url(reference.domain)
                 name = reference.domain.description or reference.domain.name
                 text = (
                     f'{name}, {reference.description}'
@@ -152,7 +152,7 @@ class IIIFBuilder:
         if related_entities := self.entity.get_links('P67'):
             for related_entity in related_entities:
                 see_also.append({
-                    'id': get_url(related_entity.range.id),
+                    'id': get_url(related_entity.range),
                     'label': related_entity.range.name.capitalize(),
                     'format': related_entity.range.class_.name.capitalize()})
 
@@ -162,13 +162,13 @@ class IIIFBuilder:
             license=lic,
             attribution=attribution)
 
-    def _get_annotation_details(
+    def get_annotation_details(
             self,
             annotation: AnnotationImage) -> tuple[str, str]:
         entity_link = ''
         if annotation.entity_id:
             entity = get_entity_by_id(annotation.entity_id)
-            url = get_url(entity.id)
+            url = get_url(entity)
             entity_link = f'<a href={url} target=_blank>{entity.name}</a>'
         annotation_url = url_for(
             'api_v1_iiif.get_iiif_annotation',
@@ -288,7 +288,7 @@ class V2Builder(IIIFBuilder):
     def build_annotation(
             self,
             annotation: AnnotationImage) -> dict[str, Any]:
-        annotation_url, entity_link = self._get_annotation_details(annotation)
+        annotation_url, entity_link = self.get_annotation_details(annotation)
         return {
             '@id': annotation_url,
             '@type': 'oa:Annotation',
@@ -411,7 +411,7 @@ class V3Builder(IIIFBuilder):
     def build_annotation(
             self,
             annotation: AnnotationImage) -> dict[str, Any]:
-        annotation_url, entity_link = self._get_annotation_details(annotation)
+        annotation_url, entity_link = self.get_annotation_details(annotation)
         return {
             'id': annotation_url,
             'type': 'Annotation',

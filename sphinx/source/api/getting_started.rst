@@ -96,14 +96,3 @@ Python
    print(f"Site Name: {data['siteName']}")
    print(f"Default Language: {data['defaultLanguage']}")
 
-R
-^
-.. code-block:: r
-
-   library(httr)
-
-   url <- "https://demo.openatlas.eu/api/1/system/info"
-   res <- GET(url, add_headers(Authorization = "Bearer YOUR_TOKEN_HERE"))
-   data <- content(res, as = "parsed")
-
-   print(data$siteName)

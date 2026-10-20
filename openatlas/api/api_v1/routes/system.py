@@ -19,7 +19,8 @@ from openatlas.database.api import get_overview_counts_by_case_study
 api_v1_system = APIBlueprint(
     'api_v1_system',
     __name__,
-    url_prefix='/api/1/system')
+    url_prefix='/api/1/system',
+    abp_security=[{'bearerAuth': []}])
 register_error_handlers(api_v1_system)
 
 
@@ -83,7 +84,7 @@ def get_entity_count(query: EntityCountQuery) -> dict[str, Any]:
     valid_classes = [e.value for e in OpenAtlasClassEnum]
     counts = get_overview_counts_by_case_study(
         classes=valid_classes,
-        case_study_id=query.case_study_id)
+        case_study_id=query.case_study)
 
     return EntityCountResponse(counts=counts).model_dump(by_alias=True)
 

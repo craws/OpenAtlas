@@ -6,40 +6,16 @@ import validators
 from flask import g, url_for
 
 from openatlas.api.api_v1.entity import get_entity_by_id
-from openatlas.api.api_v1.formatters.la_helpers import (
-    ACTORS,
-    BIBLIOGRAPHY_AAT,
-    CLASS_TYPES,
-    DIMENSION_ROOTS,
-    MIME_CLASSIFICATIONS,
-    UNIT_MAP,
-    aat_type,
-    alias_name,
-    category_aat,
-    date_to_utc_iso_str,
-    get_language,
-    identifier,
-    is_float,
-    la_type,
-    primary_name,
-    statement,
-    unique_identifier,
-)
-from openatlas.api.api_v1.formatters.util import (
-    EntityLinks,
-    entity_uri,
-    get_links_for_entities,
-    get_type_references,
-)
-from openatlas.api.api_v1.util.files import (
-    get_cached_file_path,
-    get_file_size,
-    get_iiif_manifest_and_path,
-    get_license_type,
-    get_mime_type,
-    prefetch_files,
-    resolve_rights_holders,
-)
+from openatlas.api.api_v1.formatters.la_helpers import \
+    ACTORS, BIBLIOGRAPHY_AAT, CLASS_TYPES, DIMENSION_ROOTS, \
+    MIME_CLASSIFICATIONS, UNIT_MAP, aat_type, alias_name, category_aat, \
+    date_to_utc_iso_str, get_language, identifier, is_float, la_type, \
+    primary_name, statement, unique_identifier
+from openatlas.api.api_v1.formatters.util import \
+    EntityLinks, entity_uri, get_links_for_entities, get_type_references
+from openatlas.api.api_v1.util.files import \
+    get_cached_file_path, get_file_size, get_iiif_manifest_and_path, \
+    get_license_type, get_mime_type, prefetch_files, resolve_rights_holders
 from openatlas.models.annotation import AnnotationText
 from openatlas.models.dates import Dates
 from openatlas.models.entity import Entity, Link
@@ -49,13 +25,11 @@ CLOSE_MATCH = {
     'type': 'Type',
     '_label': 'Close Match'}
 
-
 ACTOR_EVENT_KEYS = {
     'P11': ('participant', 'participated_in'),
     'P14': ('carried_out_by', 'carried_out'),
     'P22': ('participant', 'participated_in'),
     'P23': ('participant', 'participated_in')}
-
 
 OBJECT_EVENT_KEYS = {
     'P24': ('changed_ownership_through', 'Acquisition', True),
@@ -151,9 +125,9 @@ def get_timespan(dates: Dates, label: str) -> dict[str, Any] | None:
         'end_of_the_end': format_datetime(dates.end_to, True)}
     if data['end_of_the_end'] is None:
         data['end_of_the_end'] = (
-            format_datetime(dates.end_from, True)
-            or format_datetime(dates.begin_to, True)
-            or format_datetime(dates.begin_from, True))
+                format_datetime(dates.end_from, True)
+                or format_datetime(dates.begin_to, True)
+                or format_datetime(dates.begin_from, True))
     return {'type': 'TimeSpan', '_label': label} \
         | {k: v for k, v in data.items() if v is not None}
 
@@ -178,30 +152,30 @@ class LaFormatter:
         self.entity: Entity
         self.geometries: dict[int, Any] = {}
         self.handlers: dict[str, Any] = {
-            'P1': self._p1,
-            'P2': self._p2,
-            'P7': self._p7,
-            'P9': self._p9,
-            'P11': self._actor_event,
-            'P14': self._actor_event,
-            'P22': self._actor_event,
-            'P23': self._actor_event,
-            'P24': self._object_event,
-            'P25': self._move,
-            'P26': self._move,
-            'P27': self._move,
-            'P31': self._object_event,
-            'P46': self._p46,
-            'P52': self._p52,
-            'P53': self._p53,
-            'P67': self._p67,
-            'P73': self._p73,
-            'P74': self._p74,
-            'P107': self._p107,
-            'P108': self._object_event,
-            'P127': self._p127,
-            'P134': self._p134,
-            'OA7': self._oa7}
+            'P1': self.p1,
+            'P2': self.p2,
+            'P7': self.p7,
+            'P9': self.p9,
+            'P11': self.actor_event,
+            'P14': self.actor_event,
+            'P22': self.actor_event,
+            'P23': self.actor_event,
+            'P24': self.object_event,
+            'P25': self.move,
+            'P26': self.move,
+            'P27': self.move,
+            'P31': self.object_event,
+            'P46': self.p46,
+            'P52': self.p52,
+            'P53': self.p53,
+            'P67': self.p67,
+            'P73': self.p73,
+            'P74': self.p74,
+            'P107': self.p107,
+            'P108': self.object_event,
+            'P127': self.p127,
+            'P134': self.p134,
+            'OA7': self.oa7}
 
     def format_entity(self, data: EntityLinks) -> dict[str, Any]:
         self.entity = entity = data.entity
@@ -223,7 +197,7 @@ class LaFormatter:
                 and (geometry := self.geometries.get(entity.id)):
             record['defined_by'] = geometry
         for link_ in data.links:
-            self._process_link(link_, record, False)
+            self.process_link(link_, record, False)
         file_links = []
         for link_ in data.links_inverse:
             if link_.property.code == 'P67' \
@@ -231,15 +205,15 @@ class LaFormatter:
                 if get_cached_file_path(link_.domain.id):
                     file_links.append(link_)  # pragma: no cover
                 continue
-            self._process_link(link_, record, True)
-        self._add_media(file_links, record)
-        self._add_dates(data.links, record)
-        self._finalize_move(record)
+            self.process_link(link_, record, True)
+        self.add_media(file_links, record)
+        self.add_dates(data.links, record)
+        self.finalize_move(record)
         if entity.description:
-            self._add_description(record)
+            self.add_description(record)
         return record
 
-    def _process_link(
+    def process_link(
             self,
             link_: Link,
             record: dict[str, Any],
@@ -248,20 +222,20 @@ class LaFormatter:
             handler(link_, record, inverse)
 
     @staticmethod
-    def _ref(entity: Entity) -> dict[str, Any]:
+    def ref(entity: Entity) -> dict[str, Any]:
         return {
             'id': entity_uri(entity),
             'type': la_type(entity),
             '_label': entity.name}
 
-    def _typed_ref(
+    def typed_ref(
             self,
             entity: Entity,
             allowed: set[str]) -> dict[str, Any] | None:
-        ref = self._ref(entity)
+        ref = self.ref(entity)
         return ref if ref['type'] in allowed else None
 
-    def _type_ref(self, type_: Entity) -> dict[str, Any]:
+    def type_ref(self, type_: Entity) -> dict[str, Any]:
         ref: dict[str, Any] = {
             'id': entity_uri(type_),
             'type': 'Type',
@@ -277,7 +251,7 @@ class LaFormatter:
             ref['equivalent'] = equivalents
         return ref
 
-    def _embedded_event(
+    def embedded_event(
             self,
             event: Entity,
             type_name: str,
@@ -290,36 +264,36 @@ class LaFormatter:
             '_label': event.name,
             'identified_by': [unique_identifier(entity_uri(event))]}
         if link_ and link_.type and (type_ := g.types.get(link_.type.id)):
-            node['classified_as'] = [self._type_ref(type_)]
+            node['classified_as'] = [self.type_ref(type_)]
         if timespan := get_timespan(dates, f'Timespan of {event.name}'):
             node['timespan'] = timespan
         if notes := get_date_notes(dates):
             node['referred_to_by'] = notes  # pragma: no cover
         return node
 
-    def _p1(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
+    def p1(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if not inverse:
             la_append(record, 'identified_by', alias_name(link_.range.name))
 
-    def _p2(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
+    def p2(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if inverse:
             return
         type_ = link_.range
         if type_.name == 'Radiocarbon' and link_.description:
-            self._radiocarbon(link_, record)
+            self.radiocarbon(link_, record)
         elif link_.description and is_float(link_.description):
-            self._dimension(link_, record)
+            self.dimension(link_, record)
         else:
-            la_append(record, 'classified_as', self._type_ref(type_))
+            la_append(record, 'classified_as', self.type_ref(type_))
 
-    def _dimension(self, link_: Link, record: dict[str, Any]) -> None:
+    def dimension(self, link_: Link, record: dict[str, Any]) -> None:
         type_ = link_.range
         unit = type_.description or 'unit'
         if record['type'] in DIMENSION_ROOTS:
             la_append(record, 'dimension', {
                 'type': 'Dimension',
                 '_label': f'{type_.name}: {link_.description} {unit}',
-                'classified_as': [self._type_ref(type_)],
+                'classified_as': [self.type_ref(type_)],
                 'value': float(link_.description),
                 'unit': {
                     'id': 'https://vocab.getty.edu/aat/300226816',
@@ -329,10 +303,10 @@ class LaFormatter:
             la_append(record, 'referred_to_by', statement(
                 f'{link_.description} {unit}',
                 type_.name,
-                [self._type_ref(type_)]))
+                [self.type_ref(type_)]))
 
     @staticmethod
-    def _radiocarbon(link_: Link, record: dict[str, Any]) -> None:
+    def radiocarbon(link_: Link, record: dict[str, Any]) -> None:
         data = ast.literal_eval(link_.description)
         year = int(data['radiocarbonYear'])
         range_ = int(data['range'])
@@ -374,26 +348,26 @@ class LaFormatter:
                 'type': 'Group',
                 '_label': lab_id}]})
 
-    def _p7(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
+    def p7(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if not inverse and record['type'] == 'Activity' \
-                and (ref := self._typed_ref(link_.range, {'Place'})):
+                and (ref := self.typed_ref(link_.range, {'Place'})):
             la_append(record, 'took_place_at', ref)
 
-    def _p9(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
+    def p9(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if inverse and record['type'] == 'Activity' \
-                and (ref := self._typed_ref(link_.domain, {'Activity'})):
+                and (ref := self.typed_ref(link_.domain, {'Activity'})):
             record.setdefault('part_of', ref)
 
-    def _p134(
+    def p134(
             self,
             link_: Link,
             record: dict[str, Any],
             inverse: bool) -> None:
-        if record['type'] == 'Activity' and (ref := self._typed_ref(
+        if record['type'] == 'Activity' and (ref := self.typed_ref(
                 link_.domain if inverse else link_.range, {'Activity'})):
             la_append(record, 'before' if inverse else 'after', ref)
 
-    def _actor_event(
+    def actor_event(
             self,
             link_: Link,
             record: dict[str, Any],
@@ -401,15 +375,15 @@ class LaFormatter:
         event_key, actor_key = ACTOR_EVENT_KEYS[link_.property.code]
         if not inverse:
             if record['type'] == 'Activity' \
-                    and (ref := self._typed_ref(link_.range, ACTORS)):
+                    and (ref := self.typed_ref(link_.range, ACTORS)):
                 la_append(record, event_key, ref)
         elif record['type'] in ACTORS:
             la_append(
                 record,
                 actor_key,
-                self._embedded_event(link_.domain, 'Activity', link_))
+                self.embedded_event(link_.domain, 'Activity', link_))
 
-    def _object_event(
+    def object_event(
             self,
             link_: Link,
             record: dict[str, Any],
@@ -417,13 +391,13 @@ class LaFormatter:
         if not inverse or record['type'] != 'HumanMadeObject':
             return
         key, type_name, multiple = OBJECT_EVENT_KEYS[link_.property.code]
-        node = self._embedded_event(link_.domain, type_name)
+        node = self.embedded_event(link_.domain, type_name)
         if multiple:
             la_append(record, key, node)
         else:
             record.setdefault(key, node)
 
-    def _move(
+    def move(
             self,
             link_: Link,
             record: dict[str, Any],
@@ -435,13 +409,13 @@ class LaFormatter:
             '_label': f'Move of {self.entity.name}'}])[0]
         key = MOVE_KEYS[link_.property.code]
         if key == 'moved':
-            if ref := self._typed_ref(link_.range, {'HumanMadeObject'}):
+            if ref := self.typed_ref(link_.range, {'HumanMadeObject'}):
                 la_append(part, key, ref)
-        elif ref := self._typed_ref(link_.range, {'Place'}):
+        elif ref := self.typed_ref(link_.range, {'Place'}):
             part.setdefault(key, ref)
 
     @staticmethod
-    def _finalize_move(record: dict[str, Any]) -> None:
+    def finalize_move(record: dict[str, Any]) -> None:
         if 'part' not in record:
             return
         if 'moved' not in record['part'][0]:
@@ -451,54 +425,54 @@ class LaFormatter:
             for ref in record.pop('participant'):
                 la_append(record, 'influenced_by', ref)
 
-    def _p46(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
+    def p46(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if inverse and record['type'] == 'HumanMadeObject' \
-                and (ref := self._typed_ref(
-                    link_.domain, {'HumanMadeObject'})):
+                and (ref := self.typed_ref(
+            link_.domain, {'HumanMadeObject'})):
             record.setdefault('part_of', ref)
 
-    def _p52(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
+    def p52(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if not inverse and record['type'] == 'HumanMadeObject' \
-                and (ref := self._typed_ref(link_.range, ACTORS)):
+                and (ref := self.typed_ref(link_.range, ACTORS)):
             la_append(record, 'current_owner', ref)
 
-    def _p53(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
+    def p53(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if inverse:
             return
         if record['type'] == 'HumanMadeObject' \
-                and (ref := self._typed_ref(link_.range, {'Place'})):
+                and (ref := self.typed_ref(link_.range, {'Place'})):
             record.setdefault('current_location', ref)
         elif record['type'] == 'Place' \
                 and (geometry := self.geometries.get(link_.range.id)):
             record.setdefault('defined_by', geometry)
 
-    def _p74(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
+    def p74(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if not inverse and record['type'] in ACTORS \
-                and (ref := self._typed_ref(link_.range, {'Place'})):
+                and (ref := self.typed_ref(link_.range, {'Place'})):
             la_append(record, 'residence', ref)
 
-    def _p127(
+    def p127(
             self,
             link_: Link,
             record: dict[str, Any],
             inverse: bool) -> None:
         if not inverse and record['type'] == 'Type':
-            la_append(record, 'broader', self._ref(link_.range))
+            la_append(record, 'broader', self.ref(link_.range))
 
-    def _p73(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
+    def p73(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         translation = link_.range
         if inverse or not translation.description:
             return
         classified_as = []
         if standard_type := translation.standard_type:
-            classified_as.append(self._type_ref(standard_type))
+            classified_as.append(self.type_ref(standard_type))
         la_append(record, 'referred_to_by', statement(
             translation.description,
             translation.name,
             classified_as,
             [unique_identifier(entity_uri(translation))]))
 
-    def _p107(
+    def p107(
             self,
             link_: Link,
             record: dict[str, Any],
@@ -506,7 +480,7 @@ class LaFormatter:
         if not inverse or record['type'] not in ACTORS:
             return
         group = link_.domain
-        group_ref = self._typed_ref(group, {'Group'})
+        group_ref = self.typed_ref(group, {'Group'})
         if not group_ref:
             return  # pragma: no cover
         la_append(record, 'member_of', group_ref)
@@ -518,18 +492,18 @@ class LaFormatter:
             'influenced_by': [group_ref]}
         if link_.type and (type_ := g.types.get(link_.type.id)):
             activity['_label'] = f'Role as {type_.name} at {group.name}'
-            activity['classified_as'] = [self._type_ref(type_)]
+            activity['classified_as'] = [self.type_ref(type_)]
         if timespan := get_timespan(link_.dates, f'Timespan of {group.name}'):
             activity['timespan'] = timespan
         if notes := get_date_notes(link_.dates):  # pragma: no cover
             activity['referred_to_by'] = notes
         la_append(record, 'carried_out', activity)
 
-    def _oa7(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
+    def oa7(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if record['type'] not in ACTORS:
             return  # pragma: no cover
         other = link_.domain if inverse else link_.range
-        if not (ref := self._typed_ref(other, ACTORS)):
+        if not (ref := self.typed_ref(other, ACTORS)):
             return  # pragma: no cover
         activity: dict[str, Any] = {
             'type': 'Activity',
@@ -538,29 +512,29 @@ class LaFormatter:
                 f'and {link_.range.name}',
             'carried_out_by': [ref]}
         if link_.type and (type_ := g.types.get(link_.type.id)):
-            activity['classified_as'] = [self._type_ref(type_)]
+            activity['classified_as'] = [self.type_ref(type_)]
         if timespan := get_timespan(
                 link_.dates,
                 f'Timespan of relationship with {other.name}'):
             activity['timespan'] = timespan  # pragma: no cover
         la_append(record, 'participated_in', activity)
 
-    def _p67(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
+    def p67(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if inverse:
-            self._referenced_by(link_, record)
+            self.referenced_by(link_, record)
         else:
-            self._refers_to(link_, record)
+            self.refers_to(link_, record)
 
-    def _referenced_by(self, link_: Link, record: dict[str, Any]) -> None:
+    def referenced_by(self, link_: Link, record: dict[str, Any]) -> None:
         domain = link_.domain
         if domain.cidoc_class.code == 'E32':
-            self._authority_reference(link_, record)
+            self.authority_reference(link_, record)
         elif domain.class_.name == 'external_reference':
-            la_append(record, 'subject_of', self._web_page(domain))
+            la_append(record, 'subject_of', self.web_page(domain))
         else:
-            la_append(record, 'referred_to_by', self._citation(link_))
+            la_append(record, 'referred_to_by', self.citation(link_))
 
-    def _refers_to(self, link_: Link, record: dict[str, Any]) -> None:
+    def refers_to(self, link_: Link, record: dict[str, Any]) -> None:
         target = link_.range
         if record['type'] == 'DigitalObject':
             la_append(record, 'digitally_shows', {
@@ -570,7 +544,7 @@ class LaFormatter:
                           f' ({target.name})'})
         elif record['type'] == 'LinguisticObject' \
                 and self.entity.class_.name != 'reference_system':
-            la_append(record, 'about', self._ref(target))
+            la_append(record, 'about', self.ref(target))
             if link_.description:
                 la_append(record, 'referred_to_by', statement(
                     link_.description,
@@ -578,11 +552,11 @@ class LaFormatter:
                     [aat_type('300200294', 'pagination')],
                     [unique_identifier(entity_uri(target))]))
 
-    def _citation(self, link_: Link) -> dict[str, Any]:
+    def citation(self, link_: Link) -> dict[str, Any]:
         domain = link_.domain
         classified_as = []
         if standard_type := domain.standard_type:
-            classified_as.append(self._type_ref(standard_type))
+            classified_as.append(self.type_ref(standard_type))
         if aat := BIBLIOGRAPHY_AAT.get(domain.class_.name):
             classified_as.append(aat)
             classified_as.append(category_aat(
@@ -605,7 +579,7 @@ class LaFormatter:
             identified_by)
 
     @staticmethod
-    def _web_page(domain: Entity) -> dict[str, Any]:
+    def web_page(domain: Entity) -> dict[str, Any]:
         web_page = category_aat('300264578', 'web page')
         page: dict[str, Any] = {
             'type': 'LinguisticObject',
@@ -629,7 +603,7 @@ class LaFormatter:
                 statement(domain.description, 'Description')]
         return page
 
-    def _authority_reference(
+    def authority_reference(
             self,
             link_: Link,
             record: dict[str, Any]) -> None:
@@ -665,7 +639,7 @@ class LaFormatter:
                 '_label': link_.domain.name}]}]
         la_append(record, 'identified_by', authority)
 
-    def _add_media(
+    def add_media(
             self,
             file_links: list[Link],
             record: dict[str, Any]) -> None:
@@ -676,10 +650,11 @@ class LaFormatter:
                 file_ = link_.domain
                 mime_type = get_mime_type(get_cached_file_path(file_.id))
                 digital_object = {
-                    'type': 'DigitalObject',
-                    '_label': file_.name,
-                    'identified_by': [unique_identifier(entity_uri(file_))]
-                } | self._digital_details(file_, mime_type)
+                                     'type': 'DigitalObject',
+                                     '_label': file_.name,
+                                     'identified_by': [
+                                         unique_identifier(entity_uri(file_))]
+                                 } | self.digital_details(file_, mime_type)
                 if mime_type == 'application/pdf':  # pragma: no cover
                     la_append(record, 'subject_of', {
                         'type': 'LinguisticObject',
@@ -695,12 +670,12 @@ class LaFormatter:
                     'type': 'VisualItem',
                     '_label': 'Visual Representations',
                     'digitally_shown_by': shown_by})
-            for item in self._iiif_subject_of(file_links):
+            for item in self.iiif_subject_of(file_links):
                 la_append(record, 'subject_of', item)
         if entity.class_.name == 'file' and get_cached_file_path(entity.id):
-            self._add_file_details(record)
+            self.add_file_details(record)
 
-    def _digital_details(
+    def digital_details(
             self,
             file_: Entity,
             mime_type: str | None) -> dict[str, Any]:
@@ -714,21 +689,21 @@ class LaFormatter:
         if file_path and file_path.stem:
             details['access_point'] = [{
                 'id': url_for(
-                    'api.display', filename=file_path.stem, _external=True),
+                    'api_v1_files.display_file', id=file_.id, _external=True),
                 'type': 'DigitalObject',
                 '_label': file_path.stem}]
         referred_to_by = []
         if license_ := get_license_type(file_):
-            referred_to_by.append(self._license(license_, file_.name))
+            referred_to_by.append(self.license(license_, file_.name))
         copyright_ = aat_type('300435434', 'copyright/licensing statement')
         referred_to_by.extend(
             statement(holder.name, 'Rights holder', [copyright_])
-            for holder in self._rights_holders(file_.id, 'license_holder'))
+            for holder in self.rights_holders(file_.id, 'license_holder'))
         if referred_to_by:
             details['referred_to_by'] = referred_to_by
         return details
 
-    def _license(self, license_: Entity, file_name: str) -> dict[str, Any]:
+    def license(self, license_: Entity, file_name: str) -> dict[str, Any]:
         classified_as: list[dict[str, Any]] = [
             aat_type('300435434', 'copyright/licensing statement')]
         classified_as.extend(
@@ -743,7 +718,7 @@ class LaFormatter:
             [primary_name(license_.name), unique_identifier(
                 entity_uri(license_))])
 
-    def _add_file_details(self, record: dict[str, Any]) -> None:
+    def add_file_details(self, record: dict[str, Any]) -> None:
         entity = self.entity
         file_size = get_file_size(entity.id)
         if file_size != 'N/A':
@@ -759,12 +734,12 @@ class LaFormatter:
                     'type': 'MeasurementUnit',
                     '_label': UNIT_MAP[unit]}})
         mime_type = get_mime_type(get_cached_file_path(entity.id))
-        details = self._digital_details(entity, mime_type)
+        details = self.digital_details(entity, mime_type)
         for key in ('classified_as', 'referred_to_by'):
             for item in details.pop(key, []):
                 la_append(record, key, item)
         record.update(details)
-        if creators := self._rights_holders(entity.id, 'creator'):
+        if creators := self.rights_holders(entity.id, 'creator'):
             record['created_by'] = {
                 'type': 'Creation',
                 '_label': f'Creation of {entity.name}',
@@ -775,12 +750,13 @@ class LaFormatter:
                     '_label': creator.name} for creator in creators]}
 
     @staticmethod
-    def _rights_holders(id_: int, key: str) -> list[Any]:
+    def rights_holders(id_: int, key: str) -> list[Any]:
         return resolve_rights_holders([id_])[id_][key]
 
     @staticmethod
-    def _iiif_subject_of(file_links: list[Link]) -> list[dict[str, Any]]:
+    def iiif_subject_of(file_links: list[Link]) -> list[dict[str, Any]]:
         subject_of = []
+        version = str(g.settings.get('iiif_version', 2))
         for link_ in file_links:
             manifest_path = get_iiif_manifest_and_path(link_.domain.id)
             if not (manifest_path.get('IIIFManifest')
@@ -801,27 +777,27 @@ class LaFormatter:
                         'type': 'DigitalObject',
                         '_label': label}],
                     'conforms_to': [{
-                        'id': 'https://iiif.io/api/presentation/2.0/',
+                        'id': f'https://iiif.io/api/presentation/{version}.0/',
                         'type': 'InformationObject',
-                        '_label': 'IIIF Presentation API 2.0'}],
+                        '_label': f'IIIF Presentation API {version}.0'}],
                     'format':
-                        "application/ld+json;profile='https://iiif.io"
-                        "/api/presentation/2/context.json'"}]})
+                        f"application/ld+json;profile='https://iiif.io"
+                        f"/api/presentation/{version}/context.json'"}]})
         return subject_of
 
-    def _add_dates(self, links: list[Link], record: dict[str, Any]) -> None:
+    def add_dates(self, links: list[Link], record: dict[str, Any]) -> None:
         entity = self.entity
         if record['type'] == 'Activity':
             if timespan := get_timespan(
-                entity.dates,
-                f'Timespan of {entity.name}'):
+                    entity.dates,
+                    f'Timespan of {entity.name}'):
                 record['timespan'] = timespan
             for note in get_date_notes(entity.dates):
                 la_append(record, 'referred_to_by', note)
         elif config := LIFE_EVENTS.get(entity.class_.name):
-            self._add_life_events(links, record, config)
+            self.add_life_events(links, record, config)
 
-    def _add_life_events(
+    def add_life_events(
             self,
             links: list[Link],
             record: dict[str, Any],
@@ -838,12 +814,13 @@ class LaFormatter:
                 '_label': f'{type_name} of {entity.name}'}
             if span:
                 event['timespan'] = {
-                    'type': 'TimeSpan',
-                    '_label': f'Timespan of {type_name} of {entity.name}'
-                } | span
+                                        'type': 'TimeSpan',
+                                        '_label': f'Timespan of {type_name} '
+                                                  f'of {entity.name}'
+                                    } | span
             for link_ in links:
                 if link_.property.code == code \
-                        and (ref := self._typed_ref(link_.range, {'Place'})):
+                        and (ref := self.typed_ref(link_.range, {'Place'})):
                     la_append(event, 'took_place_at', ref)
             if comment:
                 event['referred_to_by'] = [statement(
@@ -858,16 +835,16 @@ class LaFormatter:
             else:
                 record[key] = event
 
-    def _add_description(self, record: dict[str, Any]) -> None:
+    def add_description(self, record: dict[str, Any]) -> None:
         entity = self.entity
         la_append(record, 'referred_to_by', statement(
             entity.description or '',
             'Description',
             [category_aat('300435416', 'description')]))
         for annotation in AnnotationText.get_by_source_id(entity.id) or []:
-            la_append(record, 'referred_to_by', self._annotation(annotation))
+            la_append(record, 'referred_to_by', self.annotation(annotation))
 
-    def _annotation(
+    def annotation(
             self,
             annotation: AnnotationText) -> dict[str, Any]:
         text = self.entity.description or ''

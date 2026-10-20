@@ -39,6 +39,9 @@ OpenAtlas maps database records to internationally recognized domain ontologies:
    * - ``skos``
      - `W3C SKOS <https://www.w3.org/2004/02/skos/>`_
      - Controlled vocabularies, concept schemes, broader/narrower hierarchies.
+   * - ``la``
+     - `Linked Art <https://linked.art/>`_
+     - Strict application profile of CIDOC CRM for cultural heritage data.
    * - ``oa``
      - `OpenAtlas Extension <https://openatlas.eu/ontology/#>`_
      - High-performance shortcuts for frequent property chains.
@@ -112,31 +115,47 @@ integration requirements:
   model, combining CIDOC CRM, CRMarchaeo, GeoSPARQL, and OpenAtlas shortcuts.
 
 2. Strict Linked Art Profile (``/api/1/linked-art/...``)
+1. Strict Linked Art Profile (``/api/1/linked-art/...``)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-* **URL**: ``/api/1/linked-art/entity/<uuid>`` and ``/api/1/linked-art/entities/<class>``
+* **Endpoints**:
+  * ``GET /api/1/linked-art/entity/{uuid}`` (or ``.../entity/{uuid}.{ext}``)
+  * ``GET /api/1/linked-art/entities/{entity_class}``
 * **Audience**: GLAM institutions (Galleries, Libraries, Archives, Museums),
-  cultural heritage aggregators.
+  cultural heritage aggregators, and Linked Open Data consumers.
+* **Status**: **Fully supported in v1 Beta** (Recommended).
 * **Characteristics**: Adheres strictly to the `Linked Art profile <https://linked.art/>`_
   (JSON schemas with ``additionalProperties: false``). Responses strictly conform
-  to Linked Art classes (such as ``HumanMadeObject``, ``Place``, ``Actor``).
+  to Linked Art classes (such as ``HumanMadeObject``, ``Place``, ``Actor``, ``Activity``),
+  providing full entity details, classified types, timespans, citations, and related links.
 
-Controlled Vocabularies & SKOS (``/api/1/vocabulary/...``)
-----------------------------------------------------------
-Hierarchical typologies and controlled vocabularies in OpenAtlas are exported as
-standard W3C Simple Knowledge Organization System (`SKOS <https://www.w3.org/2004/02/skos/>`_)
-graphs:
+2. Controlled Vocabularies & SKOS (``/api/1/vocabulary/...``)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* **Endpoints**:
+  * ``GET /api/1/vocabulary/{id}/skos``
+  * ``GET /api/1/vocabulary/{id}/skos.{ext}``
+* **Audience**: Terminology managers, thesaurus hubs (e.g. SKOSMOS), and SPARQL endpoints.
+* **Status**: **Fully supported in v1 Beta**.
+* **Characteristics**: The root type is structured as a ``skos:ConceptScheme``,
+  with all child nodes linked hierarchically via ``skos:broader`` and ``skos:narrower``.
+  Supports standard formats (Turtle, RDF/XML, JSON-LD, N-Triples).
 
-* **Endpoint**: ``GET /api/1/vocabulary/<id>/skos`` (or ``.../skos.ttl``)
-* **Structure**: The root node is typed as ``skos:ConceptScheme``. Each child
-  type becomes a ``skos:Concept`` interconnected via ``skos:broader`` and
-  ``skos:narrower``.
-* **Use Cases**: Directly importable into terminology hubs such as **SKOSMOS**,
-  allowing seamless cross-institutional vocabulary alignment.
+3. OpenAtlas Native CRM Graph (``/api/1/entity/...``)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+* **Endpoints**:
+  * ``GET /api/1/entity/{uuid}`` (or ``.../entity/{uuid}.{ext}``)
+  * ``GET /api/1/entities/{entity_class}``
+* **Status**: **In Development / Experimental (Alpha Stub)**.
+* **Characteristics**: Provides a preliminary, lightweight stub interface returning
+  the entity URI, class type, and label. A comprehensive, deep CIDOC CRM graph
+  serializer with formal property-chain shortcuts is currently under active
+  development and will be introduced in an upcoming release.
+* **Recommendation**: For production semantic integration in Version 1 Beta,
+  please use the :ref:`Linked Art endpoints <linked-art-endpoints>`.
 
 Format Selection & Content Negotiation
 --------------------------------------
 All Linked Open Data endpoints support HTTP Content Negotiation via the
-``Accept`` header, or explicit URL extensions:
+``Accept`` header, as well as explicit URL extensions:
 
 .. list-table::
    :header-rows: 1
@@ -158,26 +177,14 @@ All Linked Open Data endpoints support HTTP Content Negotiation via the
      - ``application/n-triples``
      - ``.nt``
 
-*Example*: To fetch a place entity directly in Turtle format:
+*Example*: Fetching an entity in Turtle format using content negotiation:
 
 .. code-block:: bash
 
-   curl -H "Accept: text/turtle" https://demo.openatlas.eu/api/1/entity/913322f4-a3cf-2e90-bfd1-cecc8e523b56
+   curl -H "Accept: text/turtle" https://demo.openatlas.eu/api/1/linked-art/entity/913322f4-a3cf-2e90-bfd1-cecc8e523b56
 
-Or append ``.ttl`` to the URL:
+Or by appending ``.ttl`` directly to the URL:
 
 .. code-block:: bash
 
-   curl https://demo.openatlas.eu/api/1/entity/913322f4-a3cf-2e90-bfd1-cecc8e523b56.ttl
-
-Bulk Streaming Exports (Dumps)
-------------------------------
-For research institutions and data repositories requiring full dataset backups
-or triple-store indexing, OpenAtlas v1 provides authenticated, low-memory
-streaming exports:
-
-* **LOD N-Triples Dump**: ``GET /api/1/export/dump``
-  Streams the entire OpenAtlas knowledge graph in N-Triples format.
-* **Linked Art NDJSON Dump**: ``GET /api/1/linked-art/export/dump``
-  Streams individual Linked Art JSON-LD entities as newline-delimited JSON
-  (JSON Lines), ideal for big-data processing.
+   curl https://demo.openatlas.eu/api/1/linked-art/entity/913322f4-a3cf-2e90-bfd1-cecc8e523b56.ttl

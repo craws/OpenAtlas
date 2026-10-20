@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 from openatlas.api.api_v1.models.util import BaseSchema
 
 
-class AgentPath(BaseModel):
+class AgentPath(BaseSchema):
     id: int = Field(
         description="Filter by a specific Agent ID")
 
 
-class AgentItem(BaseModel):
+class AgentItem(BaseSchema):
     id: int = Field(
         description="Unique ID of the agent.",
         examples=[123])
@@ -29,4 +29,5 @@ class AgentItem(BaseModel):
 
 
 class AgentListResponse(BaseSchema):
-    data: list[AgentItem] = Field(description="List of registered agents and rights holders.")
+    data: list[AgentItem] = Field(
+        description="List of registered agents and rights holders.")

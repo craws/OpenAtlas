@@ -1,7 +1,7 @@
 API v1 (Beta)
 =============
 
-This section provides a quick-reference index of all 36 endpoints available in
+This section provides a quick-reference index of all 31 endpoints available in
 OpenAtlas API v1, organized by feature area.
 
 .. tip::
@@ -245,14 +245,14 @@ codes:
 .. code-block:: json
 
    {
-     "title": "Not Found",
-     "message": "Entity not found",
+     "title": "Entity does not exist",
+     "message": "The requested entity could not be found in the database.",
      "details": {
-       "provided_id": "913322f4-a3cf-2e90-bfd1-000000000000",
+       "provided_id": "913322f4-a3cf-2e90-bfd1-cecc8e523b56",
        "hint": "Check if the UUID or ID is correct and the entity has not been deleted."
      },
      "status": 404,
-     "url": "https://demo.openatlas.eu/api/1/entity/913322f4-a3cf-2e90-bfd1-000000000000",
+     "url": "https://demo.openatlas.eu/api/1/linked-art/entity/913322f4-a3cf-2e90-bfd1-cecc8e523b56",
      "timestamp": "2026-10-16T10:00:00.000000Z"
    }
 
@@ -264,5 +264,5 @@ HTTP Status Codes
 * ``401 Unauthorized``: Authentication is required but was not provided.
 * ``403 Forbidden``: The provided token does not have permission to access the resource.
 * ``404 Not Found``: The requested entity, file, or endpoint does not exist.
-* ``422 Unprocessable Entity``: Validation failure on query or path parameters (e.g. invalid date or negative limit).
+* ``422 Unprocessable Entity``: Validation failure on query or path parameters (e.g. invalid date, negative limit, or NUL character in search).
 * ``500 Internal Server Error``: Unexpected database or server error.

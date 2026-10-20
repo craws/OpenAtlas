@@ -17,7 +17,11 @@ from openatlas.api.api_v1.responses.lod import (
     la_dump_responses, lod_collection_responses, lod_responses)
 from openatlas.api.api_v1.util.auth import require_auth
 
-api_v1_la = APIBlueprint('api_v1_la', __name__, url_prefix='/api/1/linked-art')
+api_v1_la = APIBlueprint(
+    'api_v1_la',
+    __name__,
+    url_prefix='/api/1/linked-art',
+    abp_security=[{'bearerAuth': []}])
 register_error_handlers(api_v1_la)
 
 

@@ -5,14 +5,10 @@ from flask import Response, g
 from rdflib import DCTERMS, RDF, Dataset, Literal, Namespace, URIRef
 
 from openatlas.api.api_v04.resources.util import to_camel_case
-from openatlas.api.api_v1.formatters.util import (
-    entity_uri,
-    get_type_references,
-)
-from openatlas.api.api_v1.models.util import (
-    ExternalReferenceSystemModel,
-    MatchTypeEnum,
-)
+from openatlas.api.api_v1.formatters.util import \
+    entity_uri, get_type_references
+from openatlas.api.api_v1.models.util import \
+    ExternalReferenceSystemModel, MatchTypeEnum
 from openatlas.api.api_v1.util.content_negotiation import make_graph_response
 from openatlas.models.entity import Entity, Link
 
@@ -21,7 +17,7 @@ SKOS: Final[Namespace] = Namespace('http://www.w3.org/2004/02/skos/core#')
 URI_SAFE_CHARS: Final[str] = ":/?#[]@!$&'()*+,;=%~"
 
 
-def _get_match_uri(reference: ExternalReferenceSystemModel) -> URIRef | None:
+def get_match_uri(reference: ExternalReferenceSystemModel) -> URIRef | None:
     if not reference.identifier:
         return None  # pragma: no cover
     resolver = reference.url or ''
@@ -35,10 +31,10 @@ def _get_match_uri(reference: ExternalReferenceSystemModel) -> URIRef | None:
     return URIRef(uri)
 
 
-def _add_match_links(graph: Dataset, concept: URIRef, type_id: int) -> None:
+def add_match_links(graph: Dataset, concept: URIRef, type_id: int) -> None:
     inverse_links = get_type_references().get(type_id, [])
     for reference in get_external_reference_items(inverse_links):
-        if not (uri := _get_match_uri(reference)):
+        if not (uri := get_match_uri(reference)):
             continue  # pragma: no cover
         predicate = SKOS.exactMatch
         if reference.match_type == MatchTypeEnum.CLOSE_MATCH:
@@ -46,7 +42,7 @@ def _add_match_links(graph: Dataset, concept: URIRef, type_id: int) -> None:
         graph.add((concept, predicate, uri))
 
 
-def _add_concept(
+def add_concept(
         graph: Dataset,
         type_: Entity,
         scheme: URIRef,
@@ -66,11 +62,11 @@ def _add_concept(
         graph.add((
             concept, SKOS.scopeNote,
             Literal(type_.description, lang=language)))
-    _add_match_links(graph, concept, type_.id)
+    add_match_links(graph, concept, type_.id)
     return concept
 
 
-def _walk_concepts(
+def walk_concepts(
         graph: Dataset,
         parent_id: int,
         parent_node: URIRef | None,
@@ -84,11 +80,11 @@ def _walk_concepts(
             continue  # pragma: no cover
         visited.add(sub_id)
         sub = g.types[sub_id]
-        concept = _add_concept(graph, sub, scheme, language, is_top_level)
+        concept = add_concept(graph, sub, scheme, language, is_top_level)
         if not is_top_level and parent_node is not None:
             graph.add((concept, SKOS.broader, parent_node))
             graph.add((parent_node, SKOS.narrower, concept))
-        _walk_concepts(
+        walk_concepts(
             graph, sub_id, concept, scheme, language, visited, False)
 
 
@@ -106,7 +102,7 @@ def build_skos_graph(root: Entity) -> Dataset:
     # graph.add((scheme, DCTERMS.creator, Literal('creator')))
     # graph.add((scheme, DCTERMS.license, Literal('license')))
 
-    _walk_concepts(graph, root.id, None, scheme, language, {root.id}, True)
+    walk_concepts(graph, root.id, None, scheme, language, {root.id}, True)
     return graph
 
 
@@ -114,18 +110,18 @@ def serialize_skos(graph: Dataset, ext: str | None = None) -> Response:
     return make_graph_response(graph, ext=ext)
 
 
-def _get_match_type(link_: Link) -> MatchTypeEnum:
+def get_match_type(link_: Link) -> MatchTypeEnum:
     assert link_.type
     return MatchTypeEnum(to_camel_case(g.types[link_.type.id].name))
 
 
-def _get_external_reference_item(
+def get_external_reference_item(
         link_: Link,
         entity: Entity) -> ExternalReferenceSystemModel:
     return ExternalReferenceSystemModel(
         id=entity.id,
         name=entity.name,
-        match_type=_get_match_type(link_),
+        match_type=get_match_type(link_),
         identifier=f'{entity.resolver_url or ""}{link_.description}',
         description=entity.description,
         system_url=entity.website_url,
@@ -139,5 +135,5 @@ def get_external_reference_items(
         if link_.type and \
                 (entity := g.reference_systems.get(link_.domain.id)):
             external_references.append(
-                _get_external_reference_item(link_, entity))
+                get_external_reference_item(link_, entity))
     return external_references

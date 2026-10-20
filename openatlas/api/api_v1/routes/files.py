@@ -27,7 +27,8 @@ from openatlas.models.entity import Entity
 api_v1_files = APIBlueprint(
     'api_v1_files',
     __name__,
-    url_prefix='/api/1/files')
+    url_prefix='/api/1/files',
+    abp_security=[{'bearerAuth': []}])
 register_error_handlers(api_v1_files)
 
 

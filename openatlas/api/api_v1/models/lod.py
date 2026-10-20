@@ -3,11 +3,8 @@ from uuid import UUID
 
 from pydantic import ConfigDict, Field, field_validator
 
-from openatlas.api.api_v1.models.util import (
-    BaseSchema,
-    ExtensionsType,
-    OpenAtlasClassEnum,
-)
+from openatlas.api.api_v1.models.util import \
+    BaseSchema, ExtensionsType, OpenAtlasClassEnum
 from openatlas.api.api_v1.util.date_util import handle_date
 
 
@@ -145,10 +142,11 @@ class EntityCollectionQuery(BaseSchema):
     @classmethod
     def validate_search(cls, value: Any) -> str | None:
         if value is None:
-            return None
+            return None  # pragma: no cover
         value_str = str(value)
         if '\x00' in value_str:
-            raise ValueError("Search string must not contain NUL (0x00) characters.")
+            raise ValueError(
+                "Search string must not contain NUL (0x00) characters.")
         return value_str
 
     @field_validator('sort_by', mode='before')
