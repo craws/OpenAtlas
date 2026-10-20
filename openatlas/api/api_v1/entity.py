@@ -50,14 +50,14 @@ def resolve_type_ids(identifier: int | UUID | None) -> list[int] | None:
     if isinstance(identifier, int):
         entity = g.types.get(identifier)
         return [identifier, *entity.get_sub_ids_recursive()] \
-            if entity else None
+            if entity else []
 
     uuid_str = str(identifier)
     for type_id, entity in g.types.items():
         if str(entity.uuid) == uuid_str:
             return [type_id, *entity.get_sub_ids_recursive()]
 
-    return None
+    return []
 
 
 def get_by_system_class(
@@ -72,6 +72,8 @@ def get_by_system_class(
         case_study: int | UUID | None = None) -> tuple[list[Entity], int]:
     type_ids = resolve_type_ids(type_id)
     case_study_ids = resolve_type_ids(case_study)
+    if type_ids == [] or case_study_ids == []:
+        return [], 0
     aliases = bool(g.classes[class_name].attributes.get('alias'))
     rows, total = get_by_class_api(
         class_name,

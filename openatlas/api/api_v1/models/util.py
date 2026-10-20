@@ -53,7 +53,7 @@ class ErrorResponse(BaseSchema):
         examples=[404])
 
 
-class DownloadQuery(BaseModel):
+class DownloadQuery(BaseSchema):
     download: bool = Field(
         False,
         description="Set to true to force the browser to download the file "

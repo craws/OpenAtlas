@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import Field
 
 from openatlas.api.api_v1.models.util import BaseSchema
 
@@ -138,7 +138,7 @@ class SystemPropertiesResponse(BaseSchema):
                     "to their details.")
 
 
-class LocaleQuery(BaseModel):
+class LocaleQuery(BaseSchema):
     locale: str = Field(
         "en",
         description="Choose language for labels (e.g., 'en', 'de').")

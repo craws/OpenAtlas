@@ -263,7 +263,7 @@ def get_file_item(entity: Entity) -> FileItem:
         public_shareable=entity.public,
         license=get_license_item(g.types[license_id]) if license_id else None,
         mimetype=get_mime_type(file_),
-        extension=file_.suffix if file_ else None,
+        extension=file_.suffix.lstrip('.') if file_ else None,
         file_url=url_for(
             'api_v1_files.display_file', id=entity.id, _external=True),
         thumbnail_url=url_for(

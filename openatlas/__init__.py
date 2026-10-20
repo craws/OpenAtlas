@@ -25,7 +25,12 @@ from openatlas.models.openatlas_class import get_classes
 app: OpenAPI = OpenAPI(
     __name__,
     instance_relative_config=True,
-    doc_prefix="/api/1/docs")
+    doc_prefix="/api/1/docs",
+    security_schemes={
+        "bearerAuth": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT"}})
 
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 app.config.from_object('config.default')
@@ -38,8 +43,7 @@ app.info = Info(
         "OpenAtlas REST and Linked Open Data (LOD) API v1. Provides "
         "endpoints for entities, CIDOC CRM mapping, Linked Art profiles, "
         "controlled vocabularies (SKOS), digital assets (IIIF), and "
-        "system metadata."),
-    termsOfService="https://openatlas.eu/") # todo: add a ToS in Github?!
+        "system metadata."))
 
 CONFIG_PATH = ''
 if 'INSTANCE_PATH' in os.environ:  # Used for multi instance

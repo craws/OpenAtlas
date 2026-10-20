@@ -702,3 +702,4 @@ class ApiV1(ApiTestCase):
             assert rv.status_code == 200
         rv = c.get('/api/1/docs/Wrong!')
         assert rv.status_code == 404
+        assert '/api/1/docs/swagger' in rv.get_json()['message']
