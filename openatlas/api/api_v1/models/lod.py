@@ -3,8 +3,8 @@ from uuid import UUID
 
 from pydantic import ConfigDict, Field, field_validator
 
-from openatlas.api.api_v1.models.util import (
-    BaseSchema, ExtensionsType, OpenAtlasClassEnum)
+from openatlas.api.api_v1.models.util import \
+    BaseSchema, ExtensionsType, OpenAtlasClassEnum
 from openatlas.api.api_v1.util.date_util import handle_date
 
 

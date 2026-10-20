@@ -1,7 +1,5 @@
-from openatlas.api.api_v1.models.lod import (
-    LinkedArtCollectionResponse,
-    LinkedArtResponse,
-)
+from openatlas.api.api_v1.models.lod import \
+    LinkedArtCollectionResponse, LinkedArtResponse
 from openatlas.api.api_v1.models.util import ErrorResponse
 
 lod_responses = {

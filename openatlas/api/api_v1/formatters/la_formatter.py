@@ -6,40 +6,16 @@ import validators
 from flask import g, url_for
 
 from openatlas.api.api_v1.entity import get_entity_by_id
-from openatlas.api.api_v1.formatters.la_helpers import (
-    ACTORS,
-    BIBLIOGRAPHY_AAT,
-    CLASS_TYPES,
-    DIMENSION_ROOTS,
-    MIME_CLASSIFICATIONS,
-    UNIT_MAP,
-    aat_type,
-    alias_name,
-    category_aat,
-    date_to_utc_iso_str,
-    get_language,
-    identifier,
-    is_float,
-    la_type,
-    primary_name,
-    statement,
-    unique_identifier,
-)
-from openatlas.api.api_v1.formatters.util import (
-    EntityLinks,
-    entity_uri,
-    get_links_for_entities,
-    get_type_references,
-)
-from openatlas.api.api_v1.util.files import (
-    get_cached_file_path,
-    get_file_size,
-    get_iiif_manifest_and_path,
-    get_license_type,
-    get_mime_type,
-    prefetch_files,
-    resolve_rights_holders,
-)
+from openatlas.api.api_v1.formatters.la_helpers import \
+    ACTORS, BIBLIOGRAPHY_AAT, CLASS_TYPES, DIMENSION_ROOTS, \
+    MIME_CLASSIFICATIONS, UNIT_MAP, aat_type, alias_name, category_aat, \
+    date_to_utc_iso_str, get_language, identifier, is_float, la_type, \
+    primary_name, statement, unique_identifier
+from openatlas.api.api_v1.formatters.util import \
+    EntityLinks, entity_uri, get_links_for_entities, get_type_references
+from openatlas.api.api_v1.util.files import \
+    get_cached_file_path, get_file_size, get_iiif_manifest_and_path, \
+    get_license_type, get_mime_type, prefetch_files, resolve_rights_holders
 from openatlas.models.annotation import AnnotationText
 from openatlas.models.dates import Dates
 from openatlas.models.entity import Entity, Link
@@ -49,13 +25,11 @@ CLOSE_MATCH = {
     'type': 'Type',
     '_label': 'Close Match'}
 
-
 ACTOR_EVENT_KEYS = {
     'P11': ('participant', 'participated_in'),
     'P14': ('carried_out_by', 'carried_out'),
     'P22': ('participant', 'participated_in'),
     'P23': ('participant', 'participated_in')}
-
 
 OBJECT_EVENT_KEYS = {
     'P24': ('changed_ownership_through', 'Acquisition', True),
@@ -151,9 +125,9 @@ def get_timespan(dates: Dates, label: str) -> dict[str, Any] | None:
         'end_of_the_end': format_datetime(dates.end_to, True)}
     if data['end_of_the_end'] is None:
         data['end_of_the_end'] = (
-            format_datetime(dates.end_from, True)
-            or format_datetime(dates.begin_to, True)
-            or format_datetime(dates.begin_from, True))
+                format_datetime(dates.end_from, True)
+                or format_datetime(dates.begin_to, True)
+                or format_datetime(dates.begin_from, True))
     return {'type': 'TimeSpan', '_label': label} \
         | {k: v for k, v in data.items() if v is not None}
 
@@ -454,7 +428,7 @@ class LaFormatter:
     def p46(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if inverse and record['type'] == 'HumanMadeObject' \
                 and (ref := self.typed_ref(
-                    link_.domain, {'HumanMadeObject'})):
+            link_.domain, {'HumanMadeObject'})):
             record.setdefault('part_of', ref)
 
     def p52(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
@@ -676,10 +650,11 @@ class LaFormatter:
                 file_ = link_.domain
                 mime_type = get_mime_type(get_cached_file_path(file_.id))
                 digital_object = {
-                    'type': 'DigitalObject',
-                    '_label': file_.name,
-                    'identified_by': [unique_identifier(entity_uri(file_))]
-                } | self.digital_details(file_, mime_type)
+                                     'type': 'DigitalObject',
+                                     '_label': file_.name,
+                                     'identified_by': [
+                                         unique_identifier(entity_uri(file_))]
+                                 } | self.digital_details(file_, mime_type)
                 if mime_type == 'application/pdf':  # pragma: no cover
                     la_append(record, 'subject_of', {
                         'type': 'LinguisticObject',
@@ -814,8 +789,8 @@ class LaFormatter:
         entity = self.entity
         if record['type'] == 'Activity':
             if timespan := get_timespan(
-                entity.dates,
-                f'Timespan of {entity.name}'):
+                    entity.dates,
+                    f'Timespan of {entity.name}'):
                 record['timespan'] = timespan
             for note in get_date_notes(entity.dates):
                 la_append(record, 'referred_to_by', note)
@@ -839,9 +814,10 @@ class LaFormatter:
                 '_label': f'{type_name} of {entity.name}'}
             if span:
                 event['timespan'] = {
-                    'type': 'TimeSpan',
-                    '_label': f'Timespan of {type_name} of {entity.name}'
-                } | span
+                                        'type': 'TimeSpan',
+                                        '_label': f'Timespan of {type_name} '
+                                                  f'of {entity.name}'
+                                    } | span
             for link_ in links:
                 if link_.property.code == code \
                         and (ref := self.typed_ref(link_.range, {'Place'})):
