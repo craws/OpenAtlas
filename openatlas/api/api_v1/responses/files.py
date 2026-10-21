@@ -1,7 +1,13 @@
 from openatlas.api.api_v1.models.files import PublicFileOverviewResponse
 from openatlas.api.api_v1.models.util import ErrorResponse
 
-public_files_response = {200: PublicFileOverviewResponse}
+public_files_response = {
+    200: PublicFileOverviewResponse,
+    404: {
+        "description": "Entity not found",
+        "content": {
+            "application/json": {
+                "schema": ErrorResponse.model_json_schema()}}}}
 
 display_file_response = {
     200: {

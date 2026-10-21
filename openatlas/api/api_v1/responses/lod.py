@@ -58,7 +58,8 @@ ontology_responses = {
     200: {
         'description': 'OpenAtlas Extension Ontology in RDF formats',
         'content': {
-            'application/ld+json': {'schema': {'type': 'object'}},
+            'application/ld+json': {
+            'schema': {'anyOf': [{'type': 'array'}, {'type': 'object'}]}},
             'text/turtle': {'schema': {'type': 'string'}},
             'application/n-triples': {'schema': {'type': 'string'}},
             'application/rdf+xml': {'schema': {'type': 'string'}}}}}

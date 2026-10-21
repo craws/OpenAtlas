@@ -12,6 +12,8 @@ import schemathesis
 from schemathesis.cli import schemathesis as schemathesis_cli
 from schemathesis.generation.modes import GenerationMode
 
+from flask_login import login_user
+
 from openatlas import app
 from openatlas.api.api_v1.models.util import OpenAtlasClassEnum
 from openatlas.api.api_v1.util.files import (
@@ -21,12 +23,28 @@ from openatlas.display.image_processing import (
     check_iiif_activation, is_supported_image, safe_resize_image)
 from openatlas.models.entity import Entity
 from openatlas.models.rights_holder import RightsHolder
+from openatlas.models.token import Token
+from openatlas.models.user import User
+
+
+def get_auth_token() -> str:
+    with app.test_request_context():
+        app.preprocess_request()
+        admin_user = next(
+            (u for u in User.get_all() if u.group == 'admin'), None)
+        if not admin_user:
+            admin_user = User.get_all()[0]
+        login_user(admin_user)
+        return Token.generate_token(1, 'schemathesis_test_token', admin_user)
+
 
 SCHEMATHESIS_ARGUMENTS = (
     'run',
     'http://localhost:5000/api/1/docs/openapi.json',
     '--url',
     'http://localhost:5000',
+    '-H',
+    f'Authorization: Bearer {get_auth_token()}',
     '--phases',
     'examples,coverage,fuzzing',
     '--checks',
@@ -146,6 +164,11 @@ def get_path_examples(path: str) -> Iterator[dict[str, Any]]:
                 yield {'id': id_, 'version': '2'}
         return
 
+    if path == '/api/1/ontology.{ext}':
+        for ext in ('json', 'ttl', 'xml', 'nt'):
+            yield {'ext': ext}
+        return
+
     data = get_database_examples()
     ext_param = {'ext': 'json'} if '{ext}' in path else {}
 
@@ -193,6 +216,8 @@ def before_add_examples(context: Any, examples: list[Any]) -> None:
             kwargs['path_parameters'] = params
         if path.startswith('/api/1/entities/'):
             kwargs['query'] = {'limit': 5, 'page': 1}
+        elif path.endswith('/export/dump'):
+            kwargs['query'] = {'limit': 1}
         elif (path in (
                 '/api/1/vocabulary/standard/{openatlas_class}',
                 '/api/1/system/count/entities')
@@ -203,6 +228,8 @@ def before_add_examples(context: Any, examples: list[Any]) -> None:
 
 @schemathesis.hook
 def map_case(_context: Any, case: Any) -> Any:
+    if case.operation.path.endswith('/export/dump'):
+        case.query = {'limit': 1}
     if (case.meta
             and case.meta.generation.mode == GenerationMode.POSITIVE
             and case.path_parameters
