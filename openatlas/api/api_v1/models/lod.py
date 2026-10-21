@@ -180,6 +180,17 @@ class LinkedArtResponse(BaseSchema):
     _label: str
 
 
+class LodResponse(BaseSchema):
+    model_config = ConfigDict(extra='allow')
+
+    context: str = Field(
+        default="https://example.org/api/1/context.json",
+        alias="@context")
+    id: str
+    type: str
+    label: str
+
+
 class OrderedCollectionPageRef(BaseSchema):
     id: str
     type: str = 'OrderedCollectionPage'
@@ -196,7 +207,7 @@ class ParentOrderedCollection(BaseSchema):
 class LinkedArtCollectionResponse(BaseSchema):
     model_config = ConfigDict(extra='allow')
 
-    context: list[str] = Field(
+    context: str | list[str] = Field(
         default=[
             'https://linked.art/ns/v1/linked-art.json',
             'https://linked.art/ns/v1/search.json'],
@@ -213,21 +224,26 @@ class LinkedArtCollectionResponse(BaseSchema):
 class LodDumpQuery(BaseSchema):
     limit: int | None = Field(
         default=None,
-        description="Limit the number of entities exported (useful for testing or partial dumps).",
+        description="Limit the number of entities exported "
+                    "(useful for testing or partial dumps).",
         ge=1)
-    entity_class: str | None = Field(
+    entity_class: OpenAtlasClassEnum | Literal['all'] | None = Field(
         default=None,
-        description="Filter export by specific OpenAtlas class (e.g. 'place', 'feature', 'artifact', or 'all').")
+        description="Filter export by specific OpenAtlas class "
+                    "(e.g. 'place', 'feature', 'artifact', or 'all').")
 
 
 class LaDumpQuery(BaseSchema):
     limit: int | None = Field(
         default=None,
-        description="Limit the number of entities exported (useful for testing or partial dumps).",
+        description="Limit the number of entities exported "
+                    "(useful for testing or partial dumps).",
         ge=1)
-    entity_class: str | None = Field(
+    entity_class: OpenAtlasClassEnum | Literal['all'] | None = Field(
         default=None,
-        description="Filter export by specific OpenAtlas class (e.g. 'place', 'feature', 'artifact', or 'all').")
+        description="Filter export by specific OpenAtlas class "
+                    "(e.g. 'place', 'feature', 'artifact', or 'all').")
     format: Literal['jsonl', 'nt'] = Field(
         default='jsonl',
-        description="Export format: 'jsonl' (JSON Lines / NDJSON, recommended for Linked Art) or 'nt' (N-Triples).")
+        description="Export format: 'jsonl' (JSON Lines / NDJSON, "
+                    "recommended for Linked Art) or 'nt' (N-Triples).")

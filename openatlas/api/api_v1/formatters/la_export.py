@@ -37,37 +37,30 @@ def stream_la_dump(
             f'SELECT id FROM model.entity {where_clause} ORDER BY id '
             f'LIMIT %(limit)s;',
             params)
-        rows = g.cursor.fetchall()
-        if not rows:
+        if not (rows := g.cursor.fetchall()):
             break
 
         ids = [r[0] for r in rows]
         last_id = ids[-1]
-
         entities = Entity.get_by_ids(ids, types=True, aliases=True)
-        if not entities:
-            break
-
         la_data = format_la_entities(entities)
-        items = la_data['orderedItems']
 
         if output_format == 'nt':
             graph = Dataset()
             graph.parse(data=json.dumps(la_data), format='json-ld')
-            nt = graph.serialize(format='nt')
             exported += len(entities)
-            yield nt
+            yield graph.serialize(format='nt')
         else:
             lines = [
                 json.dumps({'@context': LA_CONTEXT, **item})
-                for item in items]
-            chunk = '\n'.join(lines) + '\n'
+                for item in la_data['orderedItems']]
             exported += len(entities)
-            yield chunk
+            yield '\n'.join(lines) + '\n'
 
 
 def export_la_dump_to_file(
         output_path: Path | str,
+        *,
         class_name: str | None = None,
         limit: int | None = None,
         batch_size: int = 1000,

@@ -129,5 +129,6 @@ def abort_unauthorized(message: str = 'Authentication required.') -> NoReturn:
 
 def abort_forbidden(message: str = 'Insufficient permissions.') -> NoReturn:
     details = {
-        'hint': 'Your user account or API token does not have the required role.'}
+        'hint': 'Your user account or API token does not have '
+                'the required role.'}
     abort_with_error(403, 'Forbidden', message, details)

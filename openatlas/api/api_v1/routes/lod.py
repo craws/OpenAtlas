@@ -111,8 +111,8 @@ def get_context() -> Response:
 def get_ontology() -> Response:
     """
     Returns the OpenAtlas extension ontology (defining shortcuts like
-    oa:has_relationship_to, oa:begins_in, oa:ends_in) in the requested RDF format.
-    Format is determined via HTTP Accept header (defaults to JSON-LD).
+    oa:has_relationship_to, oa:begins_in, oa:ends_in) in the requested RDF
+    format. Format is determined via HTTP Accept header (defaults to JSON-LD).
     """
     return make_graph_response(get_oa_ontology_graph())
 
@@ -124,8 +124,8 @@ def get_ontology() -> Response:
     responses=ontology_responses)
 def get_ontology_ext(path: ExtensionPath) -> Response:
     """
-    Returns the OpenAtlas extension ontology with format specified by URL extension
-    (.json, .ttl, .xml, .nt).
+    Returns the OpenAtlas extension ontology with format specified by URL
+    extension (.json, .ttl, .xml, .nt).
     """
     ext_val = path.ext.value if hasattr(path.ext, 'value') else str(path.ext)
     return make_graph_response(get_oa_ontology_graph(), ext=ext_val)
@@ -142,16 +142,21 @@ def get_lod_dump(query: LodDumpQuery) -> Response:
     Requires user authentication (Flask session cookie or JWT Bearer token).
 
     Supports keyset streaming with low memory footprint. Optional query
-    parameters allow limiting the exported entities or filtering by entity class.
+    parameters allow limiting the exported entities or filtering by entity
+    class.
     """
     require_auth()
+    entity_class = (
+        query.entity_class.value
+        if hasattr(query.entity_class, 'value')
+        else query.entity_class)
     filename = 'openatlas_lod_dump.nt'
-    if query.entity_class:
-        filename = f'openatlas_{query.entity_class}_lod.nt'
+    if entity_class:
+        filename = f'openatlas_{entity_class}_lod.nt'
     return Response(
         stream_with_context(
             stream_lod_nt(
-                class_name=query.entity_class,
+                class_name=entity_class,
                 limit=query.limit)),
         mimetype='application/n-triples',
         headers={'Content-Disposition': f'attachment; filename="{filename}"'})

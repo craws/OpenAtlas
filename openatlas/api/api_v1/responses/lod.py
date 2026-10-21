@@ -1,10 +1,25 @@
 from openatlas.api.api_v1.models.lod import \
-    LinkedArtCollectionResponse, LinkedArtResponse
+    LinkedArtCollectionResponse, LinkedArtResponse, LodResponse
 from openatlas.api.api_v1.models.util import ErrorResponse
 
 lod_responses = {
     200: {
         'description': 'Entity response in different LOD formats',
+        'content': {
+            'application/ld+json': {
+                'schema': LodResponse.model_json_schema()},
+            'text/turtle': {'schema': {'type': 'string'}},
+            'application/n-triples': {'schema': {'type': 'string'}},
+            'application/rdf+xml': {'schema': {'type': 'string'}}}},
+    404: {
+        'description': 'Entity not found.',
+        'content': {
+            'application/json': {
+                'schema': ErrorResponse.model_json_schema()}}}}
+
+la_responses = {
+    200: {
+        'description': 'Entity response in Linked Art formats',
         'content': {
             'application/ld+json': {
                 'schema': LinkedArtResponse.model_json_schema()},
@@ -50,23 +65,27 @@ ontology_responses = {
 
 dump_responses = {
     200: {
-        'description': 'Full Linked Open Data dump in N-Triples format (streamed)',
+        'description':
+            'Full Linked Open Data dump in N-Triples format (streamed)',
         'content': {
             'application/n-triples': {'schema': {'type': 'string'}}}},
     401: {
-        'description': 'Authentication required. Provide a valid Bearer token or log in.',
+        'description':
+            'Authentication required. Provide a valid Bearer token or log in.',
         'content': {
             'application/json': {
                 'schema': ErrorResponse.model_json_schema()}}}}
 
 la_dump_responses = {
     200: {
-        'description': 'Full Linked Art dump (streamed as JSON Lines or N-Triples)',
+        'description':
+            'Full Linked Art dump (streamed as JSON Lines or N-Triples)',
         'content': {
             'application/x-ndjson': {'schema': {'type': 'string'}},
             'application/n-triples': {'schema': {'type': 'string'}}}},
     401: {
-        'description': 'Authentication required. Provide a valid Bearer token or log in.',
+        'description':
+            'Authentication required. Provide a valid Bearer token or log in.',
         'content': {
             'application/json': {
                 'schema': ErrorResponse.model_json_schema()}}}}

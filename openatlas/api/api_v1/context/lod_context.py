@@ -1,6 +1,8 @@
 from typing import Any
 
 from flask import url_for
+from rdflib import OWL, RDF, RDFS, BNode, Graph, Literal, Namespace, URIRef
+from rdflib.collection import Collection
 
 
 def get_oa_ontology_uri() -> str:
@@ -8,79 +10,91 @@ def get_oa_ontology_uri() -> str:
     # or https://github.com/openatlas/ontology. For now, serve locally.
     try:
         return url_for('api_v1_lod.get_ontology', _external=True) + '#'
-    except RuntimeError:
+    except RuntimeError:  # pragma: no cover
         return 'https://openatlas.eu/ontology/#'
 
 
-def get_oa_ontology_graph():
-    from rdflib import OWL, RDF, RDFS, BNode, Graph, Literal, Namespace, URIRef
-    from rdflib.collection import Collection
-
-    g = Graph()
+def get_oa_ontology_graph() -> Graph:
+    graph = Graph()
     oa_base = get_oa_ontology_uri()
     oa = Namespace(oa_base)
     crm = Namespace('http://www.cidoc-crm.org/cidoc-crm/')
-    g.bind('oa', oa)
-    g.bind('crm', crm)
-    g.bind('owl', OWL)
+    graph.bind('oa', oa)
+    graph.bind('crm', crm)
+    graph.bind('owl', OWL)
 
     ont_uri = URIRef(oa_base.rstrip('#'))
-    g.add((ont_uri, RDF.type, OWL.Ontology))
-    g.add((ont_uri, RDFS.label, Literal('OpenAtlas Extension Ontology', lang='en')))
-    g.add((ont_uri, RDFS.comment, Literal(
-        'Custom shortcuts and extensions for OpenAtlas CIDOC CRM / CRMarchaeo Linked Data. '
-        'All shortcuts can be resolved in accordance with CIDOC CRM specifications.',
+    graph.add((ont_uri, RDF.type, OWL.Ontology))
+    graph.add((
+        ont_uri,
+        RDFS.label,
+        Literal('OpenAtlas Extension Ontology', lang='en')))
+    graph.add((ont_uri, RDFS.comment, Literal(
+        'Custom shortcuts and extensions for OpenAtlas CIDOC CRM / CRMarchaeo '
+        'Linked Data. All shortcuts can be resolved in accordance with CIDOC '
+        'CRM specifications.',
         lang='en')))
 
     # oa:has_relationship_to (OA7: E39 -> E39)
-    # CIDOC CRM resolution: E39(Actor) - P11i(participated in) - E5(Event) - P11(had participant) - E39(Actor)
     p_rel = oa.has_relationship_to
-    g.add((p_rel, RDF.type, OWL.ObjectProperty))
-    g.add((p_rel, RDFS.label, Literal('has relationship to', lang='en')))
-    g.add((p_rel, RDFS.comment, Literal(
+    graph.add((p_rel, RDF.type, OWL.ObjectProperty))
+    graph.add((p_rel, RDFS.label, Literal('has relationship to', lang='en')))
+    graph.add((p_rel, RDFS.comment, Literal(
         'OpenAtlas shortcut (OA7) resolving to CIDOC CRM path: '
-        'E39(Actor) -> P11i(participated in) -> E5(Event) -> P11(had participant) -> E39(Actor). '
+        'E39(Actor) -> P11i(participated in) -> E5(Event) -> '
+        'P11(had participant) -> E39(Actor). '
         'The connecting event can be typed with E55(Type) via P2(has type).',
         lang='en')))
-    g.add((p_rel, RDFS.domain, crm.E39_Actor))
-    g.add((p_rel, RDFS.range, crm.E39_Actor))
+    graph.add((p_rel, RDFS.domain, crm.E39_Actor))
+    graph.add((p_rel, RDFS.range, crm.E39_Actor))
     chain_rel = BNode()
-    Collection(g, chain_rel, [crm.P11i_participated_in, crm.P11_had_participant])
-    g.add((p_rel, OWL.propertyChainAxiom, chain_rel))
+    Collection(
+        graph,
+        chain_rel,
+        [crm.P11i_participated_in, crm.P11_had_participant])
+    graph.add((p_rel, OWL.propertyChainAxiom, chain_rel))
 
     # oa:begins_in (OA8: E77 -> E53)
-    # CIDOC CRM resolution: E77(Persistent Item) - P92i(was brought into existence by) - E63(Beginning of Existence) - P7(took place at) - E53(Place)
     p_b = oa.begins_in
-    g.add((p_b, RDF.type, OWL.ObjectProperty))
-    g.add((p_b, RDFS.label, Literal('begins in', lang='en')))
-    g.add((p_b, RDFS.comment, Literal(
+    graph.add((p_b, RDF.type, OWL.ObjectProperty))
+    graph.add((p_b, RDFS.label, Literal('begins in', lang='en')))
+    graph.add((p_b, RDFS.comment, Literal(
         'OpenAtlas shortcut (OA8) resolving to CIDOC CRM path: '
-        'E77(Persistent Item) -> P92i(was brought into existence by) -> E63(Beginning of Existence) -> P7(took place at) -> E53(Place). '
-        'For E21(Person), E63 is specialized as E67(Birth) via P98i(was born).',
+        'E77(Persistent Item) -> P92i(was brought into existence by) -> '
+        'E63(Beginning of Existence) -> P7(took place at) -> E53(Place). '
+        'For E21(Person), E63 is specialized as E67(Birth) via '
+        'P98i(was born).',
         lang='en')))
-    g.add((p_b, RDFS.domain, crm.E77_Persistent_Item))
-    g.add((p_b, RDFS.range, crm.E53_Place))
+    graph.add((p_b, RDFS.domain, crm.E77_Persistent_Item))
+    graph.add((p_b, RDFS.range, crm.E53_Place))
     chain_b = BNode()
-    Collection(g, chain_b, [crm.P92i_was_brought_into_existence_by, crm.P7_took_place_at])
-    g.add((p_b, OWL.propertyChainAxiom, chain_b))
+    Collection(
+        graph,
+        chain_b,
+        [crm.P92i_was_brought_into_existence_by, crm.P7_took_place_at])
+    graph.add((p_b, OWL.propertyChainAxiom, chain_b))
 
     # oa:ends_in (OA9: E77 -> E53)
-    # CIDOC CRM resolution: E77(Persistent Item) - P93i(was taken out of existence by) - E64(End of Existence) - P7(took place at) - E53(Place)
     p_e = oa.ends_in
-    g.add((p_e, RDF.type, OWL.ObjectProperty))
-    g.add((p_e, RDFS.label, Literal('ends in', lang='en')))
-    g.add((p_e, RDFS.comment, Literal(
+    graph.add((p_e, RDF.type, OWL.ObjectProperty))
+    graph.add((p_e, RDFS.label, Literal('ends in', lang='en')))
+    graph.add((p_e, RDFS.comment, Literal(
         'OpenAtlas shortcut (OA9) resolving to CIDOC CRM path: '
-        'E77(Persistent Item) -> P93i(was taken out of existence by) -> E64(End of Existence) -> P7(took place at) -> E53(Place). '
-        'For E21(Person), E64 is specialized as E69(Death) via P100i(died in).',
+        'E77(Persistent Item) -> P93i(was taken out of existence by) -> '
+        'E64(End of Existence) -> P7(took place at) -> E53(Place). '
+        'For E21(Person), E64 is specialized as E69(Death) via '
+        'P100i(died in).',
         lang='en')))
-    g.add((p_e, RDFS.domain, crm.E77_Persistent_Item))
-    g.add((p_e, RDFS.range, crm.E53_Place))
+    graph.add((p_e, RDFS.domain, crm.E77_Persistent_Item))
+    graph.add((p_e, RDFS.range, crm.E53_Place))
     chain_e = BNode()
-    Collection(g, chain_e, [crm.P93i_was_taken_out_of_existence_by, crm.P7_took_place_at])
-    g.add((p_e, OWL.propertyChainAxiom, chain_e))
+    Collection(
+        graph,
+        chain_e,
+        [crm.P93i_was_taken_out_of_existence_by, crm.P7_took_place_at])
+    graph.add((p_e, OWL.propertyChainAxiom, chain_e))
 
-    return g
+    return graph
 
 
 def get_lod_context() -> dict[str, Any]:
@@ -277,6 +291,7 @@ def get_lod_context() -> dict[str, Any]:
             'has_relationship_to': {
                 '@id': 'oa:has_relationship_to',
                 '@type': '@id'},
+            'relation_type': {'@id': 'oa:relation_type'},
             'begins_in': {'@id': 'oa:begins_in', '@type': '@id'},
             'ends_in': {'@id': 'oa:ends_in', '@type': '@id'},
 
@@ -286,8 +301,12 @@ def get_lod_context() -> dict[str, Any]:
             'last': {'@id': 'as:last', '@type': '@id'},
             'prev': {'@id': 'as:prev', '@type': '@id'},
             'next': {'@id': 'as:next', '@type': '@id'},
-            'startIndex': {'@id': 'as:startIndex', '@type': 'xsd:nonNegativeInteger'},
-            'totalItems': {'@id': 'as:totalItems', '@type': 'xsd:nonNegativeInteger'},
+            'startIndex': {
+                '@id': 'as:startIndex',
+                '@type': 'xsd:nonNegativeInteger'},
+            'totalItems': {
+                '@id': 'as:totalItems',
+                '@type': 'xsd:nonNegativeInteger'},
             'orderedItems': {'@id': 'as:items', '@container': '@list'}
         }
     }

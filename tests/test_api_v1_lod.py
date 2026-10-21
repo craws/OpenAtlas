@@ -4,17 +4,22 @@ from pathlib import Path
 
 import pytest
 from flask import url_for
-from rdflib import OWL, RDF, Graph, Namespace
+from flask_login import login_user, logout_user
+from rdflib import OWL, RDF, Graph, Namespace, URIRef
 from werkzeug.exceptions import HTTPException
 
 from openatlas import app
 from openatlas.api.api_v1.context.lod_context import get_oa_ontology_uri
 from openatlas.api.api_v1.formatters.la_export import export_la_dump_to_file
+from openatlas.api.api_v1.formatters.lod import (
+    format_lod_entities, format_lod_entity)
 from openatlas.api.api_v1.formatters.lod_export import export_lod_dump_to_file
 from openatlas.api.api_v1.util.auth import (
     api_auth_required, api_group_required, get_authenticated_role,
     is_authenticated, is_authorized_role, require_auth, require_group)
-from tests.base import ApiTestCase
+from openatlas.models.token import Token
+from openatlas.models.user import User
+from tests.base import ApiTestCase, insert
 
 
 class ApiV1LodTest(ApiTestCase):
@@ -29,7 +34,9 @@ class ApiV1LodTest(ApiTestCase):
         ctx = data['@context']
         assert ctx['@version'] == 1.1
         assert ctx['crm'] == 'http://www.cidoc-crm.org/cidoc-crm/'
-        assert ctx['archaeo'] == 'http://www.cidoc-crm.org/cidoc-crm/CRMarchaeo/'
+        assert (
+            ctx['archaeo']
+            == 'http://www.cidoc-crm.org/cidoc-crm/CRMarchaeo/')
         assert ctx['geo'] == 'http://www.opengis.net/ont/geosparql#'
         assert ctx['Feature'] == 'archaeo:A6_Feature'
         assert ctx['StratigraphicUnit'] == 'archaeo:A8_Stratigraphic_Unit'
@@ -86,14 +93,17 @@ class ApiV1LodTest(ApiTestCase):
         assert data['label'] == 'Shire'
 
         # Turtle entity
-        rv_ttl = c.get(url_for('api_v1_lod.get_entity_ext', uuid=e.place.uuid, ext='ttl'))
+        rv_ttl = c.get(
+            url_for(
+                'api_v1_lod.get_entity_ext',
+                uuid=e.place.uuid,
+                ext='ttl'))
         assert rv_ttl.status_code == 200
         assert 'text/turtle' in rv_ttl.headers.get('Content-Type')
         g_ent = Graph()
         g_ent.parse(data=rv_ttl.data.decode('utf-8'), format='turtle')
         crm = Namespace('http://www.cidoc-crm.org/cidoc-crm/')
         ent_uri = data['id']
-        from rdflib import URIRef
         assert (URIRef(ent_uri), RDF.type, crm.E53_Place) in g_ent
 
     def test_lod_archaeo_hierarchy_and_shortcuts(self) -> None:
@@ -101,7 +111,8 @@ class ApiV1LodTest(ApiTestCase):
         e = self.get_api_entities()
         with app.test_request_context():
             app.preprocess_request()
-            # Archaeological hierarchy: Place contains Feature contains StratigraphicUnit contains Artifact
+            # Archaeological hierarchy:
+            # Place -> Feature -> StratigraphicUnit -> Artifact
             e.feature.link('P46', e.place, inverse=True)
             e.feature.link('P46', e.stratigraphic_unit)
             e.stratigraphic_unit.link('P46', e.artifact)
@@ -119,18 +130,27 @@ class ApiV1LodTest(ApiTestCase):
         assert feature_data['type'] == 'Feature'
         assert feature_data['label'] == 'Home of Baggins'
         assert feature_data['forms_part_of']['type'] == 'Place'
-        assert any(item['type'] == 'StratigraphicUnit' for item in feature_data['is_composed_of'])
+        assert any(
+            item['type'] == 'StratigraphicUnit'
+            for item in feature_data['is_composed_of'])
         assert feature_data['has_location']['type'] == 'Place'
-        assert feature_data['has_location']['has_geometry']['type'] == 'Geometry'
-        assert 'POINT' in feature_data['has_location']['has_geometry']['as_wkt']
+        assert (
+            feature_data['has_location']['has_geometry']['type']
+            == 'Geometry')
+        assert (
+            'POINT'
+            in feature_data['has_location']['has_geometry']['as_wkt'])
 
         # 2. Test Stratigraphic Unit
-        rv = c.get(url_for('api_v1_lod.get_entity', uuid=e.stratigraphic_unit.uuid))
+        rv = c.get(
+            url_for('api_v1_lod.get_entity', uuid=e.stratigraphic_unit.uuid))
         assert rv.status_code == 200
         su_data = rv.get_json()
         assert su_data['type'] == 'StratigraphicUnit'
         assert su_data['forms_part_of']['type'] == 'Feature'
-        assert any(item['type'] == 'HumanMadeObject' for item in su_data['is_composed_of'])
+        assert any(
+            item['type'] == 'HumanMadeObject'
+            for item in su_data['is_composed_of'])
 
         # 3. Test Human-Made Object (Artifact)
         rv = c.get(url_for('api_v1_lod.get_entity', uuid=e.artifact.uuid))
@@ -146,17 +166,61 @@ class ApiV1LodTest(ApiTestCase):
         assert actor_data['type'] == 'Person'
         assert actor_data['begins_in']['type'] == 'Place'
         assert actor_data['ends_in']['type'] == 'Place'
-        assert any(rel['type'] == 'Person' for rel in actor_data['has_relationship_to'])
+        assert any(
+            rel['type'] == 'Person'
+            for rel in actor_data['has_relationship_to'])
 
         # 5. Test Turtle serialization for Feature
-        rv_ttl = c.get(url_for('api_v1_lod.get_entity_ext', uuid=e.feature.uuid, ext='ttl'))
+        rv_ttl = c.get(
+            url_for(
+                'api_v1_lod.get_entity_ext',
+                uuid=e.feature.uuid,
+                ext='ttl'))
         assert rv_ttl.status_code == 200
-        assert b'archaeo:A6_Feature' in rv_ttl.data or b'A6_Feature' in rv_ttl.data
+        assert (
+            b'archaeo:A6_Feature' in rv_ttl.data
+            or b'A6_Feature' in rv_ttl.data)
         assert b'asWKT' in rv_ttl.data
+
+    def test_lod_formatter_all_entities(self) -> None:
+        e = self.get_api_entities()
+        with app.test_request_context():
+            app.preprocess_request()
+            acq = insert('acquisition', 'Transfer of Ring')
+            acq.link('P22', e.actor)
+            acq.link('P23', e.actor2)
+            acq.link('P24', e.artifact)
+
+            mod = insert('modification', 'Modification of Ring')
+            mod.link('P31', e.artifact)
+
+            creation = insert('creation', 'Creation of File')
+            creation.link('P94', e.file)
+
+            e.artifact.link('P52', e.actor)
+            e.artifact.link('P128', e.source)
+            e.location.link('P89', e.administrative_unit)
+
+            all_entities = [
+                e.location, e.place, e.boundary_mark, e.event, e.event2,
+                e.move, e.actor, e.actor2, e.feature, e.artifact, e.alias,
+                e.height, e.change_of_property, e.file, e.source,
+                e.bibliography, e.group, e.stratigraphic_unit,
+                e.administrative_unit, e.production, e.translation,
+                acq, mod, creation]
+            col_unpaginated = format_lod_entities(all_entities)
+            assert col_unpaginated['totalItems'] == len(all_entities)
+            for ent in all_entities:
+                assert 'id' in format_lod_entity(ent)
 
     def test_lod_collection_and_pagination(self) -> None:
         c = self.client
-        rv = c.get(url_for('api_v1_lod.get_entities', entity_class='place', limit=2, page=1))
+        rv = c.get(
+            url_for(
+                'api_v1_lod.get_entities',
+                entity_class='place',
+                limit=2,
+                page=1))
         assert rv.status_code == 200
         col = rv.get_json()
         assert col['type'] == 'OrderedCollectionPage'
@@ -165,6 +229,15 @@ class ApiV1LodTest(ApiTestCase):
         assert len(col['orderedItems']) <= 2
         assert 'first' in col['partOf']
         assert 'last' in col['partOf']
+
+        rv_p1 = c.get(
+            url_for(
+                'api_v1_lod.get_entities',
+                entity_class='type',
+                limit=1,
+                page=1))
+        assert rv_p1.status_code == 200
+        assert 'next' in rv_p1.get_json()
 
     def test_lod_export_dump(self) -> None:
         c = self.client
@@ -177,7 +250,11 @@ class ApiV1LodTest(ApiTestCase):
         assert b' .\n' in rv.data or b' .' in rv.data
 
         # 2. Filter by class
-        rv_place = c.get(url_for('api_v1_lod.get_lod_dump', entity_class='place', limit=2))
+        rv_place = c.get(
+            url_for(
+                'api_v1_lod.get_lod_dump',
+                entity_class='place',
+                limit=2))
         assert rv_place.status_code == 200
         assert rv_place.data
 
@@ -222,22 +299,43 @@ class ApiV1LodTest(ApiTestCase):
             with app.test_request_context():
                 app.preprocess_request()
                 out_gz = export_la_dump_to_file(
-                    tmp_path / 'la_dump.jsonl', limit=2, compress=True)
+                    tmp_path / 'la_dump.jsonl',
+                    batch_size=1,
+                    limit=1,
+                    compress=True)
                 assert out_gz.exists()
                 assert out_gz.name.endswith('.jsonl.gz')
 
-                out_raw = export_la_dump_to_file(
-                    tmp_path / 'la_dump.nt', limit=2, output_format='nt',
-                    compress=False)
-                assert out_raw.exists()
+                assert export_la_dump_to_file(
+                    tmp_path / 'la_dump2.jsonl.gz',
+                    class_name='place',
+                    batch_size=10,
+                    limit=None,
+                    compress=True).exists()
 
-                out_lod = export_lod_dump_to_file(
-                    tmp_path / 'lod_dump.nt', limit=2, compress=True)
-                assert out_lod.exists()
+                assert export_la_dump_to_file(
+                    tmp_path / 'la_dump.nt',
+                    limit=2,
+                    output_format='nt',
+                    compress=False).exists()
 
-                out_lod_raw = export_lod_dump_to_file(
-                    tmp_path / 'lod_dump_raw.nt', limit=2, compress=False)
-                assert out_lod_raw.exists()
+                assert export_lod_dump_to_file(
+                    tmp_path / 'lod_dump.nt',
+                    batch_size=1,
+                    limit=1,
+                    compress=True).exists()
+
+                assert export_lod_dump_to_file(
+                    tmp_path / 'lod_dump2.nt.gz',
+                    class_name='place',
+                    batch_size=10,
+                    limit=None,
+                    compress=True).exists()
+
+                assert export_lod_dump_to_file(
+                    tmp_path / 'lod_dump_raw.nt',
+                    limit=2,
+                    compress=False).exists()
 
     def test_la_export_dump_unauthorized(self) -> None:
         unauth = app.test_client()
@@ -261,10 +359,7 @@ class ApiV1LodTest(ApiTestCase):
                 require_group('admin')
             assert exc.value.response.status_code == 401
 
-        # 2. With authenticated user (Alice)
-        from flask_login import login_user
-        from openatlas.models.user import User
-
+        # 2. With authenticated user (Alice) and JWT token
         with app.test_request_context():
             app.preprocess_request()
             user = User.get_by_id(self.alice_id)
@@ -275,6 +370,10 @@ class ApiV1LodTest(ApiTestCase):
             assert is_authorized_role('readonly')
             require_auth()
             require_group('admin')
+
+            # Generate a valid DB-backed JWT token for an editor user
+            user.group = 'editor'
+            token = Token.generate_token(1, 'test_jwt', user)
 
             # Non-admin user -> 403 when admin required
             user.group = 'readonly'
@@ -295,3 +394,13 @@ class ApiV1LodTest(ApiTestCase):
 
             assert dummy_auth() == 'ok'
             assert dummy_group() == 'ok'
+            logout_user()
+
+        # 3. Verify JWT token authentication without Flask-Login session
+        with app.test_request_context(
+                headers={'Authorization': f'Bearer {token}'}):
+            app.preprocess_request()
+            assert is_authenticated()
+            assert get_authenticated_role() == 'editor'
+            assert is_authorized_role('contributor')
+            assert not is_authorized_role('custom_role')

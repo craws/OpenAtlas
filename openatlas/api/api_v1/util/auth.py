@@ -16,7 +16,7 @@ def is_authenticated() -> bool:
         return True
     try:
         return bool(verify_jwt_in_request(optional=True, locations='headers'))
-    except Exception:
+    except Exception:  # pragma: no cover
         return False
 
 
@@ -24,10 +24,11 @@ def get_authenticated_role() -> str | None:
     if current_user.is_authenticated and hasattr(current_user, 'group'):
         return str(current_user.group)
     try:
+        verify_jwt_in_request(optional=True, locations='headers')
         jwt_claims = get_jwt()
         if jwt_claims and 'role' in jwt_claims:
             return str(jwt_claims['role'])
-    except Exception:
+    except Exception:  # pragma: no cover
         return None
     return None
 

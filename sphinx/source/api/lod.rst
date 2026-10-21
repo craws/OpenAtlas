@@ -104,31 +104,41 @@ in Turtle, RDF/XML, JSON-LD, or N-Triples.
 
 Dual LOD Profiles: OpenAtlas Graph vs. Linked Art
 -------------------------------------------------
-OpenAtlas v1 offers two distinct Linked Open Data profiles to suit different
-integration requirements:
+OpenAtlas v1 offers two distinct Linked Open Data profiles, alongside W3C SKOS
+thesaurus exports, to suit different integration requirements:
+
+.. _openatlas-crm-endpoints:
 
 1. Full OpenAtlas CRM Graph (``/api/1/entity/...``)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-* **URL**: ``/api/1/entity/<uuid>`` and ``/api/1/entities/<class>``
-* **Audience**: Semantic Web applications, graph databases, RDF triple stores.
+* **Endpoints**:
+  * ``GET /api/1/entity/{uuid}`` (or ``.../entity/{uuid}.{ext}``)
+  * ``GET /api/1/entities/{entity_class}``
+  * ``GET /api/1/export/dump``
+* **Audience**: Semantic Web applications, archaeological graph databases, and RDF triple stores.
+* **Status**: **Fully supported in v1 Beta**.
 * **Characteristics**: Represents the complete richness of the OpenAtlas data
-  model, combining CIDOC CRM, CRMarchaeo, GeoSPARQL, and OpenAtlas shortcuts.
+  model, combining CIDOC CRM, CRMarchaeo (e.g. ``A6_Feature``,
+  ``A8_Stratigraphic_Unit``), GeoSPARQL (``geo:asWKT``), and formal OpenAtlas
+  shortcuts (``oa:has_relationship_to``, ``oa:begins_in``, ``oa:ends_in``).
+
+.. _linked-art-endpoints:
 
 2. Strict Linked Art Profile (``/api/1/linked-art/...``)
-1. Strict Linked Art Profile (``/api/1/linked-art/...``)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 * **Endpoints**:
   * ``GET /api/1/linked-art/entity/{uuid}`` (or ``.../entity/{uuid}.{ext}``)
   * ``GET /api/1/linked-art/entities/{entity_class}``
+  * ``GET /api/1/linked-art/export/dump``
 * **Audience**: GLAM institutions (Galleries, Libraries, Archives, Museums),
   cultural heritage aggregators, and Linked Open Data consumers.
-* **Status**: **Fully supported in v1 Beta** (Recommended).
+* **Status**: **Fully supported in v1 Beta**.
 * **Characteristics**: Adheres strictly to the `Linked Art profile <https://linked.art/>`_
   (JSON schemas with ``additionalProperties: false``). Responses strictly conform
   to Linked Art classes (such as ``HumanMadeObject``, ``Place``, ``Actor``, ``Activity``),
   providing full entity details, classified types, timespans, citations, and related links.
 
-2. Controlled Vocabularies & SKOS (``/api/1/vocabulary/...``)
+3. Controlled Vocabularies & SKOS (``/api/1/vocabulary/...``)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 * **Endpoints**:
   * ``GET /api/1/vocabulary/{id}/skos``
@@ -138,19 +148,6 @@ integration requirements:
 * **Characteristics**: The root type is structured as a ``skos:ConceptScheme``,
   with all child nodes linked hierarchically via ``skos:broader`` and ``skos:narrower``.
   Supports standard formats (Turtle, RDF/XML, JSON-LD, N-Triples).
-
-3. OpenAtlas Native CRM Graph (``/api/1/entity/...``)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-* **Endpoints**:
-  * ``GET /api/1/entity/{uuid}`` (or ``.../entity/{uuid}.{ext}``)
-  * ``GET /api/1/entities/{entity_class}``
-* **Status**: **In Development / Experimental (Alpha Stub)**.
-* **Characteristics**: Provides a preliminary, lightweight stub interface returning
-  the entity URI, class type, and label. A comprehensive, deep CIDOC CRM graph
-  serializer with formal property-chain shortcuts is currently under active
-  development and will be introduced in an upcoming release.
-* **Recommendation**: For production semantic integration in Version 1 Beta,
-  please use the :ref:`Linked Art endpoints <linked-art-endpoints>`.
 
 Format Selection & Content Negotiation
 --------------------------------------

@@ -1,7 +1,7 @@
 API v1 (Beta)
 =============
 
-This section provides a quick-reference index of all 31 endpoints available in
+This section provides a quick-reference index of all 36 endpoints available in
 OpenAtlas API v1, organized by feature area.
 
 .. tip::
@@ -113,6 +113,9 @@ Linked Open Data (LOD)
    * - ``GET``
      - ``/api/1/ontology``
      - OpenAtlas Extension OWL Ontology graph (defining shortcuts).
+   * - ``GET``
+     - ``/api/1/ontology.{ext}``
+     - OpenAtlas Extension OWL Ontology graph with explicit format extension.
    * - ``GET``
      - ``/api/1/export/dump``
      - Keyset-streaming full LOD export in N-Triples format (authenticated).

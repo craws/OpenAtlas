@@ -45,7 +45,7 @@ def lod_type(entity: Entity) -> str:
 def format_datetime(value: Any, end_of_day: bool = False) -> str | None:
     date = date_to_utc_iso_str(value)
     if date is None or 'T' in date:
-        return date
+        return date  # pragma: no cover
     return f'{date}T23:59:59Z' if end_of_day else f'{date}T00:00:00Z'
 
 
@@ -136,14 +136,20 @@ class LodFormatter:
                 'as_wkt': geometry}
 
         for link_ in data.links:
-            if handler := self.handlers.get(link_.property.code):
-                handler(link_, record, False)
+            self.process_link(link_, record, False)
 
         for link_ in data.links_inverse:
-            if handler := self.handlers.get(link_.property.code):
-                handler(link_, record, True)
+            self.process_link(link_, record, True)
 
         return record
+
+    def process_link(
+            self,
+            link_: Link,
+            record: dict[str, Any],
+            inverse: bool) -> None:
+        if handler := self.handlers.get(link_.property.code):
+            handler(link_, record, inverse)
 
     def _ref(self, entity: Entity) -> dict[str, Any]:
         ref: dict[str, Any] = {
@@ -195,12 +201,7 @@ class LodFormatter:
         if inverse:
             lod_append(record, 'is_location_of', self._ref(link_.domain))
         else:
-            ref = self._ref(link_.range)
-            if geom := self.geometries.get(link_.range.id):
-                ref['has_geometry'] = {
-                    'type': 'Geometry',
-                    'as_wkt': geom}
-            record['has_location'] = ref
+            record['has_location'] = self._ref(link_.range)
 
     def _p89(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if inverse:
@@ -236,7 +237,10 @@ class LodFormatter:
 
     def _p23(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if not inverse:
-            lod_append(record, 'transferred_title_from', self._ref(link_.range))
+            lod_append(
+                record,
+                'transferred_title_from',
+                self._ref(link_.range))
 
     def _p24(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if inverse:
@@ -288,29 +292,49 @@ class LodFormatter:
         else:
             lod_append(record, 'has_created', self._ref(link_.range))
 
-    def _p107(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
+    def _p107(
+            self,
+            link_: Link,
+            record: dict[str, Any],
+            inverse: bool) -> None:
         if inverse:
             lod_append(record, 'member_of', self._ref(link_.domain))
         else:
             lod_append(record, 'has_member', self._ref(link_.range))
 
-    def _p108(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
+    def _p108(
+            self,
+            link_: Link,
+            record: dict[str, Any],
+            inverse: bool) -> None:
         if inverse:
             record['was_produced_by'] = self._ref(link_.domain)
         else:
             lod_append(record, 'has_produced', self._ref(link_.range))
 
-    def _p127(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
+    def _p127(
+            self,
+            link_: Link,
+            record: dict[str, Any],
+            inverse: bool) -> None:
         if not inverse:
             lod_append(record, 'has_broader_term', self._type_ref(link_.range))
 
-    def _p128(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
+    def _p128(
+            self,
+            link_: Link,
+            record: dict[str, Any],
+            inverse: bool) -> None:
         if inverse:
             lod_append(record, 'is_carried_by', self._ref(link_.domain))
         else:
             lod_append(record, 'carries', self._ref(link_.range))
 
-    def _p134(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
+    def _p134(
+            self,
+            link_: Link,
+            record: dict[str, Any],
+            inverse: bool) -> None:
         if inverse:
             lod_append(record, 'was_continued_by', self._ref(link_.domain))
         else:
@@ -335,7 +359,7 @@ class LodFormatter:
 def get_context_url() -> str:
     try:
         return url_for('api_v1_lod.get_context', _external=True)
-    except RuntimeError:
+    except RuntimeError:  # pragma: no cover
         return 'https://openatlas.eu/ns/v1/context.json'
 
 

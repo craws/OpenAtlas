@@ -9,14 +9,7 @@ from rdflib import Graph
 
 from openatlas.api.api_v1.context.lod_context import get_lod_context
 from openatlas.api.api_v1.formatters.lod_formatter import format_lod_entities
-from openatlas.api.api_v1.util.auth import require_auth
 from openatlas.models.entity import Entity
-
-
-def check_export_authorization() -> None:
-    require_auth(
-        'A valid user login or JWT Bearer token is required to download full '
-        'LOD dumps.')
 
 
 def stream_lod_nt(
@@ -44,30 +37,24 @@ def stream_lod_nt(
             f'SELECT id FROM model.entity {where_clause} ORDER BY id '
             f'LIMIT %(limit)s;',
             params)
-        rows = g.cursor.fetchall()
-        if not rows:
+        if not (rows := g.cursor.fetchall()):
             break
 
         ids = [r[0] for r in rows]
         last_id = ids[-1]
-
         entities = Entity.get_by_ids(ids, types=True, aliases=True)
-        if not entities:
-            break
-
         lod_data = format_lod_entities(entities)
         lod_data['@context'] = ctx
 
         rdf_g = Graph()
         rdf_g.parse(data=json.dumps(lod_data), format='json-ld')
-        nt = rdf_g.serialize(format='nt')
-
         exported += len(entities)
-        yield nt
+        yield rdf_g.serialize(format='nt')
 
 
 def export_lod_dump_to_file(
         output_path: Path | str,
+        *,
         class_name: str | None = None,
         limit: int | None = None,
         batch_size: int = 2000,

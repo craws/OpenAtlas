@@ -4,6 +4,7 @@ from flask import Response, request
 from rdflib import Dataset, Graph
 
 from openatlas import app
+from openatlas.api.api_v1.context.lod_context import get_lod_context
 
 EXTENSION_MIME_MAP: Final[dict[str, str]] = {
     'json': 'application/ld+json',
@@ -44,12 +45,11 @@ def make_lod_response(
 
     # For RDF graph serialization (Turtle, RDF/XML, N-Triples):
     # If the context is OpenAtlas native LOD (local or remote context URL),
-    # supply the in-memory context dictionary so rdflib does not need to perform
-    # an HTTP network request to local.host or openatlas.eu.
+    # supply the in-memory context dictionary so rdflib does not need to
+    # perform an HTTP network request to local.host or openatlas.eu.
     parse_data = dict(data)
     ctx = parse_data.get('@context')
     if ctx and 'linked.art' not in str(ctx):
-        from openatlas.api.api_v1.context.lod_context import get_lod_context
         parse_data['@context'] = get_lod_context()['@context']
         json_str = app.json.dumps(parse_data)
 

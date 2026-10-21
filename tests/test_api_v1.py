@@ -39,8 +39,8 @@ class ApiV1(ApiTestCase):
         rv = c.get(url_for('api_v1_lod.get_entity', uuid=e.place.uuid))
         assert 'application/ld+json' in rv.headers.get('Content-Type', '')
         rv_json = rv.get_json()
-        assert rv_json[
-                   '@context'] == url_for('api_v1_lod.get_context', _external=True)
+        assert rv_json['@context'] == url_for(
+            'api_v1_lod.get_context', _external=True)
         assert '@graph' not in rv_json
         assert rv_json['type'] == 'Place'
         assert rv_json['label'] == 'Shire'
@@ -105,7 +105,6 @@ class ApiV1(ApiTestCase):
             {'startDate': 'invalid'},
             {'startDate': '2020-01-01-01'},
             {'startDate': '999999999'},
-            {'search': 'bad\x00search'},
             {'search': 'bad\x00search'}]:
             rv = c.get(
                 url_for(
