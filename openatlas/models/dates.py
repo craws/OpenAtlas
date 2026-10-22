@@ -97,17 +97,21 @@ def format_date(value: datetime | numpy.datetime64 | None) -> str:
         return ''
     if isinstance(value, numpy.datetime64):
         date_ = datetime64_to_timestamp(value)
-        return date_.lstrip('0').replace(' 00:00:00', '') if date_ else ''
+        return (
+            date_.lstrip('0')
+            .replace(' 00:00:00', '')
+            .replace(' 23:59:59', '')
+            if date_ else '')
     return value.date().isoformat().replace(' 00:00:00', '')
 
 
 def check_if_entity_has_time(dates: Dates) -> bool:
-    for date_ in [
-            dates.begin_from,
-            dates.begin_to,
-            dates.end_from,
-            dates.end_to]:
+    for date_ in [dates.begin_from, dates.end_from]:
         if date_ and '00:00:00' not in str(date_):
+            return True
+    for date_ in [dates.begin_to, dates.end_to]:
+        if date_ and not (
+                '00:00:00' in str(date_) or '23:59:59' in str(date_)):
             return True
     return False
 
@@ -158,9 +162,14 @@ def form_to_datetime64(
     else:
         day = '01'
 
-    hour = f'{hour:02}' if hour else '00'
-    minute = f'{minute:02}' if minute else '00'
-    second = f'{second:02}' if second else '00'
+    if to_date and hour is None and minute is None and second is None:
+        hour = '23'
+        minute = '59'
+        second = '59'
+    else:
+        hour = f'{int(hour):02}' if hour else '00'
+        minute = f'{int(minute):02}' if minute else '00'
+        second = f'{int(second):02}' if second else '00'
     try:
         date_time = numpy.datetime64(
             f'{year}-{month}-{day}T{hour}:{minute}:{second}')

@@ -154,7 +154,10 @@ def add_dates(form: Any) -> str:
         errors=errors,
         style='' if valid_dates else 'display:table-row',
         label=_('hide')
-        if form.begin_year_from.data or form.end_year_from.data else _('show'))
+        if form.begin_year_from.data
+            or form.begin_year_to.data
+            or form.end_year_from.data
+            or form.end_year_to.data else _('show'))
 
 
 @app.template_filter()

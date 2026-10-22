@@ -74,13 +74,16 @@ def validate_dates(form: FlaskForm) -> bool:
                 field = getattr(form, f'{prefix}_year_from')
                 field.errors.append(_('First date cannot be after second.'))
                 valid = False
-    has_begin = 'begin_from' in dates or 'begin_to' in dates
-    has_end = 'end_from' in dates or 'end_to' in dates
-    if valid and has_begin and has_end:
-        begin = dates['begin_to'] \
-            if 'begin_to' in dates else dates['begin_from']
-        end = dates['end_from'] if 'end_from' in dates else dates['end_to']
-        if begin > end:
+    if valid:
+        begin_from = dates.get('begin_from')
+        begin_to = dates.get('begin_to')
+        end_from = dates.get('end_from')
+        end_to = dates.get('end_to')
+        begin = begin_from or begin_to
+        end = end_to or end_from
+        if (begin_from and end_from and begin_from > end_from) \
+                or (begin_to and end_to and begin_to > end_to) \
+                or (begin and end and begin > end):
             getattr(form, 'begin_year_from').errors.append(
                 _('Begin dates cannot start after end dates.'))
             valid = False

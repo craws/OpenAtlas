@@ -216,10 +216,13 @@ def format_entity_date(
     if from_ or to:
         html += ', ' if html else ''
         if from_ and to:
-            html += _(
-                'between %(begin)s and %(end)s',
-                begin=format_date(from_),
-                end=format_date(to))
+            if format_date(from_) == format_date(to):
+                html += format_date(from_)
+            else:
+                html += _(
+                    'between %(begin)s and %(end)s',
+                    begin=format_date(from_),
+                    end=format_date(to))
         elif from_:
             html += f'{_('from')} {format_date(from_)}'
         else:
