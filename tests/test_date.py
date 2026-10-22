@@ -1,10 +1,9 @@
 from flask import url_for
 
 from openatlas import app
-from tests.base import TestBaseCase
-
 from openatlas.display.util import format_entity_date
-from openatlas.models.dates import Dates, form_to_datetime64
+from openatlas.models.dates import Dates
+from tests.base import TestBaseCase
 
 
 class DateTest(TestBaseCase):
@@ -38,6 +37,10 @@ class DateTest(TestBaseCase):
                 data=data,
                 follow_redirects=True)
             assert b'Date place' in rv.data
+            assert b'by 1220-10-04' in rv.data
+            place_id = int(rv.request.path.split('/')[-1])
+            rv = c.get(url_for('update', id_=place_id))
+            assert b'>Hide<' in rv.data
 
             data['begin_year_to'] = 1300
             data['begin_month_to'] = ''
@@ -97,11 +100,48 @@ class DateTest(TestBaseCase):
 
             data['begin_year_to'] = 7
             data['begin_year_from'] = 5
-            data['end_year_from'] = 6
-            data['end_year_to'] = ''
+            data['end_year_from'] = ''
+            data['end_year_to'] = 4
             rv = c.post(
                 url_for('insert', class_='place'),
                 data=data,
+                follow_redirects=True)
+            assert b'Begin dates cannot start after end dates' in rv.data
+
+            data['end_year_from'] = 6
+            data['end_year_to'] = 8
+            rv = c.post(
+                url_for('insert', class_='place'),
+                data=data,
+                follow_redirects=True)
+            assert b'Date place' in rv.data
+            assert rv.request.path.startswith('/entity/')
+
+            data['begin_year_from'] = 1400
+            data['begin_month_from'] = 5
+            data['begin_day_from'] = 5
+            data['begin_year_to'] = 1400
+            data['begin_month_to'] = 5
+            data['begin_day_to'] = 5
+            data['end_year_from'] = 1400
+            data['end_month_from'] = 5
+            data['end_day_from'] = 5
+            data['end_year_to'] = 1400
+            data['end_month_to'] = 5
+            data['end_day_to'] = 5
+            rv = c.post(
+                url_for('insert', class_='place'),
+                data=data,
+                follow_redirects=True)
+            assert b'Date place' in rv.data
+            assert rv.request.path.startswith('/entity/')
+
+            rv = c.post(
+                url_for('insert', class_='place'),
+                data={
+                    'name': 'Date place',
+                    'begin_year_from': 1500,
+                    'end_year_to': 1400},
                 follow_redirects=True)
             assert b'Begin dates cannot start after end dates' in rv.data
 
@@ -118,7 +158,7 @@ class DateTest(TestBaseCase):
         with app.test_request_context():
             app.preprocess_request()
             dates_with_only_to = Dates({
-                'begin_to': '1500-12-31 00:00:00',
+                'begin_to': '1500-12-31 23:59:59',
                 'begin_comment': 'Test Comment'})
             formatted_only_to_date = format_entity_date(
                 dates_with_only_to,
@@ -135,7 +175,7 @@ class DateTest(TestBaseCase):
 
             dates_with_both_from_and_to = Dates({
                 'begin_from': '1400-01-01 00:00:00',
-                'begin_to': '1500-12-31 00:00:00'})
+                'begin_to': '1500-12-31 23:59:59'})
             formatted_between_date = format_entity_date(
                 dates_with_both_from_and_to,
                 'begin')
@@ -143,7 +183,7 @@ class DateTest(TestBaseCase):
                    'between 1400-01-01 and 1500-12-31'
 
             dates_with_end_only_to = Dates({
-                'end_to': '1220-10-04 00:00:00'})
+                'end_to': '1220-10-04 23:59:59'})
             formatted_end_only_to_date = format_entity_date(
                 dates_with_end_only_to,
                 'end')

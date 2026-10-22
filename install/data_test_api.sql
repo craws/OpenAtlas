@@ -1,8 +1,8 @@
 INSERT INTO model.entity (openatlas_class_name, name, description, begin_from, begin_to, begin_comment, end_from, end_to, end_comment, created, modified)
 VALUES
-    ('place', 'Shire','The Shire was the homeland of the hobbits.','2018-01-31', '2018-03-01', 'Begin of the shire', '2019-01-31',  '2019-03-01','Descent of Shire', '2022-09-21 16:38:01.923431','2022-09-21 16:38:05.923431'),
-    ('person', 'Sam', 'That is Sam','200-01-31', '200-03-01', 'Begin of the shire', '700-01-31', '800-03-01','Descent of Shire', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-    ('group', 'The Fellowship', '','215-01-31', NULL, '', '700-01-31', NULL,'', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+    ('place', 'Shire','The Shire was the homeland of the hobbits.','2018-01-31', '2018-03-01 23:59:59', 'Begin of the shire', '2019-01-31',  '2019-03-01 23:59:59','Descent of Shire', '2022-09-21 16:38:01.923431','2022-09-21 16:38:05.923431'),
+    ('person', 'Sam', 'That is Sam','200-01-31', '200-03-01 23:59:59', 'Begin of the shire', '700-01-31', '800-03-01 23:59:59','Descent of Shire', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('group', 'The Fellowship', '','215-01-31', '215-01-31 23:59:59', '', '700-01-31', '700-01-31 23:59:59','', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
 INSERT INTO model.entity (openatlas_class_name, name, description, modified)
 VALUES
@@ -159,11 +159,11 @@ VALUES
   ('P134', (SELECT id FROM model.entity WHERE name='Travel to Mordor'), (SELECT id FROM model.entity WHERE name='Exchange of the one ring') ),
   ('P7', (SELECT id FROM model.entity WHERE name='Location of Mordor'), (SELECT id FROM model.entity WHERE name='Travel to Mordor') );
 
-INSERT INTO model.link (property_code, range_id, domain_id, begin_from, end_from)
+INSERT INTO model.link (property_code, range_id, domain_id, begin_from, begin_to, end_from, end_to)
 VALUES
-  ('P14', (SELECT id FROM model.entity WHERE name='Sam'), (SELECT id FROM model.entity WHERE name='Travel to Mordor'), '2018-03-01', '2018-04-01' ),
-  ('P107', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='The Fellowship'), '0020-03-01', '0030-04-01' ),
-  ('P107', (SELECT id FROM model.entity WHERE name='Sam'), (SELECT id FROM model.entity WHERE name='The Fellowship'), '0024-03-01', '0030-04-01' );
+  ('P14', (SELECT id FROM model.entity WHERE name='Sam'), (SELECT id FROM model.entity WHERE name='Travel to Mordor'), '2018-03-01', '2018-03-01 23:59:59', '2018-04-01', '2018-04-01 23:59:59' ),
+  ('P107', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='The Fellowship'), '0020-03-01', '0020-03-01 23:59:59', '0030-04-01', '0030-04-01 23:59:59' ),
+  ('P107', (SELECT id FROM model.entity WHERE name='Sam'), (SELECT id FROM model.entity WHERE name='The Fellowship'), '0024-03-01', '0024-03-01 23:59:59', '0030-04-01', '0030-04-01 23:59:59' );
 
 INSERT INTO model.link (property_code, range_id, domain_id, description, type_id)
 VALUES
@@ -231,7 +231,8 @@ VALUES
     ((SELECT id FROM model.entity WHERE name='File not public'), (SELECT id FROM model.rights_holder WHERE name='Sauron'), 'creator');
 
 UPDATE model.entity
-SET begin_from = CURRENT_DATE
+SET begin_from = CURRENT_DATE,
+    begin_to = CURRENT_DATE + INTERVAL '23 hours 59 minutes 59 seconds'
 WHERE name = 'Economical';
 
 

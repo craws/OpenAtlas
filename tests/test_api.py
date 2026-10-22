@@ -3,6 +3,7 @@ from pathlib import Path
 from flask import g, url_for
 
 from openatlas import app
+from openatlas.models.entity import Link
 from tests.base import ApiTestCase, get_hierarchy
 
 
@@ -151,9 +152,9 @@ class Api(ApiTestCase):
         assert desc['value'] == 'The Shire was the homeland of the hobbits.'
         timespan = rv['when']['timespans'][0]
         assert timespan['start']['earliest'] == '2018-01-31T00:00:00'
-        assert timespan['start']['latest'] == '2018-03-01T00:00:00'
+        assert timespan['start']['latest'] == '2018-03-01T23:59:59'
         assert timespan['end']['earliest'] == '2019-01-31T00:00:00'
-        assert timespan['end']['latest'] == '2019-03-01T00:00:00'
+        assert timespan['end']['latest'] == '2019-03-01T23:59:59'
         assert rv['types'][0]['identifier']
         assert rv['types'][0]['label'] == 'Boundary Mark'
         assert rv['relations'][1]['label'] == 'Height'
@@ -221,6 +222,9 @@ class Api(ApiTestCase):
         assert rv['type'] == 'Site'
         assert rv['_label'] == 'Shire'
         assert rv['timespan']['begin_of_the_begin'] == '2018-01-31'
+        assert rv['timespan']['end_of_the_begin'] == '2018-03-01'
+        assert rv['timespan']['begin_of_the_end'] == '2019-01-31'
+        assert rv['timespan']['end_of_the_end'] == '2019-03-01'
         assert rv['identified_by'][0]['_label'] == 'Sûza'
         assert rv['classified_as'][0]['_label'] == 'Boundary Mark'
         assert (rv['former_or_current_location']['defined_by'] ==
