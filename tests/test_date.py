@@ -32,6 +32,7 @@ class DateTest(TestBaseCase):
             data['end_year_to'] = 1220
             data['end_month_to'] = 10
             data['end_day_to'] = 4
+            data['end_comment'] = 'latest end bound'
             rv = c.post(
                 url_for('insert', class_='place'),
                 data=data,

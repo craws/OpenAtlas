@@ -34,6 +34,23 @@
     translate.draw_geometry = {{ _('draw geometry')|uc_first|safe|tojson }};
     translate.import_wkt = {{ _('import wkt')|uc_first|safe|tojson }};
 
+    // Dates
+    translate.date_no_date = {{ _('no date set')|uc_first|tojson }};
+    translate.date_invalid = {{ _('invalid date input')|uc_first|tojson }};
+    translate.date_exact = {{ _('exact date')|uc_first|tojson }};
+    translate.date_full_month = {{ _('full month')|uc_first|tojson }};
+    translate.date_full_year = {{ _('full year')|uc_first|tojson }};
+    translate.date_timespan = {{ _('timespan')|uc_first|tojson }};
+    translate.date_earliest_bound = {{ _('earliest bound')|uc_first|tojson }};
+    translate.date_latest_bound = {{ _('latest bound')|uc_first|tojson }};
+    translate.date_from = {{ _('from')|tojson }};
+    translate.date_onwards = {{ _('onwards')|tojson }};
+    translate.date_up_to = {{ _('up to')|tojson }};
+    translate.date_to = {{ _('to')|tojson }};
+    translate.date_between = {{ _('between')|tojson }};
+    translate.date_and = {{ _('and')|tojson }};
+    translate.date_complex_disabled = {{ _('complex date set in advanced view')|uc_first|tojson }};
+
     $.extend($.fn.dataTable.defaults, {
         language: {
             url: '/static/vendor/datatables_net/{{ session.language | safe}}.json'

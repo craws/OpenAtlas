@@ -7,7 +7,147 @@
   </td>
 </tr>
 
-<tr class="date-switch">
+<tr class="date-switch date-tab-row">
+  <td class="fit-width"></td>
+  <td class="pb-0">
+    <ul class="nav nav-tabs nav-tabs-sm" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button
+            type="button"
+            id="date-tab-simple"
+            class="nav-link py-1 px-3 active fw-bold date-mode-btn"
+            data-adv="false">
+          {{ _('simple')|uc_first }}
+        </button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button
+            type="button"
+            id="date-tab-advanced"
+            class="nav-link py-1 px-3 date-mode-btn"
+            data-adv="true">
+          {{ _('advanced')|uc_first }}
+          <small class="text-muted ms-1">({{ _('earliest')|uc_first }} / {{ _('latest')|uc_first }})</small>
+        </button>
+      </li>
+    </ul>
+  </td>
+</tr>
+
+<tr class="date-switch date-mode-simple">
+  <td class="fit-width text-end">
+    <label class="col-sm-auto mr-1 col-form-label" for="simple_begin_year">
+      {{ _('begin')|uc_first }}
+    </label>
+  </td>
+  <td>
+    <div id="simple-begin-disabled-msg" class="alert alert-secondary py-1 px-2 mb-1 small d-none align-items-center justify-content-between">
+      <span class="simple-disabled-text"></span>
+      <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 ms-2 date-mode-btn" data-adv="true">
+        {{ _('edit in advanced view')|uc_first }}
+      </button>
+    </div>
+    <div class="row g-1 align-items-center">
+      <div class="col">
+        <input
+            type="text"
+            id="simple_begin_year"
+            class="year {{ config.CSS.string_field }}"
+            data-simple="begin"
+            data-part="Y"
+            placeholder="{{ _('YYYY') }}">
+      </div>
+      <div class="col">
+        <input
+            type="text"
+            id="simple_begin_month"
+            class="month {{ config.CSS.string_field }}"
+            data-simple="begin"
+            data-part="M"
+            placeholder="{{ _('MM') }}">
+      </div>
+      <div class="col">
+        <input
+            type="text"
+            id="simple_begin_day"
+            class="day {{ config.CSS.string_field }}"
+            data-simple="begin"
+            data-part="D"
+            placeholder="{{ _('DD') }}">
+      </div>
+      <div class="col-3">
+        <input
+            type="text"
+            id="simple_begin_comment"
+            class="{{ config.CSS.string_field }}"
+            data-simple-comment="begin_comment"
+            placeholder="{{ _('comment') }}"
+            value="{{ form.begin_comment.data or '' }}">
+      </div>
+    </div>
+    <div class="mt-1">
+      <small class="date-db-preview text-muted" data-feedback-pair="begin"></small>
+    </div>
+  </td>
+</tr>
+<tr class="date-switch date-mode-simple">
+  <td class="fit-width text-end">
+    <label class="col-sm-auto mr-1 col-form-label" for="simple_end_year">
+      {{ _('end')|uc_first }}
+    </label>
+  </td>
+  <td>
+    <div id="simple-end-disabled-msg" class="alert alert-secondary py-1 px-2 mb-1 small d-none align-items-center justify-content-between">
+      <span class="simple-disabled-text"></span>
+      <button type="button" class="btn btn-sm btn-outline-primary py-0 px-2 ms-2 date-mode-btn" data-adv="true">
+        {{ _('edit in advanced view')|uc_first }}
+      </button>
+    </div>
+    <div class="row g-1 align-items-center">
+      <div class="col">
+        <input
+            type="text"
+            id="simple_end_year"
+            class="year {{ config.CSS.string_field }}"
+            data-simple="end"
+            data-part="Y"
+            placeholder="{{ _('YYYY') }}">
+      </div>
+      <div class="col">
+        <input
+            type="text"
+            id="simple_end_month"
+            class="month {{ config.CSS.string_field }}"
+            data-simple="end"
+            data-part="M"
+            placeholder="{{ _('MM') }}">
+      </div>
+      <div class="col">
+        <input
+            type="text"
+            id="simple_end_day"
+            class="day {{ config.CSS.string_field }}"
+            data-simple="end"
+            data-part="D"
+            placeholder="{{ _('DD') }}">
+      </div>
+      <div class="col-3">
+        <input
+            type="text"
+            id="simple_end_comment"
+            class="{{ config.CSS.string_field }}"
+            data-simple-comment="end_comment"
+            placeholder="{{ _('comment') }}"
+            value="{{ form.end_comment.data or '' }}">
+      </div>
+    </div>
+    <div class="mt-1">
+      <small class="date-db-preview text-muted" data-feedback-pair="end"></small>
+    </div>
+  </td>
+</tr>
+
+<tr class="date-switch date-mode-advanced d-none">
   <td class="fit-width text-end">
     <label class="col-sm-auto mr-1 col-form-label">
       {{ _('begin')|uc_first }}
@@ -16,7 +156,11 @@
   <td>
     <div class="row mb-1">
       <div class="col">
-        <div class="row g-1">
+        <div class="row g-1 align-items-center">
+          <div class="col-auto" style="width: 115px;">
+            <span class="small text-secondary fw-semibold">{{ _('earliest')|uc_first }}</span>
+            {{ _('earliest possible begin date (terminus post quem)')|tooltip|safe }}
+          </div>
           <div
               class="col">{{ form.begin_year_from(class_='year ' + config.CSS.string_field) }} {{ errors['begin_year_from']|safe }}</div>
           <div
@@ -37,7 +181,11 @@
     </div>
     <div class="row mb-2">
       <div class="col">
-        <div class="row g-1">
+        <div class="row g-1 align-items-center">
+          <div class="col-auto" style="width: 115px;">
+            <span class="small text-secondary fw-semibold">{{ _('latest')|uc_first }}</span>
+            {{ _('latest possible begin date (terminus ante quem)')|tooltip|safe }}
+          </div>
           <div
               class="col">{{ form.begin_year_to(class_='year ' + config.CSS.string_field) }} {{ errors['begin_year_to']|safe }}</div>
           <div
@@ -52,13 +200,15 @@
             <div
                 class="col">{{ form.begin_second_to(class_='second ' + config.CSS.string_field) }} {{ errors['begin_second_to']|safe }}</div>
           {% endif %}
-          <div class="col-3"></div>
+          <div class="col-3 d-flex align-items-center">
+            <small class="date-db-preview text-muted text-truncate" data-feedback-pair="begin"></small>
+          </div>
         </div>
       </div>
     </div>
   </td>
 </tr>
-<tr class="date-switch">
+<tr class="date-switch date-mode-advanced d-none">
   <td class="fit-width text-end">
     <label class="col-sm-auto mr-1 col-form-label">
       {{ _('end')|uc_first }}
@@ -67,7 +217,11 @@
   <td>
     <div class="row mb-1">
       <div class="col">
-        <div class="row g-1">
+        <div class="row g-1 align-items-center">
+          <div class="col-auto" style="width: 115px;">
+            <span class="small text-secondary fw-semibold">{{ _('earliest')|uc_first }}</span>
+            {{ _('earliest possible end date (terminus post quem)')|tooltip|safe }}
+          </div>
           <div
               class="col">{{ form.end_year_from(class_='year ' + config.CSS.string_field) }} {{ errors['end_year_from']|safe }}</div>
           <div
@@ -89,7 +243,11 @@
 
     <div class="row mb-2">
       <div class="col">
-        <div class="row g-1">
+        <div class="row g-1 align-items-center">
+          <div class="col-auto" style="width: 115px;">
+            <span class="small text-secondary fw-semibold">{{ _('latest')|uc_first }}</span>
+            {{ _('latest possible end date (terminus ante quem)')|tooltip|safe }}
+          </div>
           <div
               class="col">{{ form.end_year_to(class_='year ' + config.CSS.string_field) }} {{ errors['end_year_to']|safe }}</div>
           <div
@@ -104,7 +262,9 @@
             <div
                 class="col">{{ form.end_second_to(class_='second ' + config.CSS.string_field) }} {{ errors['end_second_to']|safe }}</div>
           {% endif %}
-          <div class="col-3"></div>
+          <div class="col-3 d-flex align-items-center">
+            <small class="date-db-preview text-muted text-truncate" data-feedback-pair="end"></small>
+          </div>
         </div>
       </div>
     </div>

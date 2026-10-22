@@ -54,7 +54,7 @@ def populate_reference_systems(form: Any, entity: Entity) -> None:
 
 def populate_dates(form: Any, dates: Dates) -> None:
     for item in ['begin', 'end']:
-        if from_ := getattr(dates, f'{item}_from'):
+        if (from_ := getattr(dates, f'{item}_from')) is not None:
             if hasattr(form, f'{item}_year_from'):
                 getattr(form, f'{item}_year_from').data = \
                     format_date_part(from_, 'year')
@@ -62,14 +62,14 @@ def populate_dates(form: Any, dates: Dates) -> None:
                     format_date_part(from_, 'month')
                 getattr(form, f'{item}_day_from').data = \
                     format_date_part(from_, 'day')
-            if 'begin_hour_from' in form:
+            if f'{item}_hour_from' in form:
                 getattr(form, f'{item}_hour_from').data = \
                     format_date_part(from_, 'hour')
                 getattr(form, f'{item}_minute_from').data = \
                     format_date_part(from_, 'minute')
                 getattr(form, f'{item}_second_from').data = \
                     format_date_part(from_, 'second')
-        if to := getattr(dates, f'{item}_to'):
+        if (to := getattr(dates, f'{item}_to')) is not None:
             if hasattr(form, f'{item}_year_to'):
                 getattr(form, f'{item}_year_to').data = \
                     format_date_part(to, 'year')
