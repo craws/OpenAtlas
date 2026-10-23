@@ -35,6 +35,8 @@ dependencies = [
     "python-gettext==4.0",
     "python-magic==0.4.27",
     "pyyaml~=6.0.1",
+    "pydantic~=2.10.6",
+    "flask-openapi3==4.1.0",
     "rapidfuzz>=3.14.3",
     "rdflib==7.1.1",
     "requests==2.32.3",
@@ -47,6 +49,7 @@ dependencies = [
     "wtforms==3.1.2",
     "xmltodict==0.13.0",
     "fiona>=1.10.0",
+    "pytest>=9.0.2",
 ]
 
 [project.optional-dependencies]
@@ -58,6 +61,7 @@ dev = [
     "coverage>=7.6.0",
     "pytest>=5.1.0",
     "pytest-cov>=5.0.0",
+    "schemathesis>=4.24.3",
     "ruff>=0.17.2",
 ]
 
@@ -91,7 +95,9 @@ dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?)|bc|c|e|ex|f|i|id|ip|j|
 ignore = [
     'PLR0915',
     'PLR0912',
-    'PLR0913'
+    'PLR0913',
+    'D1',
+    'BLE001',
 ]
 
 [tool.ruff.lint.pylint]

@@ -1,14 +1,15 @@
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any, Optional
+from typing import Any
 
 import psycopg2
 from flask import url_for
 
 from openatlas import app
-from openatlas.api.resources.api_entity import ApiEntity
-from openatlas.models.entity import Entity, insert as entity_insert
+from openatlas.api.api_v04.resources.api_entity import ApiEntity
+from openatlas.models.entity import Entity
+from openatlas.models.entity import insert as entity_insert
 
 
 class TestBaseCase(unittest.TestCase):
@@ -57,6 +58,7 @@ class ApiTestCase(TestBaseCase):
 
     def setUp(self) -> None:
         super().setUp()
+        app.config['ALLOWED_IPS'] = ['127.0.0.1']
         with open(
                 Path(app.root_path).parent / 'install' / 'data_test_api.sql',
                 encoding='utf8') as sql_file:
@@ -98,6 +100,8 @@ class ApiTestCase(TestBaseCase):
                         entities.event = entity
                     case 'Exchange of the one ring':
                         entities.event2 = entity
+                    case 'Move of ring':
+                        entities.move = entity
                     case 'Economical':
                         entities.relation_sub = entity
                     case 'Austria':
@@ -124,10 +128,30 @@ class ApiTestCase(TestBaseCase):
                         entities.file_without_licences = entity
                     case 'File without file':
                         entities.file_without_file = entity
-                    case 'OpenAtlas logo':
+                    case 'OpenAtlas logo' | 'Picture with a License':
                         entities.file = entity
                     case 'Public domain':
                         entities.open_license = entity
+                    case 'License':
+                        entities.license = entity
+                    case 'Lord of the rings':
+                        entities.case_study = entity
+                    case 'Silmarillion':
+                        entities.source = entity
+                    case 'Frodo et. al.':
+                        entities.bibliography = entity
+                    case 'The Fellowship':
+                        entities.group = entity
+                    case 'Bar':
+                        entities.stratigraphic_unit = entity
+                    case 'Gondor':
+                        entities.administrative_unit = entity
+                    case 'Empty march to Mordor':
+                        entities.empty_move = entity
+                    case 'Forging of the One Ring':
+                        entities.production = entity
+                    case 'Silmarillion text':
+                        entities.translation = entity
         return entities
 
 
@@ -143,8 +167,8 @@ class ImportTestCase(TestBaseCase):
 def insert(
         class_: str,
         name: str,
-        description: Optional[str] = None,
-        begin_to: Optional[str] = None) -> Entity:
+        description: str | None = None,
+        begin_to: str | None = None) -> Entity:
     entity = entity_insert({
         'name': name,
         'openatlas_class_name': class_,

@@ -112,7 +112,8 @@ class FileTest(TestBaseCase):
         assert b'Remove custom logo' in rv.data
 
         rv = c.get(url_for('logo', id_=iiif_id), follow_redirects=True)
-        assert rv.status_code == HTTPStatus.IM_A_TEAPOT
+        assert rv.status_code == \
+               HTTPStatus.IM_A_TEAPOT  # pylint: disable=no-member
 
         rv = c.get(
             url_for('logo_remove', action='remove_logo'),

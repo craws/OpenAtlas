@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from flask import abort, flash, g, redirect, render_template, request, url_for
+from flask import flash, g, redirect, render_template, request, url_for
 from flask_babel import gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.wrappers import Response
@@ -42,8 +42,6 @@ class RightsHolderForm(FlaskForm):
 @required_group('readonly')
 def rights_holder_view(id_: int) -> str | Response:
     rights_holder = RightsHolder.get_rights_holder_by_id(id_)
-    if not rights_holder:
-        abort(418)
 
     buttons = [manual('admin/rights_holder')]
     if is_authorized('contributor'):
@@ -139,8 +137,6 @@ def rights_holder_insert(
 def rights_holder_update(
         id_: int) -> str | Response:
     rights_holder = RightsHolder.get_rights_holder_by_id(id_)
-    if not rights_holder:
-        abort(404)
 
     form: Any = RightsHolderForm(obj=rights_holder)
     if request.method == 'GET':

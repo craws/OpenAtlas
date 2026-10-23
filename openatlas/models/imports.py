@@ -13,8 +13,8 @@ from shapely.geometry import LineString, Point, Polygon, mapping
 
 from openatlas.api.import_scripts.util import (
     get_match_types)
-from openatlas.api.resources.api_entity import ApiEntity
-from openatlas.api.resources.error import EntityDoesNotExistError
+from openatlas.api.api_v04.resources.api_entity import ApiEntity
+from openatlas.api.api_v04.resources.error import EntityDoesNotExistError
 from openatlas.database import imports as db
 from openatlas.database.connect import Transaction
 from openatlas.display.util2 import sanitize

@@ -1,0 +1,222 @@
+from collections import defaultdict
+from typing import Any
+
+from flask import g
+from shapely import GeometryCollection, from_wkt
+
+from openatlas.database.entity import select_sql
+
+
+### File ###
+
+def get_public_files_api(
+        license_ids: set[int],
+        public_share_id: int | None,
+        limit: int,
+        offset: int,
+        entity_id: int | None = None) -> tuple[list[dict[str, Any]], int]:
+    if not license_ids or public_share_id is None:
+        return [], 0  # pragma: no cover
+
+    where_sql = """
+        WHERE e.openatlas_class_name = 'file'
+        AND EXISTS (
+            SELECT 1 FROM model.link l
+            WHERE l.domain_id = e.id AND l.property_code = 'P2'
+                AND l.range_id IN %(license_ids)s)
+        AND EXISTS (
+            SELECT 1 FROM model.link l
+            WHERE l.domain_id = e.id AND l.property_code = 'P2'
+                AND l.range_id = %(public_share_id)s)
+        """
+    params: dict[str, Any] = {
+        'license_ids': tuple(license_ids),
+        'public_share_id': public_share_id,
+        'limit': limit,
+        'offset': offset}
+
+    if entity_id is not None:
+        where_sql += """
+            AND EXISTS (
+                SELECT 1 FROM model.link l
+                WHERE l.domain_id = e.id AND l.property_code = 'P67'
+                    AND l.range_id = %(entity_id)s)
+            """
+        params['entity_id'] = entity_id
+
+    g.cursor.execute(
+        'SELECT COUNT(*) FROM model.entity e ' + where_sql, params)
+    total = g.cursor.fetchone()['count']
+
+    g.cursor.execute(
+        select_sql(types=True) +
+        ' JOIN (SELECT e.id FROM model.entity e ' + where_sql +
+        ' ORDER BY e.id LIMIT %(limit)s OFFSET %(offset)s) page '
+        'ON page.id = e.id GROUP BY e.id ORDER BY e.id;',
+        params)
+    return list(g.cursor), total
+
+
+def _format_date_for_sql(date: str) -> str | None:
+    date_string = date.strip()
+    if date_string.startswith('-'):
+        return f"{date_string.lstrip('-')} BC"
+    return date_string
+
+## Entity ##
+
+def get_by_class_api(
+        class_: str,
+        types: bool = False,
+        aliases: bool = False,
+        order_by: str | None = None,
+        limit: int | None = None,
+        offset: int | None = None,
+        search_name: str | None = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
+        type_ids: list[int] | None = None,
+        case_study_ids: list[int] | None = None) \
+        -> tuple[list[dict[str, Any]], int]:
+    where_sql = 'WHERE e.openatlas_class_name = %(class)s'
+    params: dict[str, Any] = {'class': class_}
+    end_coalesce = 'COALESCE(e.end_to, e.end_from, e.begin_to, e.begin_from)'
+
+    if search_name:
+        where_sql += ' AND e.name ILIKE %(search)s'
+        params['search'] = f'%{search_name}%'
+
+    if start_date:
+        where_sql += (
+            ' AND COALESCE(e.begin_from, e.begin_to) >= %(start_date)s')
+        params['start_date'] = _format_date_for_sql(start_date)
+
+    if end_date:
+        where_sql += f' AND {end_coalesce} <= %(end_date)s'
+        params['end_date'] = _format_date_for_sql(end_date)
+
+    if type_ids:
+        where_sql += (
+            ' AND EXISTS (SELECT 1 FROM model.link l_t '
+            'WHERE l_t.domain_id = e.id AND l_t.range_id IN %(type_ids)s '
+            "AND l_t.property_code IN ('P2', 'P89'))")
+        params['type_ids'] = tuple(type_ids)
+
+    if case_study_ids:
+        where_sql += (
+            ' AND EXISTS (SELECT 1 FROM model.link l_cs '
+            'WHERE l_cs.domain_id = e.id AND l_cs.range_id IN '
+            '%(case_study_ids)s '
+            "AND l_cs.property_code IN ('P2', 'P89'))")
+        params['case_study_ids'] = tuple(case_study_ids)
+
+    g.cursor.execute(
+        f'SELECT COUNT(*) FROM model.entity e {where_sql};',
+        params)
+    total = g.cursor.fetchone()['count']
+
+    match order_by:
+        case 'name_desc':
+            order_sql = ' ORDER BY e.name DESC, e.id DESC'
+        case 'start_date_asc':
+            order_sql = ' ORDER BY e.begin_from ASC NULLS LAST, e.id ASC'
+        case 'start_date_desc':
+            order_sql = ' ORDER BY e.begin_from DESC NULLS LAST, e.id DESC'
+        case 'end_date_asc':
+            order_sql = f' ORDER BY {end_coalesce} ASC NULLS LAST, e.id ASC'
+        case 'end_date_desc':
+            order_sql = f' ORDER BY {end_coalesce} DESC NULLS LAST, e.id DESC'
+        case _:
+            order_sql = ' ORDER BY e.name ASC, e.id ASC'
+
+    inner_sql = f'SELECT e.id FROM model.entity e {where_sql}{order_sql}'
+
+    if limit is not None:
+        inner_sql += ' LIMIT %(limit)s'
+        params['limit'] = limit
+    if offset is not None:
+        inner_sql += ' OFFSET %(offset)s'
+        params['offset'] = offset
+
+    sql = (
+        f'{select_sql(types, aliases)} '
+        f'JOIN ({inner_sql}) AS le ON e.id = le.id '
+        f'GROUP BY e.id{order_sql};')
+
+    g.cursor.execute(sql, params)
+    return list(g.cursor), total
+
+## Vocabulary ##
+
+def get_vocab_ids_for_case_study(case_study_id: int) -> set[int]:
+    sql = """
+          SELECT DISTINCT l_type.range_id
+          FROM model.link l_cs
+                   JOIN model.link l_type ON l_cs.domain_id = l_type.domain_id
+          WHERE l_cs.range_id = %(case_study_id)s
+            AND l_cs.property_code = 'P2'
+            AND l_type.property_code IN ('P2', 'P89') \
+          """
+    g.cursor.execute(sql, {'case_study_id': case_study_id})
+    return {row['range_id'] for row in g.cursor.fetchall()}
+
+## Case study ##
+
+def get_overview_counts_by_case_study(
+        classes: list[str],
+        case_study_id: int | None = None) -> dict[str, int]:
+    sql = """
+          SELECT e.openatlas_class_name AS name, COUNT(e.id) AS count
+          FROM model.entity e \
+          """
+    if case_study_id is not None:
+        sql += """
+            JOIN model.link l_cs ON e.id = l_cs.domain_id
+            WHERE e.openatlas_class_name IN %(classes)s
+              AND l_cs.range_id = %(case_study_id)s
+              AND l_cs.property_code = 'P2'
+        """
+    else:
+        sql += """
+            WHERE e.openatlas_class_name IN %(classes)s
+        """
+
+    sql += " GROUP BY e.openatlas_class_name;"
+
+    g.cursor.execute(sql, {
+        'classes': tuple(classes),
+        'case_study_id': case_study_id})
+    return {row['name']: row['count'] for row in list(g.cursor)}
+
+
+### GIS ###
+
+def get_wkts_by_ids(ids: list[int]) -> dict[int, str]:
+    g.cursor.execute(
+        """
+        SELECT place.id,
+           public.ST_AsText(geom_point)                       AS point,
+           public.ST_AsText(geom_linestring)                  AS linestring,
+           public.ST_AsText(ST_ForcePolygonCCW(geom_polygon)) AS polygon
+        FROM model.entity place
+                 JOIN model.gis g ON place.id = g.entity_id
+        WHERE place.id IN %(ids)s;
+        """,
+        {'ids': tuple(ids)})
+    geometries = defaultdict(list)
+    for row in list(g.cursor):
+        if row['point']:
+            geometries[row['id']].append(from_wkt(row['point']))
+        if row['linestring']:
+            geometries[row['id']].append(from_wkt(row['linestring']))
+        if row['polygon']:
+            geometries[row['id']].append(from_wkt(row['polygon']))
+    result = {}
+    for id_, geoms in geometries.items():
+        if not geoms:
+            result[id_] = ""  # pragma: no cover
+        elif len(geoms) == 1:
+            result[id_] = geoms[0].wkt
+        else:
+            result[id_] = GeometryCollection(geoms).wkt
+    return result

@@ -1,4 +1,5 @@
 from typing import Any, Iterable, Optional
+from uuid import UUID
 
 from flask import g
 
@@ -14,12 +15,12 @@ def get_by_id(
 
 
 def get_by_uuid(
-        uuid: str,
+        uuid: UUID | str,
         types: bool = False,
         aliases: bool = False) -> dict[str, Any]:
     g.cursor.execute(
         select_sql(types, aliases) + ' WHERE e.uuid = %(uuid)s GROUP BY e.id;',
-        {'uuid': uuid})
+        {'uuid': str(uuid)})
     return g.cursor.fetchone()
 
 

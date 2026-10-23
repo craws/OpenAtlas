@@ -75,7 +75,7 @@ class Api(ApiTestCase):
                 'api_04.network_visualisation',
                 exclude_system_classes='type'))
         rv = rv.get_json()
-        assert len(rv['results']) == 66
+        assert len(rv['results']) == 72
         rv = c.get(
             url_for(
                 'api_04.network_visualisation',
@@ -84,7 +84,7 @@ class Api(ApiTestCase):
         assert len(rv['results']) == 16
         rv = c.get(url_for('api_04.network_visualisation', download=True))
         rv = rv.get_json()
-        assert len(rv['results']) == 166
+        assert len(rv['results']) == 172
 
         rv = c.get(
             url_for(
@@ -92,7 +92,7 @@ class Api(ApiTestCase):
                 id_=e.place.id,
                 exclude_system_classes='type'))
         rv = rv.get_json()
-        assert len(rv['results']) == 14
+        assert len(rv['results']) == 16
         rv = c.get(
             url_for(
                 'api_04.ego_network_visualisation',
@@ -114,7 +114,7 @@ class Api(ApiTestCase):
                 id_=e.place.id,
                 download=True))
         rv = rv.get_json()
-        assert len(rv['results']) == 18
+        assert len(rv['results']) == 20
 
         for rv in [
             c.get(url_for('api_04.geometric_entities')),
@@ -582,183 +582,128 @@ class Api(ApiTestCase):
 
         # ---Test search---
         search_string_constructor = [
-            (
-                0, [
-                {
-                    "entityAliases": [
-                        {
-                            "operator": "equal",
-                            "values": ["Sûza"],
-                            "logicalOperator": "and"}],
-                    "typeID": [
-                        {
-                            "operator": "equal",
-                            "values": [1121212],
-                            "logicalOperator": "and"}]}, {
-                    "valueTypeID": [
-                        {
-                            "operator": "lesserThanEqual",
-                            "values": [(e.height.id, 1.0), (e.weight.id, 1.0)],
-                            "logicalOperator": "and"}]}, {
-                    "entityAliases": [
-                        {
-                            "operator": "greaterThan",
-                            "values": ["Sûza"]}],
-                    "typeID": [{"operator": "equal", "values": [1121212]}]}]),
-            (
-                1, [
-                {
-                    "endFrom": [
-                        {
-                            "operator": "greaterThan",
-                            "values": ["2013-02-01"],
-                            "logicalOperator": "and"}]}]),
-            (
-                1, [
-                {
-                    "endTo": [
-                        {
-                            "operator": "greaterThanEqual",
-                            "values": ["2019-03-01"],
-                            "logicalOperator": "and"}]}, ]),
-            (
-                3, [
-                {
-                    "beginFrom": [
-                        {
-                            "operator": "lesserThan",
-                            "values": ["2020-01-01"],
-                            "logicalOperator": "and"}]}]),
-            (
-                2, [
-                {
-                    "beginTo": [
-                        {
-                            "operator": "lesserThanEqual",
-                            "values": ["2018-03-01"],
-                            "logicalOperator": "and"}]}]),
-            (
-                1, [
-                {
-                    "valueTypeID": [
-                        {
-                            "operator": "greaterThanEqual",
-                            "values": [(e.height.id, 23.0)],
-                            "logicalOperator": "or"}]}]),
-            (
-                1, [
-                {
-                    "valueTypeID": [
-                        {
-                            "operator": "equal",
-                            "values": [(e.height.id, 23.0)]}]}, {
-                    "valueTypeID": [
-                        {
-                            "operator": "greaterThanEqual",
-                            "values": [(e.height.id, 23.0)]}]}, {
-                    "typeName": [
-                        {
-                            "operator": "equal",
-                            "values": ["Boundary Mark", "Height"],
-                            "logicalOperator": "and"}]}, {
-                    "entityAliases": [
-                        {
-                            "operator": "like",
-                            "values": ["S"]}]}, {
-                    "typeName": [
-                        {
-                            "operator": "like",
-                            "values": ["Oun", "mark"],
-                            "logicalOperator": "and"}]}, {
-                    "entityDescription": [
-                        {
-                            "operator": "equal",
-                            "values": [
-                                "the shirE Was the Homeland of the hobbits.",
-                                "homeland"]}]}, {
-                    "valueTypeID": [
-                        {
-                            "operator": "greaterThanEqual",
-                            "values": [
-                                (e.height.id, 23.0), (e.weight.id, 999.0)],
-                            "logicalOperator": "and"}]}]),
-            (
-                5, [
-                {
-                    "entityCidocClass": [
-                        {
-                            "operator": "equal",
-                            "values": ["E21"],
-                            "logicalOperator": "and"}]}, {
-                    "entitySystemClass": [
-                        {
-                            "operator": "equal",
-                            "values": ["person"],
-                            "logicalOperator": "and"}]}, {
-                    "typeIDWithSubs": [
-                        {
-                            "operator": "equal",
-                            "values": [e.boundary_mark.id, e.height.id]}]}, {
-                    "typeIDWithSubs": [
-                        {
-                            "operator": "equal",
-                            "values": [e.boundary_mark.id],
-                            "logicalOperator": "and"}]}, {
-                    "typeID": [
-                        {
-                            "operator": "equal",
-                            "values": [e.boundary_mark.id, e.height.id]}]}]),
+            (0, [{
+                "entityAliases": [{
+                    "operator": "equal",
+                    "values": ["Sûza"],
+                    "logicalOperator": "and"}],
+                "typeID": [{
+                    "operator": "equal",
+                    "values": [1121212],
+                    "logicalOperator": "and"}]}, {
+                "valueTypeID": [{
+                    "operator": "lesserThanEqual",
+                    "values": [(e.height.id, 1.0), (e.weight.id, 1.0)],
+                    "logicalOperator": "and"}]}, {
+                "entityAliases": [{
+                    "operator": "greaterThan",
+                    "values": ["Sûza"]}],
+                "typeID": [{"operator": "equal", "values": [1121212]}]}]),
+            (3, [{
+                "endFrom": [{
+                    "operator": "greaterThan",
+                    "values": ["2013-02-01"],
+                    "logicalOperator": "and"}]}]),
+            (2, [{
+                "endTo": [{
+                    "operator": "greaterThanEqual",
+                    "values": ["2019-03-01"],
+                    "logicalOperator": "and"}]}, ]),
+            (5, [{
+                "beginFrom": [{
+                    "operator": "lesserThan",
+                    "values": ["2020-01-01"],
+                    "logicalOperator": "and"}]}]),
+            (3, [{
+                "beginTo": [{
+                    "operator": "lesserThanEqual",
+                    "values": ["2018-03-01"],
+                    "logicalOperator": "and"}]}]),
+            (1, [{
+                "valueTypeID": [{
+                    "operator": "greaterThanEqual",
+                    "values": [(e.height.id, 23.0)],
+                    "logicalOperator": "or"}]}]),
+            (1, [{
+                "valueTypeID": [{
+                    "operator": "equal",
+                    "values": [(e.height.id, 23.0)]}]}, {
+                "valueTypeID": [{
+                    "operator": "greaterThanEqual",
+                    "values": [(e.height.id, 23.0)]}]}, {
+                "typeName": [{
+                    "operator": "equal",
+                    "values": ["Boundary Mark", "Height"],
+                    "logicalOperator": "and"}]}, {
+                "entityAliases": [{
+                    "operator": "like",
+                    "values": ["S"]}]}, {
+                "typeName": [{
+                    "operator": "like",
+                    "values": ["Oun", "mark"],
+                    "logicalOperator": "and"}]}, {
+                "entityDescription": [{
+                    "operator": "equal",
+                    "values": [
+                        "the shirE Was the Homeland of the hobbits.",
+                        "homeland"]}]}, {
+                "valueTypeID": [{
+                    "operator": "greaterThanEqual",
+                    "values": [(e.height.id, 23.0), (e.weight.id, 999.0)],
+                    "logicalOperator": "and"}]}]),
+            (5, [{
+                "entityCidocClass": [{
+                    "operator": "equal",
+                    "values": ["E21"],
+                    "logicalOperator": "and"}]}, {
+                "entitySystemClass": [{
+                    "operator": "equal",
+                    "values": ["person"],
+                    "logicalOperator": "and"}]}, {
+                "typeIDWithSubs": [{
+                    "operator": "equal",
+                    "values": [e.boundary_mark.id, e.height.id]}]}, {
+                "typeIDWithSubs": [{
+                    "operator": "equal",
+                    "values": [e.boundary_mark.id],
+                    "logicalOperator": "and"}]}, {
+                "typeID": [{
+                    "operator": "equal",
+                    "values": [e.boundary_mark.id, e.height.id]}]}]),
             (6, [{"entityName": [{"operator": "like", "values": ["Fr"]}]}]),
-            (
-                8, [
-                {
-                    "typeIDWithSubs": [
-                        {
-                            "operator": "equal",
-                            "values": [
-                                e.boundary_mark.id, e.height.id,
-                                e.change_of_property.id]}]}, {
-                    "entityDescription": [
-                        {
-                            "operator": "like",
-                            "values": ["FrOdO", "sam"]}]}]),
-            (
-                15, [
-                {
-                    "relationToID": [
-                        {
-                            "operator": "equal",
-                            "values": [e.place.id]}]}]),
-            (
-                175, [
-                {
-                    "typeIDWithSubs": [
-                        {
-                            "operator": "notEqual",
-                            "values": [e.boundary_mark.id],
-                            "logicalOperator": "and"}]}]),
-            (
-                177, [
-                {
-                    "typeName": [
-                        {
-                            "operator": "notEqual",
-                            "values": ["Boundary Mark", "Height"],
-                            "logicalOperator": "and"}]}, {
-                    "entityID": [
-                        {
-                            "operator": "notEqual",
-                            "values": [e.place.id],
-                            "logicalOperator": "and"}]}, {
-                    "entityAliases": [
-                        {
-                            "operator": "notEqual",
-                            "values": ["Sûza"],
-                            "logicalOperator": "and"}]}, {
-                    "entityName": [
-                        {
-                            "operator": "notEqual",
-                            "values": ["Mordor"]}]}])]
+            (9, [{
+                "typeIDWithSubs": [{
+                    "operator": "equal",
+                    "values": [e.boundary_mark.id, e.height.id,
+                               e.change_of_property.id]}]}, {
+                "entityDescription": [{
+                    "operator": "like",
+                    "values": ["FrOdO", "sam"]}]}]),
+            (15, [{
+                "relationToID": [{
+                    "operator": "equal",
+                    "values": [e.place.id]}]}]),
+            (181, [{
+                "typeIDWithSubs": [{
+                    "operator": "notEqual",
+                    "values": [e.boundary_mark.id],
+                    "logicalOperator": "and"}]}]),
+            (183, [{
+                "typeName": [{
+                    "operator": "notEqual",
+                    "values": ["Boundary Mark", "Height"],
+                    "logicalOperator": "and"}]}, {
+                "entityID": [{
+                    "operator": "notEqual",
+                    "values": [e.place.id],
+                    "logicalOperator": "and"}]}, {
+                "entityAliases": [{
+                    "operator": "notEqual",
+                    "values": ["Sûza"],
+                    "logicalOperator": "and"}]}, {
+                "entityName": [{
+                    "operator": "notEqual",
+                    "values": ["Mordor"]}]}])]
 
         for count, search_string in search_string_constructor:
             rv = c.get(
@@ -853,7 +798,7 @@ class Api(ApiTestCase):
         assert rv.get_json()['pagination']['entities'] == 2
 
         rv = c.get(url_for('api_04.search', class_='type', term='i'))
-        assert rv.get_json()['pagination']['entities'] == 50
+        assert rv.get_json()['pagination']['entities'] == 51
 
         rv = c.get(url_for('api_04.search', class_='person'))
         assert rv.get_json()['pagination']['entities'] == 3
@@ -926,10 +871,9 @@ class Api(ApiTestCase):
                 'api_04.view_class',
                 class_='place',
                 search={
-                    "All": [
-                        {
-                            "operator": "notEqual",
-                            "values": ["Boundary Mark", "Height"]}]}))
+                    "All": [{
+                        "operator": "notEqual",
+                        "values": ["Boundary Mark", "Height"]}]}))
         assert 'Invalid search category' in rv.get_json()['title']
 
         rv = c.get(
@@ -944,10 +888,9 @@ class Api(ApiTestCase):
                 'api_04.view_class',
                 class_='place',
                 search={
-                    "beginFrom": [
-                        {
-                            "operator": "notEqual",
-                            "values": ["Help"]}]}))
+                    "beginFrom": [{
+                        "operator": "notEqual",
+                        "values": ["Help"]}]}))
         assert 'Invalid search values' in rv.get_json()['title']
 
         rv = c.get(
@@ -955,10 +898,9 @@ class Api(ApiTestCase):
                 'api_04.view_class',
                 class_='place',
                 search={
-                    "beginFrom": [
-                        {
-                            "operator": "notEqual",
-                            "values": ["800-1-1", "Help"]}]}))
+                    "beginFrom": [{
+                        "operator": "notEqual",
+                        "values": ["800-1-1", "Help"]}]}))
         assert 'Invalid search values' in rv.get_json()['title']
 
         rv = c.get(
@@ -984,11 +926,10 @@ class Api(ApiTestCase):
                 'api_04.view_class',
                 class_='place',
                 search={
-                    "typeName": [
-                        {
-                            "operator": "notEqualT",
-                            "values": ["Boundary Mark", "Height"],
-                            "logicalOperator": "and"}]}))
+                    "typeName": [{
+                        "operator": "notEqualT",
+                        "values": ["Boundary Mark", "Height"],
+                        "logicalOperator": "and"}]}))
         assert 'Invalid compare operator' in rv.get_json()['title']
 
         rv = c.get(
@@ -996,11 +937,10 @@ class Api(ApiTestCase):
                 'api_04.view_class',
                 class_='place',
                 search={
-                    "typeName": [
-                        {
-                            "operator": "notEqual",
-                            "values": ["Boundary Mark", "Height"],
-                            "logicalOperator": "xor"}]}))
+                    "typeName": [{
+                        "operator": "notEqual",
+                        "values": ["Boundary Mark", "Height"],
+                        "logicalOperator": "xor"}]}))
         assert 'Invalid logical operator' in rv.get_json()['title']
 
         rv = c.get(
@@ -1008,11 +948,10 @@ class Api(ApiTestCase):
                 'api_04.view_class',
                 class_='place',
                 search={
-                    "typeID": [
-                        {
-                            "operator": "notEqual",
-                            "values": 1,
-                            "logicalOperator": "or"}]}))
+                    "typeID": [{
+                        "operator": "notEqual",
+                        "values": 1,
+                        "logicalOperator": "or"}]}))
         assert 'No search value' in rv.get_json()['title']
 
         rv = c.get(
