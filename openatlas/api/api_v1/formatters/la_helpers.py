@@ -103,7 +103,6 @@ BIBLIOGRAPHY_AAT: Final[dict[str, dict[str, str]]] = {
     'bibliography': aat_type('300026497', 'bibliography'),
     'edition': aat_type('300121294', 'edition')}
 
-# Classes where the Linked Art class alone is too coarse
 CLASS_TYPES: Final[dict[str, list[dict[str, str]]]] = {
     'artifact': [ARCHAEOLOGY_AAT['artifact']],
     'human_remains': [ARCHAEOLOGY_AAT['human_remains']],

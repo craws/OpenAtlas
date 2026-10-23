@@ -46,3 +46,5 @@ env.sh
 /.junie/
 /.schemathesis/
 /.hypothesis/
+/tests/.schemathesis/
+/tests/.hypothesis/

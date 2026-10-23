@@ -725,18 +725,17 @@ class Api(ApiTestCase):
         rv = rv.get_json()[str(e.place.id)]
         for item in rv:
             if item['id'] == e.place.id:
-                assert item['id'] == e.place.id
                 assert item['openatlasClassName'] == "place"
                 assert item['children'] == [e.feature.id, e.artifact.id]
-                item = item['properties']
-                assert item['name'] == e.place.name
-                assert item['description'] == e.place.description
-                assert item['aliases'] == [e.alias.name]
-                assert item['externalReferences']
-                assert item['timespan']
-                assert item['standardType']
-                assert item['files']
-                assert item['types']
+                props = item['properties']
+                assert props['name'] == e.place.name
+                assert props['description'] == e.place.description
+                assert props['aliases'] == [e.alias.name]
+                assert props['externalReferences']
+                assert props['timespan']
+                assert props['standardType']
+                assert props['files']
+                assert props['types']
 
         rv = c.get(url_for('api_04.subunits', id_=e.place.id, count=True))
         assert b'4' in rv.data
@@ -807,9 +806,10 @@ class Api(ApiTestCase):
         # Test Error Handling
         for rv in [
             c.get(url_for('api_04.entity', id_=233423424)),
-            c.get(url_for(
-                'api_04.entity_uuid',
-                uuid='7b9e1c4a-5f2d-4b8a-9e3c-2d1f0a9b8c7d')),
+            c.get(
+                url_for(
+                    'api_04.entity_uuid',
+                    uuid='7b9e1c4a-5f2d-4b8a-9e3c-2d1f0a9b8c7d')),
             c.get(url_for('api_04.cidoc_class', class_='E18', last=1231))]:
             rv = rv.get_json()
         assert 'Entity does not exist' in rv['title']

@@ -23,19 +23,3 @@ iiif_tag = Tag(
 metadata_tag = Tag(
     name='Metadata',
     description='Project metadata, agents, and case studies.')
-
-# Planned future tags:
-# All geographic entities, filter with bbox, search nearest entities,
-# gpkg export, etc.
-# geographic_tag = Tag(name='Geographic', description='Geographic endpoints.')
-
-# Presentation view, table, search
-# frontend_tag = Tag(name='Frontend', description='Frontend endpoints.')
-
-# Network, ego network, SNA with special person connections
-# network_tag = Tag(
-#     name='Network',
-#     description='Network analysis endpoints.')
-
-# Thanados, PFP, CSV, and other
-# export_tag = Tag(name='Export', description='Different export formats.')
