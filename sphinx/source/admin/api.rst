@@ -3,7 +3,7 @@ API
 
 .. toctree::
 
-Description: :doc:`/technical/api`
+Description: :doc:`/api/index`
 
 **Public** (default=off)
 ------------------------

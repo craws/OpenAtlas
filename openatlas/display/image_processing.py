@@ -152,10 +152,12 @@ def create_resized_images() -> None:
 
 
 def check_iiif_activation() -> bool:
-    return bool(
-        g.settings['iiif'] and os.access(
-            Path(g.settings['iiif_path']),
-            os.W_OK))
+    if not hasattr(g, 'license_url_mapping'):
+        g.iiif_activation = bool(
+            g.settings['iiif'] and os.access(
+                Path(g.settings['iiif_path']),
+                os.W_OK))
+    return g.iiif_activation
 
 
 def check_iiif_file_exist(id_: int) -> bool:

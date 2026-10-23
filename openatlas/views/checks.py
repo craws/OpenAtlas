@@ -11,7 +11,7 @@ from werkzeug import Response
 from werkzeug.utils import redirect
 
 from openatlas import app
-from openatlas.api.resources.util import filter_by_type
+from openatlas.api.api_v04.resources.util import filter_by_type
 from openatlas.display.image_processing import (
     check_iiif_activation, delete_orphaned_resized)
 from openatlas.display.tab import Tab

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from flask import g
+from flask import abort, g
 
 from openatlas.database import rights_holder as db
 
@@ -20,7 +20,7 @@ class RightsHolder:
             setattr(self, name, value)
 
     @staticmethod
-    def get_rights_holder() -> list[RightsHolder]:
+    def get_rights_holders() -> list[RightsHolder]:
         return [RightsHolder(item) for item in db.get_rights_holder()]
 
     @staticmethod
@@ -31,9 +31,11 @@ class RightsHolder:
                 db.get_rights_holders_by_entity_and_role(entity_id, role)]
 
     @staticmethod
-    def get_rights_holder_by_id(id_: int) -> RightsHolder | None:
+    def get_rights_holder_by_id(id_: int) -> RightsHolder:
         item = db.get_rights_holder_by_id(id_)
-        return RightsHolder(item) if item else None
+        if not item:
+            abort(418)
+        return RightsHolder(item)
 
     @staticmethod
     def insert_rights_holder(entry: dict[str, Any]) -> int:
@@ -48,15 +50,19 @@ class RightsHolder:
         db.rights_holder_delete(id_)
 
     @staticmethod
-    def get_rights_holder_links() -> dict[int, dict[str, list[int]]]:
-        return db.get_rights_holder_links()
+    def get_rights_holder_links(
+            entity_ids: list[int] | None = None) \
+            -> dict[int, dict[str, list[int]]]:
+        return db.get_rights_holder_links(entity_ids)
 
     @staticmethod
-    def get_rights_holder_information() -> dict[
-        int,
-        dict[str, list[RightsHolder]]]:
-        rights_holder_dict = {rh.id: rh for rh in g.rights_holder}
-        rights_holder_links = RightsHolder.get_rights_holder_links()
+    def get_rights_holder_information(
+            entity_ids: list[int] | None = None) -> \
+            dict[int, dict[str, list[RightsHolder]]]:
+        rights_holders = g.rights_holder if hasattr(g, 'rights_holder') \
+            else RightsHolder.get_rights_holders()
+        rights_holder_dict = {rh.id: rh for rh in rights_holders}
+        rights_holder_links = RightsHolder.get_rights_holder_links(entity_ids)
         result: dict[int, dict[str, list[RightsHolder]]] = {}
         for entity_id, links in rights_holder_links.items():
             result[entity_id] = {

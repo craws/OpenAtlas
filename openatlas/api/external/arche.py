@@ -43,6 +43,7 @@ def create_single_uri(value: str) -> URIRef:
         return URIRef(value)
     safe_name = (
         value.strip()
+        .replace('"', "")
         .replace(" ", "_")
         .replace(",", "_")
         .replace("/", "_")
@@ -126,7 +127,7 @@ def transliterate_url(url: str) -> str:
     return urlunparse((
         parsed.scheme,
         parsed.netloc,
-        ascii_path.replace(' ', '_'),
+        ascii_path.replace(' ', '_').replace('"', ''),
         parsed.params,
         parsed.query,
         parsed.fragment))

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import operator
 import os
 import shutil
 import subprocess
@@ -16,12 +17,14 @@ from rdflib import Graph
 
 from config.default import ACDH
 from openatlas import app
-from openatlas.api.endpoints.endpoint import Endpoint
+from openatlas.api.api_v04.endpoints.endpoint import Endpoint
+from openatlas.api.api_v1.util.files import get_license_url_mapping
 from openatlas.api.external.arche import add_arche_file_metadata_to_graph
 from openatlas.api.external.arche_class import ArcheFileMetadata
-from openatlas.api.formats.rdf import rdf_export_to_file
-from openatlas.api.resources.api_entity import ApiEntity
-from openatlas.api.resources.util import filter_by_type, get_reference_systems
+from openatlas.api.api_v04.formats.rdf import rdf_export_to_file
+from openatlas.api.api_v04.resources.api_entity import ApiEntity
+from openatlas.api.api_v04.resources.util import \
+    filter_by_type, get_reference_systems
 from openatlas.display.image_processing import get_binary_path
 from openatlas.models.entity import Entity
 
@@ -158,23 +161,47 @@ def arche_export() -> bool:
                                 file.read())
 
             infos = archive.infolist()
-            total_size = sum(info.file_size for info in infos)
-            total_files = sum(1 for i in infos if not i.filename.endswith('/'))
-            all_dirs: set[Path] = set()
-            for info in infos:
-                path = Path(info.filename)
-                all_dirs.update(path.parents)
-            all_dirs.discard(Path("."))
-            total_dirs = len(all_dirs)
-            total_entries = len(infos)
+            staged_size = sum(info.file_size for info in infos)
+            manifest_member_names = ['debug/file_statistic.md'] + [
+                info.filename for info in infos if not info.is_dir()]
 
-            stat_md = (
-                f'# Archive Statistics\n'
-                f'- **Total size**: {total_size} bytes\n'
-                f'- **Total entries**: {total_entries}\n'
-                f'- **Files**: {total_files}\n'
-                f'- **Directories**: {total_dirs}\n')
+            manifest_size = 0
+            for name in manifest_member_names:
+                manifest_size += len(
+                    format_checksum_line(name, '0' * 64).encode('utf-8'))
+
+            all_entries = ['debug/file_statistic.md', 'checksums.sha256'] + [
+                info.filename for info in infos]
+            all_dirs: set[Path] = set()
+            for entry_name in all_entries:
+                all_dirs.update(Path(entry_name).parents)
+            all_dirs.discard(Path('.'))
+
+            total_entries = len(all_entries)
+            total_files = sum(
+                1 for name in all_entries if not name.endswith('/'))
+            total_dirs = len(all_dirs)
+
+            base_size = staged_size + manifest_size
+            total_size = base_size
+            stat_md = ''
+            for _ in range(10):
+                stat_md = (
+                    f'# Archive Statistics\n'
+                    f'- **Total size**: {total_size} bytes\n'
+                    f'- **Total entries**: {total_entries}\n'
+                    f'- **Files**: {total_files}\n'
+                    f'- **Directories**: {total_dirs}\n')
+                stat_size = len(stat_md.encode('utf-8'))
+                new_total_size = base_size + stat_size
+                if new_total_size == total_size:
+                    break
+                total_size = new_total_size
+
             archive.writestr('debug/file_statistic.md', stat_md)
+            archive.writestr(
+                'checksums.sha256',
+                create_checksum_manifest(archive))
 
         shutil.move(str(tmp_archive_path), str(final_archive_path))
     return final_archive_path
@@ -274,6 +301,39 @@ def hash_file(path: Path, chunk_size: int = 8192) -> str:
     return sha256.hexdigest()
 
 
+def format_checksum_line(name: str, digest: str) -> str:
+    escaped_name = name.replace('\\', '\\\\').replace('\n', '\\n')
+    marker = '\\' if escaped_name != name else ''
+    return f'{marker}{digest}\t{escaped_name}\n'
+
+
+def create_checksum_manifest(
+        archive: zipfile.ZipFile,
+        manifest_filename: str = 'checksums.sha256',
+        chunk_size: int = 8192) -> str:
+    manifest_lines: list[str] = []
+
+    infos = sorted(archive.infolist(), key=operator.attrgetter('filename'))
+
+    for a, b in zip(infos, infos[1:]):
+        if a.filename == b.filename:  # pragma: no cover
+            raise ValueError(f'Duplicate ZIP member name: {a.filename}')
+
+    for info in infos:
+        if info.is_dir() or info.filename == manifest_filename:
+            continue  # pragma: no cover
+
+        sha256 = hashlib.sha256()
+        with archive.open(info, 'r') as member_file:
+            while chunk := member_file.read(chunk_size):
+                sha256.update(chunk)
+
+        digest = sha256.hexdigest()
+        manifest_lines.append(format_checksum_line(info.filename, digest))
+
+    return ''.join(manifest_lines)
+
+
 def check_files_for_arche(
         entities: list[Entity]) -> dict[str, set[tuple[int, str]]]:
     missing = defaultdict(set)
@@ -308,33 +368,13 @@ def get_arche_file_turtle_graph(
     return graph.serialize(format="turtle")
 
 
-def _get_license_url_mapping() -> dict[int, list[str]]:
-    license_hierarchy = next(
-        type_ for type_ in g.types.values() if type_.name == "License")
-    links_for_license_types = Entity.get_links_of_entities(
-        license_hierarchy.get_sub_ids_recursive(),
-        'P67',
-        ['external_reference', 'reference_system'],
-        inverse=True)
-    license_mapping: dict[int, list[str]] = defaultdict(list)
-    for link_ in links_for_license_types:
-        if link_.domain.name not in license_mapping[link_.range.id]:
-            if link_.domain.class_.name == 'reference_system':
-                system = g.reference_systems[link_.domain.id]
-                url = f'{system.resolver_url or ''}{link_.description}'
-                license_mapping[link_.range.id].append(url)
-            else:
-                license_mapping[link_.range.id].append(link_.domain.name)
-    return dict(license_mapping)
-
-
 def get_arche_file_metadata(
         entities: list[Entity],
         type_ids: set[int] | list[int] | None,
         top_collection: str) -> list[ArcheFileMetadata]:
     publications = get_publications(entities)
     relations = get_place_and_actor_relations(entities)
-    license_urls = _get_license_url_mapping()
+    license_urls = get_license_url_mapping()
     arche_metadata_list = []
     for entity in entities:
         if not g.files.get(entity.id):

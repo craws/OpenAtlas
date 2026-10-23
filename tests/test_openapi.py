@@ -1,4 +1,6 @@
 import json
+from http import HTTPStatus
+
 from openatlas import app
 from tests.base import TestBaseCase
 
@@ -10,8 +12,8 @@ class OpenAPI(TestBaseCase):
 
         if instance_file.exists():
             instance_file.unlink()
-        rv = c.get('/openapi.json')
-        assert rv.status_code == 200
+        with c.get('/openapi.json') as rv:
+            assert rv.status_code == HTTPStatus.OK
 
         with instance_file.open(mode='r+') as f:
             data = json.load(f)
@@ -20,8 +22,8 @@ class OpenAPI(TestBaseCase):
             json.dump(data, f)
             f.truncate()
 
-        rv = c.get('/openapi.json')
-        assert rv.status_code == 200
+        with c.get('/openapi.json') as rv:
+            assert rv.status_code == HTTPStatus.OK
         with instance_file.open(mode='r') as f:
             data = json.load(f)
             assert data['servers'][0]['description'] != 'Wrong description'
@@ -33,11 +35,11 @@ class OpenAPI(TestBaseCase):
             json.dump(data, f)
             f.truncate()
 
-        rv = c.get('/openapi.json')
-        assert rv.status_code == 200
+        with c.get('/openapi.json') as rv:
+            assert rv.status_code == HTTPStatus.OK
         with instance_file.open(mode='r') as f:
             data = json.load(f)
             assert data['info']['version'] != '9.9.9'
 
         rv = c.get('/swagger')
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK

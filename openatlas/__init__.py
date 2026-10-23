@@ -5,25 +5,45 @@ import os
 import shutil
 from typing import Optional
 
-from flask import Flask, g, redirect, request, session, url_for
+from flask import g, redirect, request, session, url_for
 from flask_babel import Babel
 from flask_jwt_extended import JWTManager, verify_jwt_in_request
 from flask_login import current_user
+from flask_openapi3.models.info import Info
+from flask_openapi3.openapi import OpenAPI
 from flask_wtf.csrf import CSRFProtect
 from psycopg2 import extras
 from werkzeug.wrappers import Response
 
-from openatlas.api.resources.error import AccessDeniedError
+from openatlas.api.api_v04.resources.error import AccessDeniedError
 from openatlas.database.checks import check_type_count_needed
 from openatlas.database.connect import close_connection, open_connection
 from openatlas.database.token import check_token_revoked
 from openatlas.database.user import admins_available
 from openatlas.models.openatlas_class import get_classes
 
-app: Flask = Flask(__name__, instance_relative_config=True)
+app: OpenAPI = OpenAPI(
+    __name__,
+    instance_relative_config=True,
+    doc_prefix="/api/1/docs",
+    security_schemes={
+        "bearerAuth": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT"}})
+
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 app.config.from_object('config.default')
 app.config.from_object('config.api')
+
+app.info = Info(
+    title="OpenAtlas API",
+    version=app.config['API_VERSIONS'].get('1', '1'),
+    description=(
+        "OpenAtlas REST and Linked Open Data (LOD) API v1. Provides "
+        "endpoints for entities, CIDOC CRM mapping, Linked Art profiles, "
+        "controlled vocabularies (SKOS), digital assets (IIIF), and "
+        "system metadata."))
 
 CONFIG_PATH = ''
 if 'INSTANCE_PATH' in os.environ:  # Used for multi instance
@@ -70,14 +90,15 @@ def before_request() -> Response | None:
     g.db.autocommit = True
     g.cursor = g.db.cursor(cursor_factory=extras.DictCursor)
     g.settings = get_settings()
-
     if request.path.startswith('/display'):
         return None  # Avoid overheads for file display
 
-    if request.path.startswith('/swagger') or \
-            request.path.startswith('/openapi.json'):
+    if request.path.startswith((
+            '/swagger',
+            '/openapi.json',
+            '/api/0.4/openapi_schema/')):
         write_openapi_instance()
-        return None  # Avoid overheads for swagger
+        return None  # Avoid overheads for swagger and docs
 
     session['language'] = get_locale()
     g.admins_available = admins_available()
@@ -92,6 +113,7 @@ def before_request() -> Response | None:
         (request.path.startswith('/overview/model/property')))
     get_classes()  # Sets g.classes
     g.types = Entity.get_all_types(count_type())
+    g.case_study_type = Entity.get_hierarchy('Case study')
     g.radiocarbon_type = Entity.get_hierarchy('Radiocarbon')
     g.sex_type = Entity.get_hierarchy('Features for sexing')
     g.reference_match_type = Entity.get_hierarchy('External reference match')
@@ -111,6 +133,12 @@ def before_request() -> Response | None:
 
 
 def setup_files() -> None:
+    if request.path.startswith('/api/1/') or \
+            (request.endpoint or "") in 'display_file':
+        g.file_info = {}
+        g.api_file_paths = {}  # Per request caches, see api_v1/util/files.py
+        g.api_rights_holders = {}
+        return
     from openatlas.models.rights_holder import RightsHolder
     g.files = {}
     for file_ in app.config['UPLOAD_PATH'].iterdir():
@@ -123,7 +151,7 @@ def setup_files() -> None:
         g.display_file_ext += app.config['PROCESSABLE_EXT']
     if g.settings['iiif'] and g.settings['iiif_path']:
         g.writable_paths.append(g.settings['iiif_path'])
-    g.rights_holder = RightsHolder.get_rights_holder()
+    g.rights_holder = RightsHolder.get_rights_holders()
     rights_holder_info = RightsHolder.get_rights_holder_information()
     file_info = {}
     for file_id in g.files:
@@ -135,7 +163,8 @@ def setup_files() -> None:
 
 
 def setup_api() -> None:
-    if request.path.startswith('/api/'):
+    if (request.path.startswith('/api/')
+            and not request.path.startswith('/api/1/docs')):
         ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
         if not current_user.is_authenticated \
                 and not g.settings['api_public'] \
@@ -150,8 +179,9 @@ def count_type() -> bool:
     prefixes = [
         '/index/type',
         '/orphans',
+        '/api/1/vocabulary',
         '/api/type_tree',
-        *[f'/api/{v}/type_tree' for v in app.config['API_VERSIONS']]]
+        '/api/0.4/type_tree']
     if request.path.startswith(tuple(prefixes)):
         return True
     if request.path.startswith('/entity/') and \

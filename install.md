@@ -29,7 +29,8 @@ that we are using to set up Debian servers for OpenAtlas installations.
     sudo apt install python3-validators python3-email-validator python3-wand python3-svgwrite
     sudo apt install python3-xmltodict python3-markdown exiftran python3-bcrypt python3-dateutil p7zip-full
     sudo apt install python3-requests python3-bs4 python3-unidecode python3-lxml python3-unidecode python3-numpy
-    sudo apt install python3-fiona python3-magic python3-flask-bcrypt python3-levenshtein
+    sudo apt install python3-fiona python3-magic python3-flask-bcrypt python3-levenshtein 
+    sudo apt install python3-flask-openapi3 python3-pydantic
 
 ### Apache 2.4, gettext, npm
     sudo apt install apache2 libapache2-mod-wsgi-py3 gettext npm
@@ -189,6 +190,26 @@ Create a own folder to test IIIF images, e.g.:
 Run tests with coverage
 
     pytest
+
+## API Schemathesis Tests
+To test the API with schemathesis you can use the following commands:
+
+    uv sync --extra dev
+    uv run schemathesis run http://localhost:5000/api/1/docs/openapi.json \
+         --url http://localhost:5000 \
+         --phases examples,coverage,fuzzing
+
+If you don't want to install uvicorn package you can use the following command:
+
+    uvx schemathesis run http://localhost:5000/api/1/docs/openapi.json \ 
+        --url http://localhost:5000 \
+        --phases examples,coverage,fuzzing
+
+For deep testing you can use the following command:
+
+    uv run schemathesis run http://localhost:5000/api/1/docs/openapi.json \
+       --checks all \
+       --phases examples,coverage,fuzzing
 
 # Installing OpenAtlas with Podman (Experimental)
 
