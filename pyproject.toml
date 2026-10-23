@@ -49,6 +49,7 @@ dependencies = [
     "wtforms==3.1.2",
     "xmltodict==0.13.0",
     "fiona>=1.10.0",
+    "pytest>=9.0.2",
 ]
 
 [project.optional-dependencies]
