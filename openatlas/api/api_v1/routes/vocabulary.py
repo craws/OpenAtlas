@@ -1,0 +1,276 @@
+from typing import Any, cast
+from uuid import UUID
+
+from flask import Response, g
+from flask_openapi3 import APIBlueprint
+
+from openatlas.api.api_v1.error_handlers import (
+    abort_not_found, register_error_handlers)
+from openatlas.api.api_v1.formatters.skos import (
+    build_skos_graph, get_external_reference_items, serialize_skos)
+from openatlas.api.api_v1.formatters.util import (
+    EntityLinks, get_links_for_entities)
+from openatlas.api.api_v1.models.util import ReferenceModel, TypeCategoryEnum
+from openatlas.api.api_v1.models.vocabulary import (
+    LinkedTypeItem, VocabularyFlatItem, VocabularyFlatResponse, VocabularyId,
+    VocabularySkosPath, VocabularyStandardQuery, VocabularyStandardResponse,
+    VocabularyTreeItem, VocabularyTreePath, VocabularyTreeResponse)
+from openatlas.api.api_v1.openapi_tags import vocabulary_tag
+from openatlas.api.api_v1.responses.vocabulary import (
+    vocabulary_flat_response, vocabulary_list_response,
+    vocabulary_skos_response, vocabulary_standard_by_class_response,
+    vocabulary_tree_response)
+from openatlas.api.api_v1.util.date_util import get_timespan_dict
+from openatlas.api.api_v1.util.files import get_file_item, prefetch_files
+from openatlas.database.api import get_vocab_ids_for_case_study
+from openatlas.models.entity import Entity, Link
+
+api_v1_vocabulary = APIBlueprint(
+    'api_v1_vocabulary',
+    __name__,
+    url_prefix='/api/1/vocabulary',
+    abp_security=[{'bearerAuth': []}])
+register_error_handlers(api_v1_vocabulary)
+
+
+def get_reference_item(link_: Link) -> ReferenceModel:
+    entity = link_.domain
+    return ReferenceModel(
+        id=entity.id,
+        name=entity.name,
+        class_name=entity.class_.name,
+        type=entity.standard_type.name if entity.standard_type else None,
+        pages=link_.description or None,
+        citation=entity.description)
+
+
+def get_image_link(links: list[Link]) -> Link | None:
+    return next(
+        (link_ for link_ in links
+         if link_.domain.class_.name == 'file'
+         and link_.property.code == 'P67'),
+        None)
+
+
+def get_vocab_flat_item(
+        type_: Entity,
+        links: dict[int, EntityLinks]) -> VocabularyFlatItem:
+    root_entities = [g.types[id_] for id_ in type_.root] if type_.root else []
+    root_entity = g.types[type_.root[0]] if type_.root else None
+    type_classes = root_entity.classes if root_entity else type_.classes
+    sub_entities = [g.types[id_] for id_ in type_.subs] if type_.subs else []
+    inverse_links = links[type_.id].links_inverse
+    if inverse_links:
+        image_link = get_image_link(inverse_links)
+        image = get_file_item(image_link.domain) if image_link else None
+        external_references = get_external_reference_items(inverse_links)
+        references = [
+            get_reference_item(link_) for link_ in inverse_links
+            if link_.domain.class_.group.get('name') == 'reference'
+               and link_.property.code == 'P67']
+    else:
+        image = None
+        external_references = []
+        references = []
+    return VocabularyFlatItem(
+        id=type_.id,
+        uuid=cast(UUID, type_.uuid),
+        name=type_.name,
+        description=type_.description,
+        classes=type_classes,
+        selectable=type_.selectable,
+        image=image,
+        external_references=external_references,
+        references=references,
+        timespan=get_timespan_dict(type_.dates),
+        parents=[LinkedTypeItem(id=e.id, name=e.name) for e in root_entities],
+        sub_types=[LinkedTypeItem(id=e.id, name=e.name) for e in sub_entities],
+        entity_count=type_.count,
+        entity_count_subs=type_.count_subs,
+        category=TypeCategoryEnum(type_.category))
+
+
+@api_v1_vocabulary.get(
+    '',
+    summary="Get flat types list",
+    responses=vocabulary_list_response,
+    tags=[vocabulary_tag],
+    strict_slashes=False)
+def get_vocabulary_list() -> dict[str, Any]:
+    """Retrieves a flat list of all OpenAtlas types."""
+    vocab_dict: dict[str, VocabularyFlatItem] = {}
+    links = get_links_for_entities(
+        list(g.types.values()),
+        inverse_codes='P67',
+        include_forward=False,
+        include_geometries=False)
+    prefetch_files(links)
+    for id_, type_ in g.types.items():
+        vocab_dict[str(id_)] = get_vocab_flat_item(type_, links)
+    return VocabularyFlatResponse(data=vocab_dict).model_dump(by_alias=True)
+
+
+@api_v1_vocabulary.get(
+    '/<int:id>',
+    summary="Get vocabulary type by ID",
+    responses=vocabulary_flat_response,
+    tags=[vocabulary_tag])
+def get_vocabulary_item(path: VocabularyId) -> dict[str, Any]:
+    """Retrieves information for a single vocabulary type."""
+    type_ = g.types.get(path.id)
+    if not type_:
+        abort_not_found(path.id)
+    links = get_links_for_entities(
+        [type_],
+        inverse_codes='P67',
+        include_forward=False,
+        include_geometries=False)
+    prefetch_files(links)
+    return get_vocab_flat_item(type_, links).model_dump(by_alias=True)
+
+
+@api_v1_vocabulary.get(
+    '/<int:id>/skos',
+    summary="Export vocabulary hierarchy as SKOS",
+    responses=vocabulary_skos_response,
+    tags=[vocabulary_tag])
+def get_vocabulary_skos(path: VocabularyId) -> Response:
+    """Exports a single vocabulary tree as a SKOS ConceptScheme for
+    thesaurus management tools such as SKOSMOS.
+
+    The type identified by ``id`` becomes the ``skos:ConceptScheme`` and all
+    of its descendants are exported as ``skos:Concept`` linked via
+    ``skos:broader``/``skos:narrower``. The serialization format is negotiated
+    via the ``Accept`` header (defaulting to JSON-LD).
+    """
+    root = g.types.get(path.id)
+    if not root:
+        abort_not_found(path.id)
+    return serialize_skos(build_skos_graph(root))
+
+
+@api_v1_vocabulary.get(
+    '/<int:id>/skos.<ext>',
+    summary="Export vocabulary hierarchy as SKOS with format extension",
+    responses=vocabulary_skos_response,
+    tags=[vocabulary_tag])
+def get_vocabulary_skos_ext(path: VocabularySkosPath) -> Response:
+    """Exports a single vocabulary tree as a SKOS ConceptScheme for
+    thesaurus management tools such as SKOSMOS.
+
+    The type identified by ``id`` becomes the ``skos:ConceptScheme`` and all
+    of its descendants are exported as ``skos:Concept`` linked via
+    ``skos:broader``/``skos:narrower``. The serialization format is driven by
+    the URL extension (``ttl``, ``xml``, ``json``, ``nt``).
+    """
+    root = g.types.get(path.id)
+    if not root:
+        abort_not_found(path.id)
+    ext = path.ext.value if hasattr(path.ext, 'value') else str(path.ext)
+    return serialize_skos(build_skos_graph(root), ext)
+
+
+def walk_tree(
+        vocab_ids: list[int],
+        used_vocab_ids: set[int] | None = None) -> list[VocabularyTreeItem]:
+    """Recursively builds the type tree from a list of type IDs. Prunes
+    branches if used_vocab_ids is provided."""
+    items = []
+    for id_ in vocab_ids:
+        item = g.types[id_]
+        children = walk_tree(item.subs, used_vocab_ids)
+
+        if used_vocab_ids is not None \
+                and id_ not in used_vocab_ids and not children:
+            continue
+
+        items.append(VocabularyTreeItem(
+            id=item.id,
+            uuid=item.uuid,
+            name=item.name,
+            selectable=item.selectable,
+            classes=item.classes,
+            entity_count=item.count,
+            entity_count_subs=item.count_subs,
+            children=children))
+    return items
+
+
+def generate_vocabulary_tree(
+        openatlas_class: str | None = None) -> dict[str, Any]:
+    vocab_tree_dict: dict[str, list[VocabularyTreeItem]] = {
+        'standard': [], 'custom': [], 'place': [],
+        'value': [], 'system': [], 'tools': []}
+
+    for category in vocab_tree_dict:
+        root_ids = []
+        for type_ in g.types.values():
+            if not type_.root and getattr(type_, 'category', None) == category:
+                if openatlas_class and type_.classes \
+                        and openatlas_class not in type_.classes:
+                    continue
+                root_ids.append(type_.id)
+
+        vocab_tree_dict[category] = walk_tree(root_ids)
+
+    return VocabularyTreeResponse(**vocab_tree_dict).model_dump(by_alias=True)
+
+
+@api_v1_vocabulary.get(
+    '/tree',
+    summary="Get types tree",
+    responses=vocabulary_tree_response,
+    tags=[vocabulary_tag])
+def get_vocabulary_tree() -> dict[str, Any]:
+    """Retrieves all OpenAtlas types sorted hierarchically into standard,
+    place, custom, value, and system categories."""
+    return generate_vocabulary_tree()
+
+
+@api_v1_vocabulary.get(
+    '/tree/<openatlas_class>',
+    summary="Get types tree by OpenAtlas class",
+    responses=vocabulary_tree_response,
+    tags=[vocabulary_tag])
+def get_vocabulary_tree_by_class(path: VocabularyTreePath) -> dict[str, Any]:
+    """Retrieves all OpenAtlas types filtered by a specific OpenAtlas class."""
+    class_name = (
+        path.openatlas_class.value
+        if hasattr(path.openatlas_class, 'value')
+        else str(path.openatlas_class))
+
+    return generate_vocabulary_tree(openatlas_class=class_name)
+
+
+@api_v1_vocabulary.get(
+    '/standard/<openatlas_class>',
+    summary="Get standard types tree by OpenAtlas class",
+    responses=vocabulary_standard_by_class_response,
+    tags=[vocabulary_tag])
+def get_vocabulary_standard_by_class(
+        path: VocabularyTreePath,
+        query: VocabularyStandardQuery) -> dict[str, Any]:
+    """Retrieves standard OpenAtlas types filtered by a specific
+    OpenAtlas class, formatted for hierarchical UI components."""
+
+    class_name = (
+        path.openatlas_class.value
+        if hasattr(path.openatlas_class, 'value')
+        else str(path.openatlas_class))
+
+    used_vocab_ids = None
+    if query.case_study:
+        used_vocab_ids = get_vocab_ids_for_case_study(query.case_study)
+
+    root_ids = []
+    for type_ in g.types.values():
+        if not type_.root and getattr(type_, 'category', None) == 'standard':
+            if class_name and type_.classes \
+                    and class_name not in type_.classes:
+                continue
+            root_ids.append(type_.id)
+
+    standard_vocab = walk_tree(root_ids, used_vocab_ids)
+
+    return VocabularyStandardResponse(
+        data=standard_vocab).model_dump(by_alias=True)

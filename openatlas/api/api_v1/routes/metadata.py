@@ -1,0 +1,104 @@
+from typing import Any
+
+from flask import g
+from flask_openapi3 import APIBlueprint
+
+from openatlas.api.api_v1.entity import get_rightsholder_by_id
+from openatlas.api.api_v1.error_handlers import (
+    abort_not_found, register_error_handlers)
+from openatlas.api.api_v1.models.agent import (
+    AgentItem, AgentListResponse, AgentPath)
+from openatlas.api.api_v1.models.metadata import (
+    CaseStudyItem, CaseStudyListResponse, CaseStudyPath)
+from openatlas.api.api_v1.openapi_tags import metadata_tag
+from openatlas.api.api_v1.responses.metadata import (
+    agent_response, agents_response, case_studies_response,
+    case_study_response)
+from openatlas.models.rights_holder import RightsHolder
+
+api_v1_metadata = APIBlueprint(
+    'api_v1_metadata',
+    __name__,
+    url_prefix='/api/1',
+    abp_security=[{'bearerAuth': []}])
+register_error_handlers(api_v1_metadata)
+
+
+def walk_case_studies(ids: list[int]) -> list[CaseStudyItem]:
+    items = []
+    for id_ in ids:
+        item = g.types.get(id_)
+        if item:
+            items.append(CaseStudyItem(
+                id=item.id,
+                uuid=item.uuid,
+                name=item.name,
+                description=item.description,
+                sub_case_studies=walk_case_studies(item.subs)))
+    return items
+
+
+@api_v1_metadata.get(
+    '/case-studies',
+    summary="Get case studies metadata",
+    tags=[metadata_tag],
+    responses=case_studies_response)
+def get_case_studies() -> dict[str, Any]:
+    """Retrieves the hierarchical list of all project case studies."""
+    case_study_ids = g.types[g.case_study_type.id].subs
+    case_studies = walk_case_studies(case_study_ids)
+    return CaseStudyListResponse(
+        data=case_studies).model_dump(by_alias=True)
+
+
+@api_v1_metadata.get(
+    '/case-studies/<int:id>',
+    summary="Get case study metadata",
+    tags=[metadata_tag],
+    responses=case_study_response)
+def get_case_study_by_id(path: CaseStudyPath) -> dict[str, Any]:
+    """Retrieves a single case study by its ID, including its nested sub-case
+    studies."""
+    case_study = g.types.get(path.id)
+    if not case_study or g.case_study_type.id not in case_study.root:
+        abort_not_found(path.id)
+    return CaseStudyItem(
+        id=case_study.id,
+        uuid=case_study.uuid,
+        name=case_study.name,
+        description=case_study.description,
+        sub_case_studies=walk_case_studies(case_study.subs)
+    ).model_dump(by_alias=True)
+
+
+@api_v1_metadata.get(
+    '/agents',
+    summary="Get agents information",
+    tags=[metadata_tag],
+    responses=agents_response)
+def get_agents() -> dict[str, Any]:
+    """Retrieves all registered rights holders, authors, and creators."""
+    right_holders = []
+    for entity in RightsHolder.get_rights_holders():
+        right_holders.append(
+            AgentItem(
+                id=entity.id,
+                name=entity.name,
+                class_name=entity.class_,
+                description=entity.description))
+    return AgentListResponse(data=right_holders).model_dump(by_alias=True)
+
+
+@api_v1_metadata.get(
+    '/agents/<int:id>',
+    summary="Get information about an agent",
+    tags=[metadata_tag],
+    responses=agent_response)
+def get_agent_by_id(path: AgentPath) -> dict[str, Any]:
+    """Retrieves information about a single rights holder or agent entity."""
+    entity = get_rightsholder_by_id(path.id)
+    return AgentItem(
+        id=entity.id,
+        name=entity.name,
+        class_name=entity.class_,
+        description=entity.description).model_dump(by_alias=True)

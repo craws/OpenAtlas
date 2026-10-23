@@ -3,6 +3,7 @@ from __future__ import annotations
 import ast
 import json
 from typing import Any, Iterable, Optional
+from uuid import UUID
 
 from flask import g, request
 from werkzeug.exceptions import abort
@@ -35,7 +36,7 @@ class Entity:
         self.class_ = g.classes[data['openatlas_class_name']]
         self.cidoc_class = self.class_.cidoc_class
         self.id = 0
-        self.uuid = ''
+        self.uuid: UUID | None = None
         self.name = ''
         self.aliases = {}
         self.description = None
@@ -539,13 +540,14 @@ class Entity:
 
     @staticmethod
     def get_by_uuid(
-            uuid: str,
+            uuid: UUID | str,
             types: bool = False,
             aliases: bool = False,
-            with_location: bool = True) -> Entity:
+            with_location: bool = True) -> Entity | None:
         data = db.get_by_uuid(uuid, types, aliases)
         if not data:
-            abort(418)
+            return None
+
         entity = Entity(data)
         if entity.class_.name == 'place' and with_location:
             entity.location = entity.get_linked_entity_safe('P53', types=True)
@@ -602,7 +604,9 @@ class Entity:
             entity_ids: int | list[int],
             codes: str | list[str] | None = None,
             classes: Optional[list[str]] = None,
-            inverse: bool = False) -> list[Link]:
+            inverse: bool = False,
+            preloaded_entities: Optional[dict[int, Entity]] = None) \
+            -> list[Link]:
         result = set()
         if codes:
             codes = codes if isinstance(codes, list) else [str(codes)]
@@ -610,8 +614,16 @@ class Entity:
         for row in rows:
             result.add(row['domain_id'])
             result.add(row['range_id'])
+
+        if preloaded_entities:
+            result = {id_ for id_ in result if id_ not in preloaded_entities}
+
         linked_entities = {
             e.id: e for e in Entity.get_by_ids(result, types=True)}
+
+        if preloaded_entities:
+            linked_entities.update(preloaded_entities)
+
         links = []
         for row in rows:
             links.append(
@@ -836,8 +848,8 @@ def insert(data: dict[str, Any]) -> Entity:
         data['description'] = result['text']
         annotation_data = result['data']
     for item in [
-            'begin_from', 'begin_to', 'begin_comment',
-            'end_from', 'end_to', 'end_comment', 'description']:
+        'begin_from', 'begin_to', 'begin_comment',
+        'end_from', 'end_to', 'end_comment', 'description']:
         data[item] = data.get(item)
     for item in ['name', 'description']:
         data[item] = sanitize(data[item])

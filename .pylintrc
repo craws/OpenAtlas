@@ -1,5 +1,5 @@
 [MASTER]
-ignore=openatlas.wsgi
+ignore=openatlas.wsgi,run_schemathesis.py
 disable=C0111, broad-except, duplicate-code
 good-names=bc, c, e, ex, f, i, id, ip, j, js, k, l, op, Run, r, rv, to, x, y, _
 extension-pkg-allow-list=lxml

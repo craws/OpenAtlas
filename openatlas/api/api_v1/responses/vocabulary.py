@@ -1,0 +1,39 @@
+from openatlas.api.api_v1.models.util import ErrorResponse
+from openatlas.api.api_v1.models.vocabulary import (
+    VocabularyFlatItem, VocabularyFlatResponse, VocabularyStandardResponse,
+    VocabularyTreeResponse)
+
+vocabulary_list_response = {200: VocabularyFlatResponse}
+vocabulary_flat_response = {
+    200: VocabularyFlatItem,
+    404: {
+        'description': 'Type not found.',
+        'content': {
+            'application/json': {
+                'schema': ErrorResponse.model_json_schema()}}}}
+vocabulary_tree_response = {200: VocabularyTreeResponse}
+vocabulary_standard_by_class_response = {200: VocabularyStandardResponse}
+
+vocabulary_skos_response = {
+    200: {
+        'description': 'Vocabulary hierarchy exported as a SKOS graph in '
+                       'different RDF serialization formats.',
+        'content': {
+            'text/turtle': {
+                'schema': {'type': 'string'}},
+            'application/rdf+xml': {
+                'schema': {'type': 'string'}},
+            'application/ld+json': {
+                'schema': {
+                    'type': 'array',
+                    'items': {
+                        'type': 'object',
+                        'additionalProperties': True}}},
+            'application/n-triples': {
+                'schema': {'type': 'string'}}}},
+
+    404: {
+        'description': 'Type not found.',
+        'content': {
+            'application/json': {
+                'schema': ErrorResponse.model_json_schema()}}}}
