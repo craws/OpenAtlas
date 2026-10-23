@@ -4,7 +4,7 @@ from flask import g
 from werkzeug.exceptions import ImATeapot
 
 from openatlas.api.api_v1.error_handlers import abort_not_found
-from openatlas.database.api import get_by_class_api
+from openatlas.database.api import get_by_class_api, get_type_sub_ids_api
 from openatlas.models.entity import Entity
 from openatlas.models.rights_holder import RightsHolder
 
@@ -46,18 +46,7 @@ def get_rightsholder_by_id(id_: int) -> RightsHolder:
 def resolve_type_ids(identifier: int | UUID | None) -> list[int] | None:
     if identifier is None:
         return None
-
-    if isinstance(identifier, int):
-        entity = g.types.get(identifier)
-        return [identifier, *entity.get_sub_ids_recursive()] \
-            if entity else []
-
-    uuid_str = str(identifier)
-    for type_id, entity in g.types.items():
-        if str(entity.uuid) == uuid_str:
-            return [type_id, *entity.get_sub_ids_recursive()]
-
-    return []
+    return get_type_sub_ids_api(identifier)
 
 
 def get_by_system_class(

@@ -707,6 +707,68 @@ class ApiV1(ApiTestCase):
             assert rv.status_code == HTTPStatus.NOT_FOUND
             assert rv.get_json()['details']['provided_id'] == str(id_)
 
+    def test_search(self) -> None:
+        c = self.client
+        e = self.get_api_entities()
+        with app.test_request_context():
+            app.preprocess_request()
+            insert('person', 'Smith', 'Exact match')
+            insert('person', 'Smithson', 'Prefix match')
+            insert('person', 'John Smith', 'Substring match')
+            insert('person', 'Smyth', 'Phonetic match')
+
+        g.pop('types', None)
+        rv = c.get(
+            f'/api/1/search?typeId={e.boundary_mark.id}')
+        assert rv.status_code == HTTPStatus.OK
+        assert not hasattr(g, 'types')
+
+        rv = c.get(
+            url_for(
+                'api_v1_frontend.search_entities',
+                search='Smith',
+                entityClass='person'))
+        assert rv.status_code == HTTPStatus.OK
+        data = rv.get_json()
+        names = [item['name'] for item in data['data']]
+        assert names[:4] == ['Smith', 'Smithson', 'John Smith', 'Smyth']
+        assert data['data'][0]['systemClass'] == 'person'
+        assert data['data'][0]['description'] == 'Exact match'
+
+        rv = c.get(
+            url_for(
+                'api_v1_frontend.search_entities',
+                search='Shire',
+                entityClass='place'))
+        assert rv.status_code == HTTPStatus.OK
+        place_data = rv.get_json()['data']
+        assert place_data[0]['name'] == 'Shire'
+        assert place_data[0]['timespan'] is not None
+
+        for params in [
+            {'entityClass': 'place', 'limit': 1, 'page': 2},
+            {'startDate': '-400', 'endDate': '2050-05'},
+            {'typeId': e.boundary_mark.id},
+            {'typeId': str(e.boundary_mark.uuid)},
+            {'caseStudy': e.case_study.id},
+            {'caseStudy': str(e.case_study.uuid)},
+            {'sortBy': 'startDate', 'sort': 'desc'}]:
+            rv = c.get(
+                url_for('api_v1_frontend.search_entities', **params))
+            assert rv.status_code == HTTPStatus.OK
+            res = rv.get_json()
+            assert 'totalItems' in res
+            assert 'first' in res
+            assert 'last' in res
+
+        rv = c.get(
+            url_for(
+                'api_v1_frontend.search_entities',
+                typeId=999999))
+        assert rv.status_code == HTTPStatus.OK
+        assert rv.get_json()['data'] == []
+        assert rv.get_json()['totalItems'] == 0
+
     def test_docs(self) -> None:
         c = self.client
         for url in [

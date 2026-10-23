@@ -2299,6 +2299,13 @@ CREATE INDEX entity_openatlas_class_name_idx ON model.entity USING btree (openat
 
 
 --
+-- Name: entity_name_dm_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX entity_name_dm_idx ON model.entity USING gin (public.daitch_mokotoff(name));
+
+
+--
 -- Name: gis_entity_id_idx; Type: INDEX; Schema: model; Owner: openatlas
 --
 

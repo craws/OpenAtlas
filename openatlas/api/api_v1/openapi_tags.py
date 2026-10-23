@@ -23,3 +23,7 @@ iiif_tag = Tag(
 metadata_tag = Tag(
     name='Metadata',
     description='Project metadata, agents, and case studies.')
+
+frontend_tag = Tag(
+    name='Frontend',
+    description='Frontend search and discovery endpoints.')

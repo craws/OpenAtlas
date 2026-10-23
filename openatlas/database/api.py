@@ -1,5 +1,6 @@
 from collections import defaultdict
 from typing import Any
+from uuid import UUID
 
 from flask import g
 from shapely import GeometryCollection, from_wkt
@@ -63,36 +64,24 @@ def _format_date_for_sql(date: str) -> str | None:
         return f"{date_string.lstrip('-')} BC"
     return date_string
 
-## Entity ##
 
-def get_by_class_api(
-        class_: str,
-        types: bool = False,
-        aliases: bool = False,
-        order_by: str | None = None,
-        limit: int | None = None,
-        offset: int | None = None,
-        search_name: str | None = None,
+_END_COALESCE = 'COALESCE(e.end_to, e.end_from, e.begin_to, e.begin_from)'
+
+
+def _build_entity_filter_sql(
+        where_sql: str,
+        params: dict[str, Any],
         start_date: str | None = None,
         end_date: str | None = None,
         type_ids: list[int] | None = None,
-        case_study_ids: list[int] | None = None) \
-        -> tuple[list[dict[str, Any]], int]:
-    where_sql = 'WHERE e.openatlas_class_name = %(class)s'
-    params: dict[str, Any] = {'class': class_}
-    end_coalesce = 'COALESCE(e.end_to, e.end_from, e.begin_to, e.begin_from)'
-
-    if search_name:
-        where_sql += ' AND e.name ILIKE %(search)s'
-        params['search'] = f'%{search_name}%'
-
+        case_study_ids: list[int] | None = None) -> str:
     if start_date:
         where_sql += (
             ' AND COALESCE(e.begin_from, e.begin_to) >= %(start_date)s')
         params['start_date'] = _format_date_for_sql(start_date)
 
     if end_date:
-        where_sql += f' AND {end_coalesce} <= %(end_date)s'
+        where_sql += f' AND {_END_COALESCE} <= %(end_date)s'
         params['end_date'] = _format_date_for_sql(end_date)
 
     if type_ids:
@@ -110,25 +99,61 @@ def get_by_class_api(
             "AND l_cs.property_code IN ('P2', 'P89'))")
         params['case_study_ids'] = tuple(case_study_ids)
 
+    return where_sql
+
+
+def _build_order_sql(order_by: str | None = None) -> str:
+    match order_by:
+        case 'name_desc':
+            return ' ORDER BY e.name DESC, e.id DESC'
+        case 'start_date_asc':
+            return ' ORDER BY e.begin_from ASC NULLS LAST, e.id ASC'
+        case 'start_date_desc':
+            return ' ORDER BY e.begin_from DESC NULLS LAST, e.id DESC'
+        case 'end_date_asc':
+            return f' ORDER BY {_END_COALESCE} ASC NULLS LAST, e.id ASC'
+        case 'end_date_desc':
+            return f' ORDER BY {_END_COALESCE} DESC NULLS LAST, e.id DESC'
+        case _:
+            return ' ORDER BY e.name ASC, e.id ASC'
+
+
+## Entity ##
+
+def get_by_class_api(
+        class_: str,
+        types: bool = False,
+        aliases: bool = False,
+        order_by: str | None = None,
+        limit: int | None = None,
+        offset: int | None = None,
+        search_name: str | None = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
+        type_ids: list[int] | None = None,
+        case_study_ids: list[int] | None = None) \
+        -> tuple[list[dict[str, Any]], int]:
+    where_sql = 'WHERE e.openatlas_class_name = %(class)s'
+    params: dict[str, Any] = {'class': class_}
+
+    if search_name:
+        where_sql += ' AND e.name ILIKE %(search)s'
+        params['search'] = f'%{search_name}%'
+
+    where_sql = _build_entity_filter_sql(
+        where_sql,
+        params,
+        start_date=start_date,
+        end_date=end_date,
+        type_ids=type_ids,
+        case_study_ids=case_study_ids)
+
     g.cursor.execute(
         f'SELECT COUNT(*) FROM model.entity e {where_sql};',
         params)
     total = g.cursor.fetchone()['count']
 
-    match order_by:
-        case 'name_desc':
-            order_sql = ' ORDER BY e.name DESC, e.id DESC'
-        case 'start_date_asc':
-            order_sql = ' ORDER BY e.begin_from ASC NULLS LAST, e.id ASC'
-        case 'start_date_desc':
-            order_sql = ' ORDER BY e.begin_from DESC NULLS LAST, e.id DESC'
-        case 'end_date_asc':
-            order_sql = f' ORDER BY {end_coalesce} ASC NULLS LAST, e.id ASC'
-        case 'end_date_desc':
-            order_sql = f' ORDER BY {end_coalesce} DESC NULLS LAST, e.id DESC'
-        case _:
-            order_sql = ' ORDER BY e.name ASC, e.id ASC'
-
+    order_sql = _build_order_sql(order_by)
     inner_sql = f'SELECT e.id FROM model.entity e {where_sql}{order_sql}'
 
     if limit is not None:
@@ -146,7 +171,94 @@ def get_by_class_api(
     g.cursor.execute(sql, params)
     return list(g.cursor), total
 
+
+def search_entities_api(
+        classes: list[str],
+        order_by: str | None = None,
+        limit: int = 50,
+        offset: int = 0,
+        search_name: str | None = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
+        type_ids: list[int] | None = None,
+        case_study_ids: list[int] | None = None) \
+        -> tuple[list[dict[str, Any]], int]:
+    where_sql = 'WHERE e.openatlas_class_name IN %(classes)s'
+    params: dict[str, Any] = {
+        'classes': tuple(classes),
+        'limit': limit,
+        'offset': offset}
+
+    if search_name:
+        where_sql += (
+            ' AND (e.name ILIKE %(search_like)s '
+            'OR public.daitch_mokotoff(e.name) '
+            '&& public.daitch_mokotoff(%(search)s))')
+        params['search'] = search_name
+        params['search_prefix'] = f'{search_name}%'
+        params['search_like'] = f'%{search_name}%'
+
+    where_sql = _build_entity_filter_sql(
+        where_sql,
+        params,
+        start_date=start_date,
+        end_date=end_date,
+        type_ids=type_ids,
+        case_study_ids=case_study_ids)
+
+    g.cursor.execute(
+        f'SELECT COUNT(*) FROM model.entity e {where_sql};',
+        params)
+    total = g.cursor.fetchone()['count']
+
+    if search_name:
+        order_sql = """
+            ORDER BY
+                CASE
+                    WHEN LOWER(e.name) = LOWER(%(search)s) THEN 0
+                    WHEN LOWER(e.name) LIKE LOWER(%(search_prefix)s) THEN 1
+                    WHEN LOWER(e.name) LIKE LOWER(%(search_like)s) THEN 2
+                    ELSE 3
+                END ASC,
+                e.name ASC,
+                e.id ASC
+        """
+    else:
+        order_sql = _build_order_sql(order_by)
+
+    sql = (
+        f'{select_sql()} {where_sql} {order_sql} '
+        'LIMIT %(limit)s OFFSET %(offset)s;')
+
+    g.cursor.execute(sql, params)
+    return list(g.cursor), total
+
 ## Vocabulary ##
+
+def get_type_sub_ids_api(identifier: int | UUID) -> list[int]:
+    where_clause = (
+        'id = %(identifier)s' if isinstance(identifier, int)
+        else 'uuid = %(identifier)s')
+    param = identifier if isinstance(identifier, int) else str(identifier)
+    g.cursor.execute(
+        f"""
+        WITH RECURSIVE type_tree AS (
+            SELECT id
+            FROM model.entity
+            WHERE {where_clause}
+              AND openatlas_class_name IN (
+                  'administrative_unit', 'type', 'type_tools')
+            UNION
+            SELECT l.domain_id
+            FROM model.link l
+            JOIN type_tree tt ON l.range_id = tt.id
+            WHERE l.property_code IN ('P127', 'P89')
+        )
+        SELECT id FROM type_tree;
+        """,
+        {'identifier': param})
+    return [row['id'] for row in list(g.cursor)]
+
 
 def get_vocab_ids_for_case_study(case_study_id: int) -> set[int]:
     sql = """

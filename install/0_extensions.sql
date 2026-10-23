@@ -1,3 +1,4 @@
 -- Has to be superuser
 CREATE EXTENSION IF NOT EXISTS postgis WITH SCHEMA public;
 CREATE EXTENSION IF NOT EXISTS unaccent WITH SCHEMA public;
+CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;
