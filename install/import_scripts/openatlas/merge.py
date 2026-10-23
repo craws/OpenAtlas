@@ -24,7 +24,7 @@ from flask import g
 from psycopg2 import extras
 
 from openatlas import app, get_classes
-from openatlas.api.resources.util import date_to_utc_iso_str
+from openatlas.api.api_v1.formatters.la_helpers import date_to_utc_iso_str
 from openatlas.database import entity as db
 from openatlas.database.checks import delete_link_duplicates
 from openatlas.database.entity import set_required
@@ -34,12 +34,9 @@ from openatlas.database.rights_holder import (
 from openatlas.models.entity import Entity, insert
 from openatlas.models.rights_holder import RightsHolder
 
-DATABASE_NAME = 'openatlas_demo_dev'  # The database to fetch data from
-PROJECT_NAME = 'THANADOS'  # Will also be added as case study
-PROJECT_DESCRIPTION = (
-    'THANADOS (The Anthropological and Archaeological Database of '
-    'Sepultures) deals with the digital collection and presentation of '
-    'Early Medieval cemeteries in the area of present day Austria.')
+DATABASE_NAME = 'openatlas_demo'  # The database to fetch data from
+PROJECT_NAME = 'MEDCON'  # Will also be added as case study
+PROJECT_DESCRIPTION = 'MEDCON'
 IMPORT_USER_ID = 1
 FILES_PATH = pathlib.Path('/home/alex/Desktop/demo_dev_files')
 
@@ -418,7 +415,7 @@ def add_files() -> None:
                     f'{id_map[int(pathlib.Path(entry).stem)]}'
                     f'{pathlib.Path(entry).suffix}')
                 print(f'File copy of: {entry.name}')
-    rights_holders = RightsHolder.get_rights_holder()
+    rights_holders = RightsHolder.get_rights_holders()
     cursor.execute(
         "SELECT id, name, class, description FROM model.rights_holder;")
     for row in list(cursor):
@@ -495,6 +492,7 @@ def annotations() -> None:
                 if row['entity_id'] else None,
                 'coordinates': row['coordinates'],
                 'text': row['text']})
+
 
 with app.test_request_context():
     app.preprocess_request()
