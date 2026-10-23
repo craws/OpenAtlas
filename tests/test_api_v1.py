@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from pathlib import Path
 
 from flask import g, url_for
@@ -71,7 +72,7 @@ class ApiV1(ApiTestCase):
                 'api_v1_lod.get_entities',
                 entity_class='acquisition',
                 **params))
-            assert rv.status_code == 200
+            assert rv.status_code == HTTPStatus.OK
 
         for sort_field, sort_order in [
                 ('startDate', 'asc'),
@@ -83,19 +84,19 @@ class ApiV1(ApiTestCase):
                 entity_class='acquisition',
                 sortBy=sort_field,
                 sort=sort_order))
-            assert rv.status_code == 200
+            assert rv.status_code == HTTPStatus.OK
 
         rv = c.get(url_for(
             'api_v1_lod.get_entities',
             entity_class='acquisition',
             sortBy='invalid_field'))
-        assert rv.status_code == 422
+        assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
         rv = c.get(url_for(
             'api_v1_lod.get_entities',
             entity_class='acquisition',
             startDate='0'))
-        assert rv.status_code == 422
+        assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
         assert b'There is no year 0' in rv.data
 
         for params in [
@@ -111,7 +112,7 @@ class ApiV1(ApiTestCase):
                     'api_v1_lod.get_entities',
                     entity_class='acquisition'),
                 query_string=params)
-            assert rv.status_code == 422
+            assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
         rv = c.get(
             url_for(
@@ -119,7 +120,7 @@ class ApiV1(ApiTestCase):
                 entity_class='type',
                 limit=1,
                 page=2))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         assert 'prev' in rv.get_json()
 
         assert format_lod_entities([]) == {
@@ -156,7 +157,7 @@ class ApiV1(ApiTestCase):
             url_for(
                 'api_v1_lod.get_entity',
                 uuid='7404a969-97ba-4861-a555-3a97be2be967'))
-        assert rv.status_code == 404
+        assert rv.status_code == HTTPStatus.NOT_FOUND
 
     def test_la(self) -> None:
         c = self.client
@@ -188,12 +189,12 @@ class ApiV1(ApiTestCase):
             url_for(
                 'api_v1_la.get_entity',
                 uuid='7404a969-97ba-4861-a555-3a97be2be967'))
-        assert rv.status_code == 404
+        assert rv.status_code == HTTPStatus.NOT_FOUND
 
         for class_ in ['place', 'person', 'artifact', 'file', 'type']:
             rv = c.get(
                 url_for('api_v1_la.get_entities', entity_class=class_))
-            assert rv.status_code == 200
+            assert rv.status_code == HTTPStatus.OK
             rv_json = rv.get_json()
             assert rv_json['type'] == 'OrderedCollectionPage'
             assert rv_json['orderedItems']
@@ -205,7 +206,7 @@ class ApiV1(ApiTestCase):
                 entity_class='type',
                 limit=1,
                 page=2))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         assert 'prev' in rv.get_json()
 
         assert format_la_entities([]) == {
@@ -287,7 +288,7 @@ class ApiV1(ApiTestCase):
 
         for entity in (e.group, e.production, e.translation):
             rv = c.get(url_for('api_v1_la.get_entity', uuid=entity.uuid))
-            assert rv.status_code == 200
+            assert rv.status_code == HTTPStatus.OK
 
         for entity in (e.place, e.feature):
             rv = c.get(url_for('api_v1_la.get_entity', uuid=entity.uuid))
@@ -299,7 +300,7 @@ class ApiV1(ApiTestCase):
         e = self.get_api_entities()
 
         rv = c.get(url_for('api_v1_root.api_v1_index'))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         rv_json = rv.get_json()
         assert rv_json['name'] == "OpenAtlas API"
         assert 'version' in rv_json
@@ -308,7 +309,7 @@ class ApiV1(ApiTestCase):
         assert 'manual' in rv_json
 
         rv = c.get(url_for('api_v1_system.get_system_info'))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         rv_json = rv.get_json()
         assert 'apiVersions' in rv_json
         assert isinstance(rv_json['apiVersions'], dict)
@@ -330,7 +331,7 @@ class ApiV1(ApiTestCase):
         assert 'counts' in rv.get_json()
 
         rv = c.get(url_for('api_v1_system.get_system_classes'))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         rv_json = rv.get_json()
         assert 'locale' in rv_json
         assert 'results' in rv_json
@@ -342,7 +343,7 @@ class ApiV1(ApiTestCase):
         assert 'counts' in rv.get_json()
 
         rv = c.get(url_for('api_v1_system.get_system_properties'))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         assert 'properties' in rv.get_json()
 
     def test_vocabulary(self) -> None:
@@ -350,14 +351,14 @@ class ApiV1(ApiTestCase):
         e = self.get_api_entities()
 
         rv = c.get(url_for('api_v1_vocabulary.get_vocabulary_list'))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         assert any(
             v['timespan']['start']['earliest']
             for v in rv.get_json()['data'].values()
             if v['timespan'])
 
         rv = c.get(url_for('api_v1_vocabulary.get_vocabulary_tree'))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         rv_json = rv.get_json()
         assert 'standard' in rv_json
         assert 'custom' in rv_json
@@ -370,19 +371,19 @@ class ApiV1(ApiTestCase):
             url_for(
                 'api_v1_vocabulary.get_vocabulary_item',
                 id=e.open_license.id))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
 
         rv = c.get(
             url_for(
                 'api_v1_vocabulary.get_vocabulary_item',
                 id=e.place.id))
-        assert rv.status_code == 404
+        assert rv.status_code == HTTPStatus.NOT_FOUND
 
         rv = c.get(
             url_for(
                 'api_v1_vocabulary.get_vocabulary_tree_by_class',
                 openatlas_class='place'))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         rv_json = rv.get_json()
         assert 'place' in rv_json
 
@@ -391,7 +392,7 @@ class ApiV1(ApiTestCase):
                 'api_v1_vocabulary.get_vocabulary_standard_by_class',
                 openatlas_class='place',
                 case_study=e.case_study.id))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         rv_json = rv.get_json()
         assert 'data' in rv_json
         assert isinstance(rv_json['data'], list)
@@ -410,7 +411,7 @@ class ApiV1(ApiTestCase):
                 'api_v1_vocabulary.get_vocabulary_skos_ext',
                 id=e.license.id,
                 ext='ttl'))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         assert 'text/turtle' in rv.headers.get('Content-Type', '')
         graph = Dataset()
         graph.parse(data=rv.data, format='turtle')
@@ -430,29 +431,27 @@ class ApiV1(ApiTestCase):
 
         rv = c.get(
             url_for('api_v1_vocabulary.get_vocabulary_skos', id=e.license.id))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         assert 'application/ld+json' in rv.headers.get('Content-Type', '')
 
-        # Unknown id returns 404
         rv = c.get(
             url_for(
                 'api_v1_vocabulary.get_vocabulary_skos',
                 id=999999))
-        assert rv.status_code == 404
+        assert rv.status_code == HTTPStatus.NOT_FOUND
         rv = c.get(
             url_for(
                 'api_v1_vocabulary.get_vocabulary_skos_ext',
                 id=999999,
                 ext='ttl'))
-        assert rv.status_code == 404
+        assert rv.status_code == HTTPStatus.NOT_FOUND
 
     def test_metadata(self) -> None:
         c = self.client
         e = self.get_api_entities()
 
-        # Case studies
         rv = c.get(url_for('api_v1_metadata.get_case_studies'))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         rv_json = rv.get_json()
         assert 'data' in rv_json
         assert isinstance(rv_json['data'], list)
@@ -461,28 +460,26 @@ class ApiV1(ApiTestCase):
             url_for(
                 'api_v1_metadata.get_case_study_by_id',
                 id=e.case_study.id))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         rv_json = rv.get_json()
         assert 'id' in rv_json
         assert 'name' in rv_json
 
         rv = c.get(url_for('api_v1_metadata.get_case_study_by_id', id=99999))
-        assert rv.status_code == 404
+        assert rv.status_code == HTTPStatus.NOT_FOUND
 
-        # Agents
         rv = c.get(url_for('api_v1_metadata.get_agents'))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         rv_json = rv.get_json()
         assert 'data' in rv_json
         assert isinstance(rv_json['data'], list)
 
-        # Agent by ID
         rv = c.get(url_for('api_v1_metadata.get_agent_by_id', id=999999))
-        assert rv.status_code == 404
+        assert rv.status_code == HTTPStatus.NOT_FOUND
         assert rv.get_json()['details']['provided_id'] == '999999'
 
         rv = c.get(url_for('api_v1_metadata.get_agent_by_id', id=1))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         rv_json = rv.get_json()
         assert 'name' in rv_json
         assert 'class' in rv_json
@@ -503,35 +500,35 @@ class ApiV1(ApiTestCase):
 
         with c.get(
                 url_for('api_v1_files.display_file', id=e.file.id)) as rv:
-            assert rv.status_code in (200, 302)
+            assert rv.status_code in (HTTPStatus.OK, HTTPStatus.FOUND)
         with c.get(
                 url_for(
                     'api_v1_files.display_file',
                     id=e.file_without_file.id)) as rv:
-            assert rv.status_code == 404
+            assert rv.status_code == HTTPStatus.NOT_FOUND
         with c.get(
                 url_for(
                     'api_v1_files.display_file',
                     id=e.file.id,
                     download=True)) as rv:
-            assert rv.status_code == 200
+            assert rv.status_code == HTTPStatus.OK
             assert f'filename={e.file.id}.png' in rv.headers.get(
                 'Content-Disposition', '')
 
         with c.get(
                 url_for('api_v1_files.display_thumbnail', id=e.file.id)) as rv:
-            assert rv.status_code in (200, 302)
+            assert rv.status_code in (HTTPStatus.OK, HTTPStatus.FOUND)
         with c.get(
                 url_for(
                     'api_v1_files.display_thumbnail',
                     id=e.file_without_file.id)) as rv:
-            assert rv.status_code == 404
+            assert rv.status_code == HTTPStatus.NOT_FOUND
         with c.get(
                 url_for(
                     'api_v1_files.display_thumbnail',
                     id=e.file.id,
                     download=True)) as rv:
-            assert rv.status_code == 200
+            assert rv.status_code == HTTPStatus.OK
             assert f'filename={e.file.id}.png' in rv.headers.get(
                 'Content-Disposition', '')
 
@@ -539,27 +536,27 @@ class ApiV1(ApiTestCase):
                 url_for(
                     'api_v1_files.display_thumbnail',
                     id=e.file_not_public.id)) as rv:
-            assert rv.status_code == 403
+            assert rv.status_code == HTTPStatus.FORBIDDEN
 
         with c.get(
                 url_for(
                     'api_v1_files.display_thumbnail',
                     id=e.file_without_licences.id)) as rv:
-            assert rv.status_code == 403
+            assert rv.status_code == HTTPStatus.FORBIDDEN
 
         with c.get(
                 url_for(
                     'api_v1_files.display_thumbnail',
                     id=e.place.id)) as rv:
-            assert rv.status_code == 404
+            assert rv.status_code == HTTPStatus.NOT_FOUND
 
         rv = c.get(url_for('api_v1_files.get_public_files'))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         assert 'data' in rv.get_json()
 
         rv = c.get(
             url_for('api_v1_files.get_public_files_by_entity', id=e.actor.id))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         json_data = rv.get_json()
         assert 'data' in json_data
         file_ids = [item['id'] for item in json_data['data']]
@@ -569,7 +566,7 @@ class ApiV1(ApiTestCase):
 
         rv = c.get(
             url_for('api_v1_files.get_public_files_by_entity', id=e.weight.id))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         assert rv.get_json()['data'] == []
         assert rv.get_json()['totalItems'] == 0
 
@@ -595,13 +592,12 @@ class ApiV1(ApiTestCase):
             annotations = AnnotationImage.get_by_file_id(e.file.id)
             annotation_id = annotations[0].id
 
-        # Manifest
         rv = c.get(
             url_for(
                 'api_v1_iiif.get_iiif_manifest',
                 id=e.file.id,
                 version='2'))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         manifest_v2 = rv.get_json()
         assert manifest_v2['@type'] == 'sc:Manifest'
         assert manifest_v2['license'] == lic_url
@@ -612,7 +608,7 @@ class ApiV1(ApiTestCase):
                 'api_v1_iiif.get_iiif_manifest',
                 id=e.file.id,
                 version='3'))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         manifest_v3 = rv.get_json()
         assert manifest_v3['type'] == 'Manifest'
         assert manifest_v3['rights'] == lic_url
@@ -624,37 +620,35 @@ class ApiV1(ApiTestCase):
                 'api_v1_iiif.get_iiif_manifest',
                 id=e.file.id,
                 version='99'))
-        assert rv.status_code == 422
+        assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
-        # Canvas
         rv = c.get(
             url_for('api_v1_iiif.get_iiif_canvas', id=e.file.id, version='2'))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
 
         rv = c.get(
             url_for('api_v1_iiif.get_iiif_canvas', id=e.file.id, version='3'))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
 
         rv = c.get(
             url_for('api_v1_iiif.get_iiif_canvas', id=e.file.id, version='99'))
-        assert rv.status_code == 422
+        assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
         # Image
         rv = c.get(
             url_for('api_v1_iiif.get_iiif_image', id=e.file.id, version='2'))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
 
         rv = c.get(
             url_for('api_v1_iiif.get_iiif_image', id=e.file.id, version='3'))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
 
         rv = c.get(
             url_for('api_v1_iiif.get_iiif_image', id=e.file.id, version='99'))
-        assert rv.status_code == 422
+        assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
-        # Direct URL structure check: /api/1/iiif/<id>/image/<version>
         rv = c.get(f'/api/1/iiif/{e.file.id}/image/2')
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
 
         # Annotation list
         rv = c.get(
@@ -662,7 +656,7 @@ class ApiV1(ApiTestCase):
                 'api_v1_iiif.get_iiif_annotation_list',
                 id=e.file.id,
                 version='2'))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         assert rv.get_json()['@type'] == 'sc:AnnotationList'
 
         rv = c.get(
@@ -670,7 +664,7 @@ class ApiV1(ApiTestCase):
                 'api_v1_iiif.get_iiif_annotation_list',
                 id=e.file.id,
                 version='3'))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         assert rv.get_json()['type'] == 'AnnotationPage'
 
         rv = c.get(
@@ -678,7 +672,7 @@ class ApiV1(ApiTestCase):
                 'api_v1_iiif.get_iiif_annotation_list',
                 id=e.file.id,
                 version='99'))
-        assert rv.status_code == 422
+        assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
         # Annotation
         rv = c.get(
@@ -686,7 +680,7 @@ class ApiV1(ApiTestCase):
                 'api_v1_iiif.get_iiif_annotation',
                 id=annotation_id,
                 version='2'))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         assert rv.get_json()['@type'] == 'oa:Annotation'
 
         rv = c.get(
@@ -694,34 +688,33 @@ class ApiV1(ApiTestCase):
                 'api_v1_iiif.get_iiif_annotation',
                 id=annotation_id,
                 version='3'))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         assert rv.get_json()['type'] == 'Annotation'
 
         rv = c.get(f'/api/1/iiif/{annotation_id}/annotation/2')
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
 
         rv = c.get(f'/api/1/iiif/{e.file.id}/manifest/4')
-        assert rv.status_code in (400, 422)
+        assert rv.status_code in (
+            HTTPStatus.BAD_REQUEST, HTTPStatus.UNPROCESSABLE_ENTITY)
 
         rv = c.get('/api/1/iiif/999999/manifest/2')
-        assert rv.status_code == 404
+        assert rv.status_code == HTTPStatus.NOT_FOUND
         assert rv.get_json()['details']['provided_id'] == '999999'
 
         for id_ in [0, 999999]:
             rv = c.get(f'/api/1/iiif/{id_}/annotation/3')
-            assert rv.status_code == 404
+            assert rv.status_code == HTTPStatus.NOT_FOUND
             assert rv.get_json()['details']['provided_id'] == str(id_)
 
     def test_docs(self) -> None:
         c = self.client
         for url in [
             '/api/1/docs/swagger',
-            '/api/1/docs/redoc',
-            '/api/1/docs/scalar',
             '/api/1/docs/openapi.json',
             '/api/1/docs/']:
             rv = c.get(url)
-            assert rv.status_code == 200
+            assert rv.status_code == HTTPStatus.OK
         rv = c.get('/api/1/docs/Wrong!')
-        assert rv.status_code == 404
+        assert rv.status_code == HTTPStatus.NOT_FOUND
         assert '/api/1/docs/swagger' in rv.get_json()['message']
