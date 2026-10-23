@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from pathlib import Path
 from typing import Any
 
@@ -111,7 +112,7 @@ class FileTest(TestBaseCase):
         assert b'Remove custom logo' in rv.data
 
         rv = c.get(url_for('logo', id_=iiif_id), follow_redirects=True)
-        assert rv.status_code == 418
+        assert rv.status_code == HTTPStatus.IM_A_TEAPOT
 
         rv = c.get(
             url_for('logo_remove', action='remove_logo'),
@@ -206,10 +207,10 @@ class FileTest(TestBaseCase):
             files[0].link('P2', g.types[get_hierarchy('License').subs[0]])
 
         rv = c.get(url_for('api.licensed_file_overview'))
-        assert bool(len(rv.get_json().keys()) == 4)
+        assert bool(len(rv.get_json().keys()) == 4)  # noqa: PLR2004
 
         rv = c.get(url_for('api.licensed_file_overview', download=True))
-        assert bool(len(rv.get_json().keys()) == 4)
+        assert bool(len(rv.get_json().keys()) == 4)  # noqa: PLR2004
 
         rv = c.get(url_for('api.licensed_file_overview', file_id=iiif_id))
         assert bool(len(rv.get_json().keys()) == 1)
