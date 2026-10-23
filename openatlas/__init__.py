@@ -93,6 +93,10 @@ def before_request() -> Response | None:
     if request.path.startswith('/display'):
         return None  # Avoid overheads for file display
 
+    if request.path.startswith('/api/1/search'):
+        setup_api()
+        return None
+
     if request.path.startswith((
             '/swagger',
             '/openapi.json',
