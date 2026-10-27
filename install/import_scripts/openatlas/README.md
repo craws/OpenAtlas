@@ -28,11 +28,14 @@ A new case study will be created and will be linked to entities that are
 imported. The name and description of the case study can be configured in the
 script.
 
+If the import contains case studies they are linked as sub case studies to
+the new case study.
+
 ## Database logs
 In the import schema of the database imported entities are logged with their
-project and former id. This information can be configured at your profile to 
+project and former id. This information can be configured at your profile to
 be displayed in the user interface.
-   
+
 # Clean up
 At the start of the script possible entries from the last run will be
 removed. This can be useful in case you have to run the script more often to
@@ -72,17 +75,10 @@ and save them with their new id.
 
 Possible IIIF images are not imported and have to be created again (if needed).
 
-# What can be problematic
-
-## Case studies
-They are imported and linked but than have to be moved as sub case studies
-afterward manually via the user interface. Also, there might be duplication
-because every entity is also linked to the "super" case study that gets
-imported.
-
-We might take a look at that when the need arises.
-
 # What is not imported
 * Users and their information
 * Site settings, e.g. the site name and intro text
 * UUIDs
+
+# Possible improvements
+* Offer manual mapping to avoid duplicates of different projects (e.g. places)

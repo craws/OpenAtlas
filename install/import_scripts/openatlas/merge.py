@@ -6,13 +6,6 @@
 # To run the script from project root:
 # python3 install/import_scripts/openatlas/merge.py
 
-# Work in progress:
-# * Annotations
-
-# Possible improvements
-# * Offer manual mapping for e.g. duplicates
-# * New case studies (would have to be subs of import case study)
-
 import os
 import pathlib
 import shutil
@@ -34,11 +27,11 @@ from openatlas.database.rights_holder import (
 from openatlas.models.entity import Entity, insert
 from openatlas.models.rights_holder import RightsHolder
 
-DATABASE_NAME = 'openatlas_demo'  # The database to fetch data from
-PROJECT_NAME = 'MEDCON'  # Will also be added as case study
-PROJECT_DESCRIPTION = 'MEDCON'
+DATABASE_NAME = 'openatlas_dpp'  # The database to fetch data from
+PROJECT_NAME = 'DPP'  # Will also be added as case study
+PROJECT_DESCRIPTION = 'DPP'
 IMPORT_USER_ID = 1
-FILES_PATH = pathlib.Path('/home/alex/Desktop/demo_dev_files')
+FILES_PATH = pathlib.Path('')  # Set path if the files are available locally
 
 
 def connect() -> Any:
@@ -494,6 +487,16 @@ def annotations() -> None:
                 'text': row['text']})
 
 
+def move_case_studies():
+    for sub_id in Entity.get_hierarchy('Case study').subs:
+        if sub_id != case_study.id:
+            entity_info = g.logger.get_log_info(sub_id)
+            if entity_info['project'].name == PROJECT_NAME:
+                entity = Entity.get_by_id(sub_id)
+                entity.delete_links('P127', ['type'])
+                entity.link('P127', case_study)
+
+
 with app.test_request_context():
     app.preprocess_request()
     project_id = insert_project()
@@ -505,6 +508,7 @@ with app.test_request_context():
     entities()
     links()
     annotations()
+    move_case_studies()
 
     if FILES_PATH and file_ids:
         add_files()
