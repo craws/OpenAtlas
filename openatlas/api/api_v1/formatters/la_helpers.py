@@ -220,7 +220,8 @@ def date_to_utc_iso_str(date: Any) -> str | None:
     if not match:
         return str(date)  # pragma: no cover
     year, month, day, hour, minute, second = match.groups()
-    if hour and (int(hour) or int(minute) or int(second)):
+    if hour and (int(hour) or int(minute) or int(second)) \
+            and f'{hour}:{minute}:{second}' != '23:59:59':
         return (f'{year}-{month}-'
                 f'{day}T{hour}:{minute}:{second}Z')  # pragma: no cover
     return f'{year}-{month}-{day}'
