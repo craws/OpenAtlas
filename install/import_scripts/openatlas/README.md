@@ -1,0 +1,84 @@
+# About
+This script can be used to merge an OpenAtlas instance into an existing one.
+
+The script is very basic but will be expanded on a need to basis, feel free
+to add feature request at our
+[Redmine](https://redmine.openatlas.eu/projects/uni/wiki)
+
+# Preparation and usage
+The database and files to be imported into are the ones configured in this
+instance, so be sure to check the configuration in **instance/production.py**:
+
+The database and files to be imported from are configured at the top of the
+**merge.py** script.
+
+Both datasets should be at the same database version and as always,
+be sure to make backups before.
+
+The script can be run, e.g. from the project root with:
+
+    python3 install/import_scripts/openatlas/merge.py
+
+# Tracking
+
+To be able to understand what was imported, 2 mechanism are used.
+
+## New case study
+A new case study will be created and will be linked to entities that are
+imported. The name and description of the case study can be configured in the
+script.
+
+If the import contains case studies they are linked as sub case studies to
+the new case study.
+
+## Database logs
+In the import schema of the database imported entities are logged with their
+project and former id. This information can be configured at your profile to
+be displayed in the user interface.
+
+# Clean up
+At the start of the script possible entries from the last run will be
+removed. This can be useful in case you have to run the script more often to
+get it right.
+
+But there are exceptions, e.g. external references systems and copied files are
+ not deleted. The files will be overridden when the script is run again.
+
+# What is imported
+
+## Types
+The script compares the new types with existing ones. In case there are types
+with the same name in the same hierarchy the existing ones will be used and
+their classes ex tended, in case there were more configured.
+
+So it is a good idea to compare the type hierarchies and adapt these if needed
+in the database that is to be imported before.
+
+## Reference systems
+Existing ones with the same name will be "re-used" and possible additional
+classes are added. New ones will be added.
+
+## Entities
+All entities (except types and reference systems) will be imported. Currently,
+there is no possibility to avoid duplicates e.g. for person, places ...
+although this is already planned to do.
+
+## Links
+All links will be imported and a delete link duplicates function is called
+afterward to avoid them.
+
+## Files
+If a source directory
+(the fiels/upload directory of the project to be imported) is configured in the
+script, the script tries to copy entries according to imported file entities
+and save them with their new id.
+
+Possible IIIF images are not imported and have to be created again (if needed).
+
+# What is not imported
+* Users and their information
+* Site settings, e.g. the site name and intro text
+* UUIDs
+
+# Possible improvements
+* Offer manual mapping to avoid duplicates of different projects (e.g. places)

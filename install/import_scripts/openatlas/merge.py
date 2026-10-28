@@ -1,0 +1,516 @@
+# Used to join data from OpenAtlas projects, see README.md
+# Before running the script make sure you have configured:
+# * The database to write to in instance/production.py
+# * The database to read from at the top of this script
+
+# To run the script from project root:
+# python3 install/import_scripts/openatlas/merge.py
+
+import os
+import pathlib
+import shutil
+import time
+from typing import Any
+
+import psycopg2
+from flask import g
+from psycopg2 import extras
+
+from openatlas import app, get_classes
+from openatlas.api.api_v1.formatters.la_helpers import date_to_utc_iso_str
+from openatlas.database import entity as db
+from openatlas.database.checks import delete_link_duplicates
+from openatlas.database.entity import set_required
+from openatlas.database.imports import import_data
+from openatlas.database.rights_holder import (
+    insert_rights_holder, insert_rights_holder_link)
+from openatlas.models.entity import Entity, insert
+from openatlas.models.rights_holder import RightsHolder
+
+DATABASE_NAME = 'openatlas_dpp'  # The database to fetch data from
+PROJECT_NAME = 'DPP'  # Will also be added as case study
+PROJECT_DESCRIPTION = 'DPP'
+IMPORT_USER_ID = 1
+FILES_PATH = pathlib.Path('')  # Set path if the files are available locally
+
+
+def connect() -> Any:
+    return psycopg2.connect(
+        database=DATABASE_NAME,
+        user=app.config['DATABASE_USER'],
+        password=app.config['DATABASE_PASS'],
+        port=app.config['DATABASE_PORT'],
+        host=app.config['DATABASE_HOST'])
+
+
+start = time.time()
+connection = connect()
+cursor = connection.cursor(cursor_factory=extras.DictCursor)
+id_map: dict[int, int] = {}  # Map imported entity ids to existing ones
+id_added: list[int] = []  # Track already inserted entities
+file_ids: list[int] = []  # Track file ids for copying
+rights_holder_map: dict[int, int] = {}  # Map right holders ids
+
+
+def cleanup_before(id_: int) -> None:
+    print('Cleanup')
+    g.cursor.execute(
+        'ALTER TABLE model.entity DISABLE TRIGGER on_delete_entity;')
+    g.cursor.execute(
+        """
+        DELETE FROM model.entity
+        WHERE id IN (
+            SELECT entity_id
+            FROM import.entity WHERE project_id = %(project_id)s);
+        """, {'project_id': id_})
+    g.cursor.execute(
+        'ALTER TABLE model.entity ENABLE TRIGGER on_delete_entity;')
+    g.cursor.execute(
+        'DELETE FROM import.entity WHERE project_id = %(project_id)s;',
+        {'project_id': id_})
+    g.types = Entity.get_all_types(False)
+
+
+def insert_project() -> int:
+    g.cursor.execute(
+        """
+        INSERT INTO import.project (name, description)
+        VALUES (%(name)s, %(description)s)
+        ON CONFLICT (name) DO UPDATE SET description = %(description)s
+        RETURNING id;
+        """,
+        {'name': PROJECT_NAME, 'description': PROJECT_DESCRIPTION})
+    return g.cursor.fetchone()['id']
+
+
+def hierarchies() -> None:
+    print('Import hierarchies')
+    cursor.execute(
+        """
+        SELECT
+            id,
+            name,
+            multiple,
+            directional,
+            created,
+            modified,
+            category,
+            required
+        FROM
+            web.hierarchy;
+        """)
+    for item in list(cursor):
+        exists = False
+        try:
+            if existing := Entity.get_hierarchy(item['name']):
+                exists = True
+                id_map[item['id']] = existing.id
+                # print(f'Hierarchy exists: {existing.name}')
+        except IndexError:
+            pass
+        if not exists:
+            insert_hierarchy(item)
+    cursor.execute(
+        """
+        SELECT hierarchy_id, openatlas_class_name
+        FROM web.hierarchy_openatlas_class;
+        """)
+    for item in list(cursor):
+        g.cursor.execute(
+            """
+            INSERT INTO web.hierarchy_openatlas_class
+                (hierarchy_id, openatlas_class_name)
+            VALUES
+                (%(hierarchy_id)s, %(openatlas_class_name)s)
+            ON CONFLICT DO NOTHING;
+            """, {
+                'hierarchy_id': id_map[item['hierarchy_id']],
+                'openatlas_class_name': item['openatlas_class_name']})
+
+
+def insert_hierarchy(item: dict[str, Any]) -> None:
+    print(f"New hierarchy: {item['name']}")
+    cursor.execute(
+        """
+        SELECT
+            name, openatlas_class_name, description,
+            begin_from, begin_to, begin_comment, end_from, end_to, end_comment
+        FROM model.entity
+        WHERE id = %(id)s;
+        """,
+        {'id': item['id']})
+    entity_ = insert(cursor.fetchone())
+    import_data(project_id, entity_.id, IMPORT_USER_ID, item['id'])
+    id_map[item['id']] = entity_.id
+    id_added.append(entity_.id)
+    cursor.execute(
+       """
+       SELECT openatlas_class_name
+       FROM web.hierarchy_openatlas_class
+       WHERE hierarchy_id = %(id)s;
+       """, {'id': item['id']})
+    Entity.insert_hierarchy(
+       entity_,
+       item['category'],
+       [x[0] for x in list(cursor)],
+       item['multiple'])
+    if item['required']:
+        set_required(entity_.id)
+
+
+def types() -> None:
+    print('Import types')
+    cursor_current = g.cursor
+    g.cursor = cursor
+    import_types = Entity.get_all_types(False)
+    g.cursor = cursor_current
+    for hierarchy in [x for x in import_types.values() if not x.root]:
+        types_recursive(hierarchy, import_types)
+    g.types = Entity.get_all_types(False)
+
+
+def types_recursive(super_: Entity, import_types: dict[int, Entity]) -> None:
+    for import_sub_id in super_.subs:
+        exists = False
+        g.types = Entity.get_all_types(False)
+        for type_id in g.types[id_map[super_.id]].subs:
+            if g.types[type_id].name == import_types[import_sub_id].name:
+                id_map[import_sub_id] = type_id
+                # print(f'exists: {import_types[id_].name}')
+                exists = True
+                break
+        if not exists:
+            insert_type_recursive(import_types[import_sub_id], import_types)
+        types_recursive(import_types[import_sub_id], import_types)
+
+
+def insert_type_recursive(
+        import_type: Entity,
+        import_types: dict[int, Entity]) -> None:
+    # print(f'New type: {import_type.name}')
+    data = {
+       'name': import_type.name,
+       'description': import_type.description,
+       'openatlas_class_name': import_type.class_.name,
+       'begin_from': date_to_utc_iso_str(import_type.dates.begin_from),
+       'begin_to': date_to_utc_iso_str(import_type.dates.begin_to),
+       'begin_comment': import_type.dates.begin_comment,
+       'end_from': date_to_utc_iso_str(import_type.dates.end_from),
+       'end_to': date_to_utc_iso_str(import_type.dates.end_to),
+       'end_comment': import_type.dates.end_comment}
+    try:
+        new_type = insert(data)
+    except Exception:
+        print(data)
+        raise
+
+    track(import_type.id, new_type.id)
+    super_id = id_map[import_type.root[-1]]
+    new_type.link(
+        new_type.class_.relations['super'].property,
+        g.types[super_id])
+    g.types = Entity.get_all_types(False)
+    for sub_id in import_type.subs:
+        insert_type_recursive(import_types[sub_id], import_types)
+
+
+def track(import_id: int, new_id: int) -> None:
+    import_data(project_id, new_id, IMPORT_USER_ID, import_id)
+    id_map[import_id] = new_id
+
+
+def entities() -> None:
+    print('Import entities')
+    cursor.execute(
+        """
+        SELECT
+            id,
+            name,
+            description,
+            created,
+            modified,
+            begin_from,
+            begin_to,
+            begin_comment,
+            end_from,
+            end_to,
+            end_comment,
+            openatlas_class_name
+        FROM
+            model.entity
+        WHERE openatlas_class_name NOT IN (
+            'administrative_unit', 'reference_system', 'type', 'type_tools');
+        """)
+    case_study_hierarchy = Entity.get_hierarchy('Case study')
+    for row in list(cursor):
+        entity = Entity.get_by_id(
+            db.insert({
+               'name': row['name'],
+               'description': row['description'],
+               'openatlas_class_name': row['openatlas_class_name'],
+               'begin_from': row['begin_from'],
+               'begin_to': row['begin_to'],
+               'begin_comment': row['begin_comment'],
+               'end_from': row['end_from'],
+               'end_to': row['end_to'],
+               'end_comment': row['end_comment']}),
+            with_location=False)
+        track(row['id'], entity.id)
+        if row['openatlas_class_name'] in case_study_hierarchy.classes:
+            entity.link('P2', case_study)
+        if row['openatlas_class_name'] == 'file':
+            file_ids.append(row['id'])
+
+
+def reference_systems() -> None:
+    print('Import reference systems')
+    cursor_current = g.cursor
+    g.cursor = cursor
+    get_classes()
+    g.types = Entity.get_all_types(False)
+    systems = Entity.get_reference_systems()
+    g.cursor = cursor_current
+    g.types = Entity.get_all_types(False)
+    get_classes()
+    for system in systems.values():
+        exists = False
+        for existing_system in g.reference_systems.values():
+            if system.name == existing_system.name:
+                print(f'Reference system exists: {existing_system.name}')
+                exists = True
+                id_map[system.id] = existing_system.id
+                for class_ in system.classes:
+                    if class_ not in existing_system.classes:
+                        db.add_reference_system_classes(
+                            existing_system.id,
+                            [class_])
+        if not exists:
+            print(f'New reference system: {system.name}')
+            imported_system = insert({
+                'name': system.name,
+                'description': system.description,
+                'openatlas_class_name': system.class_.name,
+                'website_url': system.website_url,
+                'resolver_url': system.resolver_url,
+                'example_id': system.example_id,
+                'system': system.system,
+                'api': system.api,
+                'types': system.types,
+                'reference_system_classes': system.classes})
+            track(system.id, imported_system.id)
+
+
+def links() -> None:
+    print('Import links')
+    cursor.execute(
+        """
+        SELECT
+            id,
+            property_code,
+            domain_id,
+            range_id,
+            description,
+            created,
+            modified,
+            type_id,
+            COALESCE(to_char(begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                AS begin_from, begin_comment,
+            COALESCE(to_char(begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                AS begin_to,
+            COALESCE(to_char(end_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                AS end_from, end_comment,
+            COALESCE(to_char(end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                AS end_to
+        FROM model.link;
+        """)
+    for row in list(cursor):
+        if row['domain_id'] not in id_map:
+            print(f'Missing domain_id in id_map: {row['domain_id']}')
+            continue
+        if row['range_id'] not in id_map:
+            print(f'Missing range_id in id_map: {row['range_id']}')
+            continue
+        if id_map[row['domain_id']] == '161':
+            print(f'non existing: {row['domain_id']}')
+            continue
+        try:
+            db.link({
+                'property_code': row['property_code'],
+                'domain_id': id_map[row['domain_id']],
+                'range_id': id_map[row['range_id']],
+                'description': row['description'],
+                'type_id': id_map[row['type_id']] if row['type_id'] else None,
+                'begin_from': row['begin_from'] or None,
+                'begin_to': row['begin_to'] or None,
+                'begin_comment': row['begin_comment'] or None,
+                'end_from': row['end_from'] or None,
+                'end_to': row['end_to'] or None,
+                'end_comment': row['end_comment'] or None})
+        except Exception as e:
+            print(e)
+    delete_link_duplicates()
+
+
+def add_case_study() -> Entity:
+    case = insert({
+        'name': PROJECT_NAME,
+        'description': PROJECT_DESCRIPTION,
+        'openatlas_class_name': 'type'})
+    case.link('P127', Entity.get_hierarchy('Case study'))
+    import_data(project_id, case.id, IMPORT_USER_ID)
+    return case
+
+
+def add_gis() -> None:
+    print('Import GIS')
+    cursor.execute(
+        """
+        SELECT entity_id, name, description, type,
+            geom_point, geom_polygon, geom_linestring
+        FROM model.gis;
+        """)
+    for row in list(cursor):
+        g.cursor.execute(
+            f"""
+            INSERT INTO model.gis (
+                entity_id, name, description, type,
+                geom_point, geom_polygon, geom_linestring
+            ) VALUES (
+                %(entity_id)s, %(name)s, %(description)s, %(type)s,
+                %(geom_point)s, %(geom_polygon)s, %(geom_linestring)s
+            );
+            """,
+            {
+                'entity_id': id_map[row['entity_id']],
+                'name': row['name'],
+                'description': row['description'],
+                'type': row['type'],
+                'geom_point': row['geom_point'],
+                'geom_polygon': row['geom_polygon'],
+                'geom_linestring': row['geom_linestring']
+            })
+        row['entity_id'] = id_map[row['entity_id']]
+
+
+def add_files() -> None:
+    print('Import files')
+    if not pathlib.Path(FILES_PATH).is_dir():
+        print(f'Files path {FILES_PATH} is not available.')
+        return
+    with os.scandir(FILES_PATH) as entries:
+        for entry in entries:
+            if entry.is_file(follow_symlinks=False) \
+                    and pathlib.Path(entry).stem.isdigit() \
+                    and int(pathlib.Path(entry).stem) in file_ids:
+                shutil.copy(
+                    entry,
+                    pathlib.Path(app.config['UPLOAD_PATH']) /
+                    f'{id_map[int(pathlib.Path(entry).stem)]}'
+                    f'{pathlib.Path(entry).suffix}')
+                print(f'File copy of: {entry.name}')
+    rights_holders = RightsHolder.get_rights_holders()
+    cursor.execute(
+        "SELECT id, name, class, description FROM model.rights_holder;")
+    for row in list(cursor):
+        exists = False
+        for holder in rights_holders:
+            if holder.name == row['name']:
+                rights_holder_map[row['id']] = holder.id
+                exists = True
+                break
+        if not exists:
+            if not row['class']:
+                print(f'Missing rights holder class to person: {row['name']}')
+                row['class'] = 'person'
+            id_ = insert_rights_holder({
+                'name': row['name'],
+                'role': row['class'],
+                'description': row['description']})
+            rights_holder_map[row['id']] = id_
+    cursor.execute(
+        """
+        SELECT entity_id, rights_holder_id, description
+        FROM model.rights_holder_file;
+        """)
+    for row in list(cursor):
+        insert_rights_holder_link(
+            entity_id=id_map[row['entity_id']],
+            rights_holder_id=rights_holder_map[row['rights_holder_id']],
+            role=row['description'])
+
+
+def annotations() -> None:
+    print('Import annotations')
+    cursor.execute(
+        """
+        SELECT source_id, entity_id, link_start, link_end, text
+        FROM model.annotation_text;
+        """)
+    for row in list(cursor):
+        g.cursor.execute(
+            """
+            INSERT INTO model.annotation_text (
+                source_id,
+                entity_id,
+                link_start,
+                link_end,
+                text)
+            VALUES (
+                %(source_id)s,
+                %(entity_id)s,
+                %(link_start)s,
+                %(link_end)s,
+                %(text)s);
+            """, {
+                'source_id': id_map[row['source_id']],
+                'entity_id': id_map[row['entity_id']]
+                if row['entity_id'] else None,
+                'link_start': row['link_start'],
+                'link_end': row['link_end'],
+                'text': row['text']})
+    cursor.execute(
+        """
+        SELECT image_id, entity_id, coordinates, text
+        FROM model.annotation_image;
+        """)
+    for row in list(cursor):
+        g.cursor.execute(
+            """
+            INSERT INTO model.annotation_image (
+                image_id, entity_id, coordinates, text)
+            VALUES (%(image_id)s, %(entity_id)s, %(coordinates)s, %(text)s);
+            """, {
+                'image_id': id_map[row['image_id']],
+                'entity_id': id_map[row['entity_id']]
+                if row['entity_id'] else None,
+                'coordinates': row['coordinates'],
+                'text': row['text']})
+
+
+def move_case_studies():
+    for sub_id in Entity.get_hierarchy('Case study').subs:
+        if sub_id != case_study.id:
+            entity_info = g.logger.get_log_info(sub_id)
+            if entity_info['project'].name == PROJECT_NAME:
+                entity = Entity.get_by_id(sub_id)
+                entity.delete_links('P127', ['type'])
+                entity.link('P127', case_study)
+
+
+with app.test_request_context():
+    app.preprocess_request()
+    project_id = insert_project()
+    cleanup_before(project_id)
+    case_study = add_case_study()
+    hierarchies()
+    reference_systems()
+    types()
+    entities()
+    links()
+    annotations()
+    move_case_studies()
+
+    if FILES_PATH and file_ids:
+        add_files()
+
+print(f'Execution time: {int(time.time() - start)} seconds')
