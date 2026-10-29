@@ -18,15 +18,19 @@ versions = {
     '9.5.0': ['TBA', {
         'feature': {
             '2743': 'Add creation event for sources',
+            '2865': 'Adaption of bootstrap autocomplete',
             '2861': 'API: Format selection strategy',
             '2344': 'API: Replace python-flasgger',
+            '2093': 'API: New and faster object serialization',
+            '1749': 'API: Test systems for API',
+            '2854': 'ARCHE: Add checksum file',
             '2875': 'Remove database field model.entity.cidoc_class_code',
+            '2725': 'New container with gunicorn',
             '2866':	'Refactor get_info() functions',
             '2883': 'Refactor and minor improvements'},
         'fix': {
             '2889': 'Annotation moves'
-        }
-    }],
+        }}],
     '9.4.0': ['2026-08-01', {
         'feature': {
             '924': 'Multi instance capability',

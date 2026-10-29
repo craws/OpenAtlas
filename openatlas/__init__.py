@@ -105,6 +105,12 @@ def before_request() -> Response | None:
         return None  # Avoid overheads for swagger and docs
 
     session['language'] = get_locale()
+    setup_api()
+    if request.path.startswith('/api/1'):
+        setup_files()
+        setup_api_v1()
+        return None
+
     g.admins_available = admins_available()
     if not g.admins_available \
             and request.endpoint not in ['first_admin', 'set_locale']:
@@ -131,16 +137,15 @@ def before_request() -> Response | None:
         app.config['UPLOAD_PATH'],
         app.config['TMP_PATH']]
     g.arche_uri_rules = None
-    setup_api()
     setup_files()
     return None
 
 
 def setup_files() -> None:
-    if request.path.startswith('/api/1/') or \
+    if request.path.startswith('/api/1') or \
             (request.endpoint or "") in 'display_file':
         g.file_info = {}
-        g.api_file_paths = {}  # Per request caches, see api_v1/util/files.py
+        g.api_file_paths = {}
         g.api_rights_holders = {}
         return
     from openatlas.models.rights_holder import RightsHolder
@@ -192,6 +197,38 @@ def count_type() -> bool:
             request.path.split('/entity/')[1].isdigit():
         return check_type_count_needed(int(request.path.split('/entity/')[1]))
     return False
+
+
+def setup_api_v1() -> None:
+    from openatlas.models.cidoc import cidoc_classes, cidoc_properties
+    from openatlas.models.entity import Entity
+
+    path = request.path
+    if path.startswith((
+            '/api/1/system/classes',
+            '/api/1/system/crm-properties')):
+        g.cidoc_classes = cidoc_classes(session['language'], False)
+        get_classes()
+        if path.startswith('/api/1/system/crm-properties'):
+            g.properties = cidoc_properties(session['language'], False)
+        return
+
+    if path.startswith((
+            '/api/1/vocabulary',
+            '/api/1/case-studies',
+            '/api/1/entity',
+            '/api/1/entities',
+            '/api/1/linked-art',
+            '/api/1/files',
+            '/api/1/iiif')):
+        g.cidoc_classes = cidoc_classes(session['language'], False)
+        get_classes()
+        g.types = Entity.get_all_types(count_type())
+        if path.startswith('/api/1/case-studies'):
+            g.case_study_type = Entity.get_hierarchy('Case study')
+        else:
+            g.properties = cidoc_properties(session['language'], False)
+            g.reference_systems = Entity.get_reference_systems()
 
 
 @app.after_request
