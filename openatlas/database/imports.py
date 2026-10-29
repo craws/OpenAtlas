@@ -98,7 +98,7 @@ def import_data(
         project_id: int,
         entity_id: int,
         user_id: int,
-        origin_id: Optional[int]) -> None:
+        origin_id: Optional[int] = None) -> None:
     g.cursor.execute(
         """
         INSERT INTO import.entity (
