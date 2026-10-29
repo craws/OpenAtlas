@@ -102,7 +102,7 @@ def before_request() -> Response | None:
 
     session['language'] = get_locale()
     setup_api()
-    if request.path.startswith('/api/1/'):
+    if request.path.startswith('/api/1'):
         setup_files()
         setup_api_v1()
         return None
@@ -138,7 +138,7 @@ def before_request() -> Response | None:
 
 
 def setup_files() -> None:
-    if request.path.startswith('/api/1/') or \
+    if request.path.startswith('/api/1') or \
             (request.endpoint or "") in 'display_file':
         g.file_info = {}
         g.api_file_paths = {}
@@ -213,17 +213,18 @@ def setup_api_v1() -> None:
             '/api/1/vocabulary',
             '/api/1/case-studies',
             '/api/1/entity',
+            '/api/1/entities',
             '/api/1/linked-art',
             '/api/1/files',
             '/api/1/iiif')):
+        g.cidoc_classes = cidoc_classes(session['language'], False)
+        get_classes()
         g.types = Entity.get_all_types(count_type())
         if path.startswith('/api/1/case-studies'):
             g.case_study_type = Entity.get_hierarchy('Case study')
+        else:
+            g.properties = cidoc_properties(session['language'], False)
             g.reference_systems = Entity.get_reference_systems()
-        elif path.startswith(('/api/1/linked-art', '/api/1/entity')):
-            g.reference_systems = Entity.get_reference_systems()
-            g.cidoc_classes = cidoc_classes(session['language'], False)
-            get_classes()
 
 
 @app.after_request
