@@ -27,9 +27,9 @@ from openatlas.database.rights_holder import (
 from openatlas.models.entity import Entity, insert
 from openatlas.models.rights_holder import RightsHolder
 
-DATABASE_NAME = 'openatlas_dpp'  # The database to fetch data from
-PROJECT_NAME = 'DPP'  # Will also be added as case study
-PROJECT_DESCRIPTION = 'DPP'
+DATABASE_NAME = 'openatlas_demo'  # The database to fetch data from
+PROJECT_NAME = 'MEDCON'  # Will also be added as case study
+PROJECT_DESCRIPTION = 'MEDCON'
 IMPORT_USER_ID = 1
 FILES_PATH = pathlib.Path('')  # Set path if the files are available locally
 
@@ -509,6 +509,7 @@ with app.test_request_context():
     links()
     annotations()
     move_case_studies()
+    add_gis()
 
     if FILES_PATH and file_ids:
         add_files()
