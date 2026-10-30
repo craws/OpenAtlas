@@ -154,7 +154,7 @@ application.
 
 It is possible to install one OpenAtlas application used by multiple instances.
 
-Basically you can install the application at e.g. /usr/local/openatlas and than
+Basically you can install the application at e.g. /usr/local/openatlas and
 copy the files from **/install/multi_instance** to a directory of your choice.
 
 The file folders of each installation than have to be made accessible for
@@ -165,7 +165,7 @@ The file folders of each installation than have to be made accessible for
 In case you want a different application location you can change the
 **OPENATLAS_INSTALLATION** value in the **application_path.py** file.
 
-The webserver configuration should than point to the **openatlas.wsgi**
+The webserver configuration should point to the **openatlas.wsgi**
 instance file and other paths should be adapted to the application installation
 directory.
 
@@ -183,7 +183,7 @@ Copy instance/example_testing.py to instance/testing.py and adapt as needed:
 
     cp instance/example_testing.py instance/testing.py
 
-Create a own folder to test IIIF images, e.g.:
+Create a folder to test IIIF images, e.g.:
 
     mkdir /var/www/iipsrv/tests
 
