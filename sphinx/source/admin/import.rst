@@ -154,12 +154,13 @@ For geographical entities and physical objects:
   geometry per entry, but also GeometryCollection and Multi geometries are allowed.
 * **parent_id**: Links to the `id` of a super-unit *within the same file*.
 * **openatlas_parent_id**: Links to the `ID` of an *existing* OpenAtlas entity.
-* **openatlas_class**: Required when using `parent_id` to specify the target class (e.g., `place`, `feature`, `artifact`).
+* **openatlas_class**: Required when using `parent_id` to specify the target class (e.g., `place`, `feature`, `stratigraphic_unit`, `human_remains`, `artifact`).
 
 Example Datasets (St. Gallen)
 -----------------------------
 To better understand how these fields work together, you can download and inspect
-these example files based on the historical Abbey of Saint Gall.
+these example files based on the historical Abbey of Saint Gall (including a
+fictitious cemetery to demonstrate archaeological place hierarchies).
 
 .. note::
    These examples use specific OpenAtlas IDs for type hierarchies that are only valid
