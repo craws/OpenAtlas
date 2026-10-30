@@ -45,7 +45,7 @@ def annotation_text_index() -> str:
         class_='source',
         crumbs=[
             link(_('source'), url_for('index', group='source')),
-            _('annotation')])
+            _('annotations')])
 
 
 @app.route('/annotation_image_insert/<int:id_>', methods=['GET', 'POST'])
