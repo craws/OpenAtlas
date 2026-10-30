@@ -101,7 +101,7 @@ def insert(
         overlays=origin.get_overlays() if origin else None,
         title=_(entity.class_.group['name']),
         geonames_module=entity.class_.name
-            in get_reference_system_by_name_safe('geonames').classes,
+        in get_reference_system_by_name_safe('geonames').classes,
         crumbs=crumbs_for_insert(entity, origin, structure))
 
 
@@ -146,7 +146,7 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         overlays=entity.get_overlays(),
         title=entity.name,
         geonames_module=entity.class_.name
-            in get_reference_system_by_name_safe('geonames').classes,
+        in get_reference_system_by_name_safe('geonames').classes,
         crumbs=hierarchy_crumbs(entity) +
         [entity, _('copy') if copy else _('edit')])
 
@@ -356,6 +356,8 @@ def index(group: str) -> str | Response:
                     g.classes[class_].label,
                     url_for('insert', class_=class_),
                     tooltip_text=g.classes[class_].display['tooltip']))
+    if 'source' in classes:
+        buttons.append(button('annotations', url_for('annotation_text_index')))
     return render_template(
         'entity/index.html',
         class_=group,

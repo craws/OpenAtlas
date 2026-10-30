@@ -17,6 +17,37 @@ from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity
 
 
+@app.route('/annotation_text/index')
+@required_group('readonly')
+def annotation_text_index() -> str:
+    table = Table(['source', 'text',  _('entity'), 'annotation'])
+    sources = {}
+    entities = {}
+    for item in AnnotationText.get_all():
+        if item.source_id not in sources:
+            sources[item.source_id] = Entity.get_by_id(item.source_id)
+        source = sources[item.source_id]
+        entity = None
+        if item.entity_id:
+            if item.entity_id not in entities:
+                entities[item.entity_id] = Entity.get_by_id(item.entity_id)
+            entity = entities[item.entity_id]
+        text = source.description[item.link_start:item.link_end] \
+            if source.description else ''
+        table.rows.append([
+            link(source),
+            text,
+            link(entity),
+            item.text])
+    return render_template(
+        'content.html',
+        content=table.display(),
+        class_='source',
+        crumbs=[
+            link(_('source'), url_for('index', group='source')),
+            _('annotation')])
+
+
 @app.route('/annotation_image_insert/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def annotation_image_insert(id_: int) -> str | Response:

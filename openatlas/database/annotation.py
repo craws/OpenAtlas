@@ -40,6 +40,11 @@ def get_annotation_image_by_file_id(id_: int) -> list[dict[str, object]]:
     return list(g.cursor)
 
 
+def get_annotation_text_all() -> list[dict[str, object]]:
+    g.cursor.execute(ANNOTATION_TEXT_SELECT)
+    return list(g.cursor)
+
+
 def get_annotation_text_by_source_id(id_: int) -> list[dict[str, object]]:
     g.cursor.execute(
         ANNOTATION_TEXT_SELECT +

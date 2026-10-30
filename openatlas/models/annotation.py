@@ -75,6 +75,10 @@ class AnnotationText:
         self.created = data['created']
 
     @staticmethod
+    def get_all() -> list[AnnotationText]:
+        return [AnnotationText(row) for row in db.get_annotation_text_all()]
+
+    @staticmethod
     def extract_annotations(text: str) -> dict[str, Any]:
         current_offset = 0
         if not text:
