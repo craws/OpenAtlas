@@ -206,8 +206,7 @@ def generate_vocabulary_tree(
         root_ids = []
         for type_ in g.types.values():
             if not type_.root and getattr(type_, 'category', None) == category:
-                if openatlas_class and type_.classes \
-                        and openatlas_class not in type_.classes:
+                if openatlas_class and openatlas_class not in type_.classes:
                     continue
                 root_ids.append(type_.id)
 
@@ -265,8 +264,7 @@ def get_vocabulary_standard_by_class(
     root_ids = []
     for type_ in g.types.values():
         if not type_.root and getattr(type_, 'category', None) == 'standard':
-            if class_name and type_.classes \
-                    and class_name not in type_.classes:
+            if class_name and class_name not in type_.classes:
                 continue
             root_ids.append(type_.id)
 
