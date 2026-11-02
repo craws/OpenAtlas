@@ -51,7 +51,7 @@ def display_custom_logo(ext: str) -> Any:
 @required_group('contributor')
 def set_profile_image(id_: int, origin_id: int) -> Response:
     Entity.set_profile_image(id_, origin_id)
-    return redirect(url_for('view', id_=origin_id))
+    return redirect(f'{url_for('view', id_=origin_id)}#tab-file')
 
 
 @app.route('/file/convert_iiif/<int:id_>')
