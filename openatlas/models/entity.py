@@ -329,6 +329,7 @@ class Entity:
             for link_ in self.get_links('P67', ['file'], inverse=True):
                 if file_ := g.files.get(link_.domain.id):
                     if file_.suffix in g.display_file_ext:
+                        self.set_profile_image(link_.domain.id, self.id)
                         return link_.domain.id
         return image_id
 
