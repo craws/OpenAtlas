@@ -27,7 +27,7 @@ register_error_handlers(api_v1_system)
 @api_v1_system.get(
     '/info',
     summary="Get presentation frontend configuration",
-    responses=system_info_response,
+    responses=system_info_response,  # type: ignore[arg-type]
     tags=[system_tag])
 def get_system_info() -> dict[str, Any]:
     """
@@ -76,7 +76,7 @@ def get_system_info() -> dict[str, Any]:
 @api_v1_system.get(
     '/count/entities',
     summary="Get entity counts",
-    responses=entity_count_response,
+    responses=entity_count_response,  # type: ignore[arg-type]
     tags=[system_tag])
 def get_entity_count(query: EntityCountQuery) -> dict[str, Any]:
     """Retrieves system classes with a count of their instances, optionally
@@ -92,7 +92,7 @@ def get_entity_count(query: EntityCountQuery) -> dict[str, Any]:
 @api_v1_system.get(
     '/classes',
     summary="Get system classes",
-    responses=system_classes_response,
+    responses=system_classes_response,  # type: ignore[arg-type]
     tags=[system_tag])
 def get_system_classes(query: LocaleQuery) -> dict[str, Any]:
     """Retrieves all OpenAtlas classes with their labels,
@@ -115,7 +115,7 @@ def get_system_classes(query: LocaleQuery) -> dict[str, Any]:
 @api_v1_system.get(
     '/crm-properties',
     summary="Get CIDOC properties",
-    responses=system_properties_response,
+    responses=system_properties_response,  # type: ignore[arg-type]
     tags=[system_tag])
 def get_system_properties() -> dict[str, Any]:
     """

@@ -418,7 +418,7 @@ def find_duplicates(entity_ids: set[int]) -> set[tuple[int, int]]:
 
     duplicates = set()
     for files in size_map.values():
-        if len(files) < 2:
+        if len(files) <= 1:
             continue  # Only one file of this size — skip
         hash_map: dict[str, int] = {}
         for file_id, path in files:

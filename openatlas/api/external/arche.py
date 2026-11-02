@@ -12,7 +12,11 @@ from openatlas import app
 from openatlas.api.external.arche_class import ArcheFileMetadata
 from openatlas.models.entity import Entity
 
-ENTITIES_EMITTED = set()
+
+def get_entities_emitted() -> set[str]:
+    if not hasattr(g, 'entities_emitted'):
+        g.entities_emitted = set()
+    return g.entities_emitted
 
 
 def is_arche_likeable_uri(uri: str) -> bool:
@@ -62,11 +66,12 @@ def ensure_person_exist(
         names: str | list[str],
         entity: Entity | None = None) -> None:
     names = names if isinstance(names, list) else [names]
+    entities_emitted = get_entities_emitted()
     for name in names:
         if not name or is_valid_url(name):
             continue  # pragma: no cover
         uri = create_single_uri(name)
-        if str(uri) not in ENTITIES_EMITTED:
+        if str(uri) not in entities_emitted:
             if entity and entity.class_ == 'group':
                 graph.add((uri, RDF.type, ACDH.Organisation))
             elif entity and entity.class_ == 'person':
@@ -75,7 +80,7 @@ def ensure_person_exist(
                 graph.add((uri, RDF.type, ACDH.Agent))
             graph.add((uri, ACDH.hasTitle, Literal(name, lang="und")))
             graph.add((uri, ACDH.hasIdentifier, uri))
-            ENTITIES_EMITTED.add(str(uri))
+            entities_emitted.add(str(uri))
 
 
 def ensure_publication_exist(
@@ -83,7 +88,7 @@ def ensure_publication_exist(
         publication: Entity,
         pages: str) -> None:
     uri = create_single_uri(str(publication.id))
-    if str(uri) not in ENTITIES_EMITTED:
+    if str(uri) not in get_entities_emitted():
         graph.add((uri, RDF.type, ACDH.Publication))
         name = publication.name
         graph.add((uri, ACDH.hasTitle, Literal(name, lang="und")))
@@ -99,7 +104,8 @@ def ensure_entity_exist(
         acdh_property: Any,
         entity_details: dict[str, Any]) -> None:
     uri = create_single_uri(entity_details['id'])
-    if str(uri) not in ENTITIES_EMITTED:
+    entities_emitted = get_entities_emitted()
+    if str(uri) not in entities_emitted:
         graph.add((uri, RDF.type, acdh_property))
         name = entity_details['name']
         graph.add((uri, ACDH.hasTitle, Literal(name, lang="und")))
@@ -118,7 +124,7 @@ def ensure_entity_exist(
                         uri,
                         ACDH.hasNonLinkedIdentifier,
                         Literal(f"{ref_sys[1]}:{ref_link}", lang="und")))
-        ENTITIES_EMITTED.add(str(uri))
+        entities_emitted.add(str(uri))
 
 
 def transliterate_url(url: str) -> str:
