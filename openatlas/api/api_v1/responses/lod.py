@@ -1,9 +1,11 @@
+from http import HTTPStatus
+
 from openatlas.api.api_v1.models.lod import \
     LinkedArtCollectionResponse, LinkedArtResponse
 from openatlas.api.api_v1.models.util import ErrorResponse
 
 lod_responses = {
-    200: {
+    HTTPStatus.OK: {
         'description': 'Entity response in different LOD formats',
         'content': {
             'application/ld+json': {
@@ -11,14 +13,14 @@ lod_responses = {
             'text/turtle': {'schema': {'type': 'string'}},
             'application/n-triples': {'schema': {'type': 'string'}},
             'application/rdf+xml': {'schema': {'type': 'string'}}}},
-    404: {
+    HTTPStatus.NOT_FOUND: {
         'description': 'Entity not found.',
         'content': {
             'application/json': {
                 'schema': ErrorResponse.model_json_schema()}}}}
 
 lod_collection_responses = {
-    200: {
+    HTTPStatus.OK: {
         'description': 'Collection response in different LOD '
                        'formats with OrderedCollectionPage pagination',
         'content': {
@@ -27,7 +29,7 @@ lod_collection_responses = {
             'text/turtle': {'schema': {'type': 'string'}},
             'application/n-triples': {'schema': {'type': 'string'}},
             'application/rdf+xml': {'schema': {'type': 'string'}}}},
-    404: {
+    HTTPStatus.NOT_FOUND: {
         'description': 'Entity class not found',
         'content': {
             'application/json': {

@@ -10,10 +10,10 @@ def get_tokens(
         valid: str) -> list[dict[str, Any]]:
     g.cursor.execute(
         f"""
-        SELECT 
+        SELECT
             id, user_id, jti, valid_from, valid_until, name, created, revoked,
             creator_id
-        FROM web.user_tokens 
+        FROM web.user_tokens
         WHERE TRUE
             {'AND user_id = %(user_id)s' if int(user_id) else ''}
             {'AND revoked = %(revoked)s' if revoked != 'all' else ''}
@@ -29,9 +29,9 @@ def get_tokens(
 def generate_token(data: dict[str, Any]) -> None:
     g.cursor.execute(
         """
-        INSERT INTO web.user_tokens(user_id, jti, valid_from, valid_until, 
+        INSERT INTO web.user_tokens(user_id, jti, valid_from, valid_until,
         name, creator_id)
-            VALUES (%(user_id)s, %(jti)s, %(valid_from)s, %(valid_until)s, 
+            VALUES (%(user_id)s, %(jti)s, %(valid_from)s, %(valid_until)s,
             %(name)s, %(creator_id)s);
         """, data)
 
@@ -81,7 +81,7 @@ def check_token_revoked(jti: str) -> dict[str, Any]:
     g.cursor.execute(
         """
         SELECT t.revoked, t.valid_until, u.active
-        FROM web.user_tokens t 
+        FROM web.user_tokens t
         LEFT JOIN web.user u ON t.user_id = u.id
         WHERE jti = %(jti)s;
         """,

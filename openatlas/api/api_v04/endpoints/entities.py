@@ -99,7 +99,8 @@ class GetEntityByUUID(Resource):
 class GetLatest(Resource):
     @staticmethod
     def get(limit: int) -> tuple[Resource, int] | Response | dict[str, Any]:
-        if not 0 < limit < 101:
+        max_limit = 100
+        if not 0 < limit < max_limit:
             raise InvalidLimitError
         return Endpoint(
             ApiEntity.get_latest(limit),

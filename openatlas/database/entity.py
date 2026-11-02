@@ -321,7 +321,7 @@ def api_search(
         """
             WHERE e.openatlas_class_name IN %(classes)s
                 AND (
-                    %(term)s = '' 
+                    %(term)s = ''
                     OR UNACCENT(LOWER(e.name)) LIKE UNACCENT(LOWER(%(term)s)))
             GROUP BY e.id
             ORDER BY e.name;
@@ -392,7 +392,7 @@ def get_linked_entities_recursive(
             SELECT {first}
             FROM model.link
             WHERE {second} = %(id_)s AND property_code IN %(code)s
-            UNION 
+            UNION
                 SELECT l.{first} FROM model.link l
                 INNER JOIN items i ON
                     l.{second} = i.{first}
