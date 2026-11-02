@@ -214,6 +214,7 @@ def setup_api_v1() -> None:
             '/api/1/case-studies',
             '/api/1/entity',
             '/api/1/entities',
+            '/api/1/export',
             '/api/1/linked-art',
             '/api/1/files',
             '/api/1/iiif')):

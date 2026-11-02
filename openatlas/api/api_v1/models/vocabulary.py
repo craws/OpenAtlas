@@ -11,7 +11,7 @@ from openatlas.api.api_v1.models.util import (
 class VocabularyStandardQuery(BaseSchema):
     case_study: int | None = Field(
         None,
-        description="Filter types by a specific case study ID.")
+        description='Filter types by a specific case study ID.')
 
 
 class LinkedTypeItem(BaseSchema):
@@ -24,52 +24,52 @@ class VocabularyFlatItem(BaseSchema):
     uuid: UUID
     name: str
     class_name: str = Field(
-        default="type",
-        serialization_alias="class",
-        description="The OpenAtlas class.")
+        default='type',
+        serialization_alias='class',
+        description='The OpenAtlas class.')
     category: TypeCategoryEnum | None = Field(
         default=None,
-        description="Categorization of the type.")
+        description='Categorization of the type.')
     description: str | None = None
     image: FileItem | None = Field(
         default=None,
-        description="Primary representative image for the type.")
+        description='Primary representative image for the type.')
     selectable: bool = Field(
         default=True,
-        description="Whether this type can be directly assigned to an "
-                    "entity or serves only as a structural grouping node.")
+        description='Whether this type can be directly assigned to an '
+                    'entity or serves only as a structural grouping node.')
     classes: list[str] = Field(
         default_factory=list,
-        description="Entity classes this type can be assigned to "
+        description='Entity classes this type can be assigned to '
                     "(e.g. 'artifact', 'place').",
-        examples=[["artifact", "source"]])
+        examples=[['artifact', 'source']])
     timespan: TimeSpan | None = Field(
         default=None,
-        description="Temporal validity or usage period.")
+        description='Temporal validity or usage period.')
     parents: list[LinkedTypeItem] = Field(
         default_factory=list,
-        description="Immediate parent types for breadcrumbs.")
+        description='Immediate parent types for breadcrumbs.')
     sub_types: list[LinkedTypeItem] = Field(
         default_factory=list,
-        description="Direct sub-types under this node.")
+        description='Direct sub-types under this node.')
     entity_count: int = Field(
         default=0,
-        description="Number of entities directly linked to this exact type.")
+        description='Number of entities directly linked to this exact type.')
     entity_count_subs: int = Field(
         default=0,
-        description="Number of entities linked to any of its descendants.")
+        description='Number of entities linked to any of its descendants.')
     external_references: list[ExternalReferenceSystemModel] = Field(
         default_factory=list,
-        description="Links to external authority systems "
-                    "(Wikidata, Getty AAT, etc.).")
+        description='Links to external authority systems '
+                    '(Wikidata, Getty AAT, etc.).')
     references: list[ReferenceModel] = Field(
         default_factory=list,
-        description="Bibliographic references and literature citations.")
+        description='Bibliographic references and literature citations.')
 
 
 class VocabularyFlatResponse(BaseSchema):
     data: dict[str, VocabularyFlatItem] = Field(
-        description="Mapping of type IDs (as strings) to their full details.")
+        description='Mapping of type IDs (as strings) to their full details.')
 
 
 class VocabularyTreeItem(BaseSchema):
@@ -78,20 +78,20 @@ class VocabularyTreeItem(BaseSchema):
     name: str
     selectable: bool = Field(
         default=True,
-        description="Whether this node can be selected/assigned or serves "
-                    "only as a category folder.")
+        description='Whether this node can be selected/assigned or serves '
+                    'only as a category folder.')
     classes: list[str] = Field(
         default_factory=list,
-        description="Entity classes this type is valid for.")
+        description='Entity classes this type is valid for.')
     entity_count: int = Field(
         default=0,
-        description="Number of entities directly linked to this exact type.")
+        description='Number of entities directly linked to this exact type.')
     entity_count_subs: int = Field(
         default=0,
-        description="Number of entities linked to any of its descendants.")
-    children: list["VocabularyTreeItem"] = Field(
-            default_factory=list,
-            description="Nested child nodes.")
+        description='Number of entities linked to any of its descendants.')
+    children: list['VocabularyTreeItem'] = Field(
+        default_factory=list,
+        description='Nested child nodes.')
 
 
 class VocabularyTreeResponse(BaseSchema):
@@ -109,22 +109,22 @@ class VocabularyStandardResponse(BaseSchema):
 
 class VocabularyTreePath(BaseSchema):
     openatlas_class: OpenAtlasClassEnum = Field(
-        alias="openatlas_class",
-        description="Filter the tree by a specific OpenAtlas class.")
+        alias='openatlas_class',
+        description='Filter the tree by a specific OpenAtlas class.')
 
 
 class VocabularyId(BaseSchema):
-    id: int = Field(description="ID of a type")
+    id: int = Field(description='ID of a type')
 
 
 class VocabularySkosPath(BaseSchema):
     id: int = Field(
-        description="Root ID of the vocabulary hierarchy.")
+        description='Root ID of the vocabulary hierarchy.')
     ext: ExtensionsType = Field(
-        description="Serialization format (.ttl, .xml, .json, .nt).",
+        description='Serialization format (.ttl, .xml, .json, .nt).',
         json_schema_extra={
-            "examples": {
-                "turtle": {"summary": "Turtle Format", "value": "ttl"},
-                "xml": {"summary": "RDF/XML Format", "value": "xml"},
-                "json": {"summary": "JSON-LD Format", "value": "json"},
-                "ntriples": {"summary": "N-Triples Format", "value": "nt"}}})
+            'examples': {
+                'turtle': {'summary': 'Turtle Format', 'value': 'ttl'},
+                'xml': {'summary': 'RDF/XML Format', 'value': 'xml'},
+                'json': {'summary': 'JSON-LD Format', 'value': 'json'},
+                'ntriples': {'summary': 'N-Triples Format', 'value': 'nt'}}})

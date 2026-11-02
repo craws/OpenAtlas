@@ -1,7 +1,8 @@
 from typing import Any
 
 from flask import url_for
-from rdflib import OWL, RDF, RDFS, BNode, Graph, Literal, Namespace, URIRef
+from rdflib import (
+    OWL, RDF, RDFS, XSD, BNode, Graph, Literal, Namespace, URIRef)
 from rdflib.collection import Collection
 
 
@@ -16,14 +17,15 @@ def get_oa_ontology_uri() -> str:
 
 def get_oa_ontology_graph() -> Graph:
     graph = Graph()
-    oa_base = get_oa_ontology_uri()
-    oa = Namespace(oa_base)
+    oax_base = get_oa_ontology_uri()
+    oax = Namespace(oax_base)
     crm = Namespace('http://www.cidoc-crm.org/cidoc-crm/')
-    graph.bind('oa', oa)
+    graph.bind('oax', oax)
     graph.bind('crm', crm)
     graph.bind('owl', OWL)
+    graph.bind('xsd', XSD)
 
-    ont_uri = URIRef(oa_base.rstrip('#'))
+    ont_uri = URIRef(oax_base.rstrip('#'))
     graph.add((ont_uri, RDF.type, OWL.Ontology))
     graph.add((
         ont_uri,
@@ -35,8 +37,8 @@ def get_oa_ontology_graph() -> Graph:
         'CRM specifications.',
         lang='en')))
 
-    # oa:has_relationship_to (OA7: E39 -> E39)
-    p_rel = oa.has_relationship_to
+    # oax:has_relationship_to (OA7: E39 -> E39)
+    p_rel = oax.has_relationship_to
     graph.add((p_rel, RDF.type, OWL.ObjectProperty))
     graph.add((p_rel, RDFS.label, Literal('has relationship to', lang='en')))
     graph.add((p_rel, RDFS.comment, Literal(
@@ -47,15 +49,20 @@ def get_oa_ontology_graph() -> Graph:
         lang='en')))
     graph.add((p_rel, RDFS.domain, crm.E39_Actor))
     graph.add((p_rel, RDFS.range, crm.E39_Actor))
-    chain_rel = BNode()
-    Collection(
-        graph,
-        chain_rel,
-        [crm.P11i_participated_in, crm.P11_had_participant])
-    graph.add((p_rel, OWL.propertyChainAxiom, chain_rel))
 
-    # oa:begins_in (OA8: E77 -> E53)
-    p_b = oa.begins_in
+    # oax:relation_type (OA7 type label)
+    p_rel_type = oax.relation_type
+    graph.add((p_rel_type, RDF.type, OWL.DatatypeProperty))
+    graph.add((p_rel_type, RDFS.label, Literal('relation type', lang='en')))
+    graph.add((p_rel_type, RDFS.comment, Literal(
+        'Label of the relationship type (E55 Type) for an OpenAtlas '
+        'actor-to-actor relation shortcut (OA7).',
+        lang='en')))
+    graph.add((p_rel_type, RDFS.domain, crm.E39_Actor))
+    graph.add((p_rel_type, RDFS.range, XSD.string))
+
+    # oax:begins_in (OA8: E77 -> E53)
+    p_b = oax.begins_in
     graph.add((p_b, RDF.type, OWL.ObjectProperty))
     graph.add((p_b, RDFS.label, Literal('begins in', lang='en')))
     graph.add((p_b, RDFS.comment, Literal(
@@ -74,8 +81,8 @@ def get_oa_ontology_graph() -> Graph:
         [crm.P92i_was_brought_into_existence_by, crm.P7_took_place_at])
     graph.add((p_b, OWL.propertyChainAxiom, chain_b))
 
-    # oa:ends_in (OA9: E77 -> E53)
-    p_e = oa.ends_in
+    # oax:ends_in (OA9: E77 -> E53)
+    p_e = oax.ends_in
     graph.add((p_e, RDF.type, OWL.ObjectProperty))
     graph.add((p_e, RDFS.label, Literal('ends in', lang='en')))
     graph.add((p_e, RDFS.comment, Literal(
@@ -94,24 +101,44 @@ def get_oa_ontology_graph() -> Graph:
         [crm.P93i_was_taken_out_of_existence_by, crm.P7_took_place_at])
     graph.add((p_e, OWL.propertyChainAxiom, chain_e))
 
+    # oax:begin_comment
+    p_bc = oax.begin_comment
+    graph.add((p_bc, RDF.type, OWL.DatatypeProperty))
+    graph.add((p_bc, RDFS.label, Literal('begin comment', lang='en')))
+    graph.add((p_bc, RDFS.comment, Literal(
+        'Note or comment describing the beginning of a time-span.',
+        lang='en')))
+    graph.add((p_bc, RDFS.subPropertyOf, crm.P3_has_note))
+    graph.add((p_bc, RDFS.domain, crm['E52_Time-Span']))
+    graph.add((p_bc, RDFS.range, XSD.string))
+
+    # oax:end_comment
+    p_ec = oax.end_comment
+    graph.add((p_ec, RDF.type, OWL.DatatypeProperty))
+    graph.add((p_ec, RDFS.label, Literal('end comment', lang='en')))
+    graph.add((p_ec, RDFS.comment, Literal(
+        'Note or comment describing the end of a time-span.',
+        lang='en')))
+    graph.add((p_ec, RDFS.subPropertyOf, crm.P3_has_note))
+    graph.add((p_ec, RDFS.domain, crm['E52_Time-Span']))
+    graph.add((p_ec, RDFS.range, XSD.string))
+
     return graph
 
 
 def get_lod_context() -> dict[str, Any]:
-    oa_uri = get_oa_ontology_uri()
+    oax_uri = get_oa_ontology_uri()
     return {
         '@context': {
             '@version': 1.1,
             # Namespaces
             'crm': 'http://www.cidoc-crm.org/cidoc-crm/',
             'archaeo': 'http://www.cidoc-crm.org/cidoc-crm/CRMarchaeo/',
-            'sci': 'http://www.ics.forth.gr/isl/CRMsci/',
             'geo': 'http://www.opengis.net/ont/geosparql#',
-            'skos': 'http://www.w3.org/2004/02/skos/core#',
             'rdfs': 'http://www.w3.org/2000/01/rdf-schema#',
             'xsd': 'http://www.w3.org/2001/XMLSchema#',
             'as': 'https://www.w3.org/ns/activitystreams#',
-            'oa': oa_uri,
+            'oax': oax_uri,
 
             # Core JSON-LD aliases
             'id': '@id',
@@ -122,7 +149,7 @@ def get_lod_context() -> dict[str, Any]:
             # CIDOC CRM & CRMarchaeo Entity Classes
             'HumanMadeObject': 'crm:E22_Human-Made_Object',
             'BiologicalObject': 'crm:E20_Biological_Object',
-            'Feature': 'archaeo:A6_Feature',
+            'Feature': 'crm:E25_Human-Made_Feature',
             'StratigraphicUnit': 'archaeo:A8_Stratigraphic_Unit',
             'Place': 'crm:E53_Place',
             'Person': 'crm:E21_Person',
@@ -163,8 +190,8 @@ def get_lod_context() -> dict[str, Any]:
             'end_of_the_end': {
                 '@id': 'crm:P82b_end_of_the_end',
                 '@type': 'xsd:dateTime'},
-            'begin_comment': {'@id': 'oa:begin_comment'},
-            'end_comment': {'@id': 'oa:end_comment'},
+            'begin_comment': {'@id': 'oax:begin_comment'},
+            'end_comment': {'@id': 'oax:end_comment'},
 
             # Classification & Typology
             'has_type': {'@id': 'crm:P2_has_type', '@type': '@id'},
@@ -273,7 +300,9 @@ def get_lod_context() -> dict[str, Any]:
 
             # Texts, Inscriptions & Translations
             'carries': {'@id': 'crm:P128_carries', '@type': '@id'},
-            'is_carried_by': {'@id': 'crm:P128i_is_carried_by', '@type': '@id'},
+            'is_carried_by': {
+                '@id': 'crm:P128i_is_carried_by',
+                '@type': '@id'},
             'has_translation': {
                 '@id': 'crm:P73_has_translation',
                 '@type': '@id'},
@@ -289,11 +318,11 @@ def get_lod_context() -> dict[str, Any]:
 
             # OpenAtlas Custom Shortcuts
             'has_relationship_to': {
-                '@id': 'oa:has_relationship_to',
+                '@id': 'oax:has_relationship_to',
                 '@type': '@id'},
-            'relation_type': {'@id': 'oa:relation_type'},
-            'begins_in': {'@id': 'oa:begins_in', '@type': '@id'},
-            'ends_in': {'@id': 'oa:ends_in', '@type': '@id'},
+            'relation_type': {'@id': 'oax:relation_type'},
+            'begins_in': {'@id': 'oax:begins_in', '@type': '@id'},
+            'ends_in': {'@id': 'oax:ends_in', '@type': '@id'},
 
             # ActivityStreams Paging Properties
             'partOf': {'@id': 'as:partOf', '@type': '@id'},

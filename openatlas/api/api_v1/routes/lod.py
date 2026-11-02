@@ -111,7 +111,7 @@ def get_context() -> Response:
 def get_ontology() -> Response:
     """
     Returns the OpenAtlas extension ontology (defining shortcuts like
-    oa:has_relationship_to, oa:begins_in, oa:ends_in) in the requested RDF
+    oax:has_relationship_to, oax:begins_in, oax:ends_in) in the requested RDF
     format. Format is determined via HTTP Accept header (defaults to JSON-LD).
     """
     return make_graph_response(get_oa_ontology_graph())

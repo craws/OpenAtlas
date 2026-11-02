@@ -138,7 +138,7 @@ class ApiV1(ApiTestCase):
         assert 'crm' in ctx['@context']
         assert 'archaeo' in ctx['@context']
         assert 'geo' in ctx['@context']
-        assert ctx['@context']['Feature'] == 'archaeo:A6_Feature'
+        assert ctx['@context']['Feature'] == 'crm:E25_Human-Made_Feature'
 
         # Ontology endpoint test
         rv = c.get(url_for('api_v1_lod.get_ontology'))
