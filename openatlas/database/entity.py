@@ -228,14 +228,14 @@ def get_profile_image_id(id_: int) -> Optional[int]:
     return g.cursor.fetchone()['image_id'] if g.cursor.rowcount else None
 
 
-def set_profile_image(id_: int, origin_id: int) -> None:
+def set_profile_image(image_id: int, entity_id: int) -> None:
     g.cursor.execute(
         """
         INSERT INTO web.entity_profile_image (entity_id, image_id)
         VALUES (%(entity_id)s, %(image_id)s)
         ON CONFLICT (entity_id) DO UPDATE SET image_id=%(image_id)s;
         """,
-        {'entity_id': origin_id, 'image_id': id_})
+        {'entity_id': entity_id, 'image_id': image_id})
 
 
 def delete(id_: int) -> None:  # Triggers psql delete_entity_related
