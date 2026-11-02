@@ -21,7 +21,7 @@ versions = {
             '2441': 'Overview of text annotations',
             '2865': 'Adaption of bootstrap autocomplete',
             '2420': 'Import script for OpenAtlas projects',
-            '2896': 'Improvements for image upload',
+            '2896': 'Improvements for profile images',
             '2861': 'API: Format selection strategy',
             '2344': 'API: Replace python-flasgger',
             '2093': 'API: New and faster object serialization',
