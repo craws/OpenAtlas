@@ -164,7 +164,7 @@ def get_path_examples(path: str) -> Iterator[dict[str, Any]]:
                 yield {'id': id_, 'version': '2'}
         return
 
-    if path == '/api/1/ontology.{ext}':
+    if path in ('/api/1/ontology.{ext}', '/api/1/export/pfp.{ext}'):
         for ext in ('json', 'ttl', 'xml', 'nt'):
             yield {'ext': ext}
         return
@@ -214,7 +214,7 @@ def before_add_examples(context: Any, examples: list[Any]) -> None:
         kwargs: dict[str, Any] = {}
         if params:
             kwargs['path_parameters'] = params
-        if path.startswith('/api/1/entities/'):
+        if path.startswith(('/api/1/entities/', '/api/1/export/pfp')):
             kwargs['query'] = {'limit': 5, 'page': 1}
         elif path.endswith('/export/dump'):
             kwargs['query'] = {'limit': 1}

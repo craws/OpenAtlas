@@ -27,3 +27,7 @@ metadata_tag = Tag(
 frontend_tag = Tag(
     name='Frontend',
     description='Frontend search and discovery endpoints.')
+
+export_tag = Tag(
+    name='Export',
+    description='Data dump and schema-specific RDF/LOD export endpoints.')

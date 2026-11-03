@@ -245,3 +245,10 @@ class LaDumpQuery(BaseSchema):
         default='jsonl',
         description="Export format: 'jsonl' (JSON Lines / NDJSON, "
                     "recommended for Linked Art) or 'nt' (N-Triples).")
+
+
+class PfpExportQuery(EntityCollectionQuery):
+    format: ExtensionsType | None = Field(
+        default=None,
+        description="Optional output RDF format ('ttl', 'nt', 'xml', 'json'). "
+                    'Defaults to Turtle (text/turtle) or HTTP Accept header.')

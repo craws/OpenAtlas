@@ -19,18 +19,21 @@ MIME_FORMAT_MAP: Final[dict[str, str]] = {
     'application/n-triples': 'nt'}
 
 
-def get_accepted_mimetype(ext: str | None = None) -> str:
+def get_accepted_mimetype(
+        ext: str | None = None,
+        default_mime: str = 'application/ld+json') -> str:
     if ext and ext in EXTENSION_MIME_MAP:
         return EXTENSION_MIME_MAP[ext]
     return request.accept_mimetypes.best_match(
         MIME_FORMAT_MAP.keys(),
-        default='application/ld+json')
+        default=default_mime)
 
 
 def make_graph_response(
         graph: Graph,
-        ext: str | None = None) -> Response:
-    mimetype = get_accepted_mimetype(ext)
+        ext: str | None = None,
+        default_mime: str = 'application/ld+json') -> Response:
+    mimetype = get_accepted_mimetype(ext, default_mime=default_mime)
     rdf_format = MIME_FORMAT_MAP[mimetype]
     return Response(graph.serialize(format=rdf_format), mimetype=mimetype)
 

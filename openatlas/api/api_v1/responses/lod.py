@@ -92,3 +92,20 @@ la_dump_responses = {
         'content': {
             'application/json': {
                 'schema': ErrorResponse.model_json_schema()}}}}
+
+pfp_export_responses = {
+    HTTPStatus.OK: {
+        'description': 'PFP SHACL-compliant RDF/LOD export',
+        'content': {
+            'text/turtle': {'schema': {'type': 'string'}},
+            'application/n-triples': {'schema': {'type': 'string'}},
+            'application/rdf+xml': {'schema': {'type': 'string'}},
+            'application/ld+json': {
+                'schema': {'anyOf': [{'type': 'array'}, {'type': 'object'}]}}}
+    },
+    HTTPStatus.UNAUTHORIZED: {
+        'description':
+            'Authentication required. Provide a valid Bearer token or log in.',
+        'content': {
+            'application/json': {
+                'schema': ErrorResponse.model_json_schema()}}}}

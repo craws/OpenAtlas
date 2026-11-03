@@ -12,7 +12,7 @@ from openatlas.api.api_v1.formatters.lod_util import (
 from openatlas.api.api_v1.models.lod import (
     EntityCollectionPath, EntityCollectionQuery, EntityPath, EntityPathExt,
     LaDumpQuery)
-from openatlas.api.api_v1.openapi_tags import lod_tag
+from openatlas.api.api_v1.openapi_tags import export_tag, lod_tag
 from openatlas.api.api_v1.responses.lod import (
     la_dump_responses, la_responses, lod_collection_responses)
 from openatlas.api.api_v1.util.auth import require_auth
@@ -80,7 +80,7 @@ def get_entities(
 @api_v1_la.get(
     '/export/dump',
     summary='Stream full Linked Art dump in JSON Lines or N-Triples format',
-    tags=[lod_tag],
+    tags=[export_tag],
     responses=la_dump_responses)
 def get_la_dump(query: LaDumpQuery) -> Response:
     """

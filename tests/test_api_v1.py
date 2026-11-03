@@ -2,11 +2,13 @@ from http import HTTPStatus
 from pathlib import Path
 
 from flask import g, url_for
-from rdflib import RDF, Dataset, URIRef
+from rdflib import Dataset, Graph, Literal, RDF, RDFS, URIRef, XSD
 
 from openatlas import app
 from openatlas.api.api_v1.formatters.la_formatter import format_la_entities
 from openatlas.api.api_v1.formatters.lod import format_lod_entities
+from openatlas.api.api_v1.formatters.pfp_export import (
+    CRM, FRBROO, GEO, LRMOO, PFP, PFPG)
 from openatlas.models.annotation import AnnotationImage
 from openatlas.models.settings import set_logo
 from tests.base import ApiTestCase, get_hierarchy, insert
@@ -780,3 +782,169 @@ class ApiV1(ApiTestCase):
         rv = c.get('/api/1/docs/Wrong!')
         assert rv.status_code == HTTPStatus.NOT_FOUND
         assert '/api/1/docs/swagger' in rv.get_json()['message']
+
+        spec = c.get('/api/1/docs/openapi.json').get_json()
+        for export_path in (
+                '/api/1/export/dump',
+                '/api/1/linked-art/export/dump',
+                '/api/1/export/pfp',
+                '/api/1/export/pfp.{ext}'):
+            assert 'Export' in spec['paths'][export_path]['get']['tags']
+
+    def test_pfp_export(self) -> None:
+        c = self.client
+        e = self.get_api_entities()
+
+        with app.test_request_context():
+            app.preprocess_request()
+            creator_role = get_hierarchy('Involvement')
+            e.bibliography.link(
+                'P67',
+                e.actor,
+                type_id=creator_role.subs[0])
+            e.bibliography.link('P67', e.place)
+            acq = insert('acquisition', 'Transfer of Shire')
+            acq.link('P22', e.actor)
+            acq.link('P23', e.group)
+            bilbo = insert(
+                'person',
+                'Bilbo',
+                begin_to='2890-09-22')
+            bilbo.link('P2', e.case_study)
+
+        rv = c.get(url_for('api_v1_lod.get_pfp_export'))
+        assert rv.status_code == HTTPStatus.OK
+        assert 'text/turtle' in rv.headers.get('Content-Type', '')
+
+        graph = Graph()
+        graph.parse(data=rv.data, format='turtle')
+
+        # Verify E21_Person, E74_Group, E53_Place, F3_Manifestation shapes
+        for target_cls in (
+                CRM.E21_Person,
+                CRM.E74_Group,
+                CRM.E53_Place,
+                LRMOO.F3_Manifestation):
+            instances = list(graph.subjects(RDF.type, target_cls))
+            assert instances
+            for inst in instances:
+                assert isinstance(inst, URIRef)
+                assert list(graph.objects(inst, RDFS.label))
+                identified = list(graph.objects(inst, CRM.P1_is_identified_by))
+                assert any(
+                    (n, RDF.type, CRM.E33_E41_Linguistic_Appellation) in graph
+                    for n in identified)
+                assert any(
+                    (n, RDF.type, CRM.E42_Identifier) in graph
+                    for n in identified)
+
+        # Verify Gender_Type and Profession on Person
+        for person_node in graph.subjects(RDF.type, CRM.E21_Person):
+            for p2_val in graph.objects(person_node, CRM.P2_has_type):
+                assert (p2_val, RDF.type, PFPG.Gender_Type) in graph
+                assert (person_node, PFP.has_gender, p2_val) in graph
+                labels = list(graph.objects(p2_val, RDFS.label))
+                assert any(
+                    isinstance(lbl, Literal) and lbl.language in ('en', 'de')
+                    for lbl in labels)
+        pursuits = list(graph.subjects(RDF.type, FRBROO.F51_Pursuit))
+        assert pursuits
+        for pursuit in pursuits:
+            assert list(graph.objects(pursuit, RDFS.label))
+            assert list(graph.objects(pursuit, CRM.P14_carried_out_by))
+
+        # Verify E67_Birth and E69_Death
+        births = list(graph.subjects(RDF.type, CRM.E67_Birth))
+        deaths = list(graph.subjects(RDF.type, CRM.E69_Death))
+        assert births and deaths
+        for ev in [*births, *deaths]:
+            assert isinstance(ev, URIRef)
+            assert list(graph.objects(ev, RDFS.label))
+            has_ts = list(graph.objects(ev, CRM['P4_has_time-span']))
+            has_pl = list(graph.objects(ev, CRM.P7_took_place_at))
+            assert has_ts or has_pl
+
+        # Verify E85_Joining, PC144_joined_with, E86_Leaving
+        joinings = list(graph.subjects(RDF.type, CRM.E85_Joining))
+        leavings = list(graph.subjects(RDF.type, CRM.E86_Leaving))
+        pc144s = list(graph.subjects(RDF.type, CRM.PC144_joined_with))
+        assert joinings and leavings and pc144s
+        for pc144 in pc144s:
+            assert list(graph.objects(pc144, CRM.P144_1_kind_of_member))
+
+        # Verify E52_Time-Span datatypes
+        for ts in graph.subjects(RDF.type, CRM['E52_Time-Span']):
+            assert isinstance(ts, URIRef)
+            assert list(graph.objects(ts, RDFS.label))
+            for pred in (
+                    CRM.P82_at_some_time_within,
+                    CRM.P82a_begin_of_the_begin,
+                    CRM.P82b_end_of_the_end):
+                for val in graph.objects(ts, pred):
+                    assert isinstance(val, Literal)
+                    assert val.datatype in (
+                        XSD.date, XSD.gYear, XSD.gYearMonth)
+
+        # Verify F30_Manifestation_Creation and PC14_carried_out_by
+        creations = list(
+            graph.subjects(RDF.type, LRMOO.F30_Manifestation_Creation))
+        pc14s = list(graph.subjects(RDF.type, CRM.PC14_carried_out_by))
+        assert creations and pc14s
+        for pc14 in pc14s:
+            domains = list(graph.objects(pc14, CRM.P01_is_domain_of))
+            assert len(domains) == 1
+            assert (domains[0], RDF.type, LRMOO.F30_Manifestation_Creation) \
+                in graph
+
+        # Verify Events (E7_Activity, E8_Acquisition, E9_Move) & Participation
+        activities = list(graph.subjects(RDF.type, CRM.E7_Activity))
+        acquisitions = list(graph.subjects(RDF.type, CRM.E8_Acquisition))
+        moves = list(graph.subjects(RDF.type, CRM.E9_Move))
+        assert activities and acquisitions and moves
+        assert list(graph.triples((None, CRM.P11_had_participant, None)))
+        assert list(graph.triples((None, CRM.P11i_participated_in, None)))
+        assert list(graph.triples((None, CRM.P14_carried_out_by, None)))
+        assert list(graph.triples((None, CRM.P14i_performed, None)))
+        assert list(graph.triples((None, CRM.P22_transferred_title_to, None)))
+        assert list(
+            graph.triples((None, CRM.P23_transferred_title_from, None)))
+
+        # Verify Place WKT literal
+        wkt_vals = list(graph.objects(None, CRM.P168_place_is_defined_by))
+        assert wkt_vals
+        assert all(
+            isinstance(w, Literal) and w.datatype == GEO.wktLiteral
+            for w in wkt_vals)
+
+        # Test formats (.nt, ?format=nt, ?format=json, ?format=xml)
+        rv_nt = c.get(url_for('api_v1_lod.get_pfp_export_ext', ext='nt'))
+        assert rv_nt.status_code == HTTPStatus.OK
+        assert 'application/n-triples' in rv_nt.headers.get('Content-Type', '')
+
+        rv_fmt = c.get(
+            url_for(
+                'api_v1_lod.get_pfp_export',
+                format='nt',
+                caseStudy=e.case_study.id,
+                limit=5,
+                page=1))
+        assert rv_fmt.status_code == HTTPStatus.OK
+        assert 'application/n-triples' in rv_fmt.headers.get(
+            'Content-Type', '')
+
+        rv_empty = c.get(
+            url_for(
+                'api_v1_lod.get_pfp_export',
+                typeId=999999))
+        assert rv_empty.status_code == HTTPStatus.OK
+
+        rv_no_rows = c.get(
+            url_for(
+                'api_v1_lod.get_pfp_export',
+                search='non_existent_entity_xyz_123'))
+        assert rv_no_rows.status_code == HTTPStatus.OK
+
+        # Test unauthorized access
+        c.get(url_for('logout'))
+        rv_unauth = c.get(url_for('api_v1_lod.get_pfp_export'))
+        assert rv_unauth.status_code == HTTPStatus.UNAUTHORIZED

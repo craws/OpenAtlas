@@ -12,13 +12,14 @@ from openatlas.api.api_v1.formatters.lod import (
 from openatlas.api.api_v1.formatters.lod_export import stream_lod_nt
 from openatlas.api.api_v1.formatters.lod_util import (
     get_entities_response, get_entity_response)
+from openatlas.api.api_v1.formatters.pfp_export import get_pfp_export_graph
 from openatlas.api.api_v1.models.lod import (
     EntityCollectionPath, EntityCollectionQuery, EntityPath, EntityPathExt,
-    ExtensionPath, LodDumpQuery)
-from openatlas.api.api_v1.openapi_tags import lod_tag
+    ExtensionPath, LodDumpQuery, PfpExportQuery)
+from openatlas.api.api_v1.openapi_tags import export_tag, lod_tag
 from openatlas.api.api_v1.responses.lod import (
     context_responses, dump_responses, lod_collection_responses, lod_responses,
-    ontology_responses)
+    ontology_responses, pfp_export_responses)
 from openatlas.api.api_v1.util.auth import require_auth
 from openatlas.api.api_v1.util.content_negotiation import make_graph_response
 
@@ -134,7 +135,7 @@ def get_ontology_ext(path: ExtensionPath) -> Response:
 @api_v1_lod.get(
     '/export/dump',
     summary='Stream full Linked Open Data dump in N-Triples format',
-    tags=[lod_tag],
+    tags=[export_tag],
     responses=dump_responses)
 def get_lod_dump(query: LodDumpQuery) -> Response:
     """
@@ -160,3 +161,47 @@ def get_lod_dump(query: LodDumpQuery) -> Response:
                 limit=query.limit)),
         mimetype='application/n-triples',
         headers={'Content-Disposition': f'attachment; filename="{filename}"'})
+
+
+@api_v1_lod.get(
+    '/export/pfp',
+    summary='Export PFP SHACL-compliant RDF/LOD graph',
+    tags=[export_tag],
+    responses=pfp_export_responses)  # type: ignore[arg-type]
+def get_pfp_export(query: PfpExportQuery) -> Response:
+    """
+    Exports a paginated RDF/LOD graph compliant with the PFP SHACL shapes
+    (Persons, Groups, Places, Manifestations, and connected events).
+    Requires user authentication (Flask session cookie or JWT Bearer token).
+
+    Supports filtering by `caseStudy`, `typeId`, `search`, `startDate`,
+    `endDate`, and pagination (`limit`, `page`, `sortBy`, `sort`).
+    Output format defaults to `text/turtle` and can be negotiated via the
+    `format` query parameter (`ttl`, `nt`, `xml`, `json`) or `Accept` header.
+    """
+    require_auth()
+    ext_val = query.format.value if query.format else None
+    return make_graph_response(
+        get_pfp_export_graph(query),
+        ext=ext_val,
+        default_mime='text/turtle')
+
+
+@api_v1_lod.get(
+    '/export/pfp.<ext>',
+    summary='Export PFP SHACL-compliant RDF/LOD graph with extension',
+    tags=[export_tag],
+    responses=pfp_export_responses)  # type: ignore[arg-type]
+def get_pfp_export_ext(
+        path: ExtensionPath,
+        query: PfpExportQuery) -> Response:
+    """
+    Exports a paginated PFP SHACL-compliant RDF/LOD graph with the output
+    format determined by the URL extension (`.ttl`, `.nt`, `.xml`, `.json`).
+    Requires user authentication (Flask session cookie or JWT Bearer token).
+    """
+    require_auth()
+    return make_graph_response(
+        get_pfp_export_graph(query),
+        ext=path.ext.value,
+        default_mime='text/turtle')
