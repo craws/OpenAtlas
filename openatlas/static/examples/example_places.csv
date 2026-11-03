@@ -1,14 +1,10 @@
-id,name,alias,description,wkt,type_ids,origin_type_ids,parent_id,openatlas_class
-st_gallen_cemetery,Cemetery of Saint Gall,Klosterfriedhof St. Gallen;Gräberfeld St. Gallen,Fictitious early medieval cemetery associated with the Abbey of Saint Gall.,POINT(9.3772 47.4235),5844,,,place
-st_gallen_grave_1,Grave 1,Grab 1,Early medieval east-west oriented inhumation grave.,POINT(9.3770 47.4234),5284,,st_gallen_cemetery,feature
-st_gallen_filling_1,Grave Filling 1,Verfüllung 1,Backfilling layer of Grave 1.,,5993,,st_gallen_grave_1,stratigraphic_unit
-st_gallen_burial_1,Burial 1,Bestattung 1,Primary skeletal burial in extended supine position.,,314,,st_gallen_grave_1,stratigraphic_unit
-st_gallen_skeleton_1,Skeleton 1,Skelett 1,Well-preserved skeleton of an adult male.,,5307,,st_gallen_burial_1,human_remains
-st_gallen_skull_1,Skull 1,Schädel 1,Cranium with complete permanent dentition.,,5426,,st_gallen_skeleton_1,human_remains
-st_gallen_pot_1,Ceramic Pot,Gefäß 1,Early medieval biconical earthenware pot placed at the feet.,,4852,st_gallen_grave_goods,st_gallen_burial_1,artifact
-st_gallen_knife_1,Iron Knife,Eisenmesser,Single-edged rod-tanged knife placed near the pelvis.,,4877,st_gallen_grave_goods,st_gallen_burial_1,artifact
-st_gallen_buckle_1,Belt Buckle,Gürtelschnalle,Bronze belt buckle with engraved zoomorphic ornament.,,4693,st_gallen_grave_goods,st_gallen_burial_1,artifact
-st_gallen_grave_2,Grave 2,Grab 2,Early medieval inhumation grave with wooden coffin remains.,POINT(9.3773 47.4234),5284,,st_gallen_cemetery,feature
-st_gallen_burial_2,Burial 2,Bestattung 2,Burial within a wooden coffin accompanied by weapon grave goods.,,314,,st_gallen_grave_2,stratigraphic_unit
-st_gallen_sword_1,Spatha,Schwert,Double-edged damascened iron sword deposited beside the deceased.,,4962,st_gallen_grave_goods,st_gallen_burial_2,artifact
-st_gallen_beads_1,Glass Beads,Glasperlen,Strand of wound polychrome glass beads.,,4799,st_gallen_grave_goods,st_gallen_burial_2,artifact
+id,name,alias,description,begin_from,begin_to,begin_comment,end_from,end_to,end_comment,wkt,type_ids,value_types,reference_system_wikidata,reference_system_geonames,openatlas_class,parent_id,openatlas_parent_id,origin_type_ids,origin_value_types
+st_gallen_church,Abbey Church of Saint Gall,Cathedral of Saint Gall;Collegiate Church of Saint Gall,Main church building of the Abbey of Saint Gall originally constructed under Abbot Gozbert.,0830,0837,Carolingian construction under Abbot Gozbert.,,,,"GEOMETRYCOLLECTION(POINT(9.3772 47.4239), POLYGON((9.3767 47.4241, 9.3778 47.4241, 9.3778 47.4237, 9.3767 47.4237, 9.3767 47.4241)))",285,116609;675,Q666619;exact_match,2658822;close_match,place,,,,
+st_gallen_entrance_gate,Main Entrance Gate,,Monumental main entrance portal on the western facade of the Abbey Church.,,,,,,,"MULTIPOINT((9.3767 47.42395), (9.3767 47.42385))",26201,,,,feature,st_gallen_church,,,
+st_gallen_side_aisle,North Side Aisle,,Northern side aisle of the Abbey Church housing lateral liturgical furnishings.,,,,,,,"POLYGON((9.3768 47.4241, 9.3775 47.4241, 9.3775 47.4240, 9.3768 47.4240, 9.3768 47.4241))",26197,,,,feature,st_gallen_church,,,
+st_gallen_high_altar,High Altar,,Central liturgical altar situated in the choir of the Abbey Church.,,,,,,,POINT(9.3776 47.4239),26197,,,,feature,st_gallen_church,,,
+st_gallen_reliquary,Reliquary of Saint Gall,,Ornate medieval reliquary shrine standing on the High Altar.,,,,,,,POINT(9.3776 47.4239),26499,,,,artifact,st_gallen_high_altar,,,
+st_gallen_side_altar,Altar of Saint Otmar,,Side altar dedicated to Saint Otmar located in the North Side Aisle.,,,,,,,POINT(9.3771 47.42405),26499,,,,artifact,st_gallen_side_aisle,,,
+st_gallen_otmar_relic,Relic of Saint Otmar,,Reliquary vessel of Saint Otmar displayed on the Altar of Saint Otmar.,,,,,,,POINT(9.3771 47.42405),26499,,,,artifact,st_gallen_side_altar,,,
+st_gallen_portal_relief,Tympanum Relief,,Carved stone relief above the Main Entrance Gate.,,,,,,,POINT(9.3767 47.4239),26214,,,,artifact,st_gallen_entrance_gate,,,
+st_gallen_bell,Abbey Bell,,Historical bronze bell of the Abbey Church of Saint Gall.,,,,,,,POINT(9.3777 47.4239),26443,,,,artifact,st_gallen_church,,,

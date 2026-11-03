@@ -283,10 +283,10 @@ def get_coordinates_from_wkt(coordinates: str) -> dict[str, Any]:
     geometries = []
     if wkt_:
         if wkt_.geom_type in {
-            "MultiPoint",
-            "MultiLineString",
-            "MultiPolygon",
-            "GeometryCollection"}:
+                "MultiPoint",
+                "MultiLineString",
+                "MultiPolygon",
+                "GeometryCollection"}:
             for poly in wkt_.geoms:
                 geometries.append(convert_wkt_to_geojson(poly))
         else:
