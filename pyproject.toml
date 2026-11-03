@@ -50,6 +50,7 @@ dependencies = [
     "xmltodict==0.13.0",
     "fiona>=1.10.0",
     "pytest>=9.0.2",
+    "mypy>=1.11",
 ]
 
 [project.optional-dependencies]

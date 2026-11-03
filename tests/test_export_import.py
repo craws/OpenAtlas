@@ -309,6 +309,7 @@ class ImportTest(ImportTestCase):
         data_frame = pd.read_csv(
             self.static_path / 'examples' /  'example_place_hierarchy.csv',
             keep_default_na=False)
+        data_frame.at[7, 'parent_id'] = ''
         data_frame.at[7, 'openatlas_parent_id'] = place.id
         data_frame.at[7, 'origin_value_types'] = 'type_7;38'
         data_frame.at[2, 'origin_value_types'] = 'type_7;38'

@@ -14,7 +14,8 @@ def is_leap_year(year: int) -> bool:
 
 
 def get_last_day_of_month(year: int, month: int) -> int:
-    if month == 2:
+    february = 2
+    if month == february:
         return 29 if is_leap_year(year) else 28
     if month in (4, 6, 9, 11):
         return 30

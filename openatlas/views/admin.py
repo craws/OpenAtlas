@@ -465,7 +465,7 @@ def get_disk_space_info() -> dict[str, Any] | None:
     if iiif_path and iiif_path.resolve() != paths['upload']['path'].resolve():
         paths['iiif'] = {'path': iiif_path}
 
-    for key, info in paths.items():
+    for _key, info in paths.items():
         info['size'] = get_dir_size(str(info['path']))
         info['mounted'] = info['path'].is_mount()
 

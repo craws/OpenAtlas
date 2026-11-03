@@ -329,6 +329,7 @@ class Entity:
             for link_ in self.get_links('P67', ['file'], inverse=True):
                 if file_ := g.files.get(link_.domain.id):
                     if file_.suffix in g.display_file_ext:
+                        Entity.set_profile_image(link_.domain.id, self.id)
                         return link_.domain.id
         return image_id
 
@@ -596,8 +597,8 @@ class Entity:
         return [Entity(r) for r in db.get_latest(classes, limit)]
 
     @staticmethod
-    def set_profile_image(id_: int, origin_id: int) -> None:
-        db.set_profile_image(id_, origin_id)
+    def set_profile_image(image_id: int, entity_id: int) -> None:
+        db.set_profile_image(image_id, entity_id)
 
     @staticmethod
     def get_links_of_entities(

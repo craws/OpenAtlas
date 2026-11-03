@@ -98,7 +98,6 @@ class Display:
                 description_ = annotation_text_links(self.entity)
         if self.entity.category != 'value':
             text += description(description_, label)
-
         self.tabs['info'].content = render_template(
             'entity/view.html',
             entity=self.entity,

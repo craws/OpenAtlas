@@ -29,7 +29,7 @@ register_error_handlers(api_v1_la)
     '/entity/<uuid:uuid>',
     summary='Get a strictly compliant Linked Art entity by UUID',
     tags=[lod_tag],
-    responses=la_responses)
+    responses=la_responses)  # type: ignore[arg-type]
 def get_entity(path: EntityPath) -> dict[str, Any] | Response:
     """
     Retrieves a single entity formatted as Linked Art.
@@ -46,7 +46,7 @@ def get_entity(path: EntityPath) -> dict[str, Any] | Response:
     summary='Get a strictly compliant Linked Art entity by UUID '
             'with extension',
     tags=[lod_tag],
-    responses=la_responses)
+    responses=la_responses)  # type: ignore[arg-type]
 def get_entity_ext(path: EntityPathExt) -> dict[str, Any] | Response:
     """
     Retrieves a single Linked Art entity with a specific format extension.
@@ -62,7 +62,7 @@ def get_entity_ext(path: EntityPathExt) -> dict[str, Any] | Response:
     '/entities/<string:entity_class>',
     summary='Get a polymorphic collection of Linked Art entities',
     tags=[lod_tag],
-    responses=lod_collection_responses)
+    responses=lod_collection_responses)  # type: ignore[arg-type]
 def get_entities(
         path: EntityCollectionPath,
         query: EntityCollectionQuery) -> dict[str, Any] | Response:

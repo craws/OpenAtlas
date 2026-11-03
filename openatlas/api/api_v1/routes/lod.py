@@ -34,7 +34,7 @@ register_error_handlers(api_v1_lod)
     '/entity/<uuid:uuid>',
     summary='Get an LOD entity by UUID',
     tags=[lod_tag],
-    responses=lod_responses)
+    responses=lod_responses)  # type: ignore[arg-type]
 def get_entity(path: EntityPath) -> dict[str, Any] | Response:
     """
     Retrieves a single entity formatted as Linked Open Data
@@ -51,7 +51,7 @@ def get_entity(path: EntityPath) -> dict[str, Any] | Response:
     '/entity/<uuid:uuid>.<ext>',
     summary='Get an LOD entity by UUID with extension',
     tags=[lod_tag],
-    responses=lod_responses)
+    responses=lod_responses)  # type: ignore[arg-type]
 def get_entity_ext(path: EntityPathExt) -> dict[str, Any] | Response:
     """
     Retrieves a single LOD entity with a specific format extension.
@@ -69,7 +69,7 @@ def get_entity_ext(path: EntityPathExt) -> dict[str, Any] | Response:
     '/entities/<string:entity_class>',
     summary='Get a polymorphic collection of entities',
     tags=[lod_tag],
-    responses=lod_collection_responses)
+    responses=lod_collection_responses)  # type: ignore[arg-type]
 def get_entities(
         path: EntityCollectionPath,
         query: EntityCollectionQuery) -> dict[str, Any] | Response:
