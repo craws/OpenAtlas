@@ -118,7 +118,7 @@ def display_thumbnail(path: FileIdPath, query: DownloadQuery) -> Response:
 
     return send_file(
         thumbnail_path,
-        mimetype=get_mime_type(original_path),
+        mimetype=get_mime_type(thumbnail_path),
         as_attachment=bool(query.download))
 
 

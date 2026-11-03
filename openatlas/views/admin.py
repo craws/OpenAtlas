@@ -505,7 +505,7 @@ def count_files_to_convert() -> int:
     converted_files = 0
     existing_files = [entity.id for entity in Entity.get_by_class('file')]
     for id_, path in g.files.items():
-        if id_ in existing_files and path.suffix in g.display_file_ext:
+        if id_ in existing_files and path.suffix.lower() in g.display_file_ext:
             total_files += 1
             if check_iiif_file_exist(id_):
                 converted_files += 1
