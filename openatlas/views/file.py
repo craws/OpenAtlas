@@ -105,7 +105,8 @@ def convert() -> None:
     for id_, file_path in g.files.items():
         if check_iiif_file_exist(id_):
             continue
-        if id_ in existing_files and file_path.suffix in g.display_file_ext:
+        if id_ in existing_files \
+                and file_path.suffix.lower() in g.display_file_ext:
             convert_image_to_iiif(id_)
     flash(_('all image files are converted'))
 
@@ -169,6 +170,10 @@ def file_delete(name: str) -> Response:
     if name != 'all':  # Delete one file
         try:
             (app.config['UPLOAD_PATH'] / name).unlink()
+            for resized_path in app.config['RESIZED_IMAGES'].glob(
+                    f'**/{Path(name).stem}.*'):
+                if resized_path.is_file():  # pragma: no cover
+                    resized_path.unlink()
             flash(f'{name} {_('was deleted')}')
         except Exception as e:
             g.logger.log('error', 'file', f'deletion of {name} failed', e)
@@ -181,6 +186,10 @@ def file_delete(name: str) -> Response:
         for f in app.config['UPLOAD_PATH'].iterdir():
             if f.stem.isdigit() and int(f.stem) not in entity_file_ids:
                 (app.config['UPLOAD_PATH'] / f.name).unlink()
+                for resized_path in app.config['RESIZED_IMAGES'].glob(
+                        f'**/{f.stem}.*'):
+                    if resized_path.is_file():
+                        resized_path.unlink()
     return redirect(
         f'{url_for('check_files')}#tab-orphaned-files')  # pragma: no cover
 
