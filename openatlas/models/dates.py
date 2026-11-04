@@ -146,7 +146,10 @@ def form_to_datetime64(
             10: 31, 11: 30, 12: 31}
         date_lookup = months_days_leap \
             if is_leap_year(year_) else months_days
-        return date_lookup[month_]
+        return date_lookup.get(month_, 31)
+
+    if day and not month:
+        return None
 
     if month:
         month = f'{month:02}'

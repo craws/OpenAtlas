@@ -47,6 +47,38 @@ def validate_dates(form: FlaskForm) -> bool:
     for prefix in ['begin_', 'end_']:
         for postfix in ['_from', '_to']:
             if getattr(form, f'{prefix}year{postfix}').data:
+                parts = ['year', 'month', 'day']
+                if f'{prefix}hour{postfix}' in form:
+                    parts += ['hour', 'minute', 'second']
+                if any(
+                        getattr(form, f'{prefix}{part}{postfix}').errors
+                        for part in parts):
+                    valid = False
+                    continue
+                if getattr(form, f'{prefix}day{postfix}').data \
+                        and not getattr(form, f'{prefix}month{postfix}').data:
+                    getattr(form, f'{prefix}month{postfix}').errors.append(
+                        _('not a valid date'))
+                    valid = False
+                    continue
+                if f'{prefix}hour{postfix}' in form:
+                    hour = getattr(form, f'{prefix}hour{postfix}').data
+                    minute = getattr(form, f'{prefix}minute{postfix}').data
+                    second = getattr(form, f'{prefix}second{postfix}').data
+                    if second is not None and minute is None:
+                        getattr(
+                            form,
+                            f'{prefix}minute{postfix}').errors.append(
+                                _('not a valid date'))
+                        valid = False
+                        continue
+                    if minute is not None and hour is None:
+                        getattr(
+                            form,
+                            f'{prefix}hour{postfix}').errors.append(
+                                _('not a valid date'))
+                        valid = False
+                        continue
                 date = form_to_datetime64(
                     getattr(form, f'{prefix}year{postfix}').data,
                     getattr(form, f'{prefix}month{postfix}').data,
@@ -84,7 +116,10 @@ def validate_dates(form: FlaskForm) -> bool:
         if (begin_from and end_from and begin_from > end_from) \
                 or (begin_to and end_to and begin_to > end_to) \
                 or (begin and end and begin > end):
-            getattr(form, 'begin_year_from').errors.append(
-                _('Begin dates cannot start after end dates.'))
+            field = (
+                getattr(form, 'begin_year_from')
+                if getattr(form, 'begin_year_from').data
+                else getattr(form, 'begin_year_to'))
+            field.errors.append(_('Begin dates cannot start after end dates.'))
             valid = False
     return valid

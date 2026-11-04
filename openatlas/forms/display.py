@@ -146,15 +146,17 @@ def add_dates(form: Any) -> str:
             errors[field_name] = ''
             for error in getattr(form, field_name).errors:
                 errors[field_name] += error
-            errors[field_name] = \
-                f'<label class="error">{errors[field_name]}</label>'
+            errors[field_name] = (
+                f'<label id="{field_name}-error" class="error" '
+                f'for="{field_name}">{errors[field_name]}</label>')
     return render_template(
         'util/dates.html',
         form=form,
         errors=errors,
         style='' if valid_dates else 'display:table-row',
         label=_('hide')
-        if form.begin_year_from.data
+        if not valid_dates
+            or form.begin_year_from.data
             or form.begin_year_to.data
             or form.end_year_from.data
             or form.end_year_to.data else _('show'))

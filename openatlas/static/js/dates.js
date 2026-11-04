@@ -523,7 +523,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('form').forEach((form) => {
       form.addEventListener('submit', () => {
         queueMicrotask(() => {
-          if (form.querySelector('.date-switch .error')) {
+          if (form.querySelector('.date-switch input.error, .date-switch label.error:not([style*="display: none"])')) {
             isDateSectionOpen = true;
             isAdvancedDateView = true;
             if (dateSwitcher) {

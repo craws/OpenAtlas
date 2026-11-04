@@ -152,7 +152,15 @@ $(document).ready(function () {
   // Adding a generic submit handler to form validation
   .each(function () {
     $(this).validate({
-      errorClass: "d-block error",
+      errorClass: "error",
+      errorPlacement: function (error, element) {
+        const dateGroup = element.closest('.date-bound-group');
+        if (dateGroup.length) {
+          dateGroup.find('.date-error-container').append(error);
+        } else {
+          error.insertAfter(element);
+        }
+      },
       submitHandler: validateSubmitHandler,
     });
   });

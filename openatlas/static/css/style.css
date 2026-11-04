@@ -176,6 +176,16 @@ span.disk-space-legend {
   color: #dc3545;
 }
 
+label.error {
+  display: block;
+}
+
+input.error,
+select.error,
+textarea.error {
+  border-color: #dc3545;
+}
+
 div.alert p {
   margin: 0;
 }
