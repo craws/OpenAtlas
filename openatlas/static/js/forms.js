@@ -14,6 +14,9 @@ function onActivateKeyInput(event) {
 }
 
 function validateSubmitHandler (form) {
+  if (form.dataset.dateInvalid === 'true') {
+    return;
+  }
   if (typeof this.submitButton !== 'undefined') {
       if (this.submitButton.id === "insert_and_continue") $('#continue_').val('yes');
       if (this.submitButton.id === "insert_continue_sub") $('#continue_').val('sub');
@@ -86,10 +89,10 @@ $(document).ready(function () {
   });
 
   /* Below section sets up validation for various forms */
-  // Enable validation for hidden fields
+  // Enable validation for hidden fields except date-switch inputs (handled by dates.js)
   let v = $.validator;
   v.setDefaults({
-    ignore: [],
+    ignore: ".date-switch input",
   });
 
   v.addClassRules({
@@ -153,14 +156,6 @@ $(document).ready(function () {
   .each(function () {
     $(this).validate({
       errorClass: "error",
-      errorPlacement: function (error, element) {
-        const dateGroup = element.closest('.date-bound-group');
-        if (dateGroup.length) {
-          dateGroup.find('.date-error-container').append(error);
-        } else {
-          error.insertAfter(element);
-        }
-      },
       submitHandler: validateSubmitHandler,
     });
   });

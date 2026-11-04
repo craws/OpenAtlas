@@ -46,56 +46,64 @@ def validate_dates(form: FlaskForm) -> bool:
     dates = {}
     for prefix in ['begin_', 'end_']:
         for postfix in ['_from', '_to']:
-            if getattr(form, f'{prefix}year{postfix}').data:
-                parts = ['year', 'month', 'day']
-                if f'{prefix}hour{postfix}' in form:
-                    parts += ['hour', 'minute', 'second']
+            parts = ['year', 'month', 'day']
+            if f'{prefix}hour{postfix}' in form:
+                parts += ['hour', 'minute', 'second']
+            if any(
+                    getattr(form, f'{prefix}{part}{postfix}').errors
+                    for part in parts):
+                valid = False
+                continue
+            if getattr(form, f'{prefix}year{postfix}').data is None:
                 if any(
-                        getattr(form, f'{prefix}{part}{postfix}').errors
-                        for part in parts):
-                    valid = False
-                    continue
-                if getattr(form, f'{prefix}day{postfix}').data \
-                        and not getattr(form, f'{prefix}month{postfix}').data:
-                    getattr(form, f'{prefix}month{postfix}').errors.append(
+                        getattr(form, f'{prefix}{part}{postfix}').data
+                        is not None
+                        for part in parts[1:]):
+                    getattr(form, f'{prefix}year{postfix}').errors.append(
                         _('not a valid date'))
                     valid = False
-                    continue
-                if f'{prefix}hour{postfix}' in form:
-                    hour = getattr(form, f'{prefix}hour{postfix}').data
-                    minute = getattr(form, f'{prefix}minute{postfix}').data
-                    second = getattr(form, f'{prefix}second{postfix}').data
-                    if second is not None and minute is None:
-                        getattr(
-                            form,
-                            f'{prefix}minute{postfix}').errors.append(
-                                _('not a valid date'))
-                        valid = False
-                        continue
-                    if minute is not None and hour is None:
-                        getattr(
-                            form,
-                            f'{prefix}hour{postfix}').errors.append(
-                                _('not a valid date'))
-                        valid = False
-                        continue
-                date = form_to_datetime64(
-                    getattr(form, f'{prefix}year{postfix}').data,
-                    getattr(form, f'{prefix}month{postfix}').data,
-                    getattr(form, f'{prefix}day{postfix}').data,
-                    getattr(form, f'{prefix}hour{postfix}').data
-                    if f'{prefix}hour{postfix}' in form else None,
-                    getattr(form, f'{prefix}minute{postfix}').data
-                    if f'{prefix}minute{postfix}' in form else None,
-                    getattr(form, f'{prefix}second{postfix}').data
-                    if f'{prefix}second{postfix}' in form else None,
-                    to_date=postfix == '_to')
-                if not date:
-                    getattr(form, f'{prefix}day{postfix}').errors.append(
-                        _('not a valid date'))
+                continue
+            if getattr(form, f'{prefix}day{postfix}').data \
+                    and not getattr(form, f'{prefix}month{postfix}').data:
+                getattr(form, f'{prefix}month{postfix}').errors.append(
+                    _('not a valid date'))
+                valid = False
+                continue
+            if f'{prefix}hour{postfix}' in form:
+                hour = getattr(form, f'{prefix}hour{postfix}').data
+                minute = getattr(form, f'{prefix}minute{postfix}').data
+                second = getattr(form, f'{prefix}second{postfix}').data
+                if second is not None and minute is None:
+                    getattr(
+                        form,
+                        f'{prefix}minute{postfix}').errors.append(
+                            _('not a valid date'))
                     valid = False
                     continue
-                dates[prefix + postfix.replace('_', '')] = date
+                if minute is not None and hour is None:
+                    getattr(
+                        form,
+                        f'{prefix}hour{postfix}').errors.append(
+                            _('not a valid date'))
+                    valid = False
+                    continue
+            date = form_to_datetime64(
+                getattr(form, f'{prefix}year{postfix}').data,
+                getattr(form, f'{prefix}month{postfix}').data,
+                getattr(form, f'{prefix}day{postfix}').data,
+                getattr(form, f'{prefix}hour{postfix}').data
+                if f'{prefix}hour{postfix}' in form else None,
+                getattr(form, f'{prefix}minute{postfix}').data
+                if f'{prefix}minute{postfix}' in form else None,
+                getattr(form, f'{prefix}second{postfix}').data
+                if f'{prefix}second{postfix}' in form else None,
+                to_date=postfix == '_to')
+            if not date:
+                getattr(form, f'{prefix}day{postfix}').errors.append(
+                    _('not a valid date'))
+                valid = False
+                continue
+            dates[prefix + postfix.replace('_', '')] = date
 
     # Check for valid date combination e.g. begin not after end
     if valid:

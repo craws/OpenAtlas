@@ -297,15 +297,25 @@ def add_date_fields(
     if isinstance(item, Entity) and item.class_.group['name'] == 'type' and (
             (item.id and not item.root) or (not item.id and item.category)):
         return  # No dates because it's a type hierarchy
-    validator_second = [OptionalValidator(), NumberRange(min=0, max=59)]
-    validator_minute = [OptionalValidator(), NumberRange(min=0, max=59)]
-    validator_hour = [OptionalValidator(), NumberRange(min=0, max=23)]
-    validator_day = [OptionalValidator(), NumberRange(min=1, max=31)]
-    validator_month = [OptionalValidator(), NumberRange(min=1, max=12)]
+    validator_second = [
+        OptionalValidator(),
+        NumberRange(min=0, max=59, message=_('not a valid date'))]
+    validator_minute = [
+        OptionalValidator(),
+        NumberRange(min=0, max=59, message=_('not a valid date'))]
+    validator_hour = [
+        OptionalValidator(),
+        NumberRange(min=0, max=23, message=_('not a valid date'))]
+    validator_day = [
+        OptionalValidator(),
+        NumberRange(min=1, max=31, message=_('not a valid date'))]
+    validator_month = [
+        OptionalValidator(),
+        NumberRange(min=1, max=12, message=_('not a valid date'))]
     validator_year = [
         OptionalValidator(),
-        NumberRange(min=-4713, max=9999),
-        NoneOf([0])]
+        NumberRange(min=-4713, max=9999, message=_('not a valid date')),
+        NoneOf([0], message=_('not a valid date'))]
     has_time = bool(
         current_user.settings['module_time']
         or (item and check_if_entity_has_time(item.dates)))

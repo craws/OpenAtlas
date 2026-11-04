@@ -126,7 +126,7 @@ def add_row(
 
 
 def add_dates(form: Any) -> str:
-    errors = {}
+    errors = {'begin': '', 'end': ''}
     valid_dates = True
     date_name = [
         'begin_year_from', 'begin_month_from', 'begin_day_from',
@@ -143,12 +143,11 @@ def add_dates(form: Any) -> str:
         errors[field_name] = ''
         if getattr(form, field_name).errors:
             valid_dates = False
-            errors[field_name] = ''
+            block = 'begin' if field_name.startswith('begin_') else 'end'
             for error in getattr(form, field_name).errors:
                 errors[field_name] += error
-            errors[field_name] = (
-                f'<label id="{field_name}-error" class="error" '
-                f'for="{field_name}">{errors[field_name]}</label>')
+                if not errors[block]:
+                    errors[block] = error
     return render_template(
         'util/dates.html',
         form=form,

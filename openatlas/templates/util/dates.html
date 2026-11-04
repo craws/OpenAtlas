@@ -86,7 +86,7 @@
       </div>
     </div>
     <div class="mt-1">
-      <small class="date-db-preview text-muted" data-feedback-pair="begin"></small>
+      <small class="date-db-preview {{ 'text-danger fw-semibold' if errors['begin'] else 'text-muted' }}" data-feedback-pair="begin">{{ errors['begin'] }}</small>
     </div>
   </td>
 </tr>
@@ -142,7 +142,7 @@
       </div>
     </div>
     <div class="mt-1">
-      <small class="date-db-preview text-muted" data-feedback-pair="end"></small>
+      <small class="date-db-preview {{ 'text-danger fw-semibold' if errors['end'] else 'text-muted' }}" data-feedback-pair="end">{{ errors['end'] }}</small>
     </div>
   </td>
 </tr>
@@ -154,7 +154,7 @@
     </label>
   </td>
   <td>
-    <div class="mb-1 date-bound-group">
+    <div class="mb-1">
       <div class="row g-1 align-items-center">
         <div class="col-auto" style="width: 115px;">
           <span class="small text-secondary fw-semibold">{{ _('earliest')|uc_first }}</span>
@@ -170,21 +170,8 @@
         {% endif %}
         <div class="col-3">{{ form.begin_comment(class_=config.CSS.string_field) }}</div>
       </div>
-      <div class="row g-1">
-        <div class="col-auto" style="width: 115px;"></div>
-        <div class="col date-error-container">
-          {{ errors['begin_year_from']|safe }}
-          {{ errors['begin_month_from']|safe }}
-          {{ errors['begin_day_from']|safe }}
-          {% if 'begin_hour_from' in form %}
-            {{ errors['begin_hour_from']|safe }}
-            {{ errors['begin_minute_from']|safe }}
-            {{ errors['begin_second_from']|safe }}
-          {% endif %}
-        </div>
-      </div>
     </div>
-    <div class="mb-1 date-bound-group">
+    <div class="mb-1">
       <div class="row g-1 align-items-center">
         <div class="col-auto" style="width: 115px;">
           <span class="small text-secondary fw-semibold">{{ _('latest')|uc_first }}</span>
@@ -200,24 +187,11 @@
         {% endif %}
         <div class="col-3"></div>
       </div>
-      <div class="row g-1">
-        <div class="col-auto" style="width: 115px;"></div>
-        <div class="col date-error-container">
-          {{ errors['begin_year_to']|safe }}
-          {{ errors['begin_month_to']|safe }}
-          {{ errors['begin_day_to']|safe }}
-          {% if 'begin_hour_from' in form %}
-            {{ errors['begin_hour_to']|safe }}
-            {{ errors['begin_minute_to']|safe }}
-            {{ errors['begin_second_to']|safe }}
-          {% endif %}
-        </div>
-      </div>
     </div>
     <div class="row g-1 mt-1">
       <div class="col-auto" style="width: 115px;"></div>
       <div class="col">
-        <small class="date-db-preview text-muted" data-feedback-pair="begin"></small>
+        <small class="date-db-preview {{ 'text-danger fw-semibold' if errors['begin'] else 'text-muted' }}" data-feedback-pair="begin">{{ errors['begin'] }}</small>
       </div>
     </div>
   </td>
@@ -229,7 +203,7 @@
     </label>
   </td>
   <td>
-    <div class="mb-1 date-bound-group">
+    <div class="mb-1">
       <div class="row g-1 align-items-center">
         <div class="col-auto" style="width: 115px;">
           <span class="small text-secondary fw-semibold">{{ _('earliest')|uc_first }}</span>
@@ -245,21 +219,8 @@
         {% endif %}
         <div class="col-3">{{ form.end_comment(class_=config.CSS.string_field) }}</div>
       </div>
-      <div class="row g-1">
-        <div class="col-auto" style="width: 115px;"></div>
-        <div class="col date-error-container">
-          {{ errors['end_year_from']|safe }}
-          {{ errors['end_month_from']|safe }}
-          {{ errors['end_day_from']|safe }}
-          {% if 'begin_hour_from' in form %}
-            {{ errors['end_hour_from']|safe }}
-            {{ errors['end_minute_from']|safe }}
-            {{ errors['end_second_from']|safe }}
-          {% endif %}
-        </div>
-      </div>
     </div>
-    <div class="mb-1 date-bound-group">
+    <div class="mb-1">
       <div class="row g-1 align-items-center">
         <div class="col-auto" style="width: 115px;">
           <span class="small text-secondary fw-semibold">{{ _('latest')|uc_first }}</span>
@@ -275,24 +236,11 @@
         {% endif %}
         <div class="col-3"></div>
       </div>
-      <div class="row g-1">
-        <div class="col-auto" style="width: 115px;"></div>
-        <div class="col date-error-container">
-          {{ errors['end_year_to']|safe }}
-          {{ errors['end_month_to']|safe }}
-          {{ errors['end_day_to']|safe }}
-          {% if 'begin_hour_from' in form %}
-            {{ errors['end_hour_to']|safe }}
-            {{ errors['end_minute_to']|safe }}
-            {{ errors['end_second_to']|safe }}
-          {% endif %}
-        </div>
-      </div>
     </div>
     <div class="row g-1 mt-1">
       <div class="col-auto" style="width: 115px;"></div>
       <div class="col">
-        <small class="date-db-preview text-muted" data-feedback-pair="end"></small>
+        <small class="date-db-preview {{ 'text-danger fw-semibold' if errors['end'] else 'text-muted' }}" data-feedback-pair="end">{{ errors['end'] }}</small>
       </div>
     </div>
   </td>
