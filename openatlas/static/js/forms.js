@@ -89,19 +89,12 @@ $(document).ready(function () {
   });
 
   /* Below section sets up validation for various forms */
-  // Enable validation for hidden fields except date-switch inputs (handled by dates.js)
   let v = $.validator;
   v.setDefaults({
-    ignore: ".date-switch input",
+    ignore: ".date-switch input, .year, .month, .day, .hour, .minute, .second",
   });
 
   v.addClassRules({
-    year: {number: true, min: -4713, max: 9999},
-    month: {digits: true, min: 1, max: 12},
-    day: {digits: true, min: 1, max: 31},
-    hour: {digits: true, min: 0, max: 23},
-    minute: {digits: true, min: 0, max: 59},
-    second: {digits: true, min: 0, max: 59},
     integer: {digits: true},
     signed_integer: {signedInteger: true},
     email: {email: true},

@@ -11,10 +11,10 @@ document.addEventListener('DOMContentLoaded', () => {
    * ======================================================================= */
 
   function isLeapYear(yearInt) {
-    const astroYear = yearInt > 0 ? yearInt : yearInt + 1;
-    if (astroYear % 400 === 0) return true;
-    if (astroYear % 100 === 0) return false;
-    return astroYear % 4 === 0;
+    const year = yearInt > 0 ? yearInt : yearInt + 1;
+    if (year % 400 === 0) return true;
+    if (year % 100 === 0) return false;
+    return year % 4 === 0;
   }
 
   function getLastDayOfMonth(yearInt, monthInt) {
@@ -40,14 +40,49 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function isBadNumberInput(id) {
+    const el = document.getElementById(id);
+    return Boolean(el && el.validity && el.validity.badInput);
+  }
+
+  function blockInvalidNumberChars(input) {
+    const allowMinus = input.classList.contains('year');
+    input.addEventListener('keydown', (event) => {
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+      if (['e', 'E', '+', '.', ','].includes(event.key) || (!allowMinus && event.key === '-')) {
+        event.preventDefault();
+      }
+    });
+    input.addEventListener('paste', (event) => {
+      const text = (event.clipboardData || window.clipboardData)?.getData('text') || '';
+      const regex = allowMinus ? /^-?\d*$/ : /^\d*$/;
+      if (!regex.test(text.trim())) {
+        event.preventDefault();
+      }
+    });
+  }
+
   function readBoundaryRaw(mode, bound) {
+    const badParts = ['Y', 'M', 'D', 'h', 'm', 's'].filter((part) =>
+      isBadNumberInput(`${mode}_${PART_TO_FIELD[part]}_${bound}`)
+    );
+    if (!isAdvancedDateView) {
+      ['Y', 'M', 'D'].forEach((part) => {
+        const simpleId = `simple_${mode}_${PART_TO_FIELD[part]}`;
+        const simpleEl = document.getElementById(simpleId);
+        if (simpleEl && !simpleEl.disabled && isBadNumberInput(simpleId) && !badParts.includes(part)) {
+          badParts.push(part);
+        }
+      });
+    }
     return {
       Y: getInputValue(`${mode}_year_${bound}`),
       M: getInputValue(`${mode}_month_${bound}`),
       D: getInputValue(`${mode}_day_${bound}`),
       h: getInputValue(`${mode}_hour_${bound}`),
       m: getInputValue(`${mode}_minute_${bound}`),
-      s: getInputValue(`${mode}_second_${bound}`)
+      s: getInputValue(`${mode}_second_${bound}`),
+      badParts
     };
   }
 
@@ -80,46 +115,47 @@ document.addEventListener('DOMContentLoaded', () => {
     const hStr = (raw.h || '').trim();
     const minStr = (raw.m || '').trim();
     const sStr = (raw.s || '').trim();
+    const badParts = Array.isArray(raw.badParts) ? raw.badParts : [];
 
-    if (!yStr && !mStr && !dStr && !hStr && !minStr && !sStr) {
+    if (!yStr && !mStr && !dStr && !hStr && !minStr && !sStr && badParts.length === 0) {
       return { empty: true, valid: true, invalidParts: [], hasCustomTime: false };
     }
 
-    const invalidParts = [];
+    const invalidParts = [...badParts];
     let yearValid = false;
     let yearNum = 0;
     if (!yStr) {
-      invalidParts.push('Y');
+      if (!invalidParts.includes('Y')) invalidParts.push('Y');
     } else {
       yearNum = Number(yStr);
       if (!/^-?\d+$/.test(yStr) || !Number.isInteger(yearNum) || yearNum === 0 || yearNum < -4713 || yearNum > 9999) {
-        invalidParts.push('Y');
+        if (!invalidParts.includes('Y')) invalidParts.push('Y');
       } else {
         yearValid = true;
       }
     }
 
-    let monthValid = true;
+    let monthValid = !invalidParts.includes('M');
     let monthNum = isToDate ? 12 : 1;
     if (mStr !== '') {
       monthNum = Number(mStr);
       if (!/^\d+$/.test(mStr) || monthNum < 1 || monthNum > 12) {
-        invalidParts.push('M');
+        if (!invalidParts.includes('M')) invalidParts.push('M');
         monthValid = false;
       }
     }
 
     const maxDay = (yearValid && monthValid) ? getLastDayOfMonth(yearNum, monthNum) : 31;
     let dayNum = isToDate ? maxDay : 1;
-    if (dStr !== '') {
-      if (mStr === '') {
-        if (!invalidParts.includes('M')) {
-          invalidParts.push('M');
-        }
+    if (dStr !== '' || invalidParts.includes('D')) {
+      if (mStr === '' && !invalidParts.includes('M')) {
+        invalidParts.push('M');
       }
-      dayNum = Number(dStr);
-      if (!/^\d+$/.test(dStr) || dayNum < 1 || dayNum > maxDay) {
-        invalidParts.push('D');
+      if (dStr !== '') {
+        dayNum = Number(dStr);
+        if (!/^\d+$/.test(dStr) || dayNum < 1 || dayNum > maxDay) {
+          if (!invalidParts.includes('D')) invalidParts.push('D');
+        }
       }
     }
 
@@ -128,11 +164,14 @@ document.addEventListener('DOMContentLoaded', () => {
     let secNum = isToDate ? 59 : 0;
     let hasCustomTime = false;
 
-    if (hStr !== '' || minStr !== '' || sStr !== '') {
-      if (minStr !== '' && hStr === '') {
+    if (
+      hStr !== '' || minStr !== '' || sStr !== '' ||
+      invalidParts.includes('h') || invalidParts.includes('m') || invalidParts.includes('s')
+    ) {
+      if ((minStr !== '' || invalidParts.includes('m')) && hStr === '' && !invalidParts.includes('h')) {
         invalidParts.push('h');
       }
-      if (sStr !== '' && minStr === '') {
+      if ((sStr !== '' || invalidParts.includes('s')) && minStr === '' && !invalidParts.includes('m')) {
         invalidParts.push('m');
       }
       if (hStr !== '') {
@@ -179,9 +218,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const padS = String(secNum).padStart(2, '0');
     const bcSuffix = isBC ? ' BC' : '';
 
-    const astroYear = isBC ? yearNum + 1 : yearNum;
     const sortValue =
-      (astroYear * 10000000000) +
+      (yearNum * 10000000000) +
       (monthNum * 100000000) +
       (dayNum * 1000000) +
       (hourNum * 10000) +
@@ -587,6 +625,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.querySelectorAll('input[data-simple]').forEach((input) => {
+      blockInvalidNumberChars(input);
       input.addEventListener('input', function () {
         const mode = this.getAttribute('data-simple');
         const simpleObj = {
@@ -602,6 +641,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.querySelectorAll('.date-mode-advanced input').forEach((input) => {
+      if (input.type === 'number') {
+        blockInvalidNumberChars(input);
+      }
       input.addEventListener('input', () => {
         updateDateFeedback();
       });
@@ -637,7 +679,9 @@ document.addEventListener('DOMContentLoaded', () => {
           isDateSectionOpen = true;
           const bSem = analyzePairSemantics('begin');
           const eSem = analyzePairSemantics('end');
-          if (!bSem.isStandard || !eSem.isStandard) {
+          const simpleBeginDisabled = document.getElementById('simple_begin_year')?.disabled;
+          const simpleEndDisabled = document.getElementById('simple_end_year')?.disabled;
+          if ((bSem.mode === 'invalid' && simpleBeginDisabled) || (eSem.mode === 'invalid' && simpleEndDisabled)) {
             isAdvancedDateView = true;
           }
           if (dateSwitcher) {
@@ -647,5 +691,96 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }, true);
     });
+  }
+
+  /* =======================================================================
+   * 8. Search Form Date Validation
+   * ======================================================================= */
+
+  const searchBeginYear = document.getElementById('begin_year');
+  const searchEndYear = document.getElementById('end_year');
+  const searchFeedback = document.getElementById('search-date-feedback');
+
+  if (searchBeginYear && searchEndYear) {
+    const searchFieldIds = [
+      'begin_year', 'begin_month', 'begin_day',
+      'end_year', 'end_month', 'end_day'
+    ];
+
+    function updateSearchDateFeedback() {
+      const rFrom = resolveBoundary({
+        Y: getInputValue('begin_year'),
+        M: getInputValue('begin_month'),
+        D: getInputValue('begin_day'),
+        badParts: ['Y', 'M', 'D'].filter((part) => isBadNumberInput(`begin_${PART_TO_FIELD[part]}`))
+      }, false);
+      const rTo = resolveBoundary({
+        Y: getInputValue('end_year'),
+        M: getInputValue('end_month'),
+        D: getInputValue('end_day'),
+        badParts: ['Y', 'M', 'D'].filter((part) => isBadNumberInput(`end_${PART_TO_FIELD[part]}`))
+      }, true);
+
+      searchFieldIds.forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('error');
+      });
+
+      const invalidFields = [];
+      let errorLabel = '';
+
+      if (!rFrom.valid || !rTo.valid) {
+        if (!rFrom.valid) {
+          rFrom.invalidParts.forEach((part) => {
+            invalidFields.push(`begin_${PART_TO_FIELD[part]}`);
+          });
+        }
+        if (!rTo.valid) {
+          rTo.invalidParts.forEach((part) => {
+            invalidFields.push(`end_${PART_TO_FIELD[part]}`);
+          });
+        }
+        errorLabel = translate.date_invalid || 'Not a valid date';
+      } else if (!rFrom.empty && !rTo.empty && rFrom.sortValue > rTo.sortValue) {
+        invalidFields.push('begin_year', 'end_year');
+        errorLabel = translate.date_begin_after_end || 'Begin dates cannot start after end dates.';
+      }
+
+      const hasError = invalidFields.length > 0;
+      invalidFields.forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('error');
+      });
+
+      if (searchFeedback) {
+        searchFeedback.textContent = errorLabel;
+        searchFeedback.classList.toggle('d-none', !hasError);
+        searchFeedback.classList.toggle('text-danger', hasError);
+        searchFeedback.classList.toggle('fw-semibold', hasError);
+      }
+
+      const form = searchBeginYear.closest('form');
+      if (form) {
+        form.dataset.dateInvalid = hasError ? 'true' : 'false';
+      }
+    }
+
+    searchFieldIds.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) {
+        blockInvalidNumberChars(el);
+        el.addEventListener('input', updateSearchDateFeedback);
+      }
+    });
+
+    const searchForm = searchBeginYear.closest('form');
+    if (searchForm) {
+      searchForm.addEventListener('submit', (event) => {
+        updateSearchDateFeedback();
+        if (searchForm.dataset.dateInvalid === 'true') {
+          event.preventDefault();
+        }
+      }, true);
+    }
   }
 });

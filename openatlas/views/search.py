@@ -32,12 +32,16 @@ class SearchForm(FlaskForm):
         option_widget=widgets.CheckboxInput(),
         widget=widgets.ListWidget(prefix_label=False))
     search = SubmitField(_('search'))
-    validator_day = [Optional(), NumberRange(min=1, max=31)]
-    validator_month = [Optional(), NumberRange(min=1, max=12)]
+    validator_day = [
+        Optional(),
+        NumberRange(min=1, max=31, message=_('not a valid date'))]
+    validator_month = [
+        Optional(),
+        NumberRange(min=1, max=12, message=_('not a valid date'))]
     validator_year = [
         Optional(),
-        NumberRange(min=-4713, max=9999),
-        NoneOf([0])]
+        NumberRange(min=-4713, max=9999, message=_('not a valid date')),
+        NoneOf([0], message=_('not a valid date'))]
     begin_year = IntegerField(
         render_kw={'placeholder': _('YYYY')},
         validators=validator_year)
