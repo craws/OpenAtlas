@@ -2,9 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const dateSwitcher = document.getElementById('date-switcher');
   const dateSwitchElements = document.querySelectorAll('.date-switch');
   const beginYearFrom = document.getElementById('begin_year_from');
-  const beginYearTo = document.getElementById('begin_year_to');
-  const endYearFrom = document.getElementById('end_year_from');
-  const endYearTo = document.getElementById('end_year_to');
 
   /* =======================================================================
    * 1. Calendar and Leap Year Calculation Helpers
