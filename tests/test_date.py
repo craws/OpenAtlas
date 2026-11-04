@@ -167,21 +167,17 @@ class DateTest(TestBaseCase):
             for invalid_data in [
                 {'name': 'Date place', 'begin_month_from': 13},
                 {'name': 'Date place', 'begin_month_from': 5},
-                {
-                    'name': 'Date place',
-                    'begin_year_from': 1400,
-                    'begin_day_from': 5},
-                {
-                    'name': 'Date place',
-                    'begin_year_from': 1400,
-                    'begin_second_from': 5},
-                {
-                    'name': 'Date place',
-                    'begin_year_from': 1400,
-                    'begin_minute_from': 5}]:
+                {'name': 'Date place',
+                 'begin_year_from': 1400,
+                 'begin_day_from': 5},
+                {'name': 'Date place',
+                 'begin_year_from': 1400,
+                 'begin_second_from': 5},
+                {'name': 'Date place',
+                 'begin_year_from': 1400,
+                 'begin_minute_from': 5}]:
                 rv = c.post(
                     url_for('insert', class_='place'),
                     data=invalid_data,
                     follow_redirects=True)
                 assert b'not a valid date' in rv.data
-

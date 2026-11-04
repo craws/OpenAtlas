@@ -625,11 +625,9 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    /* ========================================================================
-     * 7. Form Validation Integration
-     * Automatically expands the date section and switches to Advanced View
-     * when form validation marks a date field as invalid on submission.
-     * ======================================================================== */
+    /* =====================================================================
+     * 7. Form Validation
+     * ===================================================================== */
 
     document.querySelectorAll('form').forEach((form) => {
       form.addEventListener('submit', (event) => {

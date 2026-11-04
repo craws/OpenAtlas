@@ -49,7 +49,7 @@ class RightsHolderTests(TestBaseCase):
 
         rv = c.get(url_for('rights_holder_view', id_=9999))
         assert rv.status_code == \
-               HTTPStatus.IM_A_TEAPOT  # pylint: disable=no-member
+               HTTPStatus.IM_A_TEAPOT
 
         rv = c.post(
             url_for(

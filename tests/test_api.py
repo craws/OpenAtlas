@@ -3,7 +3,6 @@ from pathlib import Path
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.models.entity import Link
 from tests.base import ApiTestCase, get_hierarchy
 
 

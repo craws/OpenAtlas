@@ -18,7 +18,7 @@ iiif_manifest_response = {
         "content": {
             "application/json": {
                 "schema": ErrorResponse.model_json_schema()}}},
-    HTTPStatus.UNPROCESSABLE_CONTENT: {
+    HTTPStatus.UNPROCESSABLE_ENTITY: {
         "description": "Validation error: unsupported IIIF version "
                        "(must be '2' or '3')."}}
 
