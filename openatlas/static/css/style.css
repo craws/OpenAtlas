@@ -186,6 +186,12 @@ textarea.error {
   border-color: #dc3545;
 }
 
+.date-time-sep {
+  border-left: 1px solid #dee2e6;
+  margin-left: 0.35rem;
+  padding-left: 0.35rem !important;
+}
+
 div.alert p {
   margin: 0;
 }

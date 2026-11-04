@@ -402,8 +402,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (yStr && mStr && dStr) {
       return {
-        from: { Y: yStr, M: mStr, D: dStr, h: '', m: '', s: '' },
-        to: { Y: yStr, M: mStr, D: dStr, h: '', m: '', s: '' }
+        from: { Y: yStr, M: mStr, D: dStr, h: '00', m: '00', s: '00' },
+        to: { Y: yStr, M: mStr, D: dStr, h: '23', m: '59', s: '59' }
       };
     }
     if (yStr && mStr && !dStr) {
@@ -412,19 +412,19 @@ document.addEventListener('DOMContentLoaded', () => {
         ? String(getLastDayOfMonth(yearNum, monthNum))
         : '31';
       return {
-        from: { Y: yStr, M: mStr, D: '1', h: '', m: '', s: '' },
-        to: { Y: yStr, M: mStr, D: lastDay, h: '', m: '', s: '' }
+        from: { Y: yStr, M: mStr, D: '1', h: '00', m: '00', s: '00' },
+        to: { Y: yStr, M: mStr, D: lastDay, h: '23', m: '59', s: '59' }
       };
     }
     if (yStr && !mStr && !dStr) {
       return {
-        from: { Y: yStr, M: '1', D: '1', h: '', m: '', s: '' },
-        to: { Y: yStr, M: '12', D: '31', h: '', m: '', s: '' }
+        from: { Y: yStr, M: '1', D: '1', h: '00', m: '00', s: '00' },
+        to: { Y: yStr, M: '12', D: '31', h: '23', m: '59', s: '59' }
       };
     }
     return {
-      from: { Y: yStr, M: mStr, D: dStr, h: '', m: '', s: '' },
-      to: { Y: yStr, M: mStr, D: dStr, h: '', m: '', s: '' }
+      from: { Y: yStr, M: mStr, D: dStr, h: '00', m: '00', s: '00' },
+      to: { Y: yStr, M: mStr, D: dStr, h: '23', m: '59', s: '59' }
     };
   }
 
