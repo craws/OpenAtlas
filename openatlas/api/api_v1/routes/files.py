@@ -60,7 +60,7 @@ def get_iiif_redirect_url(
     '/<int:id>/display',
     summary="Get image file",
     tags=[file_tag],
-    responses=display_file_response)
+    responses=display_file_response)  # type: ignore[arg-type]
 def display_file(path: FileIdPath, query: DownloadQuery) -> Response:
     """Serves the binary image file.
 
@@ -92,7 +92,7 @@ def display_file(path: FileIdPath, query: DownloadQuery) -> Response:
     '/<int:id>/thumbnail',
     summary="Get thumbnail image",
     tags=[file_tag],
-    responses=thumbnail_response)
+    responses=thumbnail_response)  # type: ignore[arg-type]
 def display_thumbnail(path: FileIdPath, query: DownloadQuery) -> Response:
     """Serves the static, pre-calculated thumbnail image.
 
@@ -118,7 +118,7 @@ def display_thumbnail(path: FileIdPath, query: DownloadQuery) -> Response:
 
     return send_file(
         thumbnail_path,
-        mimetype=get_mime_type(original_path),
+        mimetype=get_mime_type(thumbnail_path),
         as_attachment=bool(query.download))
 
 
@@ -151,7 +151,7 @@ def get_public_files_response(
     '/public',
     summary="Get licensed files overview",
     tags=[file_tag],
-    responses=public_files_response)
+    responses=public_files_response)  # type: ignore[arg-type]
 def get_public_files(query: PublicFilesQuery) -> dict[str, Any]:
     """Retrieves a page of publicly shareable files with a license."""
     return get_public_files_response('api_v1_files.get_public_files', query)
@@ -161,7 +161,7 @@ def get_public_files(query: PublicFilesQuery) -> dict[str, Any]:
     '/entity/<int:id>',
     summary="Get licensed files overview for an entity",
     tags=[file_tag],
-    responses=public_files_response)
+    responses=public_files_response)  # type: ignore[arg-type]
 def get_public_files_by_entity(
         path: EntityFilesPath,
         query: PublicFilesQuery) -> dict[str, Any]:

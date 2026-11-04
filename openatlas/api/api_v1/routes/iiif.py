@@ -29,7 +29,7 @@ register_error_handlers(api_v1_iiif)
     '/<int:id>/manifest/<string:version>',
     summary="Get IIIF Manifest",
     tags=[iiif_tag],
-    responses=iiif_manifest_response)
+    responses=iiif_manifest_response)  # type: ignore[arg-type]
 def get_iiif_manifest(path: FileIiifPath) -> dict[str, Any]:
     """Returns the IIIF manifest for a specific file and IIIF version."""
     entity = get_file_entity(path.id)
@@ -43,7 +43,7 @@ def get_iiif_manifest(path: FileIiifPath) -> dict[str, Any]:
     '/<int:id>/canvas/<string:version>',
     summary="Get IIIF Canvas",
     tags=[iiif_tag],
-    responses=iiif_canvas_response)
+    responses=iiif_canvas_response)  # type: ignore[arg-type]
 def get_iiif_canvas(path: FileIiifPath) -> dict[str, Any]:
     """Returns the IIIF canvas for a specific file and IIIF version."""
     entity = get_file_entity(path.id)
@@ -55,7 +55,7 @@ def get_iiif_canvas(path: FileIiifPath) -> dict[str, Any]:
     '/<int:id>/image/<string:version>',
     summary="Get IIIF Image",
     tags=[iiif_tag],
-    responses=iiif_image_response)
+    responses=iiif_image_response)  # type: ignore[arg-type]
 def get_iiif_image(path: FileIiifPath) -> dict[str, Any]:
     """Returns the IIIF image (annotation) for a specific file and version."""
     entity = get_file_entity(path.id)
@@ -67,7 +67,7 @@ def get_iiif_image(path: FileIiifPath) -> dict[str, Any]:
     '/<int:id>/annotation-list/<string:version>',
     summary="Get IIIF Annotation List/Page",
     tags=[iiif_tag],
-    responses=iiif_annotation_list_response)
+    responses=iiif_annotation_list_response)  # type: ignore[arg-type]
 def get_iiif_annotation_list(path: FileIiifPath) -> dict[str, Any]:
     """Returns the IIIF annotation list (v2) or page (v3)."""
     entity = get_file_entity(path.id)
@@ -79,7 +79,7 @@ def get_iiif_annotation_list(path: FileIiifPath) -> dict[str, Any]:
     '/<int:id>/annotation/<string:version>',
     summary="Get IIIF Annotation",
     tags=[iiif_tag],
-    responses=iiif_annotation_response)
+    responses=iiif_annotation_response)  # type: ignore[arg-type]
 def get_iiif_annotation(path: AnnotationIiifPath) -> dict[str, Any]:
     """Returns a specific IIIF annotation."""
     if not (data := get_annotation_image_by_id(path.id)):

@@ -44,6 +44,12 @@ class SourceTest(TestBaseCase):
         rv = c.get(url_for('update', id_=source_id))
         assert b'Necronomicon' in rv.data
 
+        rv = c.get(url_for('index', group='source'))
+        assert b'Annotation' in rv.data
+
+        rv = c.get(url_for('annotation_text_index'))
+        assert b'whatever' in rv.data
+
         del annotation_data['entityId']
         rv = c.post(
             url_for('update', id_=source_id),

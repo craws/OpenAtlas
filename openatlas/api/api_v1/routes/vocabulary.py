@@ -93,7 +93,7 @@ def get_vocab_flat_item(
 @api_v1_vocabulary.get(
     '',
     summary="Get flat types list",
-    responses=vocabulary_list_response,
+    responses=vocabulary_list_response,  # type: ignore[arg-type]
     tags=[vocabulary_tag],
     strict_slashes=False)
 def get_vocabulary_list() -> dict[str, Any]:
@@ -113,7 +113,7 @@ def get_vocabulary_list() -> dict[str, Any]:
 @api_v1_vocabulary.get(
     '/<int:id>',
     summary="Get vocabulary type by ID",
-    responses=vocabulary_flat_response,
+    responses=vocabulary_flat_response,  # type: ignore[arg-type]
     tags=[vocabulary_tag])
 def get_vocabulary_item(path: VocabularyId) -> dict[str, Any]:
     """Retrieves information for a single vocabulary type."""
@@ -132,7 +132,7 @@ def get_vocabulary_item(path: VocabularyId) -> dict[str, Any]:
 @api_v1_vocabulary.get(
     '/<int:id>/skos',
     summary="Export vocabulary hierarchy as SKOS",
-    responses=vocabulary_skos_response,
+    responses=vocabulary_skos_response,  # type: ignore[arg-type]
     tags=[vocabulary_tag])
 def get_vocabulary_skos(path: VocabularyId) -> Response:
     """Exports a single vocabulary tree as a SKOS ConceptScheme for
@@ -152,7 +152,7 @@ def get_vocabulary_skos(path: VocabularyId) -> Response:
 @api_v1_vocabulary.get(
     '/<int:id>/skos.<ext>',
     summary="Export vocabulary hierarchy as SKOS with format extension",
-    responses=vocabulary_skos_response,
+    responses=vocabulary_skos_response,  # type: ignore[arg-type]
     tags=[vocabulary_tag])
 def get_vocabulary_skos_ext(path: VocabularySkosPath) -> Response:
     """Exports a single vocabulary tree as a SKOS ConceptScheme for
@@ -206,8 +206,7 @@ def generate_vocabulary_tree(
         root_ids = []
         for type_ in g.types.values():
             if not type_.root and getattr(type_, 'category', None) == category:
-                if openatlas_class and type_.classes \
-                        and openatlas_class not in type_.classes:
+                if openatlas_class and openatlas_class not in type_.classes:
                     continue
                 root_ids.append(type_.id)
 
@@ -219,7 +218,7 @@ def generate_vocabulary_tree(
 @api_v1_vocabulary.get(
     '/tree',
     summary="Get types tree",
-    responses=vocabulary_tree_response,
+    responses=vocabulary_tree_response,  # type: ignore[arg-type]
     tags=[vocabulary_tag])
 def get_vocabulary_tree() -> dict[str, Any]:
     """Retrieves all OpenAtlas types sorted hierarchically into standard,
@@ -230,7 +229,7 @@ def get_vocabulary_tree() -> dict[str, Any]:
 @api_v1_vocabulary.get(
     '/tree/<openatlas_class>',
     summary="Get types tree by OpenAtlas class",
-    responses=vocabulary_tree_response,
+    responses=vocabulary_tree_response,  # type: ignore[arg-type]
     tags=[vocabulary_tag])
 def get_vocabulary_tree_by_class(path: VocabularyTreePath) -> dict[str, Any]:
     """Retrieves all OpenAtlas types filtered by a specific OpenAtlas class."""
@@ -245,7 +244,7 @@ def get_vocabulary_tree_by_class(path: VocabularyTreePath) -> dict[str, Any]:
 @api_v1_vocabulary.get(
     '/standard/<openatlas_class>',
     summary="Get standard types tree by OpenAtlas class",
-    responses=vocabulary_standard_by_class_response,
+    responses=vocabulary_standard_by_class_response,  # type: ignore[arg-type]
     tags=[vocabulary_tag])
 def get_vocabulary_standard_by_class(
         path: VocabularyTreePath,
@@ -265,8 +264,7 @@ def get_vocabulary_standard_by_class(
     root_ids = []
     for type_ in g.types.values():
         if not type_.root and getattr(type_, 'category', None) == 'standard':
-            if class_name and type_.classes \
-                    and class_name not in type_.classes:
+            if class_name and class_name not in type_.classes:
                 continue
             root_ids.append(type_.id)
 

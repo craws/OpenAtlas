@@ -42,7 +42,7 @@ def walk_case_studies(ids: list[int]) -> list[CaseStudyItem]:
     '/case-studies',
     summary="Get case studies metadata",
     tags=[metadata_tag],
-    responses=case_studies_response)
+    responses=case_studies_response)  # type: ignore[arg-type]
 def get_case_studies() -> dict[str, Any]:
     """Retrieves the hierarchical list of all project case studies."""
     case_study_ids = g.types[g.case_study_type.id].subs
@@ -55,7 +55,7 @@ def get_case_studies() -> dict[str, Any]:
     '/case-studies/<int:id>',
     summary="Get case study metadata",
     tags=[metadata_tag],
-    responses=case_study_response)
+    responses=case_study_response)  # type: ignore[arg-type]
 def get_case_study_by_id(path: CaseStudyPath) -> dict[str, Any]:
     """Retrieves a single case study by its ID, including its nested sub-case
     studies."""
@@ -75,7 +75,7 @@ def get_case_study_by_id(path: CaseStudyPath) -> dict[str, Any]:
     '/agents',
     summary="Get agents information",
     tags=[metadata_tag],
-    responses=agents_response)
+    responses=agents_response)  # type: ignore[arg-type]
 def get_agents() -> dict[str, Any]:
     """Retrieves all registered rights holders, authors, and creators."""
     right_holders = []
@@ -93,7 +93,7 @@ def get_agents() -> dict[str, Any]:
     '/agents/<int:id>',
     summary="Get information about an agent",
     tags=[metadata_tag],
-    responses=agent_response)
+    responses=agent_response)  # type: ignore[arg-type]
 def get_agent_by_id(path: AgentPath) -> dict[str, Any]:
     """Retrieves information about a single rights holder or agent entity."""
     entity = get_rightsholder_by_id(path.id)

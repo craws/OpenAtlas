@@ -150,16 +150,31 @@ Geometries & Hierarchies (Places & Artifacts)
 +++++++++++++++++++++++++++++++++++++++++++++
 For geographical entities and physical objects:
 
-* **wkt**: Well-Known Text geometry (e.g., `POINT(9.3 47.4)`). Only one
-  geometry per entry, but also GeometryCollection and Multi geometries are allowed.
-* **parent_id**: Links to the `id` of a super-unit *within the same file*.
-* **openatlas_parent_id**: Links to the `ID` of an *existing* OpenAtlas entity.
-* **openatlas_class**: Required when using `parent_id` to specify the target class (e.g., `place`, `feature`, `artifact`).
+* **wkt**: Well-Known Text geometry (e.g., ``POINT(9.3 47.4)``). Only one
+  geometry per entry, but ``GEOMETRYCOLLECTION`` and ``MULTI*`` geometries (such
+  as ``MULTIPOINT``, ``MULTILINESTRING``, and ``MULTIPOLYGON``) are also allowed.
+* **parent_id**: Links to the ``id`` of a super-unit *within the same file*.
+* **openatlas_parent_id**: Links to the ``ID`` of an *existing* OpenAtlas entity.
+* **openatlas_class**: Required when using ``parent_id`` to specify the target class (e.g., ``place``, ``feature``, ``stratigraphic_unit``, ``human_remains``, ``artifact``).
+
+Depending on your research focus, place hierarchies can be structured in different ways:
+
+* **Archaeological Hierarchy**: Follows a strict stratigraphic structure from
+  ``place`` (e.g., cemetery) -> ``feature`` (e.g., grave) -> ``stratigraphic_unit``
+  (e.g., burial or backfilling) -> ``artifact`` / ``human_remains``.
+* **Historical / Art-Historical Hierarchy**: Does not require strict stratigraphic
+  layering. For example, a building can be modeled as a ``place`` (e.g., Abbey Church)
+  with architectural elements as ``feature`` (e.g., entrance gate, side aisle, or
+  high altar), while ``artifact`` entries (e.g., a reliquary standing on an altar,
+  a relief on a portal, or a church bell) can be linked directly to a ``place``,
+  ``feature``, or another ``artifact``.
 
 Example Datasets (St. Gallen)
 -----------------------------
 To better understand how these fields work together, you can download and inspect
-these example files based on the historical Abbey of Saint Gall.
+these example files based on the historical Abbey of Saint Gall (including both a
+historical/art-historical building hierarchy for the Abbey Church and a fictitious
+early medieval cemetery to demonstrate a strict archaeological place hierarchy).
 
 .. note::
    These examples use specific OpenAtlas IDs for type hierarchies that are only valid
@@ -167,7 +182,8 @@ these example files based on the historical Abbey of Saint Gall.
 
 * :download:`Types <../../../openatlas/static/examples/example_types.csv>`
 * :download:`Bibliography <../../../openatlas/static/examples/example_bibliography.csv>`
-* :download:`Places (Place hierarchy)<../../../openatlas/static/examples/example_places.csv>`
+* :download:`Places - Historical/Art-Historical (Abbey Church) <../../../openatlas/static/examples/example_places.csv>`
+* :download:`Places - Archaeological Hierarchy (Cemetery) <../../../openatlas/static/examples/example_place_hierarchy.csv>`
 * :download:`Persons <../../../openatlas/static/examples/example_persons.csv>`
 * :download:`Modifications (Events) <../../../openatlas/static/examples/example_modifications.csv>`
 * :download:`Sources <../../../openatlas/static/examples/example_sources.csv>`

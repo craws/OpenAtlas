@@ -138,8 +138,7 @@ def before_request() -> Response | None:
 
 
 def setup_files() -> None:
-    if request.path.startswith('/api/1') or \
-            (request.endpoint or "") in 'display_file':
+    if request.path.startswith('/api/1'):
         g.file_info = {}
         g.api_file_paths = {}
         g.api_rights_holders = {}
@@ -153,7 +152,8 @@ def setup_files() -> None:
         g.settings['file_upload_max_size'] * 1024 * 1024  # Max upload in MB
     g.display_file_ext = app.config['DISPLAY_FILE_EXT']
     if g.settings['image_processing']:
-        g.display_file_ext += app.config['PROCESSABLE_EXT']
+        g.display_file_ext = \
+            app.config['DISPLAY_FILE_EXT'] + app.config['PROCESSABLE_EXT']
     if g.settings['iiif'] and g.settings['iiif_path']:
         g.writable_paths.append(g.settings['iiif_path'])
     g.rights_holder = RightsHolder.get_rights_holders()

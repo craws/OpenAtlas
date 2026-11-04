@@ -20,7 +20,7 @@ register_error_handlers(api_v1_root)
 @api_v1_root.get(
     '/',
     summary="API Index",
-    responses=index_response,
+    responses=index_response,  # type: ignore[arg-type]
     tags=[system_tag],
     strict_slashes=False)
 def api_v1_index() -> dict[str, Any]:

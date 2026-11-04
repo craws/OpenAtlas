@@ -212,7 +212,8 @@ def link_types(
     if data := row.get('origin_value_types'):
         for value_types in str(data).split():
             value_type = value_types.split(';')
-            if len(value_type) == 2:
+            has_value = 2
+            if len(value_type) == has_value:
                 if entity_id := get_id_from_origin_id(project, value_type[0]):
                     number = value_type[1][1:] \
                         if value_type[1].startswith('-') else value_type[1]
@@ -282,10 +283,10 @@ def get_coordinates_from_wkt(coordinates: str) -> dict[str, Any]:
     geometries = []
     if wkt_:
         if wkt_.geom_type in {
-            "MultiPoint",
-            "MultiLineString",
-            "MultiPolygon",
-            "GeometryCollection"}:
+                "MultiPoint",
+                "MultiLineString",
+                "MultiPolygon",
+                "GeometryCollection"}:
             for poly in wkt_.geoms:
                 geometries.append(convert_wkt_to_geojson(poly))
         else:

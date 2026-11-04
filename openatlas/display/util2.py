@@ -99,6 +99,7 @@ def get_file_path(id_: int, size: Optional[str] = None) -> Optional[Path]:
     ext = g.files[id_].suffix
     path = app.config['UPLOAD_PATH'] / f'{id_}{ext}'
     if size:
+        ext = ext.lower()
         if ext in app.config['PROCESSABLE_EXT']:
             ext = app.config['PROCESSED_EXT']  # pragma: no cover
         path = app.config['RESIZED_IMAGES'] / size / f'{id_}{ext}'

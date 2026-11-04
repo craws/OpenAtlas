@@ -272,20 +272,20 @@ def profile_image(
     src = url_for('display_file', name=path.name)
     url = src
     width = g.settings["profile_image_width"]
+    size = app.config['IMAGE_SIZE']['thumbnail']
     if g.settings['iiif'] and check_iiif_file_exist(file_id):
         iiif_ext = '.tiff' if g.settings['iiif_conversion'] \
             else g.files[file_id].suffix
         src = \
             f'{g.settings['iiif_url']}{file_id}{iiif_ext}' \
             f'/full/!{width},{width}/0/default.jpg'
-    elif g.settings['image_processing'] and check_processed_image(path.name):
-        if path_ := get_file_path(
-                file_id,
-                app.config['IMAGE_SIZE']['thumbnail']):
-            src = url_for(
-                'display_file',
-                size=app.config['IMAGE_SIZE']['thumbnail'],
-                name=path_.name)
+    elif (path_ := get_file_path(file_id, size)) or (
+            g.settings['image_processing']
+            and check_processed_image(path.name)
+            and (path_ := get_file_path(file_id, size))):
+        src = url_for('display_file', size=size, name=path_.name)
+        if path.suffix.lower() in app.config['PROCESSABLE_EXT']:
+            url = src  # pragma: no cover
 
     external = False
     if entity.class_.group['name'] == 'file':
@@ -294,7 +294,7 @@ def profile_image(
             return f'<p>{uc_first(_('no preview available'))}</p>'
     else:
         url = url_for('view', id_=entity.image_id)
-    max_width = '100%' if max_width_100 else '{width}px'
+    max_width = '100%' if max_width_100 else f'{width}px'
     html = \
         f'<img style="max-width:{max_width}" alt="{entity.name}" src="{src}">'
     if not link_image:
@@ -302,7 +302,7 @@ def profile_image(
     html = link(html, url, external=external)
     if entity.class_.name == 'file' \
             and check_iiif_activation() \
-            and g.files[file_id].suffix in g.display_file_ext:
+            and g.files[file_id].suffix.lower() in g.display_file_ext:
         if check_iiif_file_exist(file_id) \
                 or not g.settings['iiif_conversion']:
             html += ('<br>' + link(
