@@ -148,9 +148,6 @@ def form_to_datetime64(
             if is_leap_year(year_) else months_days
         return date_lookup.get(month_, 31)
 
-    if day and not month:
-        return None
-
     if month:
         month = f'{month:02}'
     elif to_date:

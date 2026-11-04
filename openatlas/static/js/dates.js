@@ -6,11 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const endYearFrom = document.getElementById('end_year_from');
   const endYearTo = document.getElementById('end_year_to');
 
-  /* ==========================================================================
+  /* =======================================================================
    * 1. Calendar and Leap Year Calculation Helpers
-   * Pure mathematical helper functions for astronomical/historical years (incl. BC)
-   * and month lengths.
-   * ========================================================================== */
+   * ======================================================================= */
 
   function isLeapYear(yearInt) {
     const astroYear = yearInt > 0 ? yearInt : yearInt + 1;
@@ -26,11 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
     return daysInMonths[monthInt];
   }
 
-  /* ==========================================================================
+  /* =======================================================================
    * 2. DOM Input/Output Helpers for Date Boundaries
-   * Functions for reading raw values from and writing raw values to the
-   * advanced date and time input fields (from / to).
-   * ========================================================================== */
+   * ======================================================================= */
 
   function getInputValue(id) {
     const el = document.getElementById(id);
@@ -64,12 +60,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setInputValue(`${mode}_second_${bound}`, raw.s);
   }
 
-  /* ==========================================================================
+  /* =======================================================================
    * 3. Validation, Check, and Normalization Functions
-   * Validates raw date/time inputs (value ranges, required parts, leap days),
-   * fills in default boundary values, formats ISO strings, and computes a
-   * numeric sort value for chronological comparison.
-   * ========================================================================== */
+   * ======================================================================= */
 
   const PART_TO_FIELD = {
     Y: 'year',
@@ -209,12 +202,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  /* ==========================================================================
-   * 4. Semantic Analysis and Model Transformation
-   * Analyzes a begin/end boundary pair to determine its semantic mode
-   * (empty, invalid, after, before, exact, between) and expands simple date
-   * inputs into full from/to boundary pairs.
-   * ========================================================================== */
+  /* =======================================================================
+   * 4. Analyzes a begin/end and expands simple date
+    * ====================================================================== */
 
   function analyzePairSemantics(mode) {
     const fromRaw = readBoundaryRaw(mode, 'from');
@@ -438,11 +428,9 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  /* ==========================================================================
-   * 5. UI Synchronization, Tab Switching, and User Feedback
-   * Updates preview labels, synchronizes Simple View with Advanced View, and
-   * controls visibility of the date section and view modes.
-   * ========================================================================== */
+  /* =======================================================================
+   * 5. UI Elements
+   * ======================================================================= */
 
   function updateDateFeedback() {
     if (!beginYearFrom) return;
@@ -561,11 +549,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  /* ==========================================================================
+  /* =======================================================================
    * 6. Initialization and Event Binding
-   * Determines initial open/closed and Simple/Advanced state on page load and
-   * registers event listeners for tabs, inputs, comments, and validation errors.
-   * ========================================================================== */
+   * ======================================================================= */
 
   if (beginYearFrom) {
     const bSemInit = analyzePairSemantics('begin');

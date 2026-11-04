@@ -81,7 +81,13 @@ class ActorTests(TestBaseCase):
             'name': 'Susan Alexandra Weaver',
             'alias-1': 'Ripley1',
             'end_year_from': '',
+            'end_hour_from': '',
+            'end_minute_from': '',
+            'end_second_from': '',
             'end_year_to': '',
+            'end_hour_to': '',
+            'end_minute_to': '',
+            'end_second_to': '',
             'begin_year_to': '1950',
             'begin_day_from': ''})
 
