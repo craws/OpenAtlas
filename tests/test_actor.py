@@ -88,14 +88,22 @@ class ActorTests(TestBaseCase):
             'end_hour_to': '',
             'end_minute_to': '',
             'end_second_to': '',
-            'begin_year_to': '1950',
-            'begin_day_from': ''})
+            'begin_year_from': '',
+            'begin_month_from': '',
+            'begin_day_from': '',
+            'begin_hour_from': '',
+            'begin_minute_from': '',
+            'begin_second_from': '',
+            'begin_year_to': '1950'})
 
         rv = c.post(
             url_for('update', id_=actor_id),
             data=data,
             follow_redirects=True)
         assert b'Changes have been saved' in rv.data
+
+        rv = c.get(url_for('update', id_=actor_id))
+        assert b'Susan Alexandra Weaver' in rv.data
 
         rv = c.post(
             url_for('ajax_create_entity'),

@@ -1,7 +1,7 @@
 INSERT INTO model.entity (openatlas_class_name, name, description, begin_from, begin_to, begin_comment, end_from, end_to, end_comment, created, modified)
 VALUES
     ('place', 'Shire','The Shire was the homeland of the hobbits.','2018-01-31', '2018-03-01 23:59:59', 'Begin of the shire', '2019-01-31',  '2019-03-01 23:59:59','Descent of Shire', '2022-09-21 16:38:01.923431','2022-09-21 16:38:05.923431'),
-    ('type', 'Ring', NULL, '200-01-31', '200-03-01', 'Begin of the ring', '2015-01-31', '2017-03-01','End of the Ring', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+    ('type', 'Ring', NULL, '200-01-31 12:00:00', '200-03-01 12:00:00', 'Begin of the ring', '2015-01-31', '2017-03-01','End of the Ring', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('person', 'Sam', 'That is Sam','200-01-31', '200-03-01 23:59:59', 'Begin of the shire', '700-01-31', '800-03-01 23:59:59','Descent of Shire', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
     ('group', 'The Fellowship', '','215-01-31', '215-01-31 23:59:59', '', '700-01-31', '700-01-31 23:59:59','', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 
@@ -266,6 +266,10 @@ UPDATE model.entity
 SET begin_from = CURRENT_DATE,
     begin_to = CURRENT_DATE + INTERVAL '23 hours 59 minutes 59 seconds'
 WHERE name = 'Economical';
+
+UPDATE model.entity
+SET begin_from = '3019-03-01'
+WHERE name IN ('Move of ring', 'Frodo');
 
 UPDATE model.entity
 SET begin_from = '2000-01-01', end_to = '2001-01-01'
