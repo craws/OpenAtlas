@@ -29,3 +29,8 @@ Can be linked via tabs to
   editions of charters or secondary sources
 * **Text** - add translations or similar to the source
 * :doc:`file`
+
+Creation of a source
+--------------------
+To map the creation of sources (e.g. to also connect the creators), you can
+create a creation :doc:`event` and specify the created sources there.
