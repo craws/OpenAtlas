@@ -14,6 +14,8 @@ CIDOC documentation:
   form of event, such as a battle, a meeting, or a wedding
 * **Acquisition** (:cidoc_entity:`E8 Acquisition<e8-acquisition>`) - Maps a
   change of property from one owner to another
+* **Creation** (:cidoc_entity:`E65 Creation<e65-creation>`) - The creation of a
+  source (for the making of an artifact use production)
 * **Modification** (:cidoc_entity:`E11 Event<e5-event>`) - Used to track
   the modification of artifacts, e.g. a conservation treatment or a change
   of parts
@@ -55,6 +57,13 @@ Acquisition
 * **Given place** - Select which :doc:`places <place>` changed ownership
 * **Given artifact** - Select which :doc:`items <item>`
   changed ownership
+
+Creation
+********
+
+* **Created source** - Select which source were created
+
+The creators of sources can be added as **performer** via tabs.
 
 Modification
 ************

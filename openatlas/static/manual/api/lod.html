@@ -1,0 +1,295 @@
+
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Linked Open Data &mdash; OpenAtlas 9.5.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
+  
+      <script src="../_static/jquery.js?v=8dae8fb0"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=d9c24813"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="API v1 (Beta)" href="reference.html" />
+    <link rel="prev" title="Getting Started" href="getting_started.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenAtlas
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User interface</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../entity/index.html">Entity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../model/index.html">Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technical/database_structure.html">Database Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technical/application_structure.html">Application Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technical/api.html">API (Moved)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Help</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Linked Open Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#why-linked-open-data">Why Linked Open Data?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#core-ontologies-in-openatlas-v1">Core Ontologies in OpenAtlas v1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#lod-profiles-in-version-1-beta">LOD Profiles in Version 1 (Beta)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#format-selection-content-negotiation">Format Selection &amp; Content Negotiation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">API v1 (Beta)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_04.html">API v0.4 (Stable)</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAtlas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Linked Open Data</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="linked-open-data">
+<h1>Linked Open Data<a class="headerlink" href="#linked-open-data" title="Link to this heading"></a></h1>
+<p>This guide explains how OpenAtlas handles <strong>Linked Open Data (LOD)</strong> in Version 1,
+which ontologies are employed, and how research data is structured and serialized.</p>
+<section id="why-linked-open-data">
+<h2>Why Linked Open Data?<a class="headerlink" href="#why-linked-open-data" title="Link to this heading"></a></h2>
+<p>Research data in archaeology, history, and the humanities is inherently
+heterogeneous and interconnected. OpenAtlas uses Linked Open Data to fulfill the
+<a class="reference external" href="https://www.go-fair.org/fair-principles/">FAIR data principles</a>
+(Findable, Accessible, Interoperable, Reusable).</p>
+<p>By assigning persistent URIs and expressing relationships through formal
+ontologies, data stored in OpenAtlas can be integrated with international
+vocabularies (such as Getty AAT or Wikidata) and aggregated across disciplinary
+boundaries.</p>
+</section>
+<section id="core-ontologies-in-openatlas-v1">
+<h2>Core Ontologies in OpenAtlas v1<a class="headerlink" href="#core-ontologies-in-openatlas-v1" title="Link to this heading"></a></h2>
+<p>OpenAtlas maps database records to internationally recognized domain ontologies:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 30.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Prefix</p></th>
+<th class="head"><p>Vocabulary / Ontology</p></th>
+<th class="head"><p>Typical Usage</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">crm</span></code></p></td>
+<td><p><a class="reference external" href="https://www.cidoc-crm.org/">CIDOC CRM v7.1</a></p></td>
+<td><p>Core entities: Places (E53), Persons (E21), Groups (E74), Objects (E22), Activities (E7).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">archaeo</span></code></p></td>
+<td><p><a class="reference external" href="https://www.cidoc-crm.org/crmarchaeo/">CRMarchaeo</a></p></td>
+<td><p>Archaeological excavation data: Features (A6) and Stratigraphic Units (A8).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">geo</span></code></p></td>
+<td><p><a class="reference external" href="https://www.ogc.org/standard/geosparql/">OGC GeoSPARQL</a></p></td>
+<td><p>Geometries (<code class="docutils literal notranslate"><span class="pre">geo:Geometry</span></code>) and Well-Known Text (<code class="docutils literal notranslate"><span class="pre">geo:asWKT</span></code>).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">skos</span></code></p></td>
+<td><p><a class="reference external" href="https://www.w3.org/2004/02/skos/">W3C SKOS</a></p></td>
+<td><p>Controlled vocabularies, concept schemes, broader/narrower hierarchies.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">la</span></code></p></td>
+<td><p><a class="reference external" href="https://linked.art/">Linked Art</a></p></td>
+<td><p>Strict application profile of CIDOC CRM for cultural heritage data.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="lod-profiles-in-version-1-beta">
+<h2>LOD Profiles in Version 1 (Beta)<a class="headerlink" href="#lod-profiles-in-version-1-beta" title="Link to this heading"></a></h2>
+<p>OpenAtlas v1 provides two Linked Open Data interfaces, along with W3C SKOS
+thesaurus exports:</p>
+<section id="strict-linked-art-profile-api-1-linked-art">
+<h3>1. Strict Linked Art Profile (<code class="docutils literal notranslate"><span class="pre">/api/1/linked-art/...</span></code>)<a class="headerlink" href="#strict-linked-art-profile-api-1-linked-art" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Endpoints</strong>:
+* <code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/1/linked-art/entity/{uuid}</span></code> (or <code class="docutils literal notranslate"><span class="pre">.../entity/{uuid}.{ext}</span></code>)
+* <code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/1/linked-art/entities/{entity_class}</span></code></p></li>
+<li><p><strong>Audience</strong>: GLAM institutions (Galleries, Libraries, Archives, Museums),
+cultural heritage aggregators, and Linked Open Data consumers.</p></li>
+<li><p><strong>Status</strong>: <strong>Fully supported in v1 Beta</strong> (Recommended).</p></li>
+<li><p><strong>Characteristics</strong>: Adheres strictly to the <a class="reference external" href="https://linked.art/">Linked Art profile</a>
+(JSON schemas with <code class="docutils literal notranslate"><span class="pre">additionalProperties:</span> <span class="pre">false</span></code>). Responses strictly conform
+to Linked Art classes (such as <code class="docutils literal notranslate"><span class="pre">HumanMadeObject</span></code>, <code class="docutils literal notranslate"><span class="pre">Place</span></code>, <code class="docutils literal notranslate"><span class="pre">Actor</span></code>, <code class="docutils literal notranslate"><span class="pre">Activity</span></code>),
+providing full entity details, classified types, timespans, citations, and related links.</p></li>
+</ul>
+</section>
+<section id="controlled-vocabularies-skos-api-1-vocabulary">
+<h3>2. Controlled Vocabularies &amp; SKOS (<code class="docutils literal notranslate"><span class="pre">/api/1/vocabulary/...</span></code>)<a class="headerlink" href="#controlled-vocabularies-skos-api-1-vocabulary" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Endpoints</strong>:
+* <code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/1/vocabulary/{id}/skos</span></code>
+* <code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/1/vocabulary/{id}/skos.{ext}</span></code></p></li>
+<li><p><strong>Audience</strong>: Terminology managers, thesaurus hubs (e.g. SKOSMOS), and SPARQL endpoints.</p></li>
+<li><p><strong>Status</strong>: <strong>Fully supported in v1 Beta</strong>.</p></li>
+<li><p><strong>Characteristics</strong>: The root type is structured as a <code class="docutils literal notranslate"><span class="pre">skos:ConceptScheme</span></code>,
+with all child nodes linked hierarchically via <code class="docutils literal notranslate"><span class="pre">skos:broader</span></code> and <code class="docutils literal notranslate"><span class="pre">skos:narrower</span></code>.
+Supports standard formats (Turtle, RDF/XML, JSON-LD, N-Triples).</p></li>
+</ul>
+</section>
+<section id="openatlas-native-crm-graph-api-1-entity">
+<h3>3. OpenAtlas Native CRM Graph (<code class="docutils literal notranslate"><span class="pre">/api/1/entity/...</span></code>)<a class="headerlink" href="#openatlas-native-crm-graph-api-1-entity" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Endpoints</strong>:
+* <code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/1/entity/{uuid}</span></code> (or <code class="docutils literal notranslate"><span class="pre">.../entity/{uuid}.{ext}</span></code>)
+* <code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/1/entities/{entity_class}</span></code></p></li>
+<li><p><strong>Status</strong>: <strong>In Development / Experimental (Alpha Stub)</strong>.</p></li>
+<li><p><strong>Characteristics</strong>: Provides a preliminary, lightweight stub interface returning
+the entity URI, class type, and label. A comprehensive, deep CIDOC CRM graph
+serializer with formal property-chain shortcuts is currently under active
+development and will be introduced in an upcoming release.</p></li>
+<li><p><strong>Recommendation</strong>: For production semantic integration in Version 1 Beta,
+please use the <a class="reference internal" href="reference.html#linked-art-endpoints"><span class="std std-ref">Linked Art endpoints</span></a>.</p></li>
+</ul>
+</section>
+</section>
+<section id="format-selection-content-negotiation">
+<h2>Format Selection &amp; Content Negotiation<a class="headerlink" href="#format-selection-content-negotiation" title="Link to this heading"></a></h2>
+<p>All Linked Open Data endpoints support HTTP Content Negotiation via the
+<code class="docutils literal notranslate"><span class="pre">Accept</span></code> header, as well as explicit URL extensions:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 25.0%" />
+<col style="width: 35.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Format</p></th>
+<th class="head"><p>HTTP Header (<code class="docutils literal notranslate"><span class="pre">Accept</span></code>)</p></th>
+<th class="head"><p>URL Extension</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>JSON-LD</strong> (Default)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">application/ld+json</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">.json</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Turtle</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">text/turtle</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">.ttl</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><strong>RDF/XML</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">application/rdf+xml</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">.xml</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>N-Triples</strong></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">application/n-triples</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">.nt</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p><em>Example</em>: Fetching an entity in Turtle format using content negotiation:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Accept: text/turtle&quot;</span><span class="w"> </span>https://demo.openatlas.eu/api/1/linked-art/entity/913322f4-a3cf-2e90-bfd1-cecc8e523b56
+</pre></div>
+</div>
+<p>Or by appending <code class="docutils literal notranslate"><span class="pre">.ttl</span></code> directly to the URL:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>https://demo.openatlas.eu/api/1/linked-art/entity/913322f4-a3cf-2e90-bfd1-cecc8e523b56.ttl
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="reference.html" class="btn btn-neutral float-right" title="API v1 (Beta)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+        <p>CC BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
+        <script type="text/javascript">
+            <!-- Adds target=_blank to external links -->
+            $(document).ready(function () {
+                $('a[href^="http://"], a[href^="https://"]').not('a[class*=internal]').attr('target', '_blank');
+            });
+        </script>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
