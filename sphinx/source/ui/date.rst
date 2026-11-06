@@ -107,10 +107,12 @@ Begin date must not be later than the End date.
 
 Hour, minute and second fields appear in **Advanced** when the time module is
 activated in the :doc:`/tools/profile` or when time information already exists
-for the entity. If all time fields are left empty, an Earliest bound uses
-**00:00:00** and a Latest bound uses **23:59:59**. To specify a particular
-time, enter the hour, minute and second; do not rely on partial time values
-being completed consistently.
+for the entity. Empty time fields are completed according to the bound: an
+**Earliest** bound fills omitted parts with **00** (defaulting to
+**00:00:00**, **12:00:00** for hour **12**, or **12:30:00** for **12:30**),
+while a **Latest** bound fills an omitted hour with **23** and omitted minutes
+and seconds with **59** (defaulting to **23:59:59**, **12:59:59** for hour
+**12**, or **12:30:59** for **12:30**).
 
 **Background**
 

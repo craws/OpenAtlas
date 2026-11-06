@@ -154,9 +154,11 @@ values that require time fields. To enable the module, click the **gear**, open
 need to refresh the form afterwards. The time fields do not appear in **Simple**.
 
 Hour values range from 0 to 23; minutes and seconds range from 0 to 59. A
-minute requires an hour, and a second requires a minute. If all time fields are
-left empty, **Earliest** uses **00:00:00** and **Latest** uses **23:59:59**.
-For a particular time, enter all three components rather than relying on
-partially completed time fields.
+minute requires an hour, and a second requires a minute. Omitted time fields
+are completed according to the bound: **Earliest** fills missing values with
+**00** (for example, **00:00:00** when blank, **12:00:00** for hour **12**, or
+**12:30:00** for **12:30**), whereas **Latest** fills a missing hour with
+**23** and missing minutes and seconds with **59** (for example, **23:59:59**
+when blank, **12:59:59** for hour **12**, or **12:30:59** for **12:30**).
 
 .. image:: date_hours.png

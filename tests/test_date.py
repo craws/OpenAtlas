@@ -140,6 +140,24 @@ class DateTest(TestBaseCase):
             rv = c.post(
                 url_for('insert', class_='place'),
                 data={
+                    'name': 'Date place partial time',
+                    'begin_year_from': 1400,
+                    'begin_month_from': 5,
+                    'begin_day_from': 5,
+                    'begin_hour_from': 12,
+                    'begin_minute_from': 30,
+                    'begin_year_to': 1400,
+                    'begin_month_to': 5,
+                    'begin_day_to': 5,
+                    'begin_hour_to': 12,
+                    'begin_minute_to': 30},
+                follow_redirects=True)
+            assert b'1400-05-05 12:30:00' in rv.data
+            assert b'1400-05-05 12:30:59' in rv.data
+
+            rv = c.post(
+                url_for('insert', class_='place'),
+                data={
                     'name': 'Date place',
                     'begin_year_from': 1500,
                     'end_year_to': 1400},

@@ -110,8 +110,7 @@ def check_if_entity_has_time(dates: Dates) -> bool:
         if date_ and '00:00:00' not in str(date_):
             return True
     for date_ in [dates.begin_to, dates.end_to]:
-        if date_ and not (
-                '00:00:00' in str(date_) or '23:59:59' in str(date_)):
+        if date_ and '23:59:59' not in str(date_):
             return True
     return False
 
@@ -162,14 +161,15 @@ def form_to_datetime64(
     else:
         day = '01'
 
-    if to_date and hour is None and minute is None and second is None:
-        hour = '23'
-        minute = '59'
-        second = '59'
-    else:
-        hour = f'{int(hour):02}' if hour else '00'
-        minute = f'{int(minute):02}' if minute else '00'
-        second = f'{int(second):02}' if second else '00'
+    hour = (
+        f'{int(hour):02}' if hour not in (None, '')
+        else ('23' if to_date else '00'))
+    minute = (
+        f'{int(minute):02}' if minute not in (None, '')
+        else ('59' if to_date else '00'))
+    second = (
+        f'{int(second):02}' if second not in (None, '')
+        else ('59' if to_date else '00'))
     try:
         date_time = numpy.datetime64(
             f'{year}-{month}-{day}T{hour}:{minute}:{second}')
