@@ -15,6 +15,8 @@ def index_changelog() -> str:
 
 
 versions = {
+    '9.6.0': ['TBA', {
+        'feature': {}}],
     '9.5.0': ['2026-11-06', {
         'feature': {
             '2743': 'Add creation event for sources',
