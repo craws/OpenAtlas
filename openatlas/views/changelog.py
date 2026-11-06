@@ -15,6 +15,8 @@ def index_changelog() -> str:
 
 
 versions = {
+    '9.6.0': ['TBA', {
+        'feature': {}}],
     '9.5.0': ['2026-11-06', {
         'feature': {
             '2743': 'Add creation event for sources',
@@ -29,7 +31,7 @@ versions = {
             '2869': 'API: Endpoints redesign',
             '2854': 'ARCHE: Add checksum file',
             '2875': 'Remove database field model.entity.cidoc_class_code',
-            '2725': 'New container with gunicorn',
+            '2725': 'New container with Gunicorn',
             '2866':	'Refactor get_info() functions',
             '2883': 'Refactor and minor improvements'},
         'fix': {

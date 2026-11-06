@@ -6,7 +6,7 @@ from tests.base import TestBaseCase
 
 
 class OpenAPI(TestBaseCase):
-    def test_openapi_file_generation(self):
+    def test_openapi_file_generation(self) -> None:
         c = self.client
         instance_file = app.config['OPENAPI_INSTANCE_FILE']
 

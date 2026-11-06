@@ -124,7 +124,7 @@ class ReferenceSystemTest(TestBaseCase):
 
         rv = c.post(
             url_for('ajax_external_api', system_id=system_id),
-            data={'id_': '156'})
+            data={'id_': '1544'})
         assert b'Urkunde' in rv.data
 
         apis_url = 'https://discworld.acdh-dev.oeaw.ac.at/'
