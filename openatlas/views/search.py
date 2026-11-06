@@ -64,16 +64,29 @@ class SearchForm(FlaskForm):
 
     def validate(self, extra_validators: Any = None) -> bool:
         valid = FlaskForm.validate(self)
-        from_date = form_to_datetime64(
-            self.begin_year.data,
-            self.begin_month.data,
-            self.begin_day.data)
-        to_date = form_to_datetime64(
-            self.end_year.data,
-            self.end_month.data,
-            self.end_day.data,
-            to_date=True)
-        if from_date and to_date and from_date > to_date:
+        dates = []
+        for year, month, day, to_date in [
+                (self.begin_year, self.begin_month, self.begin_day, False),
+                (self.end_year, self.end_month, self.end_day, True)]:
+            if year.errors or month.errors or day.errors:
+                valid = False
+                continue
+            if year.data is None:
+                if month.data is not None or day.data is not None:
+                    year.errors.append(_('not a valid date'))
+                    valid = False
+                continue
+            if day.data and not month.data:
+                month.errors.append(_('not a valid date'))
+                valid = False
+                continue
+            if date := form_to_datetime64(
+                    year.data, month.data, day.data, to_date=to_date):
+                dates.append(date)
+            else:
+                day.errors.append(_('not a valid date'))
+                valid = False
+        if len(dates) == 2 and dates[0] > dates[1]:
             self.begin_year.errors.append(  # type: ignore
                 _('Begin dates cannot start after end dates.'))
             valid = False
