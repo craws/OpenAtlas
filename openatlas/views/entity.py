@@ -224,7 +224,8 @@ def redirect_url_insert(
         origin: Entity | None,
         relation_name: str | None) -> str:
     url = url_for('view', id_=entity.id)
-    if hasattr(form, 'continue_') and form.continue_.data == 'yes':
+    continue_ = getattr(form, "continue_", None)
+    if continue_ and form.continue_.data == 'yes':
         url = request.url
         if entity.class_.group['name'] == 'type' and origin:
             if not (super_id := getattr(form, 'super').data):
@@ -242,25 +243,27 @@ def redirect_url_insert(
                 origin_id=origin.id,
                 name=relation_name,
                 selection_id=entity.id)
-        elif not hasattr(form, 'continue_') or form.continue_.data != 'yes':
+        elif not continue_ or form.continue_.data != 'yes':
             url = url_for('view', id_=origin.id) \
                   + f'#tab-{relation_name.replace('_', '-')}'
-    if hasattr(form, 'continue_') \
-            and form.continue_.data in ['sub', 'human_remains']:
+    if continue_ and form.continue_.data in ['sub', 'human_remains']:
         class_ = form.continue_.data
+        insert_relation = 'item'
         if class_ == 'sub':
             match entity.class_.name:
                 case 'place':
                     class_ = 'feature'
+                    insert_relation = 'feature'
                 case 'feature':
                     class_ = 'stratigraphic_unit'
+                    insert_relation = "stratigraphic_unit"
                 case 'stratigraphic_unit':
                     class_ = 'artifact'
         url = url_for(
             'insert',
             class_=class_,
             origin_id=entity.id,
-            relation='item')
+            relation=insert_relation)
     return url
 
 
