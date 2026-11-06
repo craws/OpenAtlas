@@ -1,0 +1,248 @@
+
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Getting Started &mdash; OpenAtlas 9.5.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
+  
+      <script src="../_static/jquery.js?v=8dae8fb0"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=d9c24813"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Linked Open Data" href="lod.html" />
+    <link rel="prev" title="Overview" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenAtlas
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User interface</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../entity/index.html">Entity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../model/index.html">Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technical/database_structure.html">Database Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technical/application_structure.html">Application Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technical/api.html">API (Moved)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Help</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#access-modes">Access Modes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#authentication-methods">Authentication Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#your-first-request-system-information">Your First Request: System Information</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="lod.html">Linked Open Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">API v1 (Beta)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_04.html">API v0.4 (Stable)</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAtlas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Getting Started</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="getting-started">
+<h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h1>
+<p>This guide explains how to connect to the OpenAtlas API, configure access
+permissions, obtain an API token, and make your first requests.</p>
+<section id="access-modes">
+<h2>Access Modes<a class="headerlink" href="#access-modes" title="Link to this heading"></a></h2>
+<p>By default, the OpenAtlas API is <strong>protected</strong> to prevent unauthorized access
+to non-public research data. However, administrators can configure public
+access in the application settings:</p>
+<ol class="arabic simple">
+<li><p>Log in as an Administrator.</p></li>
+<li><p>Navigate to <strong>Admin</strong> -&gt; <strong>Settings</strong> -&gt; <strong>API</strong> (<a class="reference internal" href="../admin/api.html"><span class="doc">API</span></a>).</p></li>
+<li><p>Toggle <strong>Public</strong> to <em>On</em> or <em>Off</em>:</p>
+<ul class="simple">
+<li><p><strong>Public (Off)</strong>: The API requires authentication via Web Session, JWT
+Bearer Token, or an IP address on the whitelist.</p></li>
+<li><p><strong>Public (On)</strong>: The API can be read publicly without credentials. Only
+files marked with an open license and set to publicly shareable will be
+accessible.</p></li>
+</ul>
+</li>
+</ol>
+</section>
+<section id="authentication-methods">
+<h2>Authentication Methods<a class="headerlink" href="#authentication-methods" title="Link to this heading"></a></h2>
+<section id="web-browser-session">
+<h3>1. Web Browser Session<a class="headerlink" href="#web-browser-session" title="Link to this heading"></a></h3>
+<p>If you are logged into the OpenAtlas user interface, your browser session cookie
+is automatically shared with the API. You can visit any API URL directly in your
+browser without providing additional credentials.</p>
+</section>
+<section id="api-token-jwt-bearer-token">
+<h3>2. API Token (JWT Bearer Token)<a class="headerlink" href="#api-token-jwt-bearer-token" title="Link to this heading"></a></h3>
+<p>For scripts, analytical tools, external websites, or third-party platforms,
+access is authenticated using JSON Web Tokens (JWT).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Only OpenAtlas Administrators can generate API tokens.</p>
+</div>
+<p><strong>Generating a Token</strong>:</p>
+<ol class="arabic simple">
+<li><p>Open <strong>Admin</strong> -&gt; <strong>Settings</strong> -&gt; <strong>API</strong> (<a class="reference internal" href="../admin/api.html"><span class="doc">API</span></a>).</p></li>
+<li><p>In the <strong>API token (JWT)</strong> panel, select <strong>Generate</strong>.</p></li>
+<li><p>Choose the target <strong>User</strong> whose permissions the token will inherit.</p></li>
+<li><p>Set an <strong>Expiration</strong> time in days (or <code class="docutils literal notranslate"><span class="pre">0</span></code> for no expiration).</p></li>
+<li><p>Give the token a memorable <strong>Token name</strong> (e.g. <code class="docutils literal notranslate"><span class="pre">QGIS-Project-2026</span></code>).</p></li>
+<li><p>Click <strong>Generate</strong>. Copy the token string immediately — it is displayed
+only once!</p></li>
+</ol>
+<p><strong>Using the Token in HTTP Headers</strong>:
+Include the token in the <code class="docutils literal notranslate"><span class="pre">Authorization</span></code> header of every request:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Authorization: Bearer &lt;your-jwt-token&gt;
+</pre></div>
+</div>
+</section>
+<section id="ip-whitelist">
+<h3>3. IP Whitelist<a class="headerlink" href="#ip-whitelist" title="Link to this heading"></a></h3>
+<p>If an external server needs access from a static IP address, an administrator
+can add that IP to the <code class="docutils literal notranslate"><span class="pre">ALLOWED_IPS</span></code> list in <code class="docutils literal notranslate"><span class="pre">instance/production.py</span></code>.</p>
+</section>
+</section>
+<section id="your-first-request-system-information">
+<h2>Your First Request: System Information<a class="headerlink" href="#your-first-request-system-information" title="Link to this heading"></a></h2>
+<p>The endpoint <code class="docutils literal notranslate"><span class="pre">/api/1/system/info</span></code> returns global configuration parameters
+such as map defaults, enabled modules, and available image sizes.</p>
+<section id="browser-swagger-ui">
+<h3>Browser / Swagger UI<a class="headerlink" href="#browser-swagger-ui" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p>Open the interactive Swagger UI at <code class="docutils literal notranslate"><span class="pre">/api/1/docs/swagger</span></code>.</p></li>
+<li><p>Click the green <strong>Authorize</strong> button at the top right.</p></li>
+<li><p>In the dialog, enter your token in the format: <code class="docutils literal notranslate"><span class="pre">Bearer</span> <span class="pre">&lt;your-token&gt;</span></code>.</p></li>
+<li><p>Click <strong>Authorize</strong>, then <strong>Close</strong>.</p></li>
+<li><p>Scroll to <strong>system</strong> -&gt; <code class="docutils literal notranslate"><span class="pre">GET</span> <span class="pre">/api/1/system/info</span></code>, click <strong>Try it out</strong>,
+and click <strong>Execute</strong>.</p></li>
+</ol>
+</section>
+<section id="terminal-curl">
+<h3>Terminal (cURL)<a class="headerlink" href="#terminal-curl" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl<span class="w"> </span>-X<span class="w"> </span>GET<span class="w"> </span><span class="s2">&quot;https://demo.openatlas.eu/api/1/system/info&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer YOUR_TOKEN_HERE&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>-H<span class="w"> </span><span class="s2">&quot;Accept: application/json&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="python">
+<h3>Python<a class="headerlink" href="#python" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">requests</span>
+
+<span class="n">BASE_URL</span> <span class="o">=</span> <span class="s2">&quot;https://demo.openatlas.eu/api/1&quot;</span>
+<span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer YOUR_TOKEN_HERE&quot;</span><span class="p">}</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">BASE_URL</span><span class="si">}</span><span class="s2">/system/info&quot;</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Site Name: </span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;siteName&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Default Language: </span><span class="si">{</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;defaultLanguage&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="lod.html" class="btn btn-neutral float-right" title="Linked Open Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+        <p>CC BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
+        <script type="text/javascript">
+            <!-- Adds target=_blank to external links -->
+            $(document).ready(function () {
+                $('a[href^="http://"], a[href^="https://"]').not('a[class*=internal]').attr('target', '_blank');
+            });
+        </script>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

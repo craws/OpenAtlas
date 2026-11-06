@@ -1,0 +1,258 @@
+
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overview &mdash; OpenAtlas 9.5.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
+  
+      <script src="../_static/jquery.js?v=8dae8fb0"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=d9c24813"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Getting Started" href="getting_started.html" />
+    <link rel="prev" title="FAQ" href="../faq.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenAtlas
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User interface</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../entity/index.html">Entity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../model/index.html">Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technical/database_structure.html">Database Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technical/application_structure.html">Application Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technical/api.html">API (Moved)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Help</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overview-philosophy">Overview &amp; Philosophy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#versioning">Versioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#interactive-documentation-uis">Interactive Documentation UIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#machine-readable-openapi-specification">Machine-Readable OpenAPI Specification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#guide-contents">Guide Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lod.html">Linked Open Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">API v1 (Beta)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api_04.html">API v0.4 (Stable)</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAtlas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Overview</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h1>
+<p>Welcome to the OpenAtlas API documentation. OpenAtlas provides programmatic
+access to archaeological, historical, and geospatial data stored in an
+OpenAtlas instance.</p>
+<p>Whether you want to build a public presentation website, connect analytical
+tools, perform research queries, or integrate with Linked Open Data (LOD)
+networks, the OpenAtlas API provides human- and machine-readable data across
+multiple standard formats.</p>
+<section id="overview-philosophy">
+<h2>Overview &amp; Philosophy<a class="headerlink" href="#overview-philosophy" title="Link to this heading"></a></h2>
+<p>The OpenAtlas API combines two complementary paradigms:</p>
+<ol class="arabic simple">
+<li><p><strong>RESTful Web Services</strong>: Easy-to-use, predictable URLs delivering JSON
+and GeoJSON for developers, web applications, and desktop GIS tools.</p></li>
+<li><p><strong>Linked Open Data (LOD)</strong>: Rich, graph-based RDF representations using
+the <a class="reference external" href="https://www.cidoc-crm.org/">CIDOC Conceptual Reference Model (CIDOC CRM)</a>,
+the international <a class="reference external" href="https://linked.art/">Linked Art</a> profile, and W3C
+<a class="reference external" href="https://www.w3.org/2004/02/skos/">SKOS</a> for controlled vocabularies.</p></li>
+</ol>
+</section>
+<section id="versioning">
+<h2>Versioning<a class="headerlink" href="#versioning" title="Link to this heading"></a></h2>
+<p>OpenAtlas follows sequenced semantic versioning. The API currently supports
+two major generations:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 25.0%" />
+<col style="width: 55.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Version</p></th>
+<th class="head"><p>Status</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>0.4</strong></p></td>
+<td><p><strong>Stable</strong></p></td>
+<td><p>The proven RESTful API (Flask-RESTful). Provides endpoints for
+entities, types, GeoJSON, and LPF. Documented in <a class="reference internal" href="api_04.html"><span class="doc">API v0.4 (Stable)</span></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>1.0</strong></p></td>
+<td><p><strong>Beta</strong></p></td>
+<td><p>The next-generation API based on OpenAPI 3.1 and Pydantic. Features
+strictly compliant Linked Art profiles, SKOS thesauri, IIIF Presentation
+API v2/v3, and preliminary OpenAtlas LOD stubs.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="interactive-documentation-uis">
+<h2>Interactive Documentation UIs<a class="headerlink" href="#interactive-documentation-uis" title="Link to this heading"></a></h2>
+<p>For API v1, OpenAtlas provides three interactive browser interfaces that let
+you explore, inspect, and test all 31 endpoints directly without writing a
+single line of code:</p>
+<div class="sd-container-fluid sd-sphinx-override sd-mb-4 docutils">
+<div class="sd-row sd-row-cols-1 sd-row-cols-xs-1 sd-row-cols-sm-3 sd-row-cols-md-3 sd-row-cols-lg-3 sd-g-2 sd-g-xs-2 sd-g-sm-2 sd-g-md-2 sd-g-lg-2 docutils">
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Swagger UI</div>
+<p class="sd-card-text">Interactive testing sandbox. Try out endpoints, enter parameters,
+authorize with a token, and execute live requests.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference external" href="/api/1/docs/swagger"><span>/api/1/docs/swagger</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+ReDoc</div>
+<p class="sd-card-text">Clean, publication-ready three-panel documentation focusing on
+schemas, types, and response models.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference external" href="/api/1/docs/redoc"><span>/api/1/docs/redoc</span></a></div>
+</div>
+<div class="sd-col sd-d-flex-row docutils">
+<div class="sd-card sd-sphinx-override sd-w-100 sd-shadow-sm sd-card-hover docutils">
+<div class="sd-card-body docutils">
+<div class="sd-card-title sd-font-weight-bold docutils">
+Scalar</div>
+<p class="sd-card-text">Modern, responsive API client interface with instant code snippets
+in various programming languages.</p>
+</div>
+<a class="sd-stretched-link sd-hide-link-text reference external" href="/api/1/docs/scalar"><span>/api/1/docs/scalar</span></a></div>
+</div>
+</div>
+</div>
+</section>
+<section id="machine-readable-openapi-specification">
+<h2>Machine-Readable OpenAPI Specification<a class="headerlink" href="#machine-readable-openapi-specification" title="Link to this heading"></a></h2>
+<p>The complete OpenAPI 3.1 specification for API v1 is dynamically generated at:</p>
+<ul class="simple">
+<li><p><strong>URL</strong>: <code class="docutils literal notranslate"><span class="pre">/api/1/docs/openapi.json</span></code> (or <code class="docutils literal notranslate"><span class="pre">https://&lt;your-instance&gt;/api/1/docs/openapi.json</span></code>)</p></li>
+</ul>
+</section>
+<section id="guide-contents">
+<h2>Guide Contents<a class="headerlink" href="#guide-contents" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="getting_started.html"><span class="doc">Getting Started</span></a> - Access modes, JWT Bearer tokens, and first requests.</p></li>
+<li><p><a class="reference internal" href="lod.html"><span class="doc">Linked Open Data</span></a> - Semantic Web concepts, CIDOC CRM, CRMarchaeo, Linked Art, and SKOS.</p></li>
+<li><p><a class="reference internal" href="reference.html"><span class="doc">API v1 (Beta)</span></a> - Complete index of all 31 endpoints, parameters, and error codes.</p></li>
+<li><p><a class="reference internal" href="api_04.html"><span class="doc">API v0.4 (Stable)</span></a> - Documentation for the current stable API v0.4.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../faq.html" class="btn btn-neutral float-left" title="FAQ" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="getting_started.html" class="btn btn-neutral float-right" title="Getting Started" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+        <p>CC BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
+        <script type="text/javascript">
+            <!-- Adds target=_blank to external links -->
+            $(document).ready(function () {
+                $('a[href^="http://"], a[href^="https://"]').not('a[class*=internal]').attr('target', '_blank');
+            });
+        </script>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
