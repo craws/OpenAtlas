@@ -171,7 +171,8 @@ class ApiV1(ApiTestCase):
             e.file.link('P2', e.open_license)
 
         rv = c.get(url_for('api_v1_la.get_entity', uuid=e.place.uuid))
-        assert 'application/ld+json' in rv.headers.get('Content-Type')
+        response = rv.headers.get('Content-Type')
+        assert response and 'application/ld+json' in response
         rv_json = rv.get_json()
         assert rv_json[
                    '@context'] == 'https://linked.art/ns/v1/linked-art.json'
@@ -185,7 +186,8 @@ class ApiV1(ApiTestCase):
                 'api_v1_la.get_entity_ext',
                 uuid=e.place.uuid,
                 ext='ttl'))
-        assert 'text/turtle' in rv.headers.get('Content-Type')
+        response = rv.headers.get('Content-Type')
+        assert response and 'text/turtle' in response
 
         rv = c.get(
             url_for(

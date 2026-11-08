@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 import requests
+from flask_babel import gettext as _
 
 from openatlas import app
 from openatlas.api.external.base import ExternalApi
@@ -18,18 +19,16 @@ class GettyAAT(ExternalApi):  # pylint: disable=too-few-public-methods
         info: dict[str, object] = {}
         try:
             response = requests.get(
-                f'https://vocab.getty.edu/aat/{id_}.json',
+                f'https://vocab.getty.edu/aat/{id_}',
                 headers={
                     'Accept': 'application/json',
-                    **app.config['USER_AGENT']
-                },
+                    **app.config['USER_AGENT']},
                 proxies=app.config['PROXIES'],
-                timeout=10
-            )
+                timeout=10)
             response.raise_for_status()
             data = response.json()
-        except Exception:  # pragma: no cover
-            return info
+        except Exception as e:  # pragma: no cover
+            return {_('error'): e}
 
         if label := data.get('_label'):
             info['title'] = label

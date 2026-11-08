@@ -1,0 +1,515 @@
+
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API v1 (Beta) &mdash; OpenAtlas 9.5.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
+      <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+      <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
+  
+      <script src="../_static/jquery.js?v=8dae8fb0"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=d9c24813"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="API v0.4 (Stable)" href="api_04.html" />
+    <link rel="prev" title="Linked Open Data" href="lod.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            OpenAtlas
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User interface</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">Features</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../entity/index.html">Entity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../model/index.html">Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technical/database_structure.html">Database Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technical/application_structure.html">Application Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../technical/api.html">API (Moved)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Help</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lod.html">Linked Open Data</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API v1 (Beta)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#endpoint-summary-table">Endpoint Summary Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#query-parameters-for-collections">Query Parameters for Collections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#standard-error-response-format">Standard Error Response Format</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api_04.html">API v0.4 (Stable)</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAtlas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content style-external-links">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">API v1 (Beta)</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="api-v1-beta">
+<h1>API v1 (Beta)<a class="headerlink" href="#api-v1-beta" title="Link to this heading"></a></h1>
+<p>This section provides a quick-reference index of all 31 endpoints available in
+OpenAtlas API v1, organized by feature area.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>To test any endpoint interactively in your browser with real parameters, visit
+the <a class="reference internal" href="index.html"><span class="doc">interactive Swagger UI</span></a>.</p>
+</div>
+<section id="endpoint-summary-table">
+<h2>Endpoint Summary Table<a class="headerlink" href="#endpoint-summary-table" title="Link to this heading"></a></h2>
+<section id="system-root-endpoints">
+<h3>System &amp; Root Endpoints<a class="headerlink" href="#system-root-endpoints" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+<col style="width: 45.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Endpoint</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/</span></code></p></td>
+<td><p>API root index with schema and documentation links.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/system/info</span></code></p></td>
+<td><p>Frontend configuration (map settings, IIIF status, language).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/system/count/entities</span></code></p></td>
+<td><p>Instance counts per class (optionally filtered by case study).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/system/classes</span></code></p></td>
+<td><p>System classes, CIDOC mapping, groups, and UI icons.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/system/crm-properties</span></code></p></td>
+<td><p>Active CIDOC CRM properties, domains, ranges, and i18n labels.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="project-metadata">
+<h3>Project Metadata<a class="headerlink" href="#project-metadata" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+<col style="width: 45.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Endpoint</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/case-studies</span></code></p></td>
+<td><p>Hierarchical list of all project case studies.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/case-studies/{id}</span></code></p></td>
+<td><p>Detail information for a single case study and sub-case studies.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/agents</span></code></p></td>
+<td><p>List of registered rights holders, authors, and creators.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/agents/{id}</span></code></p></td>
+<td><p>Detailed information for an agent or rights holder.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="controlled-vocabularies-skos">
+<h3>Controlled Vocabularies &amp; SKOS<a class="headerlink" href="#controlled-vocabularies-skos" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+<col style="width: 45.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Endpoint</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/vocabulary</span></code></p></td>
+<td><p>Flat list of all OpenAtlas types with counts and references.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/vocabulary/{id}</span></code></p></td>
+<td><p>Single type item with parent/sub hierarchy and images.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/vocabulary/{id}/skos</span></code></p></td>
+<td><p>W3C SKOS ConceptScheme hierarchy (content negotiated).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/vocabulary/{id}/skos.{ext}</span></code></p></td>
+<td><p>SKOS export driven by format extension (<code class="docutils literal notranslate"><span class="pre">.ttl</span></code>, <code class="docutils literal notranslate"><span class="pre">.xml</span></code>, <code class="docutils literal notranslate"><span class="pre">.json</span></code>, <code class="docutils literal notranslate"><span class="pre">.nt</span></code>).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/vocabulary/tree</span></code></p></td>
+<td><p>Hierarchical tree organized by categories (standard, custom, place, etc.).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/vocabulary/tree/{openatlas_class}</span></code></p></td>
+<td><p>Hierarchical tree filtered by an OpenAtlas system class.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/vocabulary/standard/{openatlas_class}</span></code></p></td>
+<td><p>Standard types tree formatted for UI components and case study filters.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="strict-linked-art-profile">
+<span id="linked-art-endpoints"></span><h3>Strict Linked Art Profile<a class="headerlink" href="#strict-linked-art-profile" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+<col style="width: 45.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Endpoint</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/linked-art/entity/{uuid}</span></code></p></td>
+<td><p>Single entity conforming to the international Linked Art JSON-LD schema.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/linked-art/entity/{uuid}.{ext}</span></code></p></td>
+<td><p>Single Linked Art entity with explicit format extension.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/linked-art/entities/{entity_class}</span></code></p></td>
+<td><p>Paginated collection conforming to the Linked Art profile.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="openatlas-native-lod-in-development">
+<h3>OpenAtlas Native LOD (In Development)<a class="headerlink" href="#openatlas-native-lod-in-development" title="Link to this heading"></a></h3>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>These native OpenAtlas CIDOC CRM graph endpoints are currently under active
+development and provide a preliminary stub interface in Version 1 Beta.
+For stable, production-ready semantic graphs, please use the
+<a class="reference internal" href="#linked-art-endpoints"><span class="std std-ref">Linked Art endpoints</span></a>.</p>
+</div>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+<col style="width: 45.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Endpoint</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/entity/{uuid}</span></code></p></td>
+<td><p>Single entity preliminary LOD stub (JSON-LD default).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/entity/{uuid}.{ext}</span></code></p></td>
+<td><p>Single entity preliminary stub with explicit format extension.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/entities/{entity_class}</span></code></p></td>
+<td><p>Paginated collection preliminary stub with search and date filters.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="digital-assets-files">
+<h3>Digital Assets &amp; Files<a class="headerlink" href="#digital-assets-files" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+<col style="width: 45.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Endpoint</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/files/{id}/display</span></code></p></td>
+<td><p>Serves the original image file or redirects (302) to IIIF image URL.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/files/{id}/thumbnail</span></code></p></td>
+<td><p>Serves the pre-scaled thumbnail image or redirects (302) to IIIF thumbnail.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/files/public</span></code></p></td>
+<td><p>Paginated overview of all publicly shareable, licensed files.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/files/entity/{id}</span></code></p></td>
+<td><p>Paginated overview of public files linked to a specific entity.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="iiif-presentation-api">
+<h3>IIIF Presentation API<a class="headerlink" href="#iiif-presentation-api" title="Link to this heading"></a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 15.0%" />
+<col style="width: 40.0%" />
+<col style="width: 45.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Endpoint</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/iiif/{id}/manifest/{version}</span></code></p></td>
+<td><p>IIIF Manifest (version <code class="docutils literal notranslate"><span class="pre">2</span></code> or <code class="docutils literal notranslate"><span class="pre">3</span></code>).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/iiif/{id}/canvas/{version}</span></code></p></td>
+<td><p>IIIF Canvas for a specific file and version.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/iiif/{id}/image/{version}</span></code></p></td>
+<td><p>IIIF Image resource annotation.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/iiif/{id}/annotation-list/{version}</span></code></p></td>
+<td><p>IIIF Annotation List (v2) or Annotation Page (v3).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/iiif/{id}/annotation/{version}</span></code></p></td>
+<td><p>Specific IIIF spatial polygon or point annotation.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+<section id="query-parameters-for-collections">
+<h2>Query Parameters for Collections<a class="headerlink" href="#query-parameters-for-collections" title="Link to this heading"></a></h2>
+<p>The collection endpoints (<code class="docutils literal notranslate"><span class="pre">/api/1/linked-art/entities/{entity_class}</span></code> and
+<code class="docutils literal notranslate"><span class="pre">/api/1/entities/{entity_class}</span></code>) support the following query parameters:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 15.0%" />
+<col style="width: 15.0%" />
+<col style="width: 50.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">page</span></code></p></td>
+<td><p>Integer</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
+<td><p>Page number (1-indexed).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">limit</span></code></p></td>
+<td><p>Integer</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">50</span></code></p></td>
+<td><p>Number of items per page (maximum <code class="docutils literal notranslate"><span class="pre">100</span></code>).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">search</span></code></p></td>
+<td><p>String</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
+<td><p>Case-insensitive substring match on the entity label/name.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">startDate</span></code></p></td>
+<td><p>String</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
+<td><p>Beginning of time span (e.g. <code class="docutils literal notranslate"><span class="pre">1200</span></code>, <code class="docutils literal notranslate"><span class="pre">1200-05</span></code>, <code class="docutils literal notranslate"><span class="pre">1200-05-15</span></code>, or negative <code class="docutils literal notranslate"><span class="pre">-400</span></code> for BC).</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">endDate</span></code></p></td>
+<td><p>String</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
+<td><p>End of time span (e.g. <code class="docutils literal notranslate"><span class="pre">1500</span></code>, <code class="docutils literal notranslate"><span class="pre">1500-12-31</span></code>, or negative <code class="docutils literal notranslate"><span class="pre">-100</span></code> for BC).</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">typeId</span></code></p></td>
+<td><p>Int / UUID</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
+<td><p>Filter entities assigned to this type ID or type UUID.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">caseStudy</span></code></p></td>
+<td><p>Int / UUID</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
+<td><p>Filter entities belonging to this case study.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">sortBy</span></code></p></td>
+<td><p>String</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p>Field to sort by: <code class="docutils literal notranslate"><span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">startDate</span></code>, or <code class="docutils literal notranslate"><span class="pre">endDate</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">sort</span></code></p></td>
+<td><p>String</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">asc</span></code></p></td>
+<td><p>Sort order: <code class="docutils literal notranslate"><span class="pre">asc</span></code> (ascending) or <code class="docutils literal notranslate"><span class="pre">desc</span></code> (descending).</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="standard-error-response-format">
+<h2>Standard Error Response Format<a class="headerlink" href="#standard-error-response-format" title="Link to this heading"></a></h2>
+<p>When an error occurs, the API returns a structured JSON payload with HTTP status
+codes:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Entity does not exist&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;message&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;The requested entity could not be found in the database.&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;details&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;provided_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;913322f4-a3cf-2e90-bfd1-cecc8e523b56&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;hint&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Check if the UUID or ID is correct and the entity has not been deleted.&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;status&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">404</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;https://demo.openatlas.eu/api/1/linked-art/entity/913322f4-a3cf-2e90-bfd1-cecc8e523b56&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;timestamp&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2026-10-16T10:00:00.000000Z&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<section id="http-status-codes">
+<h3>HTTP Status Codes<a class="headerlink" href="#http-status-codes" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">200</span> <span class="pre">OK</span></code>: Successful request.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">302</span> <span class="pre">Found</span></code>: Temporary redirect (e.g. redirecting image requests to the high-performance IIIF server).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">400</span> <span class="pre">Bad</span> <span class="pre">Request</span></code>: Invalid parameters or formatting errors.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">401</span> <span class="pre">Unauthorized</span></code>: Authentication is required but was not provided.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">403</span> <span class="pre">Forbidden</span></code>: The provided token does not have permission to access the resource.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">404</span> <span class="pre">Not</span> <span class="pre">Found</span></code>: The requested entity, file, or endpoint does not exist.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">422</span> <span class="pre">Unprocessable</span> <span class="pre">Entity</span></code>: Validation failure on query or path parameters (e.g. invalid date, negative limit, or NUL character in search).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">500</span> <span class="pre">Internal</span> <span class="pre">Server</span> <span class="pre">Error</span></code>: Unexpected database or server error.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="lod.html" class="btn btn-neutral float-left" title="Linked Open Data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api_04.html" class="btn btn-neutral float-right" title="API v0.4 (Stable)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+        <p>CC BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
+        <script type="text/javascript">
+            <!-- Adds target=_blank to external links -->
+            $(document).ready(function () {
+                $('a[href^="http://"], a[href^="https://"]').not('a[class*=internal]').attr('target', '_blank');
+            });
+        </script>
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
