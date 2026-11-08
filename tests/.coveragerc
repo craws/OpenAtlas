@@ -3,5 +3,8 @@ precision=2
 omit=
     ../openatlas/api/import_scripts/*
     ../openatlas/views/vocabs.py
+    run_schemathesis.py
+    tests/run_schemathesis.py
+    */run_schemathesis.py
 sort=cover
 skip_covered=True

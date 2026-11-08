@@ -24,17 +24,20 @@ def get_actual_mime(path: Path | None) -> str:
 
 
 def is_supported_image(path: Path | None) -> bool:
+    if path and path.is_file() and path.suffix.lower() == '.svg':
+        return get_actual_mime(path) in (
+            'image/svg+xml', 'application/xml', 'text/xml', 'text/plain')
     return get_actual_mime(path).startswith('image/')
 
 
 def resize_image(filename: str) -> None:
     p = Path(filename)
     file_format = p.suffix.lower()
-    if file_format in g.display_file_ext:
+    if file_format in g.display_file_ext and file_format != '.svg':
         path = Path(app.config['UPLOAD_PATH']) / filename
         if is_supported_image(path):
             for size in app.config['IMAGE_SIZE'].values():
-                safe_resize_image(p.stem.lower(), file_format, size, True)
+                safe_resize_image(p.stem.lower(), p.suffix, size, True)
 
 
 def safe_resize_image(
@@ -60,14 +63,19 @@ def image_resizing(
         format_: str,
         size: str,
         is_image: bool = False) -> bool:
+    if format_.lower() == '.svg':
+        return False  # pragma: no cover
     source_path = Path(app.config['UPLOAD_PATH']) / f'{name}{format_}'
+    if not source_path.is_file() and name.isdigit() \
+            and hasattr(g, 'files') and int(name) in g.files:
+        source_path = g.files[int(name)]  # pragma: no cover
     if not is_image and not is_supported_image(source_path):
         return False
     filename = f'{source_path}[0]'
     try:
         with Image(filename=filename) as src:
-            ext = format_
-            if format_ in app.config['PROCESSABLE_EXT']:
+            ext = format_.lower()
+            if ext in app.config['PROCESSABLE_EXT']:
                 ext = app.config['PROCESSED_EXT']  # pragma: no cover
             with src.convert(ext.replace('.', '')) as img:
                 img.transform(resize=f"{size}x{size}>")
@@ -90,12 +98,12 @@ def check_processed_image(filename: str) -> bool:
     file_format = p.suffix.lower()
     check = False
     try:
-        if file_format in g.display_file_ext:
+        if file_format in g.display_file_ext and file_format != '.svg':
             path = Path(app.config['UPLOAD_PATH']) / filename
             if is_supported_image(path):
                 check = loop_through_processed_folders(
                     p.stem.lower(),
-                    file_format,
+                    p.suffix,
                     True)
     except OSError as e:  # pragma: no cover
         g.logger.log(
@@ -110,8 +118,8 @@ def loop_through_processed_folders(
         name: str,
         file_format: str,
         is_image: bool = False) -> bool:
-    ext = file_format
-    if file_format in app.config['PROCESSABLE_EXT']:
+    ext = file_format.lower()
+    if ext in app.config['PROCESSABLE_EXT']:
         ext = app.config['PROCESSED_EXT']  # pragma: no cover
     for size in app.config['IMAGE_SIZE'].values():
         path = Path(app.config['RESIZED_IMAGES']) / size / f'{name}{ext}'
@@ -137,25 +145,33 @@ def create_folder(folder: Path) -> bool:  # pragma: no cover
 
 
 def delete_orphaned_resized() -> None:
+    entity_file_ids = {entity.id for entity in Entity.get_by_class('file')}
     for size in app.config['IMAGE_SIZE'].values():
         path = Path(app.config['RESIZED_IMAGES']) / size
         for file in path.glob('**/*'):
-            file_name = file.stem.lower()
-            if not file_name.isdigit() or int(file_name) not in g.files:
-                file.unlink()
+            if file.is_file():
+                file_name = file.stem.lower()
+                if not file_name.isdigit() \
+                        or int(file_name) not in g.files \
+                        or int(file_name) not in entity_file_ids:
+                    file.unlink()
 
 
 def create_resized_images() -> None:
     for e in Entity.get_by_class('file'):
-        if e.id in g.files and e.get_file_ext() in g.display_file_ext:
+        if e.id in g.files and e.get_file_ext().lower() in g.display_file_ext:
             resize_image(f"{e.id}{e.get_file_ext()}")
 
 
 def check_iiif_activation() -> bool:
-    return bool(
-        g.settings['iiif'] and os.access(
-            Path(g.settings['iiif_path']),
-            os.W_OK))
+    if not hasattr(g, 'iiif_activation'):
+        g.iiif_activation = bool(
+            g.settings['iiif']
+            and g.settings['iiif_path']
+            and os.access(
+                Path(g.settings['iiif_path']),
+                os.W_OK))
+    return g.iiif_activation
 
 
 def check_iiif_file_exist(id_: int) -> bool:

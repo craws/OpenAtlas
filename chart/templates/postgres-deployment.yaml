@@ -47,22 +47,22 @@ spec:
             successThreshold: 1
             tcpSocket:
               port: 5432
-            timeoutSeconds: 1
+            timeoutSeconds: 5
           readinessProbe:
             failureThreshold: 3
             periodSeconds: 10
             successThreshold: 1
             tcpSocket:
               port: 5432
-            timeoutSeconds: 1
+            timeoutSeconds: 5
           resources: {}
           startupProbe:
-            failureThreshold: 6
+            failureThreshold: 18
             periodSeconds: 10
             successThreshold: 1
             tcpSocket:
               port: 5432
-            timeoutSeconds: 1
+            timeoutSeconds: 5
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           volumeMounts:

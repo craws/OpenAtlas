@@ -5,7 +5,9 @@ from typing import Any
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.display.image_processing import safe_resize_image
+from openatlas.display.image_processing import (
+    is_supported_image, safe_resize_image)
+from openatlas.display.table import file_preview
 from openatlas.display.util import profile_image
 from openatlas.models.entity import Entity
 from tests.base import TestBaseCase, get_hierarchy, insert
@@ -82,8 +84,19 @@ class ImageTest(TestBaseCase):
             copyfile(
                 Path(app.root_path) / 'static' / 'manifest.json',
                 Path(app.config['UPLOAD_PATH'] / f'{file_json.id}.json'))
+            file_svg = insert('file', 'Test_SVG')
+            svg_path = Path(app.config['UPLOAD_PATH'] / f'{file_svg.id}.svg')
+            copyfile(
+                Path(app.root_path) / 'static' / 'images' / 'logos' /
+                'Wikidata.svg',
+                svg_path)
+            assert is_supported_image(svg_path)
+            safe_resize_image(str(file_svg.id), '.svg', size="100")
             safe_resize_image(str(file2.id), '.png', size="???")
             profile_image(file_pathless)
+            g.files[file_svg.id] = svg_path
+            g.settings['iiif'] = False
+            assert f'{file_svg.id}.svg' in file_preview(file_svg.id)
 
         rv = c.get(url_for('view', id_=file_json.id))
         assert b'No preview available' in rv.data

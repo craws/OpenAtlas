@@ -25,7 +25,7 @@
   <script src="{{ url_for('static', filename='node_modules/datatables.net-bs4/js/dataTables.bootstrap4.min.js', v=config.VERSION) }}"></script>
   <script src="{{ url_for('static', filename='node_modules/jquery-ui-dist/jquery-ui.min.js', v=config.VERSION) }}"></script>
   <script src="{{ url_for('static', filename='node_modules/@fortawesome/fontawesome-free/js/all.min.js', v=config.VERSION) }}"></script>
-  <script src="{{ url_for('static', filename='node_modules/bootstrap-autocomplete/dist/latest/bootstrap-autocomplete.min.js', v=config.VERSION) }}"></script>
+  <script src="{{ url_for('static', filename='node_modules/@tarekraafat/autocomplete.js/dist/autoComplete.min.js', v=config.VERSION) }}"></script>
   {% include "util/translations.html" %}
   {% if gis_data %}
     {% include "map.html" %}
@@ -45,6 +45,7 @@
   </script>
   <script src="{{ url_for('static', filename='js/functions.js', v=config.VERSION) }}"></script>
   <script src="{{ url_for('static', filename='js/forms.js', v=config.VERSION) }}"></script>
+  <script src="{{ url_for('static', filename='js/autocomplete.js', v=config.VERSION) }}"></script>
   {{ session.language|get_js_messages|safe }}
   <title>
     {{ g.settings.site_name }}

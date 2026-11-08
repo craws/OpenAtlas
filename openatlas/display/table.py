@@ -212,7 +212,7 @@ def get_table_cell_content(
         case 'overlay' if origin:
             html = ''
             if is_authorized('editor') and \
-                    e.get_file_ext() in app.config['DISPLAY_FILE_EXT']:
+                    e.get_file_ext().lower() in app.config['DISPLAY_FILE_EXT']:
                 if e.id in overlays:
                     html = edit_link(
                         url_for(
@@ -297,7 +297,9 @@ def format_name_and_aliases(
 
 def file_preview(entity_id: int) -> str:
     size = app.config['IMAGE_SIZE']['table']
-    param = "loading='lazy' alt='image' max-width='100px' max-height='100px'"
+    param = (
+        "loading='lazy' alt='image' "
+        "style='max-width:100px; max-height:100px;'")
     if g.settings['iiif'] and check_iiif_file_exist(entity_id):
         ext = '.tiff' if g.settings['iiif_conversion'] \
             else g.files[entity_id].suffix
@@ -308,8 +310,11 @@ def file_preview(entity_id: int) -> str:
     if icon := get_file_path(entity_id, app.config['IMAGE_SIZE']['table']):
         url = url_for('display_file', name=icon.name, size=size)
         return f'<img src="{url}" {param}>'
+    path = get_file_path(entity_id)
+    if path and path.suffix.lower() == '.svg':
+        url = url_for('display_file', name=path.name)
+        return f'<img src="{url}" {param}>'
     if g.settings['image_processing']:
-        path = get_file_path(entity_id)
         if path and check_processed_image(path.name):
             if icon := get_file_path(
                     entity_id,
@@ -344,7 +349,7 @@ def profile_image_table_link(entity: Entity, file: Entity) -> str:
     if file.id == entity.image_id:
         return uc_first(_('main image'))
     if is_authorized('contributor') \
-            and file.get_file_ext() in g.display_file_ext:
+            and file.get_file_ext().lower() in g.display_file_ext:
         return link(
             _('set'),
             url_for('set_profile_image', id_=file.id, origin_id=entity.id))

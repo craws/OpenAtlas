@@ -3,6 +3,7 @@ from __future__ import annotations
 import ast
 import json
 from typing import Any, Iterable, Optional
+from uuid import UUID
 
 from flask import g, request
 from werkzeug.exceptions import abort
@@ -35,17 +36,17 @@ class Entity:
         self.class_ = g.classes[data['openatlas_class_name']]
         self.cidoc_class = self.class_.cidoc_class
         self.id = 0
-        self.uuid = ''
+        self.uuid: UUID | None = None
         self.name = ''
         self.aliases = {}
         self.description = None
         self.created = None
         self.modified = None
-        self.origin_id: Optional[int] = None  # When coming from another entity
-        self.image_id: Optional[int] = None  # Profile image
-        self.location: Optional[Entity] = None  # Respective location if place
+        self.origin_id: int | None = None  # When coming from another entity
+        self.image_id: int | None = None  # Profile image
+        self.location: Entity | None = None  # Respective location if place
         self.types = {}
-        self.standard_type = None
+        self.standard_type: Entity | None = None
         self.root: list[int] = []
         self.subs: list[int] = []
         self.classes: list[str] = []
@@ -327,7 +328,8 @@ class Entity:
         if not image_id:
             for link_ in self.get_links('P67', ['file'], inverse=True):
                 if file_ := g.files.get(link_.domain.id):
-                    if file_.suffix in g.display_file_ext:
+                    if file_.suffix.lower() in g.display_file_ext:
+                        Entity.set_profile_image(link_.domain.id, self.id)
                         return link_.domain.id
         return image_id
 
@@ -496,7 +498,7 @@ class Entity:
         entities = []
         for row in db.get_by_class('file', types=True):
             ext = g.files[row['id']].suffix if row['id'] in g.files else 'N/A'
-            if ext in app.config['DISPLAY_FILE_EXT']:
+            if ext.lower() in app.config['DISPLAY_FILE_EXT']:
                 entities.append(Entity(row))
         return entities
 
@@ -539,13 +541,14 @@ class Entity:
 
     @staticmethod
     def get_by_uuid(
-            uuid: str,
+            uuid: UUID | str,
             types: bool = False,
             aliases: bool = False,
-            with_location: bool = True) -> Entity:
+            with_location: bool = True) -> Entity | None:
         data = db.get_by_uuid(uuid, types, aliases)
         if not data:
-            abort(418)
+            return None
+
         entity = Entity(data)
         if entity.class_.name == 'place' and with_location:
             entity.location = entity.get_linked_entity_safe('P53', types=True)
@@ -594,15 +597,17 @@ class Entity:
         return [Entity(r) for r in db.get_latest(classes, limit)]
 
     @staticmethod
-    def set_profile_image(id_: int, origin_id: int) -> None:
-        db.set_profile_image(id_, origin_id)
+    def set_profile_image(image_id: int, entity_id: int) -> None:
+        db.set_profile_image(image_id, entity_id)
 
     @staticmethod
     def get_links_of_entities(
             entity_ids: int | list[int],
             codes: str | list[str] | None = None,
             classes: Optional[list[str]] = None,
-            inverse: bool = False) -> list[Link]:
+            inverse: bool = False,
+            preloaded_entities: Optional[dict[int, Entity]] = None) \
+            -> list[Link]:
         result = set()
         if codes:
             codes = codes if isinstance(codes, list) else [str(codes)]
@@ -610,8 +615,16 @@ class Entity:
         for row in rows:
             result.add(row['domain_id'])
             result.add(row['range_id'])
+
+        if preloaded_entities:
+            result = {id_ for id_ in result if id_ not in preloaded_entities}
+
         linked_entities = {
             e.id: e for e in Entity.get_by_ids(result, types=True)}
+
+        if preloaded_entities:
+            linked_entities.update(preloaded_entities)
+
         links = []
         for row in rows:
             links.append(
@@ -836,8 +849,8 @@ def insert(data: dict[str, Any]) -> Entity:
         data['description'] = result['text']
         annotation_data = result['data']
     for item in [
-            'begin_from', 'begin_to', 'begin_comment',
-            'end_from', 'end_to', 'end_comment', 'description']:
+        'begin_from', 'begin_to', 'begin_comment',
+        'end_from', 'end_to', 'end_comment', 'description']:
         data[item] = data.get(item)
     for item in ['name', 'description']:
         data[item] = sanitize(data[item])

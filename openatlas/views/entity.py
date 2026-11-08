@@ -101,7 +101,7 @@ def insert(
         overlays=origin.get_overlays() if origin else None,
         title=_(entity.class_.group['name']),
         geonames_module=entity.class_.name
-            in get_reference_system_by_name_safe('geonames').classes,
+        in get_reference_system_by_name_safe('geonames').classes,
         crumbs=crumbs_for_insert(entity, origin, structure))
 
 
@@ -146,7 +146,7 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
         overlays=entity.get_overlays(),
         title=entity.name,
         geonames_module=entity.class_.name
-            in get_reference_system_by_name_safe('geonames').classes,
+        in get_reference_system_by_name_safe('geonames').classes,
         crumbs=hierarchy_crumbs(entity) +
         [entity, _('copy') if copy else _('edit')])
 
@@ -224,7 +224,8 @@ def redirect_url_insert(
         origin: Entity | None,
         relation_name: str | None) -> str:
     url = url_for('view', id_=entity.id)
-    if hasattr(form, 'continue_') and form.continue_.data == 'yes':
+    continue_ = getattr(form, "continue_", None)
+    if continue_ and form.continue_.data == 'yes':
         url = request.url
         if entity.class_.group['name'] == 'type' and origin:
             if not (super_id := getattr(form, 'super').data):
@@ -242,25 +243,27 @@ def redirect_url_insert(
                 origin_id=origin.id,
                 name=relation_name,
                 selection_id=entity.id)
-        elif not hasattr(form, 'continue_') or form.continue_.data != 'yes':
+        elif not continue_ or form.continue_.data != 'yes':
             url = url_for('view', id_=origin.id) \
                   + f'#tab-{relation_name.replace('_', '-')}'
-    if hasattr(form, 'continue_') \
-            and form.continue_.data in ['sub', 'human_remains']:
+    if continue_ and form.continue_.data in ['sub', 'human_remains']:
         class_ = form.continue_.data
+        insert_relation = 'item'
         if class_ == 'sub':
             match entity.class_.name:
                 case 'place':
                     class_ = 'feature'
+                    insert_relation = 'feature'
                 case 'feature':
                     class_ = 'stratigraphic_unit'
+                    insert_relation = "stratigraphic_unit"
                 case 'stratigraphic_unit':
                     class_ = 'artifact'
         url = url_for(
             'insert',
             class_=class_,
             origin_id=entity.id,
-            relation='item')
+            relation=insert_relation)
     return url
 
 
@@ -356,6 +359,8 @@ def index(group: str) -> str | Response:
                     g.classes[class_].label,
                     url_for('insert', class_=class_),
                     tooltip_text=g.classes[class_].display['tooltip']))
+    if 'source' in classes:
+        buttons.append(button('annotations', url_for('annotation_text_index')))
     return render_template(
         'entity/index.html',
         class_=group,

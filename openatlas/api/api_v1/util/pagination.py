@@ -1,0 +1,38 @@
+import math
+from typing import Any
+from urllib.parse import urlencode
+
+from flask import request, url_for
+
+
+def get_pagination(
+        endpoint: str,
+        total_items: int,
+        page: int,
+        limit: int,
+        **endpoint_kwargs: Any) -> dict[str, Any]:
+    base_url = url_for(endpoint, _external=True, **endpoint_kwargs)
+    query_params = request.args.to_dict(flat=False)
+
+    def page_url(page_number: int) -> str:
+        params = {**query_params, 'page': page_number}
+        return f'{base_url}?{urlencode(params, doseq=True)}'
+
+    collection_params = {k: v for k, v in query_params.items() if k != 'page'}
+    collection_url = (
+        f'{base_url}?{urlencode(collection_params, doseq=True)}'
+        if collection_params else base_url)
+
+    total_pages = max(1, math.ceil(total_items / limit))
+    pagination: dict[str, Any] = {
+        'total_items': total_items,
+        'id': page_url(page),
+        'first': page_url(1),
+        'last': page_url(total_pages),
+        'collection_url': collection_url,
+        'start_index': (page - 1) * limit}
+    if page > 1:
+        pagination['previous'] = page_url(min(page - 1, total_pages))
+    if page < total_pages:
+        pagination['next'] = page_url(page + 1)
+    return pagination

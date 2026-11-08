@@ -1,34 +1,22 @@
-  <script>
+<script>
   /**
    * GND autocomplete
-   * Documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
-  */
-  $('input[data-reference-system={{ system.id }}]').autoComplete({
-    bootstrapVersion: '4',
-    resolver: 'custom',
-    formatResult: function (item) {
-      return {
-         value: item.id,
-         text: `${item.label} - ${item.category}<br><small>${item.id.substring(item.id.lastIndexOf('/') + 1)}</small>`
-      };
-    },
-    events: {
-      search: function (qry, callback) {
-        $.ajax({
-          url: "https://lobid.org/gnd/search",
-          dataType: "jsonp",
-          data: {
-            q: qry,
-            size: 100,
-            format: "json:preferredName"
-          },
-          success: function(data) {
-            callback(data);
-          }
-        })
+   * API: https://lobid.org/gnd/api
+   */
+  initReferenceAutocomplete('{{ system.id }}', {
+    search: query => $.ajax({
+      url: 'https://lobid.org/gnd/search',
+      dataType: 'jsonp',
+      timeout: 10000,
+      data: {
+        q: query,
+        size: 100,
+        format: 'json:preferredName'
       }
-    }
-  }).on('autocomplete.select', function(evt,item) {
-    $('input[data-reference-system={{ system.id }}]').val(item.id.substring(item.id.lastIndexOf('/') + 1));
+    }).then(data => (Array.isArray(data) ? data : []).map(item => ({
+      id: (item.id || '').split('/').pop(),
+      label: item.label,
+      info: item.category
+    })))
   });
 </script>

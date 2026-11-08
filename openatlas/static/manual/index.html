@@ -7,7 +7,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>OpenAtlas manual &mdash; OpenAtlas 9.4.0 documentation</title>
+  <title>OpenAtlas manual &mdash; OpenAtlas 9.5.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=f5127f15" />
       <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
@@ -16,7 +16,7 @@
   
       <script src="_static/jquery.js?v=8dae8fb0"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=cb047409"></script>
+      <script src="_static/documentation_options.js?v=d9c24813"></script>
       <script src="_static/doctools.js?v=9bcbadda"></script>
       <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="_static/design-tabs.js?v=f930bc37"></script>
@@ -56,15 +56,23 @@
 <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="model/index.html">Model</a></li>
-<li class="toctree-l1"><a class="reference internal" href="technical/api.html">API</a></li>
 <li class="toctree-l1"><a class="reference internal" href="technical/database_structure.html">Database Structure</a></li>
 <li class="toctree-l1"><a class="reference internal" href="technical/application_structure.html">Application Structure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="technical/api.html">API (Moved)</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Help</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="troubleshooting/index.html">Troubleshooting</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/lod.html">Linked Open Data</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/reference.html">API v1 (Beta)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/api_04.html">API v0.4 (Stable)</a></li>
 </ul>
 
         </div>
@@ -174,24 +182,13 @@ development specific documentation in our Redmine
 <li class="toctree-l2"><a class="reference internal" href="model/link_checker.html">Link checker</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="technical/api.html">API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="technical/api.html#introduction">Introduction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="technical/api.html#quick-start-guide">Quick Start Guide</a></li>
-<li class="toctree-l2"><a class="reference internal" href="technical/api.html#versioning">Versioning</a></li>
-<li class="toctree-l2"><a class="reference internal" href="technical/api.html#endpoints">Endpoints</a></li>
-<li class="toctree-l2"><a class="reference internal" href="technical/api.html#parameters">Parameters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="technical/api.html#error-handling">Error handling</a></li>
-<li class="toctree-l2"><a class="reference internal" href="technical/api.html#proxy">Proxy</a></li>
-<li class="toctree-l2"><a class="reference internal" href="technical/api.html#authentication-guide">Authentication guide</a></li>
-<li class="toctree-l2"><a class="reference internal" href="technical/api.html#api-reference">API Reference</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="technical/database_structure.html">Database Structure</a><ul class="simple">
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="technical/application_structure.html">Application Structure</a><ul class="simple">
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="technical/api.html">API (Moved)</a></li>
 </ul>
 </div>
 <div class="toctree-wrapper compound">
@@ -216,6 +213,50 @@ development specific documentation in our Redmine
 <li class="toctree-l2"><a class="reference internal" href="faq.html#how-to-make-files-available-for-the-public">How to make files available for the public</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faq.html#why-can-t-a-free-text-field-be-added-via-custom-types">Why can’t a free text field be added via custom types</a></li>
 <li class="toctree-l2"><a class="reference internal" href="faq.html#why-can-t-longer-texts-be-formatted">Why can’t longer texts be formatted</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/index.html#overview-philosophy">Overview &amp; Philosophy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/index.html#versioning">Versioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/index.html#interactive-documentation-uis">Interactive Documentation UIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/index.html#machine-readable-openapi-specification">Machine-Readable OpenAPI Specification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/index.html#guide-contents">Guide Contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/getting_started.html#access-modes">Access Modes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/getting_started.html#authentication-methods">Authentication Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/getting_started.html#your-first-request-system-information">Your First Request: System Information</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/lod.html">Linked Open Data</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/lod.html#why-linked-open-data">Why Linked Open Data?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/lod.html#core-ontologies-in-openatlas-v1">Core Ontologies in OpenAtlas v1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/lod.html#lod-profiles-in-version-1-beta">LOD Profiles in Version 1 (Beta)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/lod.html#format-selection-content-negotiation">Format Selection &amp; Content Negotiation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/reference.html">API v1 (Beta)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/reference.html#endpoint-summary-table">Endpoint Summary Table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/reference.html#query-parameters-for-collections">Query Parameters for Collections</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/reference.html#standard-error-response-format">Standard Error Response Format</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/api_04.html">API v0.4 (Stable)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/api_04.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/api_04.html#quick-start-guide">Quick Start Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/api_04.html#versioning">Versioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/api_04.html#endpoints">Endpoints</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/api_04.html#parameters">Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/api_04.html#error-handling">Error handling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/api_04.html#proxy">Proxy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/api_04.html#authentication-guide">Authentication guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/api_04.html#api-reference">API Reference</a></li>
 </ul>
 </li>
 </ul>

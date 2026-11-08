@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import operator
 import os
 import shutil
 import subprocess
@@ -16,12 +17,14 @@ from rdflib import Graph
 
 from config.default import ACDH
 from openatlas import app
-from openatlas.api.endpoints.endpoint import Endpoint
+from openatlas.api.api_v04.endpoints.endpoint import Endpoint
+from openatlas.api.api_v1.util.files import get_license_url_mapping
 from openatlas.api.external.arche import add_arche_file_metadata_to_graph
 from openatlas.api.external.arche_class import ArcheFileMetadata
-from openatlas.api.formats.rdf import rdf_export_to_file
-from openatlas.api.resources.api_entity import ApiEntity
-from openatlas.api.resources.util import filter_by_type, get_reference_systems
+from openatlas.api.api_v04.formats.rdf import rdf_export_to_file
+from openatlas.api.api_v04.resources.api_entity import ApiEntity
+from openatlas.api.api_v04.resources.util import \
+    filter_by_type, get_reference_systems
 from openatlas.display.image_processing import get_binary_path
 from openatlas.models.entity import Entity
 
@@ -104,13 +107,12 @@ def arche_export() -> bool:
         f'{current_date_for_filename()}_'
         f'{external_metadata['topCollection'].replace(' ', '_')}.zip')
 
-    tempfile.tempdir = str(app.config['TMP_PATH'])
-
     arche_dir = app.config['ARCHE_PATH']
     arche_dir.mkdir(parents=True, exist_ok=True)
     final_archive_path = arche_dir / archive_name
 
-    with tempfile.TemporaryDirectory() as temp_dir:
+    Path(app.config['TMP_PATH']).mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(dir=app.config['TMP_PATH']) as temp_dir:
         temp_path = Path(temp_dir)
         tmp_archive_path = temp_path / archive_name
         failed_files_md = "\n".join(
@@ -159,23 +161,47 @@ def arche_export() -> bool:
                                 file.read())
 
             infos = archive.infolist()
-            total_size = sum(info.file_size for info in infos)
-            total_files = sum(1 for i in infos if not i.filename.endswith('/'))
-            all_dirs: set[Path] = set()
-            for info in infos:
-                path = Path(info.filename)
-                all_dirs.update(path.parents)
-            all_dirs.discard(Path("."))
-            total_dirs = len(all_dirs)
-            total_entries = len(infos)
+            staged_size = sum(info.file_size for info in infos)
+            manifest_member_names = ['debug/file_statistic.md'] + [
+                info.filename for info in infos if not info.is_dir()]
 
-            stat_md = (
-                f'# Archive Statistics\n'
-                f'- **Total size**: {total_size} bytes\n'
-                f'- **Total entries**: {total_entries}\n'
-                f'- **Files**: {total_files}\n'
-                f'- **Directories**: {total_dirs}\n')
+            manifest_size = 0
+            for name in manifest_member_names:
+                manifest_size += len(
+                    format_checksum_line(name, '0' * 64).encode('utf-8'))
+
+            all_entries = ['debug/file_statistic.md', 'checksums.sha256'] + [
+                info.filename for info in infos]
+            all_dirs: set[Path] = set()
+            for entry_name in all_entries:
+                all_dirs.update(Path(entry_name).parents)
+            all_dirs.discard(Path('.'))
+
+            total_entries = len(all_entries)
+            total_files = sum(
+                1 for name in all_entries if not name.endswith('/'))
+            total_dirs = len(all_dirs)
+
+            base_size = staged_size + manifest_size
+            total_size = base_size
+            stat_md = ''
+            for _ in range(10):
+                stat_md = (
+                    f'# Archive Statistics\n'
+                    f'- **Total size**: {total_size} bytes\n'
+                    f'- **Total entries**: {total_entries}\n'
+                    f'- **Files**: {total_files}\n'
+                    f'- **Directories**: {total_dirs}\n')
+                stat_size = len(stat_md.encode('utf-8'))
+                new_total_size = base_size + stat_size
+                if new_total_size == total_size:
+                    break
+                total_size = new_total_size
+
             archive.writestr('debug/file_statistic.md', stat_md)
+            archive.writestr(
+                'checksums.sha256',
+                create_checksum_manifest(archive))
 
         shutil.move(str(tmp_archive_path), str(final_archive_path))
     return final_archive_path
@@ -251,7 +277,7 @@ def get_publications(
 
 def sort_files_by_types(
         entities: list[Entity],
-        type_ids: set[int],
+        type_ids: set[int] | list[int] | None,
         top_collection: str) -> dict[str, set[Path]]:
     files_by_types = defaultdict(set)
     for entity in entities:
@@ -273,6 +299,39 @@ def hash_file(path: Path, chunk_size: int = 8192) -> str:
         for chunk in iter(lambda: f.read(chunk_size), b''):
             sha256.update(chunk)
     return sha256.hexdigest()
+
+
+def format_checksum_line(name: str, digest: str) -> str:
+    escaped_name = name.replace('\\', '\\\\').replace('\n', '\\n')
+    marker = '\\' if escaped_name != name else ''
+    return f'{marker}{digest}\t{escaped_name}\n'
+
+
+def create_checksum_manifest(
+        archive: zipfile.ZipFile,
+        manifest_filename: str = 'checksums.sha256',
+        chunk_size: int = 8192) -> str:
+    manifest_lines: list[str] = []
+
+    infos = sorted(archive.infolist(), key=operator.attrgetter('filename'))
+
+    for a, b in zip(infos, infos[1:]):
+        if a.filename == b.filename:  # pragma: no cover
+            raise ValueError(f'Duplicate ZIP member name: {a.filename}')
+
+    for info in infos:
+        if info.is_dir() or info.filename == manifest_filename:
+            continue  # pragma: no cover
+
+        sha256 = hashlib.sha256()
+        with archive.open(info, 'r') as member_file:
+            while chunk := member_file.read(chunk_size):
+                sha256.update(chunk)
+
+        digest = sha256.hexdigest()
+        manifest_lines.append(format_checksum_line(info.filename, digest))
+
+    return ''.join(manifest_lines)
 
 
 def check_files_for_arche(
@@ -299,7 +358,7 @@ def check_files_for_arche(
 
 def get_arche_file_turtle_graph(
         entities: list[Entity],
-        type_ids: set[int],
+        type_ids: set[int] | list[int] | None,
         top_collection: str) -> str:
     graph = Graph()
     graph.bind("acdh", ACDH)
@@ -311,26 +370,22 @@ def get_arche_file_turtle_graph(
 
 def get_arche_file_metadata(
         entities: list[Entity],
-        type_ids: set[int],
+        type_ids: set[int] | list[int] | None,
         top_collection: str) -> list[ArcheFileMetadata]:
     publications = get_publications(entities)
     relations = get_place_and_actor_relations(entities)
-    license_urls = {}
+    license_urls = get_license_url_mapping()
     arche_metadata_list = []
     for entity in entities:
+        if not g.files.get(entity.id):
+            continue
         standard_type = entity.standard_type
-        if not g.files.get(entity.id) or not standard_type:
+        if not standard_type:
             continue
-        if standard_type.id in license_urls:
+        license_url_list = license_urls.get(standard_type.id)
+        if not license_url_list:  # pragma: no cover
             continue
-        url = None
-        for link_ in standard_type.get_links('P67', inverse=True):
-            if link_.domain.class_.name == "external_reference":
-                url = link_.domain.name
-                break
-        if url is None:  # pragma: no cover
-            continue
-        license_urls[standard_type.id] = url
+
         if type_ids:
             for type_ in entity.types:
                 if type_.id in type_ids:
@@ -341,7 +396,7 @@ def get_arche_file_metadata(
                             type_name,
                             relations.get(entity.id, []),
                             publications.get(entity.id, []),
-                            license_urls[standard_type.id]))
+                            license_url_list))
         else:
             arche_metadata_list.append(
                 ArcheFileMetadata.construct(
@@ -349,7 +404,7 @@ def get_arche_file_metadata(
                     top_collection,
                     relations.get(entity.id, []),
                     publications.get(entity.id, []),
-                    license_urls[standard_type.id]))
+                    license_url_list))
     return arche_metadata_list
 
 
@@ -363,7 +418,7 @@ def find_duplicates(entity_ids: set[int]) -> set[tuple[int, int]]:
 
     duplicates = set()
     for files in size_map.values():
-        if len(files) < 2:
+        if len(files) <= 1:
             continue  # Only one file of this size — skip
         hash_map: dict[str, int] = {}
         for file_id, path in files:
@@ -387,9 +442,11 @@ def open_tmp_sql_file() -> str:
     pg_dump_bin = get_binary_path('pg_dump', required=True)
     if not pg_dump_bin:  # pragma: no cover
         raise FileNotFoundError("pg_dump binary not found")
+    Path(app.config['TMP_PATH']).mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(
             mode='w+',
             suffix='.sql',
+            dir=app.config['TMP_PATH'],
             delete=False) as tmp_sql:
 
         tmp_sql.write("CREATE EXTENSION IF NOT EXISTS postgis;\n\n")

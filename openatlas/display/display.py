@@ -98,7 +98,6 @@ class Display:
                 description_ = annotation_text_links(self.entity)
         if self.entity.category != 'value':
             text += description(description_, label)
-
         self.tabs['info'].content = render_template(
             'entity/view.html',
             entity=self.entity,
@@ -191,7 +190,8 @@ class Display:
                 f'+ {uc_first(_('add'))}')
             self.tabs['additional'].content = ''
             for name in empty_tabs:
-                if self.tabs[name].buttons:
+                if self.tabs[name].buttons \
+                        and self.entity.category != 'system':
                     self.tabs['additional'].content += \
                         f'<h2>{self.tabs[name].label}</h2>' + \
                         button_bar(self.tabs[name].buttons)
@@ -360,9 +360,9 @@ class Display:
     def add_button_delete(self) -> None:
         if not deletion_possible(self.entity):
             return
-        msg = _(
+        msg = uc_first(_(
             'delete %(name)s?',
-            name=escape(self.entity.name.replace('\'', '')))
+            name=escape(self.entity.name.replace('\'', ''))))
         self.buttons.append(
             button(
                 _('delete'),
@@ -373,7 +373,8 @@ class Display:
 
     def add_button_update(self) -> None:
         if not is_authorized(self.entity.class_.write_access) \
-                or self.problematic_type:
+                or self.problematic_type \
+                or self.entity.category == 'system':
             return
         self.buttons.append(
             button(
@@ -384,7 +385,7 @@ class Display:
     def add_button_sibling_pager(self) -> None:
         prev_id = None
         next_id = None
-        position = None
+        position = 0
         self.structure['siblings'].sort(key=lambda x: x.id)
         for counter, sibling in enumerate(self.structure['siblings']):
             position = counter + 1

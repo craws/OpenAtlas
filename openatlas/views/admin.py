@@ -191,14 +191,21 @@ def get_newsletter_button(users: list[User]) -> str:
 
 
 def get_rights_holder_table() -> Table:
-    table = Table(['name', 'class', 'count', 'description'])
+    table = Table(
+        ['name', 'class', 'creator', 'license_holder', 'description'])
     file_count = RightsHolder.get_rights_holder_file_count()
-    for holder in RightsHolder.get_rights_holder():
+    for holder in RightsHolder.get_rights_holders():
         row = [
             link(holder, url_for('rights_holder_view', id_=holder.id)),
             uc_first(f'{_(holder.class_) if holder.class_ else ''}'),
             link(
-                str(file_count.get(holder.id, '')),
+                str(file_count[holder.id].get('creator', '')),
+                url_for(
+                    'rights_holder_view',
+                    id_=holder.id,
+                    _anchor='tab-files')),
+            link(
+                str(file_count[holder.id].get('license_holder', '')),
                 url_for(
                     'rights_holder_view',
                     id_=holder.id,
@@ -458,7 +465,7 @@ def get_disk_space_info() -> dict[str, Any] | None:
     if iiif_path and iiif_path.resolve() != paths['upload']['path'].resolve():
         paths['iiif'] = {'path': iiif_path}
 
-    for key, info in paths.items():
+    for _key, info in paths.items():
         info['size'] = get_dir_size(str(info['path']))
         info['mounted'] = info['path'].is_mount()
 
@@ -498,7 +505,7 @@ def count_files_to_convert() -> int:
     converted_files = 0
     existing_files = [entity.id for entity in Entity.get_by_class('file')]
     for id_, path in g.files.items():
-        if id_ in existing_files and path.suffix in g.display_file_ext:
+        if id_ in existing_files and path.suffix.lower() in g.display_file_ext:
             total_files += 1
             if check_iiif_file_exist(id_):
                 converted_files += 1
