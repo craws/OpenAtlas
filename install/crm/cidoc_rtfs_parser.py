@@ -216,35 +216,35 @@ def import_cidoc() -> None:
     cursor.execute("""
         BEGIN;
 
-        ALTER TABLE model.entity 
+        ALTER TABLE model.entity
             DROP CONSTRAINT IF EXISTS entity_class_code_fkey;
-        ALTER TABLE model.entity 
+        ALTER TABLE model.entity
             DROP CONSTRAINT IF EXISTS entity_openatlas_class_name_fkey;
-        ALTER TABLE model.link 
+        ALTER TABLE model.link
             DROP CONSTRAINT IF EXISTS link_property_code_fkey;
-        ALTER TABLE model.cidoc_class_inheritance 
+        ALTER TABLE model.cidoc_class_inheritance
             DROP CONSTRAINT IF EXISTS class_inheritance_super_code_fkey;
-        ALTER TABLE model.cidoc_class_inheritance 
+        ALTER TABLE model.cidoc_class_inheritance
             DROP CONSTRAINT IF EXISTS class_inheritance_sub_code_fkey;
-        ALTER TABLE model.cidoc_class_i18n 
+        ALTER TABLE model.cidoc_class_i18n
             DROP CONSTRAINT IF EXISTS class_i18n_class_code_fkey;
-        ALTER TABLE model.property 
+        ALTER TABLE model.property
             DROP CONSTRAINT IF EXISTS property_domain_class_code_fkey;
-        ALTER TABLE model.property 
+        ALTER TABLE model.property
             DROP CONSTRAINT IF EXISTS property_range_class_code_fkey;
-        ALTER TABLE model.property_inheritance 
+        ALTER TABLE model.property_inheritance
             DROP CONSTRAINT IF EXISTS property_inheritance_super_code_fkey;
-        ALTER TABLE model.property_inheritance 
+        ALTER TABLE model.property_inheritance
             DROP CONSTRAINT IF EXISTS property_inheritance_sub_code_fkey;
-        ALTER TABLE model.property_i18n 
+        ALTER TABLE model.property_i18n
             DROP CONSTRAINT IF EXISTS property_i18n_property_code_fkey;
-        ALTER TABLE model.openatlas_class 
+        ALTER TABLE model.openatlas_class
             DROP CONSTRAINT IF EXISTS openatlas_class_cidoc_class_code_fkey;
-        ALTER TABLE web.reference_system_openatlas_class 
-            DROP CONSTRAINT IF EXISTS 
+        ALTER TABLE web.reference_system_openatlas_class
+            DROP CONSTRAINT IF EXISTS
                 reference_system_openatlas_class_openatlas_class_name_fkey;
 
-        TRUNCATE 
+        TRUNCATE
             model.cidoc_class_inheritance,
             model.cidoc_class_i18n,
             model.cidoc_class,
@@ -260,7 +260,7 @@ def import_cidoc() -> None:
         ALTER SEQUENCE model.property_i18n_id_seq RESTART;""")
 
     # Classes
-    for code, class_ in classes.items():
+    for _, class_ in classes.items():
         sql = """
             INSERT INTO model.cidoc_class (code, name, comment)
             VALUES (%(code)s, %(name)s, %(comment)s);"""
@@ -268,7 +268,7 @@ def import_cidoc() -> None:
             'code': class_.code,
             'name': class_.name,
             'comment': class_.comment})
-    for code, class_ in classes.items():
+    for _, class_ in classes.items():
         for sub_code_of in class_.sub_class_of:
             if sub_code_of != class_.code:  # Prevent circular relations
                 sql = """
@@ -289,7 +289,7 @@ def import_cidoc() -> None:
                 'text': label})
 
     # Properties
-    for code, property_ in properties.items():
+    for _, property_ in properties.items():
         sql = """
             INSERT INTO model.property (
                 code, name, name_inverse, comment, domain_class_code,
@@ -304,7 +304,7 @@ def import_cidoc() -> None:
             'comment': property_.comment,
             'domain_code': property_.domain_code,
             'range_code': property_.range_code})
-    for code, property_ in properties.items():
+    for _, property_ in properties.items():
         for sub_property_of in property_.sub_property_of:
             sql = """
                 INSERT INTO model.property_inheritance (super_code, sub_code)
@@ -323,9 +323,9 @@ def import_cidoc() -> None:
                 INSERT INTO model.property_i18n
                     (property_code, language_code, text, text_inverse)
                 VALUES
-                    (%(property)s, 
-                    %(language)s, 
-                    %(text)s, 
+                    (%(property)s,
+                    %(language)s,
+                    %(text)s,
                     %(text_inverse)s);"""
             cursor.execute(sql, {
                 'property': property_.code,
@@ -333,71 +333,71 @@ def import_cidoc() -> None:
                 'text': label,
                 'text_inverse': text_inverse})
     cursor.execute("""
-        ALTER TABLE ONLY model.entity 
-            ADD CONSTRAINT entity_class_code_fkey 
-            FOREIGN KEY (cidoc_class_code) 
-            REFERENCES model.cidoc_class(code) 
+        ALTER TABLE ONLY model.entity
+            ADD CONSTRAINT entity_class_code_fkey
+            FOREIGN KEY (cidoc_class_code)
+            REFERENCES model.cidoc_class(code)
             ON UPDATE CASCADE ON DELETE CASCADE;
-        ALTER TABLE ONLY model.link 
-            ADD CONSTRAINT link_property_code_fkey 
-            FOREIGN KEY (property_code) 
-            REFERENCES model.property(code) 
+        ALTER TABLE ONLY model.link
+            ADD CONSTRAINT link_property_code_fkey
+            FOREIGN KEY (property_code)
+            REFERENCES model.property(code)
             ON UPDATE CASCADE ON DELETE CASCADE;
-        ALTER TABLE ONLY model.cidoc_class_inheritance 
-            ADD CONSTRAINT class_inheritance_super_code_fkey 
-            FOREIGN KEY (super_code) 
-            REFERENCES model.cidoc_class(code) 
+        ALTER TABLE ONLY model.cidoc_class_inheritance
+            ADD CONSTRAINT class_inheritance_super_code_fkey
+            FOREIGN KEY (super_code)
+            REFERENCES model.cidoc_class(code)
             ON UPDATE CASCADE ON DELETE CASCADE;
-        ALTER TABLE ONLY model.cidoc_class_inheritance 
-            ADD CONSTRAINT class_inheritance_sub_code_fkey 
-            FOREIGN KEY (sub_code) 
-            REFERENCES model.cidoc_class(code) 
+        ALTER TABLE ONLY model.cidoc_class_inheritance
+            ADD CONSTRAINT class_inheritance_sub_code_fkey
+            FOREIGN KEY (sub_code)
+            REFERENCES model.cidoc_class(code)
             ON UPDATE CASCADE ON DELETE CASCADE;
-        ALTER TABLE ONLY model.cidoc_class_i18n 
-            ADD CONSTRAINT class_i18n_class_code_fkey 
-            FOREIGN KEY (class_code) 
-            REFERENCES model.cidoc_class(code) 
+        ALTER TABLE ONLY model.cidoc_class_i18n
+            ADD CONSTRAINT class_i18n_class_code_fkey
+            FOREIGN KEY (class_code)
+            REFERENCES model.cidoc_class(code)
             ON UPDATE CASCADE ON DELETE CASCADE;
-        ALTER TABLE ONLY model.property 
-            ADD CONSTRAINT property_domain_class_code_fkey 
-            FOREIGN KEY (domain_class_code) 
-            REFERENCES model.cidoc_class(code) 
+        ALTER TABLE ONLY model.property
+            ADD CONSTRAINT property_domain_class_code_fkey
+            FOREIGN KEY (domain_class_code)
+            REFERENCES model.cidoc_class(code)
             ON UPDATE CASCADE ON DELETE CASCADE;
-        ALTER TABLE ONLY model.property 
-            ADD CONSTRAINT property_range_class_code_fkey 
-            FOREIGN KEY (range_class_code) 
-            REFERENCES model.cidoc_class(code) 
+        ALTER TABLE ONLY model.property
+            ADD CONSTRAINT property_range_class_code_fkey
+            FOREIGN KEY (range_class_code)
+            REFERENCES model.cidoc_class(code)
             ON UPDATE CASCADE ON DELETE CASCADE;
-        ALTER TABLE ONLY model.property_inheritance 
-            ADD CONSTRAINT property_inheritance_super_code_fkey 
-            FOREIGN KEY (super_code) 
-            REFERENCES model.property(code) 
+        ALTER TABLE ONLY model.property_inheritance
+            ADD CONSTRAINT property_inheritance_super_code_fkey
+            FOREIGN KEY (super_code)
+            REFERENCES model.property(code)
             ON UPDATE CASCADE ON DELETE CASCADE;
-        ALTER TABLE ONLY model.property_inheritance 
-            ADD CONSTRAINT property_inheritance_sub_code_fkey 
-            FOREIGN KEY (sub_code) 
-            REFERENCES model.property(code) 
+        ALTER TABLE ONLY model.property_inheritance
+            ADD CONSTRAINT property_inheritance_sub_code_fkey
+            FOREIGN KEY (sub_code)
+            REFERENCES model.property(code)
             ON UPDATE CASCADE ON DELETE CASCADE;
-        ALTER TABLE ONLY model.property_i18n 
-            ADD CONSTRAINT property_i18n_property_code_fkey 
-            FOREIGN KEY (property_code) 
-            REFERENCES model.property(code) 
+        ALTER TABLE ONLY model.property_i18n
+            ADD CONSTRAINT property_i18n_property_code_fkey
+            FOREIGN KEY (property_code)
+            REFERENCES model.property(code)
             ON UPDATE CASCADE ON DELETE CASCADE;
-        ALTER TABLE ONLY model.entity 
-            ADD CONSTRAINT entity_openatlas_class_name_fkey 
-            FOREIGN KEY (openatlas_class_name) 
-            REFERENCES model.openatlas_class(name) 
+        ALTER TABLE ONLY model.entity
+            ADD CONSTRAINT entity_openatlas_class_name_fkey
+            FOREIGN KEY (openatlas_class_name)
+            REFERENCES model.openatlas_class(name)
             ON UPDATE CASCADE ON DELETE CASCADE;
-        ALTER TABLE ONLY model.openatlas_class 
-            ADD CONSTRAINT openatlas_class_cidoc_class_code_fkey 
-            FOREIGN KEY (cidoc_class_code) 
-            REFERENCES model.cidoc_class(code) 
+        ALTER TABLE ONLY model.openatlas_class
+            ADD CONSTRAINT openatlas_class_cidoc_class_code_fkey
+            FOREIGN KEY (cidoc_class_code)
+            REFERENCES model.cidoc_class(code)
             ON UPDATE CASCADE ON DELETE CASCADE;
-        ALTER TABLE ONLY web.reference_system_openatlas_class 
-            ADD CONSTRAINT 
-            reference_system_openatlas_class_openatlas_class_name_fkey 
-            FOREIGN KEY (openatlas_class_name) 
-            REFERENCES model.openatlas_class(name) 
+        ALTER TABLE ONLY web.reference_system_openatlas_class
+            ADD CONSTRAINT
+            reference_system_openatlas_class_openatlas_class_name_fkey
+            FOREIGN KEY (openatlas_class_name)
+            REFERENCES model.openatlas_class(name)
             ON UPDATE CASCADE ON DELETE CASCADE;
         """)
     cursor.execute("COMMIT")

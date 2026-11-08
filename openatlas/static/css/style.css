@@ -258,13 +258,6 @@ img.schema_image {
   width: 100%;
 }
 
-/* Reference Field Autocomplete (Wikidata & Co) */
-[data-reference-system] + .bootstrap-autocomplete {
-  min-width: 12.25rem;
-  max-height: 500px;
-  overflow-y: auto;
-}
-
 .active > span > .tab-counter.badge {
   color: var(--bs-primary);
   background-color: white;
@@ -285,4 +278,51 @@ img.schema_image {
   line-height: normal;
   align-content: center;
   text-align: center;
+}
+
+/* Reference Field Autocomplete (autoComplete.js) */
+.autoComplete_list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 350px;
+  overflow-y: auto;
+  z-index: 1055;
+  list-style: none;
+  padding: 0.25rem 0;
+  margin: 2px 0 0;
+  background-color: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 0.25rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.175);
+}
+
+.autoComplete_list[hidden] {
+  display: none !important;
+}
+
+.autoComplete_result {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  cursor: pointer;
+  color: #212529;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.autoComplete_result:last-child {
+  border-bottom: none;
+}
+
+.autoComplete_result:hover,
+.autoComplete_result[aria-selected="true"] {
+  background-color: #e9ecef;
+  color: #1e2125;
+}
+
+.autoComplete_result .autocomplete-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

@@ -1,39 +1,21 @@
-  <script>
+<script>
   /**
    * OpenAtlas autocomplete
-   * Documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
-   * The plugin only supports Bootstrap 3/4; its Bootstrap 4 markup is
-   * compatible with the Bootstrap 5 styles used by OpenAtlas.
-  */
-  $('input[data-reference-system={{ system.id }}]').autoComplete({
-    bootstrapVersion: '4',
-    resolver: 'custom',
-    formatResult: function (item) {
-      const formattedClass = item.system_class.replace(/_/g, ' ');
-      const systemClass = formattedClass.charAt(0).toUpperCase() + formattedClass.slice(1);
-      const desc = item.description ? `<br><small>${item.description}</small>` : '';
+   * API: {{ system.website_url }}/api/search/all
+   */
+  initReferenceAutocomplete('{{ system.id }}', {
+    search: query => $.ajax({
+      url: '{{ system.website_url }}/api/search/all',
+      dataType: 'json',
+      data: {term: query, limit: 40}
+    }).then(data => (data?.results || []).map(item => {
+      const systemClass = (item.system_class || '').replace(/_/g, ' ');
       return {
-        value: item.id,
-        text: `${item.name} - ${systemClass}${desc}`
+        id: String(item.id || '').split('/').pop(),
+        label: item.name,
+        info: systemClass.charAt(0).toUpperCase() + systemClass.slice(1),
+        detail: item.description
       };
-    },
-    events: {
-      search: function (qry, callback) {
-        $.ajax({
-          url: "{{ system.website_url }}/api/search/all",
-          dataType: "json",
-          data: {
-            term: qry,
-            limit: 40
-          },
-          success: function(data) {
-            console.log(data)
-            callback(data.results);
-          }
-        })
-      }
-    }
-  }).on('autocomplete.select', function(evt,item) {
-    $('input[data-reference-system={{ system.id }}]').val(item.id.substring(item.id.lastIndexOf('/') + 1));
+    }))
   });
 </script>

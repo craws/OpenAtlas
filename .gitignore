@@ -43,3 +43,8 @@ env.sh
 .vscode
 /.env
 /.venv/
+/.junie/
+/.schemathesis/
+/.hypothesis/
+/tests/.schemathesis/
+/tests/.hypothesis/

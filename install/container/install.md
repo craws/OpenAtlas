@@ -67,6 +67,104 @@ Before you begin, ensure you have the following installed and configured:
     podman compose logs -f discovery  # OpenAtlas Discovery frontend logs
     ```
 
+## Gunicorn Variant (PoC)
+
+An additional experimental stack is available for testing OpenAtlas with Gunicorn instead of Apache. It uses the same PostgreSQL, database initialization, and OpenAtlas Discovery services as the default setup, and publishes the application directly on port 8081.
+
+### Development dependencies
+
+To install development dependencies (e.g. `pytest`) at runtime in the Gunicorn container, set the `UV_DEV` environment variable to `true` in your `.env` file:
+
+```bash
+echo "UV_DEV=true" >> .env
+```
+
+Or pass it directly when starting the containers:
+
+```bash
+UV_DEV=true podman compose -f compose-gunicorn.yaml up --detach
+```
+
+Start this variant from the project root after setting the database environment variables as described above:
+
+```bash
+podman compose -f compose-gunicorn.yaml up --detach
+```
+
+### Optional IIIF service (Gunicorn stack, Cantaloupe)
+
+The Gunicorn stack can run IIIF in a dedicated Cantaloupe container
+(`iiif`). This keeps OpenAtlas and IIIF separate without changing OpenAtlas
+core code.
+
+- OpenAtlas writes converted files to a shared path under `/var/www/iipsrv/`
+- Cantaloupe serves IIIF at `http://localhost:8180/iiif/2/` (identifier only)
+
+For tests/CI, keep using `tests` as folder name:
+
+```python
+IIIF = {
+    'enabled': True,
+    'path': '/var/www/iipsrv/tests/',
+    'url': 'http://iiif/iiif/2/',
+    'version': 2,
+    'conversion': True,
+    'compression': 'jpeg'}
+```
+
+For host/browser access to generated images, use:
+
+```text
+http://localhost:8180/iiif/2/<your-image>.tiff/full/full/0/default.jpg
+```
+
+For production, use a neutral folder name (for example `images`) and a public
+HTTPS URL:
+
+```python
+IIIF = {
+    'enabled': True,
+    'path': '/var/www/iipsrv/images/',
+    'url': 'https://iiif.your-domain.tld/iiif/2/',
+    'version': 2,
+    'conversion': True,
+    'compression': 'jpeg'}
+```
+
+OpenAtlas is then available at [http://localhost:8081](http://localhost:8081). To follow the application logs, run:
+
+```bash
+podman compose -f compose-gunicorn.yaml logs -f openatlas-gunicorn
+```
+
+To rebuild this variant after changing its image or application code, use:
+
+```bash
+podman compose -f compose-gunicorn.yaml build
+podman compose -f compose-gunicorn.yaml up -d --force-recreate
+```
+
+Stop the Gunicorn variant with:
+
+```bash
+podman compose -f compose-gunicorn.yaml down
+```
+
+## API Access from Discovery (CORS)
+
+Applies to both stacks. Discovery runs on `http://localhost:3000` and calls the
+OpenAtlas API directly from the browser — on `http://localhost:8080` in the
+default stack, `http://localhost:8081` in the Gunicorn variant. Because these
+are different origins, the API must send a CORS header. Without it, map and
+network views fail with a network error in the browser console.
+
+Both compose files therefore set `CORS_ALLOWANCE=http://localhost:3000` by
+default. To allow a different origin, override it in your `.env` file:
+
+```bash
+echo "CORS_ALLOWANCE=*" >> .env
+```
+
 ## Accessing the Applications
 
 Once the containers are up and running (check `podman compose ps` shows services as "running" or "healthy", you can access the applications in your web browser:

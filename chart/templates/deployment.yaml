@@ -50,7 +50,7 @@ spec:
               scheme: HTTP
             periodSeconds: 10
             successThreshold: 1
-            timeoutSeconds: 1
+            timeoutSeconds: 5
           name: openatlas
           ports:
             - containerPort: 8080
@@ -64,17 +64,17 @@ spec:
               scheme: HTTP
             periodSeconds: 10
             successThreshold: 1
-            timeoutSeconds: 1
+            timeoutSeconds: 5
           resources: {}
           startupProbe:
-            failureThreshold: 3
+            failureThreshold: 30
             httpGet:
               path: /
               port: 8080
               scheme: HTTP
             periodSeconds: 10
             successThreshold: 1
-            timeoutSeconds: 1
+            timeoutSeconds: 5
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
           volumeMounts:
@@ -108,18 +108,13 @@ spec:
               name: processed-images
             - mountPath: /var/www/openatlas/files/uploads
               name: uploads
-        - args:
-            - >-
-              if [ "$( psql
-              postgres://openatlas:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB
-              -tAc "SELECT 1 FROM web.settings WHERE id = 1" )" == '1' ]; then
-              echo 'Database has already data';  else cd
-              /var/www/openatlas/install && cat [0-9]_*.sql | psql
-              postgres://openatlas:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB
-              -f -; fi
+        - name: initdb
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: IfNotPresent
           command:
-            - /bin/bash
-            - '-c'
+            - /entrypoint.sh
+          args:
+            - initdb
           env:
             - name: POSTGRES_HOST
               value: {{ .Values.postgis.host | default ( print ( include "fullname" . ) "-postgres" ) | quote }}
@@ -135,9 +130,6 @@ spec:
             - secretRef:
                 name: {{ .Release.Name }}
                 optional: true
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: IfNotPresent
-          name: initdb
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File

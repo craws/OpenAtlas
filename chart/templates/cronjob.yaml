@@ -38,8 +38,10 @@ items:
               app: {{ template "appname" $ }}
               release: {{ $.Release.Name }}
           spec:
+            {{- if $.Values.image.secrets }}
             imagePullSecrets:
               {{ toYaml $.Values.image.secrets | nindent 14 }}
+            {{- end }}
             restartPolicy: {{ default "OnFailure" $jobConfig.restartPolicy }}
             {{- with $nodeSelectorConfig := default $.Values.nodeSelector $jobConfig.nodeSelector -}}
             {{- if $nodeSelectorConfig  }}

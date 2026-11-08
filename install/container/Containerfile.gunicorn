@@ -1,0 +1,55 @@
+FROM ghcr.io/astral-sh/uv:latest AS uv
+
+FROM python:3.13-slim
+
+COPY --from=uv /uv /uvx /bin/
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        libpq-dev \
+        libmagickwand-dev \
+        libmagic1 \
+        libvips-tools \
+        gdal-bin \
+        libgdal-dev \
+        gettext \
+        p7zip-full \
+        npm \
+        git \
+        postgresql-client-17 \
+        dos2unix \
+        curl \
+        locales-all && \
+    rm -rf /var/lib/apt/lists/* && \
+    mkdir -p /var/www/openatlas /var/www/.cache /var/www/.local /var/www/.npm && \
+    mkdir -p /var/www/iipsrv/tests && \
+    mkdir -p /var/www/openatlas/files/uploads && \
+    mkdir -p /var/www/openatlas/files/processed_images/resized && \
+    mkdir -p /var/www/openatlas/files/export/arche /var/www/openatlas/files/export/rdf /var/www/openatlas/files/export/sql && \
+    chown -R www-data:www-data /var/www/.cache /var/www/.local /var/www/.npm /var/www/openatlas /var/www/iipsrv
+
+WORKDIR /var/www/openatlas
+
+COPY pyproject.toml ./
+RUN uv pip install --system -r pyproject.toml gunicorn
+
+COPY --chown=www-data:www-data / /var/www/openatlas/
+RUN cp install/container/entrypoint.gunicorn.sh /entrypoint.sh && \
+    chmod a+x /entrypoint.sh && \
+    dos2unix /entrypoint.sh && \
+    cd openatlas/static && npm install
+
+
+RUN mkdir -p /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/dist-packages && \
+    chown -R www-data:www-data /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/dist-packages /usr/local/bin
+
+USER www-data
+
+ENV LC_ALL=en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US.UTF-8
+ENV PATH="/usr/local/bin:$PATH"
+ENV HOME=/tmp
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "4", "openatlas:app"]

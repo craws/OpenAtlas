@@ -53,9 +53,12 @@ fi
 
 source /etc/apache2/envvars
 
-cookie_key=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c 32;echo;)
+cookie_key=$(python3 -c 'import secrets, string; print("".join(secrets.choice(string.ascii_letters + string.digits + "_") for _ in range(32)))')
 export COOKIE_KEY=${COOKIE_KEY:-$cookie_key}
 export MAIL_PASSWORD=${MAIL_PASSWORD:-CHANGE ME}
+# Origins allowed to call /api/* from a browser. Empty blocks all cross-origin
+# requests, which breaks presentation sites like Discovery on another port.
+export CORS_ALLOWANCE=${CORS_ALLOWANCE:-}
 
 cat <<EOF > /var/www/openatlas/instance/production.py
 DATABASE_NAME='$POSTGRES_DB'
@@ -65,6 +68,7 @@ DATABASE_PORT=5432
 DATABASE_PASS='$POSTGRES_PASSWORD'
 MAIL_PASSWORD='$MAIL_PASSWORD'
 SECRET_KEY='$COOKIE_KEY'  # Used for cookies
+CORS_ALLOWANCE='$CORS_ALLOWANCE'
 EOF
 
 

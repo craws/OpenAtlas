@@ -6,7 +6,7 @@ from rdflib import Namespace
 
 from config.database_versions import DATABASE_VERSIONS
 
-VERSION = '9.5.0'
+VERSION = '9.6.0'
 DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 DEBUG = False
@@ -54,8 +54,8 @@ UPLOAD_PATH = Path(FILES_PATH) / 'uploads'
 TMP_PATH = Path('/tmp')  # For processing files e.g. at import and export
 
 # Image processing
-DISPLAY_FILE_EXT = ['.bmp', '.gif', '.ico', '.jpeg', '.jpg', '.png', '.svg']
-PROCESSABLE_EXT = ['.tiff', '.tif']
+DISPLAY_FILE_EXT = ('.bmp', '.gif', '.ico', '.jpeg', '.jpg', '.png', '.svg')
+PROCESSABLE_EXT = ('.tiff', '.tif')
 PROCESSED_EXT = '.jpeg'
 PROCESSED_IMAGE_PATH = Path(FILES_PATH) / 'processed_images'
 RESIZED_IMAGES = Path(PROCESSED_IMAGE_PATH) / 'resized'

@@ -70,7 +70,7 @@ Create the name of the service account to use
 Get a hostname from URL
 */}}
 {{- define "hostname" -}}
-{{- . | trimPrefix "http://" |  trimPrefix "https://" | trimSuffix "/" | trim | quote -}}
+{{- . | trimPrefix "http://" |  trimPrefix "https://" | trimSuffix "/" | replace "/" "-" | trim | quote -}}
 {{- end -}}
 
 {{- define "sharedlabels" -}}

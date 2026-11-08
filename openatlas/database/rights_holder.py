@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import Any
 
 from flask import g
@@ -57,16 +58,20 @@ def update_rights_holder(id_: int, entry: dict[str, Any]) -> None:
         {'id': id_, **entry})
 
 
-def get_rights_holder_links() -> dict[int, dict[str, list[int]]]:
+def get_rights_holder_links(
+        entity_ids: list[int] | None = None) -> \
+        dict[int, dict[str, list[int]]]:
     g.cursor.execute(
-        """
+        f"""
         SELECT
             entity_id,
             description,
             array_agg(rights_holder_id) as ids
         FROM model.rights_holder_file
+        {'WHERE entity_id = ANY(%(ids)s)' if entity_ids is not None else ''}
         GROUP BY entity_id, description
-        """)
+        """,
+        {'ids': list(entity_ids or [])})
     result: dict[int, dict[str, list[int]]] = {}
     for row in g.cursor:
         eid = row['entity_id']
@@ -133,15 +138,14 @@ def get_entity_ids_by_rights_holder(rights_holder_id: int) -> list[int]:
     return [row['entity_id'] for row in g.cursor]
 
 
-def get_rights_holder_file_count() -> dict[int, int]:
-    g.cursor.execute("""
-        SELECT 
-            rights_holder_id, 
-            COUNT(DISTINCT entity_id) AS count
-        FROM 
-            model.rights_holder_file
-        GROUP BY 
-            rights_holder_id;
-    """)
-    return {
-        row['rights_holder_id']: row['count'] for row in g.cursor.fetchall()}
+def get_rights_holder_file_count() -> dict[int, Any]:
+    g.cursor.execute(
+        """
+        SELECT rights_holder_id, description, COUNT(*)
+        FROM model.rights_holder_file
+        GROUP BY description, rights_holder_id;
+        """)
+    result: dict[int, Any] = defaultdict(dict)
+    for row in g.cursor:
+        result[row['rights_holder_id']][row['description']] = row['count']
+    return result

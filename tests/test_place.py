@@ -103,18 +103,18 @@ class PlaceTest(TestBaseCase):
         assert b'Val-hall' in rv.data
 
         data['gis_polygons'] = """[{
-            "type": "Feature", 
+            "type": "Feature",
             "geometry": {
-                "type": "Polygon", 
+                "type": "Polygon",
                 "coordinates": [[
-                    [298.9893436362036, -5.888919049309554], 
+                    [298.9893436362036, -5.888919049309554],
                     [299.00444983737543, -5.9138487869408545],
-                    [299.00650977389887, -5.893358673645309], 
+                    [299.00650977389887, -5.893358673645309],
                     [298.9848804404028, -5.9070188333813585],
                     [298.9893436362036, -5.888919049309554]]]},
             "properties": {
-            "name": "", 
-            "description": "", 
+            "name": "",
+            "description": "",
             "shapeType": "shape"}}]"""
         rv = c.post(
             url_for('update', id_=place.id),

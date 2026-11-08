@@ -29,7 +29,8 @@ that we are using to set up Debian servers for OpenAtlas installations.
     sudo apt install python3-validators python3-email-validator python3-wand python3-svgwrite
     sudo apt install python3-xmltodict python3-markdown exiftran python3-bcrypt python3-dateutil p7zip-full
     sudo apt install python3-requests python3-bs4 python3-unidecode python3-lxml python3-unidecode python3-numpy
-    sudo apt install python3-fiona python3-magic python3-flask-bcrypt python3-levenshtein
+    sudo apt install python3-fiona python3-magic python3-flask-bcrypt python3-levenshtein 
+    sudo apt install python3-flask-openapi3 python3-pydantic
 
 ### Apache 2.4, gettext, npm
     sudo apt install apache2 libapache2-mod-wsgi-py3 gettext npm
@@ -153,7 +154,7 @@ application.
 
 It is possible to install one OpenAtlas application used by multiple instances.
 
-Basically you can install the application at e.g. /usr/local/openatlas and than
+Basically you can install the application at e.g. /usr/local/openatlas and
 copy the files from **/install/multi_instance** to a directory of your choice.
 
 The file folders of each installation than have to be made accessible for
@@ -164,7 +165,7 @@ The file folders of each installation than have to be made accessible for
 In case you want a different application location you can change the
 **OPENATLAS_INSTALLATION** value in the **application_path.py** file.
 
-The webserver configuration should than point to the **openatlas.wsgi**
+The webserver configuration should point to the **openatlas.wsgi**
 instance file and other paths should be adapted to the application installation
 directory.
 
@@ -182,13 +183,33 @@ Copy instance/example_testing.py to instance/testing.py and adapt as needed:
 
     cp instance/example_testing.py instance/testing.py
 
-Create a own folder to test IIIF images, e.g.:
+Create a folder to test IIIF images, e.g.:
 
     mkdir /var/www/iipsrv/tests
 
 Run tests with coverage
 
     pytest
+
+## API Schemathesis Tests
+To test the API with schemathesis you can use the following commands:
+
+    uv sync --extra dev
+    uv run schemathesis run http://localhost:5000/api/1/docs/openapi.json \
+         --url http://localhost:5000 \
+         --phases examples,coverage,fuzzing
+
+If you don't want to install uvicorn package you can use the following command:
+
+    uvx schemathesis run http://localhost:5000/api/1/docs/openapi.json \ 
+        --url http://localhost:5000 \
+        --phases examples,coverage,fuzzing
+
+For deep testing you can use the following command:
+
+    uv run schemathesis run http://localhost:5000/api/1/docs/openapi.json \
+       --checks all \
+       --phases examples,coverage,fuzzing
 
 # Installing OpenAtlas with Podman (Experimental)
 
