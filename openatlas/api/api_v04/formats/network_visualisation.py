@@ -11,36 +11,6 @@ from openatlas.api.api_v04.resources.database_mapper import (
 from openatlas.models.entity import Link
 
 
-def overwrite_object_locations_with_place(
-        links: list[dict[str, Any]],
-        exclude_: set[str]) -> list[dict[str, Any]]:
-    locations = {}
-    for l in links:
-        if l['property_code'] == 'P53':
-            locations[l['range_id']] = {
-                'range_id': l['domain_id'],
-                'range_name': l['domain_name'],
-                'range_system_class': l['domain_system_class']}
-
-    copy = links.copy()
-    for i, l in enumerate(copy):
-        if l['range_id'] in locations:
-            links[i].update(
-                range_id=locations[l['range_id']]['range_id'],
-                range_name=locations[l['range_id']]['range_name'],
-                range_system_class=locations[
-                    l['range_id']]['range_system_class'])
-        if (l['domain_id'] in locations
-                and "administrative_unit" not in exclude_):
-            links[i].update(
-                domain_id=locations[l['domain_id']]['range_id'],
-                domain_name=locations[
-                    l['domain_id']]['range_name'],
-                domain_ystem_class=locations[
-                    l['domain_id']]['range_system_class'])
-    return links
-
-
 def get_link_dictionary(links: list[dict[str, Any]]) -> dict[int, Any]:
     ids = {l_['domain_id'] for l_ in links} | {l_['range_id'] for l_ in links}
     types = {}
@@ -67,27 +37,12 @@ def get_link_dictionary(links: list[dict[str, Any]]) -> dict[int, Any]:
     return output
 
 
-def get_excluded_classes(parser: Parser) -> set[str]:
-    location_classes = {
-        "administrative_unit",
-        "artifact",
-        "feature",
-        "human_remains",
-        "place",
-        "stratigraphic_unit"}
-    exclude = set(parser.exclude_system_classes or [])
-    if all(item in location_classes for item in exclude):
-        exclude.add('object_location')
-    return exclude
-
-
 def get_network_visualisation(parser: Parser) -> dict[str, Any]:
-    exclude_classes = get_excluded_classes(parser)
+    exclude_classes = set(parser.exclude_system_classes or [])
     included_classes = [
         cls for cls in g.classes if cls not in exclude_classes]
 
     links = get_all_links_for_network(included_classes)
-    links = overwrite_object_locations_with_place(links, exclude_classes)
 
     entity_ids = set()
     filtered_links = []
@@ -147,10 +102,6 @@ def get_ego_network_visualisation(id_: int, parser: Parser) -> dict[str, Any]:
             all_links.append(link)
 
     exclude_classes = set(parser.exclude_system_classes or [])
-    all_links = overwrite_object_locations_with_place(
-        all_links,
-        exclude_classes)
-
     filtered_links = []
     for link in all_links:
         link_classes = {

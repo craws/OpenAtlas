@@ -61,7 +61,6 @@ class Network:
         classes = [
             c.name for c in g.classes.values()
             if c.display.get('network_color')]
-        classes.append('object_location')
         entities: set[int] = set()
         nodes = []
         node_name = 'label' if dimensions else 'name'

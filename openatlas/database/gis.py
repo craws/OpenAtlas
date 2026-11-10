@@ -156,8 +156,7 @@ def get_all(extra_ids: list[int]) -> list[dict[str, Any]]:
     g.cursor.execute(
         """
         SELECT
-            object.id AS object_id,
-            g.entity_id AS location_id,
+            g.entity_id,
             g.id,
             g.name,
             g.description,
@@ -168,20 +167,15 @@ def get_all(extra_ids: list[int]) -> list[dict[str, Any]]:
             CASE WHEN geom_polygon IS NULL THEN NULL ELSE
                 public.ST_AsGeoJSON(public.ST_PointOnSurface(geom_polygon))
                 END AS polygon_point,
-            object.name AS object_name,
-            object.description AS object_desc,
+            e.id AS entity_id,
+            e.name AS entity_name,
+            e.description AS entity_description,
             string_agg(CAST(t.range_id AS text), ',') AS types
-        FROM model.entity place
-        JOIN model.link l ON place.id = l.range_id
-        JOIN model.entity object ON l.domain_id = object.id
-        JOIN model.gis g ON place.id = g.entity_id
-        LEFT JOIN model.link t ON object.id = t.domain_id
-            AND t.property_code = 'P2'
-        WHERE place.openatlas_class_name = 'object_location'
-            AND l.property_code = 'P53'
-            AND (object.openatlas_class_name = 'place'
-                OR object.id IN %(extra_ids)s)
-        GROUP BY object.id, g.id;
+        FROM model.gis g
+        JOIN model.entity e ON g.entity_id = e.id
+        LEFT JOIN model.link t ON e.id = t.domain_id AND t.property_code = 'P2'
+        WHERE e.openatlas_class_name = 'place' OR e.id IN %(extra_ids)s
+        GROUP BY e.id, g.id;
         """,
         {'extra_ids': tuple(extra_ids)})
     return list(g.cursor)

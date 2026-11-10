@@ -205,9 +205,7 @@ def process_types(entity: Entity, form: Any) -> None:
     for type_ in [g.types[id_] for id_ in entity.class_.hierarchies]:
         if data := convert(getattr(form, str(type_.id)).data):
             if type_.class_.name == 'administrative_unit':
-                location = entity.location \
-                           or entity.get_linked_entity_safe('P53')
-                location.link('P89', [g.types[id_] for id_ in data])
+                entity.link('P89', [g.types[id_] for id_ in data])
             else:
                 entity.link('P2', [g.types[id_] for id_ in data])
 
@@ -229,13 +227,10 @@ def process_relations(
             elif origin:
                 ids.append(origin.root[0] if origin.root else origin.id)
         if ids:
-            entities = Entity.get_by_ids(ids)
-            if 'object_location' in relation.classes:
-                locations = []
-                for place in entities:
-                    locations.append(place.get_linked_entity_safe('P53'))
-                entities = locations
-            entity.link(relation.property, entities, inverse=relation.inverse)
+            entity.link(
+                relation.property,
+                entity.get_by_ids(ids),
+                inverse=relation.inverse)
     if origin and relation_name:
         origin_relation = origin.class_.relations[relation_name]
         if not origin_relation.additional_fields and (

@@ -33,10 +33,9 @@ def get_centroids_by_entities(
 
 
 def get_gis_all(
-        objects: Optional[list[Entity]] = None,
+        entities: Optional[list[Entity]] = None,
         structure: Optional[dict[str, Any]] = None) -> dict[str, Any]:
-    if not objects:
-        objects = []
+    entities = [] if not entities else entities
     all_: dict[str, list[Any]] = {'point': [], 'linestring': [], 'polygon': []}
     extra: dict[str, list[Any]] = {'supers': [], 'subs': [], 'siblings': []}
     selected: dict[str, list[Any]] = {
@@ -53,16 +52,16 @@ def get_gis_all(
         subunit_ids = [e.id for e in structure['subunits']]
         sibling_ids = [e.id for e in structure['siblings']]
         super_id = [structure['supers'][-1].id] if structure['supers'] else []
-        extra_ids = [objects[0].id if objects else 0] \
+        extra_ids = [entities[0].id if entities else 0] \
             + super_id \
             + subunit_ids \
             + sibling_ids
-    object_ids = [x.id for x in objects] if objects else []
+    entity_ids = [x.id for x in entities]
     for row in db.get_all(extra_ids):
         description = row['description'].replace('"', '\"') \
             if row['description'] else ''
-        object_desc = row['object_desc'].replace('"', '\"') \
-            if row['object_desc'] else ''
+        entity_description = row['entity_description'].replace('"', '\"') \
+            if row['entity_description'] else ''
         if row['point']:
             shape = 'point'
             geojson = row['point']
@@ -72,14 +71,13 @@ def get_gis_all(
         else:
             shape = 'polygon'
             geojson = row['polygon']
-        item = {
+        item: dict[str, Any] = {
             'type': 'Feature',
             'geometry': json.loads(geojson),
             'properties': {
-                'objectId': row['object_id'],
-                'objectName': row['object_name'].replace('"', '\"'),
-                'objectDescription': object_desc,
-                'locationId': row['location_id'],
+                'objectId': row['entity_id'],
+                'objectName': row['entity_name'].replace('"', '\"'),
+                'objectDescription': entity_description,
                 'id': row['id'],
                 'name': row['name'].replace('"', '\"') if row['name'] else '',
                 'description': description,
@@ -102,29 +100,29 @@ def get_gis_all(
                     break
         if structure \
                 and structure['supers'] \
-                and row['object_id'] == structure['supers'][-1].id:
+                and row['entity_id'] == structure['supers'][-1].id:
             extra['supers'].append(item)
-        if row['object_id'] in object_ids:
+        if row['entity_id'] in entity_ids:
             selected[shape].append(item)
-        elif row['object_id'] in subunit_ids:
+        elif row['entity_id'] in subunit_ids:
             extra['subs'].append(item)  # pragma: no cover
-        elif row['object_id'] in sibling_ids:
+        elif row['entity_id'] in sibling_ids:
             extra['siblings'].append(item)  # pragma: no cover
         else:
             all_[shape].append(item)
         if row['polygon_point']:
             polygon_point = dict(item)  # Make a copy
             polygon_point['geometry'] = json.loads(row['polygon_point'])
-            if row['object_id'] in object_ids:
+            if row['entity_id'] in entity_ids:
                 selected['polygon_point'].append(polygon_point)
-            elif row['object_id'] \
+            elif row['entity_id'] \
                     and structure \
                     and structure['supers'] \
-                    and row['object_id'] == structure['supers'][-1].id:
+                    and row['entity_id'] == structure['supers'][-1].id:
                 extra['supers'].append(polygon_point)
-            elif row['object_id'] in subunit_ids:
+            elif row['entity_id'] in subunit_ids:
                 extra['subs'].append(polygon_point)  # pragma: no cover
-            elif row['object_id'] in sibling_ids:
+            elif row['entity_id'] in sibling_ids:
                 extra['siblings'].append(polygon_point)  # pragma: no cover
             else:
                 all_['point'].append(polygon_point)

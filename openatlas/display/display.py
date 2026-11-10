@@ -114,26 +114,14 @@ class Display:
         for name, relation in self.entity.class_.relations.items():
             if not relation.mode == 'tab':
                 continue
-            entity_for_links = self.entity
-            if self.entity.class_.name == 'place' \
-                    and self.entity.location \
-                    and relation.reverse_relation \
-                    and relation.reverse_relation.classes \
-                    == ['object_location']:
-                entity_for_links = self.entity.location
             items = []
-            for item in entity_for_links.get_links(
+            for item in self.entity.get_links(
                     relation.property,
                     relation.classes,
                     relation.inverse):
-                if item.domain.class_.name == 'object_location':
-                    item.domain = item.domain.get_linked_entity_safe(
-                        'P53',
-                        inverse=True,
-                        types=True)
                 items.append(item)
             if relation.name == 'relative':
-                for item in entity_for_links.get_links(
+                for item in self.entity.get_links(
                         relation.property,
                         relation.classes,
                         not relation.inverse):
@@ -271,10 +259,9 @@ class Display:
                 ['P11', 'P14', 'P22', 'P23', 'P25'],
                 class_groups['event']['classes'],
                 inverse=True):
-            for location in event.get_linked_entities(
+            for place in event.get_linked_entities(
                     ['P7', 'P26', 'P27'],
-                    ['object_location']):
-                place = location.get_linked_entity_safe('P53', inverse=True)
+                    ['place']):
                 self.linked_places[place.id] = place
         self.tabs['place'] = Tab(
             'place',
@@ -282,8 +269,7 @@ class Display:
 
     def add_place_person_tab(self) -> None:
         persons = {}
-        location = self.entity.get_linked_entity_safe('P53')
-        for event in location.get_linked_entities(
+        for event in self.entity.get_linked_entities(
                 ['P7', 'P26', 'P27'],
                 class_groups['event']['classes'],
                 inverse=True):
@@ -455,8 +441,7 @@ class Display:
                         relation.property,
                         relation.classes,
                         relation.inverse):
-                    if e.class_.name == 'object_location':
-                        e = e.get_linked_entity_safe('P53', True)
+                    if e.class_.name == 'place':
                         self.linked_places[e.id] = e
                     if name == 'place_from':
                         self.data['begin'] = \

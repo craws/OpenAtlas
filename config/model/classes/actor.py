@@ -17,19 +17,19 @@ group: dict[str, Any] = {
     'relations': {
         'residence': {
             'label': _('residence'),
-            'classes': ['object_location'],
+            'classes': ['place'],
             'property': 'P74',
             'mode': 'direct',
             'add_dynamic': True},
         'begins_in': {
             'label': _('begins in'),
-            'classes': ['object_location'],
+            'classes': ['place'],
             'property': 'OA8',
             'mode': 'direct',
             'add_dynamic': True},
         'ends_in': {
             'label': _('ends in'),
-            'classes': ['object_location'],
+            'classes': ['place'],
             'property': 'OA9',
             'mode': 'direct',
             'add_dynamic': True},

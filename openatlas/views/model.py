@@ -45,9 +45,7 @@ def model_index() -> str:
                 or (row['property_code'] == 'P2'
                     and row['range'] in ['type', 'type_tools']) \
                 or (row['property_code'] == 'P67'
-                    and row['domain'] == 'reference_system') \
-                or (row['property_code'] == 'P53'
-                    and row['range'] == 'object_location'):
+                    and row['domain'] == 'reference_system'):
             continue
         if row['domain'] not in relations \
                 or row['range'] not in relations[row['domain']] \
@@ -276,8 +274,6 @@ def network(dimensions: Optional[int] = 0, id_: Optional[int] = None) -> str:
     classes = []
     for class_ in g.classes.values():
         color = class_.display.get('network_color')
-        if class_.name == 'object_location':
-            color = g.classes['place'].display.get('network_color')
         if color:
             classes.append(class_)
             setattr(
@@ -286,9 +282,7 @@ def network(dimensions: Optional[int] = 0, id_: Optional[int] = None) -> str:
                 StringField(default=color, render_kw=render_kw))
     setattr(NetworkForm, 'save', SubmitField(_('apply')))
     form = NetworkForm()
-    form.classes.choices = [
-        (class_.name, class_.label)
-        for class_ in [x for x in classes if x.name != 'object_location']]
+    form.classes.choices = [(c.name, c.label) for c in classes]
     colors = {}
     for class_ in classes:
         color_code = class_.display.get('network_color')

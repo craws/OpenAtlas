@@ -164,8 +164,7 @@ def move_form(type_: Entity) -> Any:
                 'P89',
                 inverse=True,
                 sort=True):
-            if place := entity.get_linked_entity('P53', inverse=True):
-                choices.append((entity.id, place.name))
+            choices.append((entity.id, entity.name))
     elif root.name in app.config['PROPERTY_TYPES']:
         for row in Link.get_links_by_type(type_):
             choices.append((

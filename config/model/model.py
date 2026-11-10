@@ -1,7 +1,5 @@
 from typing import Any
 
-from flask_babel import lazy_gettext as _
-
 from config.model.classes import (
     actor, event, file, item, place, reference, reference_system, source,
     type_)
@@ -22,7 +20,6 @@ model: dict[str, Any] = {
     'human_remains': item.human_remains,
     'modification': event.modification,
     'move': event.move,
-    'object_location': {'label': _('object location'), 'attributes': {}},
     'person': actor.person,
     'place': place.place,
     'production': event.production,

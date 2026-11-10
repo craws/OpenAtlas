@@ -67,7 +67,7 @@ class_ = {
             'mode': 'display'},
         'location': {
             'label': _('location'),
-            'classes': ['object_location'],
+            'classes': ['place'],
             'property': 'P7',
             'mode': 'direct',
             'add_dynamic': True}},
@@ -146,13 +146,13 @@ move['display']['tooltip'] = _('movement of items or persons')
 move['relations'] = move['relations'] | {
     'place_from': {
         'label': _('place from'),
-        'classes': ['object_location'],
+        'classes': ['place'],
         'property': 'P27',
         'mode': 'direct',
         'add_dynamic': True},
     'place_to': {
         'label': _('place to'),
-        'classes': ['object_location'],
+        'classes': ['place'],
         'property': 'P26',
         'mode': 'direct',
         'add_dynamic': True},

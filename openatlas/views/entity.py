@@ -135,8 +135,6 @@ def update(id_: int, copy: Optional[str] = None) -> str | Response:
     gis_data = None
     entity.image_id = entity.get_profile_image_id()
     if entity.class_.attributes.get('location'):
-        entity.location = entity.location \
-            or entity.get_linked_entity_safe('P53')
         gis_data = get_gis_all([entity], entity.get_structure())
     return render_template(
         'entity/update.html',

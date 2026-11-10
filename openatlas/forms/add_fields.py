@@ -252,8 +252,6 @@ def add_relations(
                     origin,
                     origin_relation):
                 selection = origin
-            if selection and selection.class_.name == 'object_location':
-                selection = selection.get_linked_entity_safe('P53', True)
             add_dynamic = []
             if relation.add_dynamic:
                 add_dynamic = [

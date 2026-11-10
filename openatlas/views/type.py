@@ -68,8 +68,6 @@ def type_delete_recursive(id_: int) -> str | Response:
         entities = []
         for item in get_entities_linked_to_type_recursive(type_.id, []):
             if item.class_.name != 'administrative_unit':
-                item = item.get_linked_entity_safe('P53', inverse=True) \
-                    if item.class_.name == 'object_location' else item
                 entities.append(item)
         tabs['entities'].table = entity_table(entities)
 
@@ -143,11 +141,7 @@ def type_unset_selectable(id_: int) -> Response:
 @app.route('/type/multiple_linked/<int:id_>')
 @required_group('editor')
 def show_multiple_linked_entities(id_: int) -> str:
-    type_ = g.types[id_]
-    multiple_linked_entities = [
-        e.get_linked_entity_safe('P53', inverse=True)
-        if e.class_.name == 'object_location' else e
-        for e in type_.get_multiple_typed_entities()]
+    multiple_linked_entities = [g.types[id_].get_multiple_typed_entities()]
     table = entity_table(
         multiple_linked_entities,
         columns=['name', 'class', 'begin', 'end', 'description'])
@@ -160,8 +154,8 @@ def show_multiple_linked_entities(id_: int) -> str:
     return render_template(
         'tabs.html',
         tabs=tabs,
-        entity=type_,
+        entity=g.types[id_],
         crumbs=[
-            link(type_, index=True),
-            link(type_),
+            link(g.types[id_], index=True),
+            link(g.types[id_]),
             _('multiple linked entities')])

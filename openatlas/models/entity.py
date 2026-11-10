@@ -305,19 +305,10 @@ class Entity:
                     insert({'name': alias, 'openatlas_class_name': 'alias'}))
 
     def update_gis(self, gis_data: dict[str, Any], new: bool = False) -> None:
-        if new:
-            location = insert({
-                'name': f'Location of {self.name}',
-                'openatlas_class_name': 'object_location'})
-            self.link('P53', location)
-        else:
-            location = self.get_linked_entity_safe('P53')
-            db.update({
-                'id': location.id,
-                'name': f'Location of {sanitize(self.name)}'})
-            delete_gis_by_entity(location)
+        if not new:
+            delete_gis_by_entity(self)
         if gis_data:
-            insert_gis(location, gis_data)
+            insert_gis(self, gis_data)
 
     def get_profile_image_id(self) -> Optional[int]:
         if self.class_.name == 'file':
@@ -418,10 +409,7 @@ class Entity:
         if self.classes:
             for entity in Entity.get_by_class(self.classes, types=True):
                 linked = False
-                to_check = entity
-                if self.class_.name == 'administrative_unit':
-                    to_check = entity.get_linked_entity_safe('P53', types=True)
-                for type_ in to_check.types:
+                for type_ in entity.types:
                     if type_.root[0] == self.id:
                         linked = True
                         break
@@ -532,12 +520,7 @@ class Entity:
             if 'activity' in request.path:  # Re-raise if in user activity view
                 raise AttributeError
             abort(418)
-        entity = Entity(data)
-        if entity.class_.name == 'place' and with_location:
-            entity.location = entity.get_linked_entity_safe('P53', types=True)
-            if types:
-                entity.types.update(entity.location.types)
-        return entity
+        return Entity(data)
 
     @staticmethod
     def get_by_uuid(
@@ -545,16 +528,10 @@ class Entity:
             types: bool = False,
             aliases: bool = False,
             with_location: bool = True) -> Entity | None:
-        data = db.get_by_uuid(uuid, types, aliases)
-        if not data:
-            return None
+        if data := db.get_by_uuid(uuid, types, aliases):
+            return Entity(data)
+        return None
 
-        entity = Entity(data)
-        if entity.class_.name == 'place' and with_location:
-            entity.location = entity.get_linked_entity_safe('P53', types=True)
-            if types:
-                entity.types.update(entity.location.types)
-        return entity
 
     @staticmethod
     def get_by_ids(

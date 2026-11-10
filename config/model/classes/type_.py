@@ -67,7 +67,7 @@ administrative_unit = {
                 'columns': ['name', 'count', 'description']}},
         'entities': {
             'label': _('entities'),
-            'classes': ['object_location'],
+            'classes': ['place'],
             'property': 'P89',
             'inverse': True,
             'multiple': True,

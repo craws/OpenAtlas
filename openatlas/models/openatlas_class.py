@@ -104,15 +104,9 @@ def get_reverse_relation(
         relation: Relation,
         related_class_name: str) -> Relation | None:
     if relation.classes:
-        related_class = \
-            g.classes[related_class_name.replace('object_location', 'place')]
+        related_class = g.classes[related_class_name]
         for relation2 in related_class.relations.values():
             if class_.name in relation2.classes \
-                    and relation.property == relation2.property \
-                    and relation.inverse != relation2.inverse:
-                return relation2
-            if class_.name == 'place' and 'object_location' \
-                    in relation2.classes \
                     and relation.property == relation2.property \
                     and relation.inverse != relation2.inverse:
                 return relation2
