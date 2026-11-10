@@ -354,7 +354,6 @@ INSERT INTO model.openatlas_class (name, cidoc_class_code, new_types_allowed, wr
   ('human_remains',        'E20', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Human remains' AND openatlas_class_name = 'type' ORDER BY id ASC LIMIT 1)),
   ('modification',         'E11', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Event' AND openatlas_class_name = 'type' ORDER BY id ASC LIMIT 1)),
   ('move',                  'E9', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Event' AND openatlas_class_name = 'type' ORDER BY id ASC LIMIT 1)),
-  ('object_location',      'E53', false, 'contributor', NULL),
   ('person',               'E21', true,  'contributor', NULL),
   ('place',                'E18', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Place' AND openatlas_class_name = 'type' ORDER BY id ASC LIMIT 1)),
   ('production',           'E12', true,  'contributor', (SELECT id FROM model.entity WHERE name = 'Event' AND openatlas_class_name = 'type' ORDER BY id ASC LIMIT 1)),
