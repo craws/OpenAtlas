@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import defaultdict
 import json
 import re
 from typing import Any, Optional
@@ -128,6 +129,14 @@ class AnnotationText:
         return [
             AnnotationText(row) for row
             in db.get_annotation_text_by_source_id(id_)]
+
+    @staticmethod
+    def get_by_source_ids(ids: list[int]) -> dict[int, list[AnnotationText]]:
+        annotations: defaultdict[int, list[AnnotationText]] = defaultdict(list)
+        for row in db.get_annotation_text_by_source_ids(ids):
+            annotation = AnnotationText(row)
+            annotations[annotation.source_id].append(annotation)
+        return dict(annotations)
 
     @staticmethod
     def insert(data: dict[str, Any]) -> None:

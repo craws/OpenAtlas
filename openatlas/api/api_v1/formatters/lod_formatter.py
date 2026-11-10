@@ -6,6 +6,7 @@ from openatlas.api.api_v1.formatters.la_helpers import (
     date_to_utc_iso_str, is_float)
 from openatlas.api.api_v1.formatters.util import (
     EntityLinks, entity_uri, get_links_for_entities, get_type_references)
+from openatlas.models.annotation import AnnotationText
 from openatlas.models.dates import Dates
 from openatlas.models.entity import Entity, Link
 
@@ -83,6 +84,8 @@ class LodFormatter:
             else get_type_references())
         self.entity: Entity
         self.geometries: dict[int, Any] = {}
+        self.annotations: dict[int, list[AnnotationText]] = {}
+        self.annotation_entities: dict[int, Entity] = {}
         self.handlers = {
             'P1': self._p1,
             'P2': self._p2,
@@ -114,6 +117,24 @@ class LodFormatter:
             'OA8': self._oa8,
             'OA9': self._oa9}
 
+    def prefetch_annotations(self, entities: list[Entity]) -> None:
+        source_ids = [
+            entity.id for entity in entities
+            if entity.class_.name in ('source', 'text')]
+        if not source_ids:
+            return
+
+        self.annotations = AnnotationText.get_by_source_ids(source_ids)
+        linked_entity_ids = {
+            annotation.entity_id
+            for annotations in self.annotations.values()
+            for annotation in annotations
+            if annotation.entity_id is not None}
+        if linked_entity_ids:
+            self.annotation_entities = {
+                entity.id: entity
+                for entity in Entity.get_by_ids(linked_entity_ids)}
+
     def format_entity(self, data: EntityLinks) -> dict[str, Any]:
         self.entity = entity = data.entity
         self.geometries = data.geometries
@@ -140,6 +161,25 @@ class LodFormatter:
 
         for link_ in data.links_inverse:
             self.process_link(link_, record, True)
+
+        if annotations := self.annotations.get(entity.id):
+            record['annotations'] = []
+            for annotation in annotations:
+                annotation_data: dict[str, Any] = {
+                    'type': 'Annotation'}
+                if annotation.entity_id is not None:
+                    if body_entity := self.annotation_entities.get(
+                            annotation.entity_id):
+                        annotation_data['body_entity'] = entity_uri(body_entity)
+                if annotation.text:
+                    annotation_data['body_comment'] = annotation.text
+                annotation_data['target'] = {
+                    'source': entity_uri(entity),
+                    'selector': {
+                        'type': 'TextPositionSelector',
+                        'start': annotation.link_start,
+                        'end': annotation.link_end}}
+                record['annotations'].append(annotation_data)
 
         return record
 
@@ -367,6 +407,7 @@ def format_lod_entity(entity: Entity) -> dict[str, Any]:
     links_data = get_links_for_entities([entity])
     item = links_data[entity.id]
     formatter = LodFormatter()
+    formatter.prefetch_annotations([entity])
     record = formatter.format_entity(item)
     return {'@context': get_context_url()} | record
 
@@ -383,6 +424,7 @@ def format_lod_entities(
             'orderedItems': []}
     links_data = get_links_for_entities(entities) if entities else {}
     formatter = LodFormatter()
+    formatter.prefetch_annotations(entities)
     items = [formatter.format_entity(item) for item in links_data.values()]
     if pagination is None:
         return {

@@ -55,11 +55,23 @@ def get_oa_ontology_graph() -> Graph:
     graph.add((p_rel_type, RDF.type, OWL.DatatypeProperty))
     graph.add((p_rel_type, RDFS.label, Literal('relation type', lang='en')))
     graph.add((p_rel_type, RDFS.comment, Literal(
-        'Label of the relationship type (E55 Type) for an OpenAtlas '
-        'actor-to-actor relation shortcut (OA7).',
+        'Label of the relationship type (crm:E55_Type) for an OpenAtlas '
+        'actor-to-actor relation shortcut (OA7). Serialized on the embedded '
+        'target actor node in JSON-LD.',
         lang='en')))
-    graph.add((p_rel_type, RDFS.domain, crm.E39_Actor))
     graph.add((p_rel_type, RDFS.range, XSD.string))
+
+    # oax:unit (measurement unit label)
+    p_unit = oax.unit
+    graph.add((p_unit, RDF.type, OWL.DatatypeProperty))
+    graph.add((p_unit, RDFS.label, Literal('unit', lang='en')))
+    graph.add((p_unit, RDFS.comment, Literal(
+        'OpenAtlas shortcut for the measurement unit label (resolving to '
+        'crm:E54_Dimension -> crm:P91_has_unit -> crm:E58_Measurement_Unit '
+        '-> rdfs:label).',
+        lang='en')))
+    graph.add((p_unit, RDFS.domain, crm.E54_Dimension))
+    graph.add((p_unit, RDFS.range, XSD.string))
 
     # oax:begins_in (OA8: E77 -> E53)
     p_b = oax.begins_in
@@ -137,6 +149,7 @@ def get_lod_context() -> dict[str, Any]:
             'geo': 'http://www.opengis.net/ont/geosparql#',
             'rdfs': 'http://www.w3.org/2000/01/rdf-schema#',
             'xsd': 'http://www.w3.org/2001/XMLSchema#',
+            'oa': 'http://www.w3.org/ns/oa#',
             'as': 'https://www.w3.org/ns/activitystreams#',
             'oax': oax_uri,
 
@@ -145,6 +158,18 @@ def get_lod_context() -> dict[str, Any]:
             'type': '@type',
             'label': 'rdfs:label',
             'description': 'crm:P3_has_note',
+
+            # W3C Web Annotation Data Model
+            'Annotation': 'oa:Annotation',
+            'TextPositionSelector': 'oa:TextPositionSelector',
+            'annotations': {'@reverse': 'oa:hasTarget'},
+            'target': {'@id': 'oa:hasTarget', '@type': '@id'},
+            'source': {'@id': 'oa:hasSource', '@type': '@id'},
+            'selector': {'@id': 'oa:hasSelector', '@type': '@id'},
+            'start': {'@id': 'oa:start', '@type': 'xsd:nonNegativeInteger'},
+            'end': {'@id': 'oa:end', '@type': 'xsd:nonNegativeInteger'},
+            'body_entity': {'@id': 'oa:hasBody', '@type': '@id'},
+            'body_comment': {'@id': 'rdfs:comment'},
 
             # CIDOC CRM & CRMarchaeo Entity Classes
             'HumanMadeObject': 'crm:E22_Human-Made_Object',
@@ -288,7 +313,7 @@ def get_lod_context() -> dict[str, Any]:
             # Dimensions & Measurements
             'has_dimension': {'@id': 'crm:P43_has_dimension', '@type': '@id'},
             'value': {'@id': 'crm:P90_has_value', '@type': 'xsd:decimal'},
-            'unit': {'@id': 'crm:P91_has_unit'},
+            'unit': {'@id': 'oax:unit', '@type': 'xsd:string'},
 
             # Hierarchy of Types
             'has_broader_term': {

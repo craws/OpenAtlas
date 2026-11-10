@@ -178,6 +178,30 @@ class LinkedArtResponse(BaseSchema):
     _label: str
 
 
+class LodTextPositionSelector(BaseSchema):
+    model_config = ConfigDict(alias_generator=None, populate_by_name=True)
+
+    type: Literal['TextPositionSelector'] = 'TextPositionSelector'
+    start: int
+    end: int
+
+
+class LodAnnotationTarget(BaseSchema):
+    model_config = ConfigDict(alias_generator=None, populate_by_name=True)
+
+    source: str
+    selector: LodTextPositionSelector
+
+
+class LodAnnotation(BaseSchema):
+    model_config = ConfigDict(alias_generator=None, populate_by_name=True)
+
+    type: Literal['Annotation'] = 'Annotation'
+    body_entity: str | None = None
+    body_comment: str | None = None
+    target: LodAnnotationTarget
+
+
 class LodResponse(BaseSchema):
     model_config = ConfigDict(extra='allow')
 
@@ -187,6 +211,7 @@ class LodResponse(BaseSchema):
     id: str
     type: str
     label: str
+    annotations: list[LodAnnotation] | None = None
 
 
 class OrderedCollectionPageRef(BaseSchema):

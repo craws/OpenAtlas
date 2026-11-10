@@ -7,7 +7,7 @@ from rdflib import RDF, Dataset, URIRef
 from openatlas import app
 from openatlas.api.api_v1.formatters.la_formatter import format_la_entities
 from openatlas.api.api_v1.formatters.lod import format_lod_entities
-from openatlas.models.annotation import AnnotationImage
+from openatlas.models.annotation import AnnotationImage, AnnotationText
 from openatlas.models.settings import set_logo
 from tests.base import ApiTestCase, get_hierarchy, insert
 
@@ -45,6 +45,63 @@ class ApiV1(ApiTestCase):
         assert '@graph' not in rv_json
         assert rv_json['type'] == 'Place'
         assert rv_json['label'] == 'Shire'
+
+        with app.test_request_context():
+            app.preprocess_request()
+            AnnotationText.delete_annotations_text(e.source.id)
+            AnnotationText.delete_annotations_text(e.translation.id)
+            AnnotationText.insert({
+                'source_id': e.source.id,
+                'entity_id': e.actor.id,
+                'link_start': 4,
+                'link_end': 16,
+                'text': 'Tales of the First Age'})
+            AnnotationText.insert({
+                'source_id': e.source.id,
+                'entity_id': None,
+                'link_start': 17,
+                'link_end': 20,
+                'text': 'Comment only'})
+            AnnotationText.insert({
+                'source_id': e.translation.id,
+                'entity_id': e.actor.id,
+                'link_start': 0,
+                'link_end': 12,
+                'text': None})
+
+        rv = c.get(url_for('api_v1_lod.get_entity', uuid=e.source.uuid))
+        source_data = rv.get_json()
+        annotation = source_data['annotations'][0]
+        assert annotation['type'] == 'Annotation'
+        assert annotation['body_comment'] == 'Tales of the First Age'
+        assert annotation['target'] == {
+            'source': source_data['id'],
+            'selector': {
+                'type': 'TextPositionSelector',
+                'start': 4,
+                'end': 16}}
+        assert annotation['body_entity'].endswith(
+            str(e.actor.uuid))
+        assert source_data['annotations'][1] == {
+            'type': 'Annotation',
+            'body_comment': 'Comment only',
+            'target': {
+                'source': source_data['id'],
+                'selector': {
+                    'type': 'TextPositionSelector',
+                    'start': 17,
+                    'end': 20}}}
+
+        rv = c.get(
+            url_for('api_v1_lod.get_entity', uuid=e.translation.uuid))
+        translation_annotation = rv.get_json()['annotations'][0]
+        assert 'body_comment' not in translation_annotation
+        assert translation_annotation['body_entity'].endswith(
+            str(e.actor.uuid))
+        rv = c.get(url_for(
+            'api_v1_lod.get_entity_ext', uuid=e.source.uuid, ext='ttl'))
+        assert rv.status_code == HTTPStatus.OK
+        assert 'text/turtle' in rv.headers.get('Content-Type', '')
 
         rv = c.get(
             url_for('api_v1_lod.get_entity_ext', uuid=e.place.uuid, ext='ttl'))
@@ -138,6 +195,11 @@ class ApiV1(ApiTestCase):
         assert 'crm' in ctx['@context']
         assert 'archaeo' in ctx['@context']
         assert 'geo' in ctx['@context']
+        assert ctx['@context']['oa'] == 'http://www.w3.org/ns/oa#'
+        assert ctx['@context']['annotations'] == {
+            '@reverse': 'oa:hasTarget'}
+        assert ctx['@context']['body_entity'] == {
+            '@id': 'oa:hasBody', '@type': '@id'}
         assert ctx['@context']['Feature'] == 'crm:E25_Human-Made_Feature'
 
         # Ontology endpoint test

@@ -57,6 +57,19 @@ def get_annotation_text_by_source_id(id_: int) -> list[dict[str, object]]:
     return list(g.cursor)
 
 
+def get_annotation_text_by_source_ids(
+        ids: list[int]) -> list[dict[str, object]]:
+    g.cursor.execute(
+        ANNOTATION_TEXT_SELECT +
+        """
+        WHERE source_id = ANY(%(ids)s)
+            AND NOT (entity_id IS NULL AND (text IS NULL OR text = ''))
+        ORDER BY source_id, link_start;
+        """,
+        {'ids': ids})
+    return list(g.cursor)
+
+
 def get_annotation_text_orphans() -> list[dict[str, object]]:
     g.cursor.execute(
         """
