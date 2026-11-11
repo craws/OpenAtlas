@@ -6,6 +6,7 @@
  *   initReferenceAutocomplete(systemId, {
  *     minLength: 3,   // minimum characters before searching (default 1)
  *     delay: 400,     // debounce in ms (default 300)
+ *     idLinkBase: '', // optional trusted URL prefix for identifier links
  *     search: query => promise resolving to [{id, label, info, detail}]
  *   });
  *
@@ -86,7 +87,9 @@ function initReferenceAutocomplete(systemId, options) {
             ${record.info ? `<span class="text-muted"> - ${escapeHtml(record.info)}</span>` : ''}
           </div>
           <small class="d-block text-muted">
-            ${escapeHtml(record.id)}${record.detail ? ` - ${escapeHtml(record.detail)}` : ''}
+            ${options.idLinkBase
+              ? `<a href="${escapeHtml(options.idLinkBase + encodeURIComponent(record.id))}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">${escapeHtml(record.id)}</a>`
+              : escapeHtml(record.id)}${record.detail ? ` - ${escapeHtml(record.detail)}` : ''}
           </small>`;
       }
     },

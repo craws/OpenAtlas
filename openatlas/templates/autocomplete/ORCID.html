@@ -1,0 +1,13 @@
+<script>
+  /**
+   * ORCID autocomplete
+   */
+  initReferenceAutocomplete('{{ system.id }}', {
+    idLinkBase: 'https://orcid.org/',
+    search: query => $.ajax({
+      url: '/proxy/orcid',
+      dataType: 'json',
+      data: {query: query}
+    })
+  });
+</script>

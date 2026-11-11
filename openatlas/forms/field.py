@@ -142,7 +142,11 @@ class ReferenceField(Field):
         self.data = {'value': '', 'precision': ''}
         self.row_css = 'reference-system-switch'
         system = g.reference_systems[reference_system_id]
-        if system.api and (Path(app.root_path) / app.template_folder /
+        if system.api and (
+                system.api != 'ORCID' or (
+                    app.config.get('ORCID_CLIENT_ID') and
+                    app.config.get('ORCID_CLIENT_SECRET'))) and (
+                Path(app.root_path) / app.template_folder /
                 'autocomplete' / f'{system.api}.html').exists():
             self.reference_system_js = Markup(
                 render_template(
