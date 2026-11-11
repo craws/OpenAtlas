@@ -41,7 +41,8 @@ two major generations:
      - **Beta**
      - The next-generation API based on OpenAPI 3.1 and Pydantic. Features
        native Linked Open Data graphs, Linked Art profiles, SKOS thesauri,
-       IIIF Presentation API v2/v3, and high-performance streaming dumps.
+       IIIF Presentation API 3, and high-performance streaming dumps. IIIF
+       Image API services can use version 2 or 3.
 
 Interactive Documentation UIs
 -----------------------------

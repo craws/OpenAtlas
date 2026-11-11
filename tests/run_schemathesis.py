@@ -159,9 +159,9 @@ def get_database_examples() -> dict[str, Any]:
 
 def get_path_examples(path: str) -> Iterator[dict[str, Any]]:
     if path.startswith('/api/1/iiif/'):
-        if path == '/api/1/iiif/{id}/annotation/{version}':
+        if path == '/api/1/iiif/{id}/annotation':
             for id_ in get_database_examples()['annotations']:
-                yield {'id': id_, 'version': '2'}
+                yield {'id': id_}
         return
 
     if path == '/api/1/ontology.{ext}':
@@ -207,7 +207,7 @@ def get_path_examples(path: str) -> Iterator[dict[str, Any]]:
 def before_add_examples(context: Any, examples: list[Any]) -> None:
     path = context.operation.path
     if (path.startswith('/api/1/iiif/')
-            and path != '/api/1/iiif/{id}/annotation/{version}'):
+            and path != '/api/1/iiif/{id}/annotation'):
         return
     case_studies = get_database_examples()['case_studies']
     for params in get_path_examples(path):

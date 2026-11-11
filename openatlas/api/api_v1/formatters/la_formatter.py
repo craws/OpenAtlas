@@ -754,7 +754,6 @@ class LaFormatter:
     @staticmethod
     def iiif_subject_of(file_links: list[Link]) -> list[dict[str, Any]]:
         subject_of = []
-        version = str(g.settings.get('iiif_version', 2))
         for link_ in file_links:
             manifest_path = get_iiif_manifest_and_path(link_.domain.id)
             if not (manifest_path.get('IIIFManifest')
@@ -775,12 +774,11 @@ class LaFormatter:
                         'type': 'DigitalObject',
                         '_label': label}],
                     'conforms_to': [{
-                        'id': f'https://iiif.io/api/presentation/{version}.0/',
+                        'id': 'https://iiif.io/api/presentation/3.0/',
                         'type': 'InformationObject',
-                        '_label': f'IIIF Presentation API {version}.0'}],
-                    'format':
-                        f"application/ld+json;profile='https://iiif.io"
-                        f"/api/presentation/{version}/context.json'"}]})
+                        '_label': 'IIIF Presentation API 3.0'}],
+                    'format': "application/ld+json;profile='https://iiif.io"
+                              "/api/presentation/3/context.json'"}]})
         return subject_of
 
     def add_dates(self, links: list[Link], record: dict[str, Any]) -> None:

@@ -22,8 +22,7 @@ class IiifInfo(BaseSchema):
         description='Base URL of the IIIF Image API server.')
     version: str | None = Field(
         None,
-        description='IIIF Presentation API specification '
-                    "version (e.g. '2' or '3').")
+        description='IIIF Presentation API version, currently 3.')
 
 
 class MapConfig(BaseSchema):

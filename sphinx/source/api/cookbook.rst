@@ -184,11 +184,11 @@ You can embed this URL directly in HTML (``<img src="...">``) or markdown.
 
 Loading Manifests in Mirador or Universal Viewer
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-1. Retrieve the IIIF v3 Manifest URL:
+1. Retrieve the IIIF Presentation 3 Manifest URL:
 
    .. code-block:: text
 
-      https://<your-instance>/api/1/iiif/<file-id>/manifest/3
+      https://<your-instance>/api/1/iiif/<file-id>/manifest
 
 2. Open any web-based IIIF viewer (such as the `Mirador Demo <https://projectmirador.org/embed.html>`_).
 3. Paste the manifest URL into the viewer's "Add Resource" dialog to explore
