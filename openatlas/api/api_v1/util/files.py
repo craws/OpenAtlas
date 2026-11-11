@@ -292,7 +292,6 @@ def get_iiif_manifest_and_path(img_id: int) -> dict[str, str]:
     if iiif_file_exists(img_id):
         iiif_manifest = url_for(
             'api_v1_iiif.get_iiif_manifest',
-            version=g.settings['iiif_version'],
             id=img_id,
             _external=True)
         if file_ := get_cached_file_path(img_id):

@@ -121,11 +121,6 @@ class ExtensionsType(str, Enum):
     NTRIPLES = 'nt'
 
 
-class IiifVersion(str, Enum):
-    V2 = "2"
-    V3 = "3"
-
-
 class MatchTypeEnum(str, Enum):
     EXACT_MATCH = "exactMatch"
     CLOSE_MATCH = "closeMatch"

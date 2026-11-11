@@ -167,20 +167,24 @@ IIIF Presentation API
      - Endpoint
      - Description
    * - ``GET``
-     - ``/api/1/iiif/{id}/manifest/{version}``
-     - IIIF Manifest (version ``2`` or ``3``).
+     - ``/api/1/iiif/{id}/manifest``
+     - IIIF Presentation 3 Manifest.
    * - ``GET``
-     - ``/api/1/iiif/{id}/canvas/{version}``
-     - IIIF Canvas for a specific file and version.
+     - ``/api/1/iiif/{id}/canvas``
+     - IIIF Presentation 3 Canvas.
    * - ``GET``
-     - ``/api/1/iiif/{id}/image/{version}``
-     - IIIF Image resource annotation.
+     - ``/api/1/iiif/{id}/image``
+     - IIIF Presentation 3 image resource annotation.
    * - ``GET``
-     - ``/api/1/iiif/{id}/annotation-list/{version}``
-     - IIIF Annotation List (v2) or Annotation Page (v3).
+     - ``/api/1/iiif/{id}/annotation-list``
+     - IIIF Presentation 3 Annotation Page.
    * - ``GET``
-     - ``/api/1/iiif/{id}/annotation/{version}``
-     - Specific IIIF spatial polygon or point annotation.
+     - ``/api/1/iiif/{id}/annotation``
+     - Specific IIIF Presentation 3 spatial polygon or point annotation.
+
+The Presentation API version is always 3, so its endpoint paths do not include
+a version segment. The linked Image API service can still be version 2 or 3,
+as indicated by its ``info.json`` metadata.
 
 Query Parameters for Collections
 --------------------------------

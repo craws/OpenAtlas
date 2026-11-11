@@ -41,7 +41,8 @@ two major generations:
      - **Beta**
      - The next-generation API based on OpenAPI 3.1 and Pydantic. Features
        strictly compliant Linked Art profiles, SKOS thesauri, IIIF Presentation
-       API v2/v3, and preliminary OpenAtlas LOD stubs.
+       API 3, and preliminary OpenAtlas LOD stubs. IIIF Image API services can
+       use version 2 or 3.
 
 Interactive Documentation UIs
 -----------------------------

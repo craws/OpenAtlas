@@ -70,28 +70,23 @@ def calculate_bounding_box(
 
 
 class IIIFBuilder:
-    def __init__(self, entity: Entity, version: int) -> None:
+    def __init__(self, entity: Entity) -> None:
         self.entity = entity
-        self.version = version
         self.manifest_url = url_for(
             'api_v1_iiif.get_iiif_manifest',
             id=entity.id,
-            version=version,
             _external=True)
         self.canvas_url = url_for(
             'api_v1_iiif.get_iiif_canvas',
             id=entity.id,
-            version=version,
             _external=True)
         self.image_resource_url = url_for(
             'api_v1_iiif.get_iiif_image',
             id=entity.id,
-            version=version,
             _external=True)
         self.annotation_list_url = url_for(
             'api_v1_iiif.get_iiif_annotation_list',
             id=entity.id,
-            version=version,
             _external=True)
         self.file_path = get_cached_file_path(entity.id)
         self.mime_type = get_actual_mime(self.file_path)
@@ -110,7 +105,9 @@ class IIIFBuilder:
             resp.raise_for_status()
         except Exception:  # pragma: no cover
             abort_file_not_found(self.entity.id)
-        return image_url, resp.json()
+        image_api = resp.json()
+        image_url = image_api.get('id') or image_api.get('@id') or image_url
+        return image_url, image_api
 
     @property
     def image_url(self) -> str:
@@ -119,6 +116,28 @@ class IIIFBuilder:
     @property
     def image_api(self) -> dict[str, Any]:
         return self.image_metadata[1]
+
+    @cached_property
+    def image_service(self) -> dict[str, Any]:
+        profile = self.image_api.get('profile')
+        if isinstance(profile, list):
+            profile = profile[0] if profile else ''
+        context = self.image_api.get('@context', '')
+        if isinstance(context, list):
+            context = ' '.join(str(item) for item in context)
+        service_type = 'ImageService3' if (
+            self.image_api.get('type') == 'ImageService3'
+            or '/3/' in str(context)
+            or (isinstance(profile, str) and profile.startswith('level'))
+        ) else 'ImageService2'
+        if (service_type == 'ImageService3'
+                and isinstance(profile, str)
+                and profile.startswith('http')):
+            profile = profile.rsplit('/', 1)[-1].removesuffix('.json')
+        return {
+            'id': self.image_url,
+            'type': service_type,
+            'profile': profile}
 
     @cached_property
     def common_meta(self) -> ManifestMetadata:
@@ -173,158 +192,22 @@ class IIIFBuilder:
         annotation_url = url_for(
             'api_v1_iiif.get_iiif_annotation',
             id=annotation.id,
-            version=self.version,
             _external=True)
         return annotation_url, entity_link
-
-    def build_manifest(self) -> dict[str, Any]:
-        raise NotImplementedError  # pragma: no cover
-
-    def build_canvas(self) -> dict[str, Any]:
-        raise NotImplementedError  # pragma: no cover
-
-    def build_image(self) -> dict[str, Any]:
-        raise NotImplementedError  # pragma: no cover
-
-    def build_annotation(
-            self,
-            annotation: AnnotationImage) -> dict[str, Any]:
-        raise NotImplementedError  # pragma: no cover
-
-    def get_logo(self) -> dict[str, Any]:
-        raise NotImplementedError  # pragma: no cover
 
     def get_selector(self, coordinates_str: str) -> dict[str, Any]:
         coordinates = convert_coordinates(coordinates_str)
         x, y, width, height = calculate_bounding_box(coordinates)
 
-        if self.version == 3:
-            return {
-                'type': 'Choice',
-                'default': {
-                    'type': 'FragmentSelector',
-                    'value': f'xywh={x},{y},{width},{height}'},
-                'item': {
-                    'type': 'SvgSelector',
-                    'value': generate_svg_path(coordinates)}}
-
         return {
+            'type': 'Choice',
             'default': {
-                '@type': 'oa:FragmentSelector',
+                'type': 'FragmentSelector',
                 'value': f'xywh={x},{y},{width},{height}'},
             'item': {
-                '@type': 'oa:SvgSelector',
-                'value': generate_svg_path(coordinates)},
-            '@type': 'oa:Choice'}
+                'type': 'SvgSelector',
+                'value': generate_svg_path(coordinates)}}
 
-
-class V2Builder(IIIFBuilder):
-    def build_manifest(self) -> dict[str, Any]:
-        v2_see_also = [
-            {'@id': sa['id'], 'label': sa['label'], 'format': sa['format']}
-            for sa in self.common_meta.see_also]
-
-        return {
-            '@context': 'https://iiif.io/api/presentation/2/context.json',
-            '@id': self.manifest_url,
-            '@type': 'sc:Manifest',
-            'label': self.entity.name,
-            'description': (
-                [{'@value': self.entity.description, '@language': 'en'}]
-                if self.entity.description else ''),
-            'metadata': self.common_meta.items,
-            'seeAlso': v2_see_also,
-            'attribution': self.common_meta.attribution,
-            'license': (
-                self.common_meta.license.url
-                if self.common_meta.license and self.common_meta.license.url
-                else ''),
-            'logo': self.get_logo(),
-            'sequences': [{
-                '@id': f'{self.manifest_url}/sequence/normal',
-                '@type': 'sc:Sequence',
-                'canvases': [self.build_canvas()]}]}
-
-    def build_canvas(self) -> dict[str, Any]:
-        return {
-            '@id': self.canvas_url,
-            '@type': 'sc:Canvas',
-            'label': self.entity.name,
-            'height': self.image_api['height'],
-            'width': self.image_api['width'],
-            'description': '',
-            'images': [self.build_image()],
-            'otherContent': [{
-                '@id': self.annotation_list_url,
-                '@type': 'sc:AnnotationList'}],
-            'thumbnail': {
-                '@id': f'{self.image_url}/full/!200,200/0/default.jpg',
-                '@type': 'dctypes:Image',
-                'format': self.mime_type,
-                'height': 200,
-                'width': 200,
-                'service': {
-                    '@context': 'https://iiif.io/api/image/2/context.json',
-                    '@id': self.image_url,
-                    'profile': self.image_api['profile']}}}
-
-    def build_image(self) -> dict[str, Any]:
-        return {
-            '@id': self.image_resource_url,
-            '@type': 'oa:Annotation',
-            'motivation': 'sc:painting',
-            'resource': {
-                '@id': self.image_url,
-                '@type': 'dctypes:Image',
-                'format': self.mime_type,
-                'service': {
-                    '@context': 'https://iiif.io/api/image/2/context.json',
-                    '@id': self.image_url,
-                    'profile': self.image_api['profile']},
-                'height': self.image_api['height'],
-                'width': self.image_api['width']},
-            'on': self.canvas_url}
-
-    def build_annotation(
-            self,
-            annotation: AnnotationImage) -> dict[str, Any]:
-        annotation_url, entity_link = self.get_annotation_details(annotation)
-        return {
-            '@id': annotation_url,
-            '@type': 'oa:Annotation',
-            'motivation': ['oa:commenting'],
-            'resource': [{
-                '@type': 'dctypes:Dataset',
-                'chars': entity_link,
-                'format': 'text/html'}, {
-                '@type': 'dctypes:Text',
-                'chars': annotation.text,
-                'format': 'text/plain'}],
-            'on': {
-                '@type': 'oa:SpecificResource',
-                'full': self.canvas_url,
-                'selector': self.get_selector(annotation.coordinates),
-                'within': {
-                    '@id': self.manifest_url,
-                    '@type': 'sc:Manifest'}}}
-
-    def get_logo(self) -> dict[str, Any]:
-        logo_id = g.settings.get('logo_file_id')
-        if not logo_id or not str(logo_id).isdigit():
-            return {}  # pragma: no cover
-        logo_url = url_for(
-            'api_v1_files.display_file',
-            id=int(logo_id),
-            _external=True)
-        return {
-            '@id': logo_url,
-            'service': {
-                '@context': 'https://iiif.io/api/image/2/context.json',
-                '@id': url_for('overview', _external=True),
-                'profile': 'https://iiif.io/api/image/2/level2.json'}}
-
-
-class V3Builder(IIIFBuilder):
     def build_manifest(self) -> dict[str, Any]:
         v3_metadata = [{
             'label': {'en': [item['label']]},
@@ -379,10 +262,7 @@ class V3Builder(IIIFBuilder):
                 'id': f'{self.image_url}/full/!200,200/0/default.jpg',
                 'type': 'Image',
                 'format': self.mime_type,
-                'service': [{
-                    'id': self.image_url,
-                    'type': 'ImageService3',
-                    'profile': 'level2'}]}]}
+                'service': [self.image_service]}]}
         if annotations_:
             canvas['annotations'] = [{
                 'id': self.annotation_list_url,
@@ -400,10 +280,7 @@ class V3Builder(IIIFBuilder):
                 'id': self.image_url,
                 'type': 'Image',
                 'format': self.mime_type,
-                'service': [{
-                    'id': self.image_url,
-                    'type': 'ImageService3',
-                    'profile': 'level2'}],
+                'service': [self.image_service],
                 'height': self.image_api['height'],
                 'width': self.image_api['width']},
             'target': self.canvas_url}
@@ -445,45 +322,27 @@ class V3Builder(IIIFBuilder):
                 'profile': 'level2'}]}
 
 
-def get_builder(entity: Entity, version: int = 2) -> IIIFBuilder:
-    return V3Builder(entity, 3) if version == 3 else V2Builder(entity, 2)
+def build_manifest(entity: Entity) -> dict[str, Any]:
+    return IIIFBuilder(entity).build_manifest()
 
 
-def build_manifest_v2(entity: Entity) -> dict[str, Any]:
-    return V2Builder(entity, version=2).build_manifest()
+def build_canvas(entity: Entity) -> dict[str, Any]:
+    return IIIFBuilder(entity).build_canvas()
 
 
-def build_manifest_v3(entity: Entity) -> dict[str, Any]:
-    return V3Builder(entity, version=3).build_manifest()
+def build_image(entity: Entity) -> dict[str, Any]:
+    return IIIFBuilder(entity).build_image()
 
 
-def build_canvas(entity: Entity, version: int = 2) -> dict[str, Any]:
-    return get_builder(entity, version).build_canvas()
-
-
-def build_image(entity: Entity, version: int = 2) -> dict[str, Any]:
-    return get_builder(entity, version).build_image()
-
-
-def build_annotation(
-        annotation: AnnotationImage,
-        version: int = 2) -> dict[str, Any]:
+def build_annotation(annotation: AnnotationImage) -> dict[str, Any]:
     entity = get_entity_by_id(annotation.image_id)
-    return get_builder(entity, version).build_annotation(annotation)
+    return IIIFBuilder(entity).build_annotation(annotation)
 
 
-def build_annotation_list(entity: Entity, version: int = 2) -> dict[str, Any]:
+def build_annotation_list(entity: Entity) -> dict[str, Any]:
     annotations_ = AnnotationImage.get_by_file_id(entity.id)
-    builder = get_builder(entity, version)
-
-    if version == 3:
-        return {
-            'id': builder.annotation_list_url,
-            'type': 'AnnotationPage',
-            'items': [builder.build_annotation(a) for a in annotations_]}
-
+    builder = IIIFBuilder(entity)
     return {
-        '@context': 'https://iiif.io/api/presentation/2/context.json',
-        '@id': builder.annotation_list_url,
-        '@type': 'sc:AnnotationList',
-        'resources': [builder.build_annotation(a) for a in annotations_]}
+        'id': builder.annotation_list_url,
+        'type': 'AnnotationPage',
+        'items': [builder.build_annotation(a) for a in annotations_]}
