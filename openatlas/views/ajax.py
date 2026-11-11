@@ -14,6 +14,7 @@ from openatlas.api.external.geonames import GeoNames  # noqa
 from openatlas.api.external.gnd import GND  # noqa
 from openatlas.api.external.kulturpool import Kulturpool  # noqa
 from openatlas.api.external.openatlas_api import OpenAtlas  # noqa
+from openatlas.api.external.ror import ROR  # noqa
 from openatlas.api.external.wikidata import Wikidata  # noqa
 from openatlas.api.external.viaf import VIAF  # noqa
 from openatlas.display.util import display_info, required_group
@@ -129,6 +130,15 @@ def viaf_proxy() -> Response | tuple[Response, int]:
         return jsonify(response.json())
     except requests.exceptions.RequestException as e:  # pragma: no cover
         return jsonify({'error': str(e), 'result': []}), 502
+
+
+@app.route('/proxy/ror', methods=['GET'])
+@required_group('readonly')
+def ror_proxy() -> Response | tuple[Response, int]:
+    try:
+        return jsonify({'items': ROR.search(request.args.get('query', ''))})
+    except requests.exceptions.RequestException as e:
+        return jsonify({'error': str(e), 'items': []}), 502
 
 
 @app.route('/proxy/chronontology', methods=['GET'])
