@@ -7,6 +7,7 @@ from rdflib import RDF, Dataset, URIRef
 from openatlas import app
 from openatlas.api.api_v1.formatters.la_formatter import format_la_entities
 from openatlas.api.api_v1.formatters.lod import format_lod_entities
+from openatlas.database import overlay as db_overlay
 from openatlas.models.annotation import AnnotationImage, AnnotationText
 from openatlas.models.settings import set_logo
 from tests.base import ApiTestCase, get_hierarchy, insert
@@ -653,6 +654,14 @@ class ApiV1(ApiTestCase):
             e.file.link('P67', e.actor)
             e.file.link('P67', lic_ext_ref, inverse=True)
             set_logo(e.file.id)
+            overlay_data = {
+                'image_id': e.file.id,
+                'bounding_box': (
+                    '[[48.58653, 15.64356], [48.58709, 15.64294]]')}
+            if db_overlay.get_by_object([e.file.id]):
+                db_overlay.update(overlay_data)
+            else:
+                db_overlay.insert(overlay_data)
 
             AnnotationImage.insert(
                 image_id=e.file.id,
@@ -669,11 +678,30 @@ class ApiV1(ApiTestCase):
         assert rv.status_code == HTTPStatus.OK
         manifest = rv.get_json()
         assert manifest['type'] == 'Manifest'
+        assert manifest['@context'] == [
+            'https://iiif.io/api/extension/georef/1/context.json',
+            'https://iiif.io/api/presentation/3/context.json']
         assert manifest['id'].endswith(
             f'/api/1/iiif/{e.file.id}/manifest')
         assert manifest['rights'] == lic_url
         statement = manifest['requiredStatement']['value']['en'][0]
         assert 'Public domain' in statement
+
+        rv = c.get(
+            url_for('api_v1_iiif.get_iiif_georeference', id=e.file.id))
+        assert rv.status_code == HTTPStatus.OK
+        georeference = rv.get_json()
+        georeference_path = f'/api/1/iiif/{e.file.id}/georeference'
+        assert georeference['id'].endswith(georeference_path)
+        georeference_annotation = georeference['items'][0]
+        assert georeference_annotation['motivation'] == 'georeferencing'
+        assert georeference_annotation['target']['source']['type'] == (
+            'ImageService2')
+        features = georeference_annotation['body']['features']
+        assert (
+            [feature['geometry']['coordinates'] for feature in features]
+            == [[15.64294, 48.58709], [15.64356, 48.58709],
+                [15.64294, 48.58653]])
 
         rv = c.get(
             url_for('api_v1_iiif.get_iiif_canvas', id=e.file.id))
@@ -682,6 +710,9 @@ class ApiV1(ApiTestCase):
         canvas_path = f'/api/1/iiif/{e.file.id}/canvas'
         assert canvas['id'].endswith(canvas_path)
         assert manifest['items'][0]['id'].endswith(canvas_path)
+        assert any(
+            annotation_page['id'].endswith(georeference_path)
+            for annotation_page in canvas['annotations'])
 
         # Image
         rv = c.get(
@@ -689,6 +720,7 @@ class ApiV1(ApiTestCase):
         assert rv.status_code == HTTPStatus.OK
         image = rv.get_json()
         image_path = f'/api/1/iiif/{e.file.id}/image'
+        assert image['body']['service'][0]['type'] == 'ImageService2'
         assert image['id'].endswith(image_path)
         assert image['target'].endswith(canvas_path)
         assert canvas['items'][0]['items'][0]['id'].endswith(image_path)
@@ -722,7 +754,7 @@ class ApiV1(ApiTestCase):
             f'/api/1/iiif/{{id}}/{endpoint}'
             for endpoint in (
                 'manifest', 'canvas', 'image', 'annotation-list',
-                'annotation')}
+                'georeference', 'annotation')}
         assert iiif_paths <= openapi['paths'].keys()
         assert not any(
             path.startswith('/api/1/iiif/') and '{version}' in path
@@ -744,6 +776,14 @@ class ApiV1(ApiTestCase):
             rv = c.get(f'/api/1/iiif/{id_}/annotation')
             assert rv.status_code == HTTPStatus.NOT_FOUND
             assert rv.get_json()['details']['provided_id'] == str(id_)
+
+        with app.test_request_context():
+            app.preprocess_request()
+            overlay = db_overlay.get_by_object([e.file.id])[0]
+            db_overlay.remove(overlay['id'])
+        rv = c.get(
+            url_for('api_v1_iiif.get_iiif_georeference', id=e.file.id))
+        assert rv.status_code == HTTPStatus.NOT_FOUND
 
     def test_search(self) -> None:
         c = self.client

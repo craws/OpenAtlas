@@ -186,6 +186,9 @@ IIIF Presentation API
      - ``/api/1/iiif/{id}/annotation-list``
      - IIIF Presentation 3 Annotation Page.
    * - ``GET``
+     - ``/api/1/iiif/{id}/georeference``
+     - IIIF Georeferencing Annotation Page, when the file has map overlay coordinates.
+   * - ``GET``
      - ``/api/1/iiif/{id}/annotation``
      - Specific IIIF Presentation 3 spatial polygon or point annotation.
 

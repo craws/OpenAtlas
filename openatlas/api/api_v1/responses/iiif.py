@@ -70,6 +70,23 @@ iiif_annotation_list_response = {
             "application/json": {
                 "schema": ErrorResponse.model_json_schema()}}}}
 
+iiif_georeference_response = {
+    HTTPStatus.OK: {
+        "description": "IIIF Georeference Annotation Page JSON",
+        "content": {
+            "application/json": {}}},
+    HTTPStatus.FORBIDDEN: {
+        "description": "Forbidden: file without license or not marked "
+                       "as publicly shareable.",
+        "content": {
+            "application/json": {
+                "schema": ErrorResponse.model_json_schema()}}},
+    HTTPStatus.NOT_FOUND: {
+        "description": "File or georeference not found.",
+        "content": {
+            "application/json": {
+                "schema": ErrorResponse.model_json_schema()}}}}
+
 iiif_annotation_response = {
     HTTPStatus.OK: {
         "description": "IIIF Annotation JSON",
