@@ -9,11 +9,12 @@ from openatlas.api.api_v1.models.iiif import (
 from openatlas.api.api_v1.openapi_tags import iiif_tag
 from openatlas.api.api_v1.responses.iiif import (
     iiif_annotation_list_response, iiif_annotation_response,
-    iiif_canvas_response, iiif_image_response, iiif_manifest_response)
+    iiif_canvas_response, iiif_georeference_response, iiif_image_response,
+    iiif_manifest_response)
 from openatlas.api.api_v1.util.files import check_file_access, get_file_entity
 from openatlas.api.api_v1.util.iiif_manifest import (
-    build_annotation, build_annotation_list, build_canvas, build_image,
-    build_manifest)
+    build_annotation, build_annotation_list, build_canvas,
+    build_georeference, build_image, build_manifest)
 from openatlas.database.annotation import get_annotation_image_by_id
 from openatlas.models.annotation import AnnotationImage
 
@@ -71,6 +72,18 @@ def get_iiif_annotation_list(path: FileIiifPath) -> dict[str, Any]:
     entity = get_file_entity(path.id)
     check_file_access(entity)
     return build_annotation_list(entity)
+
+
+@api_v1_iiif.get(
+    '/<int:id>/georeference',
+    summary="Get IIIF Georeference Annotation Page",
+    tags=[iiif_tag],
+    responses=iiif_georeference_response)  # type: ignore[arg-type]
+def get_iiif_georeference(path: FileIiifPath) -> dict[str, Any]:
+    """Returns a IIIF georeference annotation page for a file."""
+    entity = get_file_entity(path.id)
+    check_file_access(entity)
+    return build_georeference(entity)
 
 
 @api_v1_iiif.get(

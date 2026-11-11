@@ -1,3 +1,4 @@
+import ast
 from dataclasses import dataclass, field
 from functools import cached_property
 from typing import Any
@@ -8,11 +9,13 @@ from flask import g, url_for
 from flask_babel import gettext as _
 
 from openatlas.api.api_v1.entity import get_entity_by_id
-from openatlas.api.api_v1.error_handlers import abort_file_not_found
+from openatlas.api.api_v1.error_handlers import (
+    abort_file_not_found, abort_not_found)
 from openatlas.api.api_v1.models.files import LicenseItem
 from openatlas.api.api_v1.util.files import (
     get_cached_file_path, get_license_item, get_license_type, iiif_file_exists,
     resolve_rights_holders)
+from openatlas.database import overlay as db_overlay
 from openatlas.display.image_processing import get_actual_mime
 from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
@@ -69,6 +72,25 @@ def calculate_bounding_box(
     return x, y, max(x_values) - x, max(y_values) - y
 
 
+def get_overlay_corners(bounding_box: Any) -> list[list[float]] | None:
+    # Overlays are stored as [latitude, longitude], GeoJSON needs [lon, lat]
+    try:
+        coordinates = (
+            ast.literal_eval(bounding_box)
+            if isinstance(bounding_box, str) else bounding_box)
+        points = [(float(lat), float(lon)) for lat, lon in coordinates]
+    except (SyntaxError, TypeError, ValueError):
+        return None
+    match points:
+        case [(lat_a, lon_a), (lat_b, lon_b)]:  # Legacy bounds, any order
+            north, south = max(lat_a, lat_b), min(lat_a, lat_b)
+            west, east = min(lon_a, lon_b), max(lon_a, lon_b)
+            return [[west, north], [east, north], [west, south]]
+        case [_, _, _]:  # Top left, top right, bottom left
+            return [[lon, lat] for lat, lon in points]
+    return None
+
+
 class IIIFBuilder:
     def __init__(self, entity: Entity) -> None:
         self.entity = entity
@@ -86,6 +108,10 @@ class IIIFBuilder:
             _external=True)
         self.annotation_list_url = url_for(
             'api_v1_iiif.get_iiif_annotation_list',
+            id=entity.id,
+            _external=True)
+        self.georeference_url = url_for(
+            'api_v1_iiif.get_iiif_georeference',
             id=entity.id,
             _external=True)
         self.file_path = get_cached_file_path(entity.id)
@@ -122,22 +148,17 @@ class IIIFBuilder:
         profile = self.image_api.get('profile')
         if isinstance(profile, list):
             profile = profile[0] if profile else ''
-        context = self.image_api.get('@context', '')
-        if isinstance(context, list):
-            context = ' '.join(str(item) for item in context)
-        service_type = 'ImageService3' if (
-            self.image_api.get('type') == 'ImageService3'
-            or '/3/' in str(context)
-            or (isinstance(profile, str) and profile.startswith('level'))
-        ) else 'ImageService2'
-        if (service_type == 'ImageService3'
-                and isinstance(profile, str)
-                and profile.startswith('http')):
-            profile = profile.rsplit('/', 1)[-1].removesuffix('.json')
         return {
             'id': self.image_url,
-            'type': service_type,
+            'type': 'ImageService2',
             'profile': profile}
+
+    @cached_property
+    def overlay_corners(self) -> list[list[float]] | None:
+        overlays = db_overlay.get_by_object([self.entity.id])
+        if not overlays:
+            return None
+        return get_overlay_corners(overlays[0]['bounding_box'])
 
     @cached_property
     def common_meta(self) -> ManifestMetadata:
@@ -221,7 +242,9 @@ class IIIFBuilder:
             for sa in self.common_meta.see_also]
 
         manifest: dict[str, Any] = {
-            '@context': 'https://iiif.io/api/presentation/3/context.json',
+            '@context': [
+                'https://iiif.io/api/extension/georef/1/context.json',
+                'https://iiif.io/api/presentation/3/context.json'],
             'id': self.manifest_url,
             'type': 'Manifest',
             'label': {'en': [self.entity.name]},
@@ -263,13 +286,63 @@ class IIIFBuilder:
                 'type': 'Image',
                 'format': self.mime_type,
                 'service': [self.image_service]}]}
+        canvas_annotations = []
         if annotations_:
-            canvas['annotations'] = [{
+            canvas_annotations.append({
                 'id': self.annotation_list_url,
                 'type': 'AnnotationPage',
                 'items': [
-                    self.build_annotation(a) for a in annotations_]}]
+                    self.build_annotation(a) for a in annotations_]})
+        if self.overlay_corners:
+            canvas_annotations.append({
+                'id': self.georeference_url,
+                'type': 'AnnotationPage'})
+        if canvas_annotations:
+            canvas['annotations'] = canvas_annotations
         return canvas
+
+    def build_georeference(self) -> dict[str, Any]:
+        if not (coordinates := self.overlay_corners):
+            abort_not_found(self.entity.id)
+        width = self.image_api['width']
+        height = self.image_api['height']
+        resource_coordinates = [[0, 0], [width, 0], [0, height]]
+        features = [{
+            'type': 'Feature',
+            'properties': {'resourceCoords': resource_coords},
+            'geometry': {
+                'type': 'Point',
+                'coordinates': georeference_coords}}
+            for resource_coords, georeference_coords
+            in zip(resource_coordinates, coordinates, strict=True)]
+        return {
+            '@context': [
+                'https://iiif.io/api/extension/georef/1/context.json',
+                'https://iiif.io/api/presentation/3/context.json'],
+            'id': self.georeference_url,
+            'type': 'AnnotationPage',
+            'items': [{
+                'id': f'{self.georeference_url}/annotation',
+                'type': 'Annotation',
+                'motivation': 'georeferencing',
+                'target': {
+                    'type': 'SpecificResource',
+                    'source': {
+                        **self.image_service,
+                        'width': width,
+                        'height': height},
+                    'selector': {
+                        'type': 'SvgSelector',
+                        'value': (
+                            f'<svg width="{width}" height="{height}">'
+                            f'<polygon points="0,0 {width},0 '
+                            f'{width},{height} 0,{height}" /></svg>')}},
+                'body': {
+                    'type': 'FeatureCollection',
+                    'transformation': {
+                        'type': 'polynomial',
+                        'options': {'order': 1}},
+                    'features': features}}]}
 
     def build_image(self) -> dict[str, Any]:
         return {
@@ -346,3 +419,7 @@ def build_annotation_list(entity: Entity) -> dict[str, Any]:
         'id': builder.annotation_list_url,
         'type': 'AnnotationPage',
         'items': [builder.build_annotation(a) for a in annotations_]}
+
+
+def build_georeference(entity: Entity) -> dict[str, Any]:
+    return IIIFBuilder(entity).build_georeference()
