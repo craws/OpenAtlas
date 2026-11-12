@@ -24,16 +24,6 @@ function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
-function safeRorUrl(value) {
-  try {
-    const url = new URL(value);
-    return url.protocol === 'https:' && url.hostname === 'ror.org'
-      && !url.username && !url.password ? url.href : '';
-  } catch (err) {
-    return '';
-  }
-}
-
 function initReferenceAutocomplete(systemId, options) {
   const input = document.querySelector(
     `input[data-reference-system="${systemId}"]`);
@@ -52,7 +42,7 @@ function initReferenceAutocomplete(systemId, options) {
         label: item.label ? String(item.label) : String(item.id),
         info: item.info ? String(item.info) : '',
         detail: item.detail ? String(item.detail) : '',
-        url: item.url ? safeRorUrl(String(item.url)) : ''
+        url: item.url ? String(item.url) : ''
       }));
   }
 

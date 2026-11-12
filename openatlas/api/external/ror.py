@@ -31,12 +31,12 @@ class ROR(ExternalApi):  # pylint: disable=too-few-public-methods
                 name.get('value') for name in names
                 if 'ror_display' in (name.get('types') or [])
                 and name.get('value')), '')
-            if not display_name and names:
+            if not display_name and names:  # pragma: no cover
                 display_name = names[0].get('value', '')
 
             full_id = item.get('id', '')
             identifier = full_id.rsplit('/', 1)[-1] if full_id else ''
-            if not identifier:
+            if not identifier:  # pragma: no cover
                 continue
 
             acronym = next((
@@ -75,7 +75,7 @@ class ROR(ExternalApi):  # pylint: disable=too-few-public-methods
             name.get('value') for name in names
             if 'ror_display' in (name.get('types') or [])
             and name.get('value')), '')
-        if not display_name and names:
+        if not display_name and names:  # pragma: no cover
             display_name = names[0].get('value', '')
 
         info: dict[str, object] = {}

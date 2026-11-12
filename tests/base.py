@@ -1,13 +1,15 @@
+from http import HTTPStatus
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
 import psycopg2
-from flask import url_for
+from flask import g, url_for
 
 from openatlas import app
 from openatlas.api.api_v04.resources.api_entity import ApiEntity
+from openatlas.display.util2 import get_file_path
 from openatlas.models.entity import Entity
 from openatlas.models.entity import insert as entity_insert
 
@@ -63,6 +65,30 @@ class ApiTestCase(TestBaseCase):
                 Path(app.root_path).parent / 'install' / 'data_test_api.sql',
                 encoding='utf8') as sql_file:
             self.cursor.execute(sql_file.read())
+
+    def upload_logo(self) -> None:
+        with app.test_request_context():
+            app.preprocess_request()
+            rights_holder_ids = [rh.id for rh in g.rights_holder]
+
+        logo_path = Path(app.root_path) / 'static' / 'images' / 'layout'
+        public_type = Entity.get_hierarchy('Public sharing allowed')
+        with open(logo_path / 'logo.png', 'rb') as img:
+            response = self.client.post(
+                url_for('insert', class_='file'),
+                data={
+                    'name': 'OpenAtlas logo',
+                    'file': img,
+                    'description': 'OpenAtlas logo',
+                    'creator': f'{rights_holder_ids}',
+                    'license_holder': f'{rights_holder_ids}',
+                    str(public_type.id): public_type.subs[1]})
+
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+        logo = self.get_api_entities().logo
+        with app.test_request_context():
+            app.preprocess_request()
+            self.assertIsNotNone(get_file_path(logo.id))
 
     @staticmethod
     def get_classes(data: list[dict[str, Any]]) -> bool:
@@ -128,8 +154,10 @@ class ApiTestCase(TestBaseCase):
                         entities.file_without_licences = entity
                     case 'File without file':
                         entities.file_without_file = entity
-                    case 'OpenAtlas logo' | 'Picture with a License':
-                        entities.file = entity
+                    case 'OpenAtlas logo':
+                        entities.logo = entity
+                    case 'Picture with a License':
+                        entities.picture_with_license = entity
                     case 'Public domain':
                         entities.open_license = entity
                     case 'License':

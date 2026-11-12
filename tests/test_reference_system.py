@@ -1,6 +1,5 @@
 from http import HTTPStatus
 from typing import Any
-from unittest.mock import Mock, patch
 
 from flask import url_for
 from werkzeug.exceptions import ImATeapot
@@ -107,6 +106,21 @@ class ReferenceSystemTest(TestBaseCase):
             data={'id_': '01004/78/99'})
         assert_ajax_call(rv, 'nicht vorhanden')
 
+
+        rv = c.post(
+            url_for(
+                'ajax_external_api',
+                system_id=get_reference_system_by_name_safe('ROR').id),
+            data={'id_': '028bsh698'})
+        assert_ajax_call(rv, 'ACDH')
+
+        rv = c.post(
+            url_for(
+                'ajax_external_api',
+                system_id=get_reference_system_by_name_safe('ROR').id),
+            data={'id_': '99999999999'})
+        assert_ajax_call(rv, '"number_of_results": 0')
+
         rv = c.get(url_for('insert', class_='reference_system'))
         assert b'resolver URL' in rv.data
 
@@ -125,8 +139,8 @@ class ReferenceSystemTest(TestBaseCase):
 
         rv = c.post(
             url_for('ajax_external_api', system_id=system_id),
-            data={'id_': '1544'})
-        assert b'Urkunde' in rv.data
+            data={'id_': '19729'})
+        assert_ajax_call(rv, 'Thunau Obere Holzwiese')
 
         apis_url = 'https://discworld.acdh-dev.oeaw.ac.at/'
         apis: dict[str, str | list[str]] = {
@@ -140,28 +154,43 @@ class ReferenceSystemTest(TestBaseCase):
         rv = c.post(
             url_for('ajax_external_api', system_id=system_id),
             data={'id_': '12'})
-        assert b'Carrot' in rv.data
+        assert_ajax_call(rv, 'Carrot')
 
         rv = c.get(url_for('apis_proxy', system_url=apis_url, search='Carr'))
-        assert b'Carrot' in rv.data
+
+        assert_ajax_call(rv, 'Carrot')
 
         rv = c.get(url_for('viaf_proxy', query='Tolkien'))
-        assert b'Tolkien' in rv.data
+        assert_ajax_call(rv, 'Tolkien')
 
         rv = c.get(url_for('apis_proxy', system_url='wrong', search='Carr'))
-        assert b'error' in rv.data
+        assert_ajax_call(rv, 'error')
 
         rv = c.get(url_for('crossref_proxy', rows='10', query='OpenAtlas'))
-        assert b'OpenAtlas' in rv.data
+        assert_ajax_call(rv, 'OpenAtlas')
 
         rv = c.get(url_for('crossref_proxy', rows='wrong', query='Open'))
-        assert b'error' in rv.data
+        assert_ajax_call(rv, 'error')
+
+        rv = c.get(url_for('ror_proxy', query='028bsh698'))
+        assert_ajax_call(rv, 'ACDH')
+
+        rv = c.get(url_for('ror_proxy', query='99999999999999999'))
+        assert_ajax_call(rv, '"items": []')
 
         rv = c.get(url_for('chronontology_proxy', size='10', q='Wien*'))
-        assert b'Wien' in rv.data or b'results' in rv.data
+        assert_ajax_call(rv, 'results')
 
         rv = c.get(url_for('chronontology_proxy', size='wrong', q='Wien*'))
-        assert b'error' in rv.data
+        assert_ajax_call(rv, 'error')
+
+        data['reference_system_classes'] = ['place']
+
+        rv = c.get(url_for('chronontology_proxy', size='10', q='Wien*'))
+        assert_ajax_call(rv, 'Wien')
+
+        rv = c.get(url_for('chronontology_proxy', size='wrong', q='Wien*'))
+        assert_ajax_call(rv, 'error')
 
         data['reference_system_classes'] = ['place']
         rv = c.post(
