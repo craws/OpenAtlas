@@ -137,7 +137,7 @@ def viaf_proxy() -> Response | tuple[Response, int]:
 def ror_proxy() -> Response | tuple[Response, int]:
     try:
         return jsonify({'items': ROR.search(request.args.get('query', ''))})
-    except requests.exceptions.RequestException as e:
+    except requests.exceptions.RequestException as e:  # pragma: no cover
         return jsonify({'error': str(e), 'items': []}), 502
 
 
