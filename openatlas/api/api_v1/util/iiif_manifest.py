@@ -205,11 +205,16 @@ class IIIFBuilder:
     @cached_property
     def site_provider(self) -> dict[str, Any]:
         site_url = url_for('overview', _external=True)
+        site_name = g.settings.get('site_name') or 'OpenAtlas'
         provider: dict[str, Any] = {
             'id': site_url,
             'type': 'Agent',
-            'label': {'en': [g.settings.get('site_name') or 'OpenAtlas']},
-            'homepage': [{'id': site_url, 'type': 'Text'}]}
+            'label': {'en': [site_name]},
+            'homepage': [{
+                'id': site_url,
+                'type': 'Text',
+                'label': {'en': [site_name]},
+                'format': 'text/html'}]}
         if logo := self.get_logo():
             provider['logo'] = [logo]
         return provider

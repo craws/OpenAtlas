@@ -689,8 +689,11 @@ class ApiV1(ApiTestCase):
         assert site_provider['label']['en'] == [
             c.get(url_for('api_v1_system.get_system_info')).get_json()[
                 'siteName']]
-        assert site_provider['homepage'][0]['id'] == url_for(
-            'overview', _external=True)
+        assert site_provider['homepage'][0] == {
+            'id': url_for('overview', _external=True),
+            'type': 'Text',
+            'label': site_provider['label'],
+            'format': 'text/html'}
         assert site_provider['logo']
         statement = manifest['requiredStatement']['value']['en'][0]
         assert 'Public domain' in statement
