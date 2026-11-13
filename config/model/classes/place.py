@@ -20,7 +20,11 @@ place: dict[str, Any] = {
         'alias': {},
         'dates': {},
         'description': {},
-        'location': {}},
+        'location': {},
+        'includes': {
+            'cidoc_class': 'E53',
+            'via': 'P53',
+            'inverse': True}},
     'extra': ['reference_system'],
     'relations': {
         'source': standard_relations['source'],

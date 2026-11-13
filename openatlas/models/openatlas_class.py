@@ -87,10 +87,15 @@ def get_classes() -> None:
             display=model_['display'],
             extra=model_['extra'])
     g.classes = classes
+    g.cidoc_class_includes = {}
 
     # Set default reverse relations with first relation class which is good
     # enough for most cases. If not, call it again with a specific class.
     for class_ in classes.values():
+        model_ = get_model(class_.name)
+        if includes := model_['attributes'].get('includes'):
+            g.cidoc_class_includes[g.classes[class_.name].cidoc_class.code] \
+                = includes['cidoc_class']
         for relation in class_.relations.values():
             if relation.classes:
                 relation.reverse_relation = get_reverse_relation(

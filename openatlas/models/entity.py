@@ -161,11 +161,21 @@ class Entity:
             range_error = True
             if g.properties[code].find_object(
                     'domain_class_code',
-                    domain.class_.cidoc_class.code):
+                    domain.class_.cidoc_class.code) or (
+                        domain.class_.cidoc_class.code in
+                                g.cidoc_class_includes and
+                        g.properties[code].find_object(
+                            'domain_class_code',
+                            g.cidoc_class_includes[domain.class_.cidoc_class.code])):
                 domain_error = False
             if g.properties[code].find_object(
                     'range_class_code',
-                    range_.class_.cidoc_class.code):
+                    range_.class_.cidoc_class.code) or (
+                        range_.class_.cidoc_class.code in
+                                g.cidoc_class_includes and
+                        g.properties[code].find_object(
+                            'range_class_code',
+                            g.cidoc_class_includes[range_.class_.cidoc_class.code])):
                 range_error = False
             if domain_error or range_error:  # pragma: no cover
                 text = \
