@@ -1,0 +1,22 @@
+<script>
+  /**
+   * ROR autocomplete
+   * API: https://api.ror.org/v2/organizations
+   */
+  initReferenceAutocomplete('{{ system.id }}', {
+    minLength: 3,
+    delay: 400,
+    maxResults: 15,
+    search: query => $.ajax({
+      url: '/proxy/ror',
+      dataType: 'json',
+      data: {query: query}
+    }).then(data => (data?.items || []).map(item => ({
+      id: item.id,
+      label: `${item.name || item.id}${item.acronym ? ` (${item.acronym})` : ''}`,
+      info: [item.city, item.country].filter(Boolean).join(', '),
+      detail: (item.types || []).join(', '),
+      url: item.url
+    })))
+  });
+</script>
