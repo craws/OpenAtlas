@@ -684,6 +684,14 @@ class ApiV1(ApiTestCase):
         assert manifest['id'].endswith(
             f'/api/1/iiif/{e.file.id}/manifest')
         assert manifest['rights'] == lic_url
+        site_provider = manifest['provider'][0]
+        assert site_provider['type'] == 'Agent'
+        assert site_provider['label']['en'] == [
+            c.get(url_for('api_v1_system.get_system_info')).get_json()[
+                'siteName']]
+        assert site_provider['homepage'][0]['id'] == url_for(
+            'overview', _external=True)
+        assert site_provider['logo']
         statement = manifest['requiredStatement']['value']['en'][0]
         assert 'Public domain' in statement
 
@@ -695,8 +703,12 @@ class ApiV1(ApiTestCase):
         assert georeference['id'].endswith(georeference_path)
         georeference_annotation = georeference['items'][0]
         assert georeference_annotation['motivation'] == 'georeferencing'
-        assert georeference_annotation['target']['source']['type'] == (
-            'ImageService2')
+        georeference_source = georeference_annotation['target']['source']
+        assert georeference_source['type'] == 'ImageService2'
+        assert georeference_source['partOf'] == [{
+            'id': manifest['id'],
+            'type': 'Manifest'}]
+        assert georeference_source['provider'] == [site_provider]
         features = georeference_annotation['body']['features']
         assert (
             [feature['geometry']['coordinates'] for feature in features]
@@ -748,6 +760,27 @@ class ApiV1(ApiTestCase):
         assert annotation['type'] == 'Annotation'
         assert annotation['id'].endswith(annotation_path)
         assert annotation['target']['source'].endswith(canvas_path)
+
+        with app.test_request_context():
+            app.preprocess_request()
+            set_logo()
+        no_logo_manifest = c.get(
+            url_for('api_v1_iiif.get_iiif_manifest', id=e.file.id)).get_json()
+        no_logo_provider = no_logo_manifest['provider'][0]
+        assert no_logo_provider['label'] == site_provider['label']
+        assert no_logo_provider['homepage'] == site_provider['homepage']
+        assert 'logo' not in no_logo_provider
+        no_logo_georeference = c.get(
+            url_for(
+                'api_v1_iiif.get_iiif_georeference',
+                id=e.file.id)).get_json()
+        no_logo_source = no_logo_georeference['items'][0][
+            'target']['source']
+        assert no_logo_source['provider'] == [no_logo_provider]
+
+        with app.test_request_context():
+            app.preprocess_request()
+            set_logo(e.file.id)
 
         openapi = c.get('/api/1/docs/openapi.json').get_json()
         iiif_paths = {

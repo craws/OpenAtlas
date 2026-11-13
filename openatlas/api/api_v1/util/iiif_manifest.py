@@ -202,6 +202,18 @@ class IIIFBuilder:
             license=lic,
             attribution=attribution)
 
+    @cached_property
+    def site_provider(self) -> dict[str, Any]:
+        site_url = url_for('overview', _external=True)
+        provider: dict[str, Any] = {
+            'id': site_url,
+            'type': 'Agent',
+            'label': {'en': [g.settings.get('site_name') or 'OpenAtlas']},
+            'homepage': [{'id': site_url, 'type': 'Text'}]}
+        if logo := self.get_logo():
+            provider['logo'] = [logo]
+        return provider
+
     def get_annotation_details(
             self,
             annotation: AnnotationImage) -> tuple[str, str]:
@@ -260,12 +272,7 @@ class IIIFBuilder:
                 'value': {'en': [self.common_meta.attribution]}}
         if self.common_meta.license and self.common_meta.license.url:
             manifest['rights'] = self.common_meta.license.url
-        if g.settings.get('logo_file_id'):
-            manifest['provider'] = [{
-                'id': url_for('overview', _external=True),
-                'type': 'Agent',
-                'label': {'en': ['Provider']},
-                'logo': [self.get_logo()]}]
+        manifest['provider'] = [self.site_provider]
 
         return manifest
 
@@ -330,7 +337,11 @@ class IIIFBuilder:
                     'source': {
                         **self.image_service,
                         'width': width,
-                        'height': height},
+                        'height': height,
+                        'partOf': [{
+                            'id': self.manifest_url,
+                            'type': 'Manifest'}],
+                        'provider': [self.site_provider]},
                     'selector': {
                         'type': 'SvgSelector',
                         'value': (
