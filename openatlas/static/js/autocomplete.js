@@ -42,7 +42,8 @@ function initReferenceAutocomplete(systemId, options) {
         id: String(item.id).trim(),
         label: item.label ? String(item.label) : String(item.id),
         info: item.info ? String(item.info) : '',
-        detail: item.detail ? String(item.detail) : ''
+        detail: item.detail ? String(item.detail) : '',
+        url: item.url ? String(item.url) : ''
       }));
   }
 
@@ -91,6 +92,17 @@ function initReferenceAutocomplete(systemId, options) {
               ? `<a href="${escapeHtml(options.idLinkBase + encodeURIComponent(record.id))}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">${escapeHtml(record.id)}</a>`
               : escapeHtml(record.id)}${record.detail ? ` - ${escapeHtml(record.detail)}` : ''}
           </small>`;
+        if (record.url) {
+          const link = document.createElement('a');
+          link.href = record.url;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.title = 'Open ROR record';
+          link.setAttribute('aria-label', 'Open ROR record');
+          link.textContent = ' ↗';
+          link.addEventListener('click', event => event.stopPropagation());
+          item.querySelector('small').append(link);
+        }
       }
     },
     events: {

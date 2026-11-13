@@ -51,6 +51,7 @@ dependencies = [
     "fiona>=1.10.0",
     "pytest>=9.0.2",
     "mypy>=1.11",
+    "pylint>=3.0",
 ]
 
 [project.optional-dependencies]

@@ -38,6 +38,7 @@ EXTERNAL_API = [
     'Kulturpool',
     'OpenAtlas',
     'ORCID',
+    'ROR',
     'VIAF',
     'Wikidata']
 
