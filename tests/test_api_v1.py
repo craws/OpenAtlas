@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from flask import url_for
+from flask import g, url_for
 from rdflib import RDF, Dataset, URIRef
 
 from openatlas import app
