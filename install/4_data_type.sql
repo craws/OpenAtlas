@@ -396,7 +396,8 @@ INSERT INTO model.entity (openatlas_class_name, name, description) VALUES
   ('reference_system', 'VIAF', 'VIAF (Virtual International Authority File) is a major international service that clusters authority data from national libraries and cultural institutions worldwide into single, unified clusters.'),
   ('reference_system', 'Kulturpool', 'Kulturpool is Austria''s central digital portal for art, culture, and science, aggregating millions of digital objects and metadata from nationwide museums, libraries, and archives. Administered by the Natural History Museum Vienna (NHM), it serves as the official national aggregator for the European digital platform Europeana.'),
   ('reference_system', 'Getty AAT', 'Getty AAT (Art and Architecture Thesaurus) is a controlled vocabulary for art and architecture terms. AAT is a thesaurus containing generic terms, dates, relationships, sources, and notes for work types, roles, materials, styles, cultures, techniques, and other concepts related to art, architecture, and other cultural heritage (e.g., amphora, oil paint, olieverf, acetolysis, sintering, orthographic drawings, Olmeca, Rinascimento, Buddhism, watercolors, asa-no-ha-toji, sralais). Please enter only the Getty AAT identifier itself, not the full URL or domain.'),
-  ('reference_system', 'ROR', 'The Research Organization Registry (ROR) provides open persistent identifiers for research organizations.');
+  ('reference_system', 'ROR', 'The Research Organization Registry (ROR) provides open persistent identifiers for research organizations.'),
+  ('reference_system', 'ORCID', 'ORCID (Open Researcher and Contributor ID) provides persistent digital identifiers that distinguish researchers and contributors.');
 
 INSERT INTO web.reference_system (system, name, api, entity_id, resolver_url, website_url, identifier_example)
 VALUES
@@ -409,7 +410,8 @@ VALUES
   (true, 'ChronOntology', 'ChronOntology', (SELECT id FROM model.entity WHERE name = 'ChronOntology' AND openatlas_class_name = 'reference_system'), 'https://chronontology.dainst.org/period/', 'https://chronontology.dainst.org/', 'UCBAClZzVqwh'),
   (true, 'Kulturpool',    'Kulturpool',    (SELECT id FROM model.entity WHERE name = 'Kulturpool'    AND openatlas_class_name = 'reference_system'), 'https://kulturpool.at/objekte/', 'https://kulturpool.at/', 'dfc50104-275f-44b7-aa9f-00975528a671'),
   (true, 'Getty AAT',     'GettyAAT',      (SELECT id FROM model.entity WHERE name = 'Getty AAT'     AND openatlas_class_name = 'reference_system'), 'https://vocab.getty.edu/page/aat/', 'https://www.getty.edu/research/tools/vocabularies/aat/', '300387513'),
-  (true, 'ROR',           'ROR',           (SELECT id FROM model.entity WHERE name = 'ROR'           AND openatlas_class_name = 'reference_system'), 'https://ror.org/', 'https://ror.org/', '03anc3s82');
+  (true, 'ROR',           'ROR',           (SELECT id FROM model.entity WHERE name = 'ROR'           AND openatlas_class_name = 'reference_system'), 'https://ror.org/', 'https://ror.org/', '03anc3s82'),
+  (true, 'ORCID',         'ORCID',         (SELECT id FROM model.entity WHERE name = 'ORCID'         AND openatlas_class_name = 'reference_system'), 'https://orcid.org/', 'https://orcid.org/', '0000-0001-7608-7446');
 
 INSERT INTO model.link (property_code, range_id, domain_id) VALUES
   ('P2', (SELECT id FROM model.entity WHERE name='exact match'), (SELECT id FROM model.entity WHERE name='Cadaster')),
@@ -424,6 +426,7 @@ INSERT INTO web.reference_system_openatlas_class (reference_system_id, openatlas
   ((SELECT entity_id FROM web.reference_system WHERE name='Getty AAT'), 'type'),
   ((SELECT entity_id FROM web.reference_system WHERE name='GND'), 'person'),
   ((SELECT entity_id FROM web.reference_system WHERE name='ROR'), 'group'),
+  ((SELECT entity_id FROM web.reference_system WHERE name='ORCID'), 'person'),
   ((SELECT entity_id FROM web.reference_system WHERE name='DOI'), 'edition'),
   ((SELECT entity_id FROM web.reference_system WHERE name='DOI'), 'external_reference'),
   ((SELECT entity_id FROM web.reference_system WHERE name='DOI'), 'bibliography');

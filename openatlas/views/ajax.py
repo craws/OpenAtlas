@@ -14,6 +14,7 @@ from openatlas.api.external.geonames import GeoNames  # noqa
 from openatlas.api.external.gnd import GND  # noqa
 from openatlas.api.external.kulturpool import Kulturpool  # noqa
 from openatlas.api.external.openatlas_api import OpenAtlas  # noqa
+from openatlas.api.external.orcid import ORCID  # noqa
 from openatlas.api.external.ror import ROR  # noqa
 from openatlas.api.external.wikidata import Wikidata  # noqa
 from openatlas.api.external.viaf import VIAF  # noqa
@@ -112,6 +113,15 @@ def crossref_proxy() -> Response | tuple[Response, int]:
         return jsonify(response.json())
     except requests.exceptions.RequestException as e:
         return jsonify({'error': str(e), 'message': {'items': []}}), 502
+
+
+@app.route('/proxy/orcid', methods=['GET'])
+@required_group('readonly')
+def orcid_proxy() -> Response | tuple[Response, int]:
+    try:
+        return jsonify({'items': ORCID.search(request.args.get('query', ''))})
+    except requests.exceptions.RequestException as e:  # pragma: no cover
+        return jsonify({'error': str(e), 'items': []}), 502
 
 
 @app.route('/proxy/viaf', methods=['GET'])

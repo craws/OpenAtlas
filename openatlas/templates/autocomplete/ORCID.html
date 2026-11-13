@@ -1,0 +1,22 @@
+<script>
+  /**
+   * ORCID autocomplete
+   * API: https://pub.orcid.org/v3.0/expanded-search/
+   */
+  initReferenceAutocomplete('{{ system.id }}', {
+    minLength: 3,
+    delay: 400,
+    maxResults: 15,
+    search: query => $.ajax({
+      url: '/proxy/orcid',
+      dataType: 'json',
+      data: {query: query}
+    }).then(data => (data?.items || []).map(item => ({
+      id: item.id,
+      label: item.name || item.id,
+      info: (item.other_names || []).slice(0, 2).join(', '),
+      detail: (item.institutions || []).join(', '),
+      url: item.url
+    })))
+  });
+</script>

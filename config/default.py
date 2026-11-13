@@ -37,6 +37,7 @@ EXTERNAL_API = [
     'GND',
     'Kulturpool',
     'OpenAtlas',
+    'ORCID',
     'ROR',
     'VIAF',
     'Wikidata']
