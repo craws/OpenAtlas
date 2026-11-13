@@ -115,7 +115,6 @@ class IIIFBuilder:
             id=entity.id,
             _external=True)
         self.file_path = get_cached_file_path(entity.id)
-        self.mime_type = get_actual_mime(self.file_path)
 
     @cached_property
     def image_metadata(self) -> tuple[str, dict[str, Any]]:
@@ -284,19 +283,20 @@ class IIIFBuilder:
     def build_canvas(self) -> dict[str, Any]:
         annotations_ = AnnotationImage.get_by_file_id(self.entity.id)
         canvas: dict[str, Any] = {
+            '@context': 'https://iiif.io/api/presentation/3/context.json',
             'id': self.canvas_url,
             'type': 'Canvas',
             'label': {'en': [self.entity.name]},
             'height': self.image_api['height'],
             'width': self.image_api['width'],
             'items': [{
-                'id': f'{self.canvas_url}/annotation_page/1',
+                'id': f'{self.canvas_url}#page-1',
                 'type': 'AnnotationPage',
                 'items': [self.build_image()]}],
             'thumbnail': [{
                 'id': f'{self.image_url}/full/!200,200/0/default.jpg',
                 'type': 'Image',
-                'format': self.mime_type,
+                'format': 'image/jpeg',
                 'service': [self.image_service]}]}
         canvas_annotations = []
         if annotations_:
@@ -334,7 +334,7 @@ class IIIFBuilder:
             'id': self.georeference_url,
             'type': 'AnnotationPage',
             'items': [{
-                'id': f'{self.georeference_url}/annotation',
+                'id': f'{self.georeference_url}#annotation',
                 'type': 'Annotation',
                 'motivation': 'georeferencing',
                 'target': {
@@ -362,13 +362,14 @@ class IIIFBuilder:
 
     def build_image(self) -> dict[str, Any]:
         return {
+            '@context': 'https://iiif.io/api/presentation/3/context.json',
             'id': self.image_resource_url,
             'type': 'Annotation',
             'motivation': 'painting',
             'body': {
-                'id': self.image_url,
+                'id': f'{self.image_url}/full/full/0/default.jpg',
                 'type': 'Image',
-                'format': self.mime_type,
+                'format': 'image/jpeg',
                 'service': [self.image_service],
                 'height': self.image_api['height'],
                 'width': self.image_api['width']},
@@ -378,24 +379,33 @@ class IIIFBuilder:
             self,
             annotation: AnnotationImage) -> dict[str, Any]:
         annotation_url, entity_link = self.get_annotation_details(annotation)
+        body = []
+        if entity_link:
+            body.append({
+                'type': 'TextualBody',
+                'value': entity_link,
+                'format': 'text/html'})
+        if annotation.text:
+            body.append({
+                'type': 'TextualBody',
+                'value': annotation.text,
+                'format': 'text/plain'})
         return {
+            '@context': 'https://iiif.io/api/presentation/3/context.json',
             'id': annotation_url,
             'type': 'Annotation',
             'motivation': 'commenting',
-            'body': [{
-                'type': 'Dataset',
-                'value': entity_link,
-                'format': 'text/html'}, {
-                'type': 'TextualBody',
-                'value': annotation.text,
-                'format': 'text/plain'}],
+            'body': body,
             'target': {
+                'type': 'SpecificResource',
                 'source': self.canvas_url,
                 'selector': self.get_selector(annotation.coordinates)}}
 
     def get_logo(self) -> dict[str, Any]:
         logo_id = g.settings.get('logo_file_id')
         if not logo_id or not str(logo_id).isdigit():
+            return {}  # pragma: no cover
+        if not (logo_path := get_cached_file_path(int(logo_id))):
             return {}  # pragma: no cover
         logo_url = url_for(
             'api_v1_files.display_file',
@@ -404,11 +414,7 @@ class IIIFBuilder:
         return {
             'id': logo_url,
             'type': 'Image',
-            'format': 'image/jpeg',
-            'service': [{
-                'id': url_for('overview', _external=True),
-                'type': 'ImageService3',
-                'profile': 'level2'}]}
+            'format': get_actual_mime(logo_path)}
 
 
 def build_manifest(entity: Entity) -> dict[str, Any]:
@@ -432,6 +438,7 @@ def build_annotation_list(entity: Entity) -> dict[str, Any]:
     annotations_ = AnnotationImage.get_by_file_id(entity.id)
     builder = IIIFBuilder(entity)
     return {
+        '@context': 'https://iiif.io/api/presentation/3/context.json',
         'id': builder.annotation_list_url,
         'type': 'AnnotationPage',
         'items': [builder.build_annotation(a) for a in annotations_]}

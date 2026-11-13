@@ -7,6 +7,7 @@ from rdflib import RDF, Dataset, URIRef
 from openatlas import app
 from openatlas.api.api_v1.formatters.la_formatter import format_la_entities
 from openatlas.api.api_v1.formatters.lod import format_lod_entities
+from openatlas.api.api_v1.responses.iiif import IIIF_CONTENT_TYPE
 from openatlas.database import overlay as db_overlay
 from openatlas.models.annotation import AnnotationImage, AnnotationText
 from openatlas.models.settings import set_logo
@@ -676,6 +677,7 @@ class ApiV1(ApiTestCase):
                 'api_v1_iiif.get_iiif_manifest',
                 id=e.file.id))
         assert rv.status_code == HTTPStatus.OK
+        assert rv.headers['Content-Type'] == IIIF_CONTENT_TYPE
         manifest = rv.get_json()
         assert manifest['type'] == 'Manifest'
         assert manifest['@context'] == [
@@ -701,10 +703,15 @@ class ApiV1(ApiTestCase):
         rv = c.get(
             url_for('api_v1_iiif.get_iiif_georeference', id=e.file.id))
         assert rv.status_code == HTTPStatus.OK
+        assert rv.headers['Content-Type'] == IIIF_CONTENT_TYPE
         georeference = rv.get_json()
         georeference_path = f'/api/1/iiif/{e.file.id}/georeference'
         assert georeference['id'].endswith(georeference_path)
+        assert georeference['@context'] == [
+            'https://iiif.io/api/extension/georef/1/context.json',
+            'https://iiif.io/api/presentation/3/context.json']
         georeference_annotation = georeference['items'][0]
+        assert georeference_annotation['id'].endswith('#annotation')
         assert georeference_annotation['motivation'] == 'georeferencing'
         georeference_source = georeference_annotation['target']['source']
         assert georeference_source['type'] == 'ImageService2'
@@ -722,9 +729,13 @@ class ApiV1(ApiTestCase):
             url_for('api_v1_iiif.get_iiif_canvas', id=e.file.id))
         assert rv.status_code == HTTPStatus.OK
         canvas = rv.get_json()
+        assert canvas['@context'] == (
+            'https://iiif.io/api/presentation/3/context.json')
         canvas_path = f'/api/1/iiif/{e.file.id}/canvas'
         assert canvas['id'].endswith(canvas_path)
         assert manifest['items'][0]['id'].endswith(canvas_path)
+        assert canvas['items'][0]['id'].endswith(f'{canvas_path}#page-1')
+        assert canvas['thumbnail'][0]['format'] == 'image/jpeg'
         assert any(
             annotation_page['id'].endswith(georeference_path)
             for annotation_page in canvas['annotations'])
@@ -734,8 +745,13 @@ class ApiV1(ApiTestCase):
             url_for('api_v1_iiif.get_iiif_image', id=e.file.id))
         assert rv.status_code == HTTPStatus.OK
         image = rv.get_json()
+        assert rv.headers['Content-Type'] == IIIF_CONTENT_TYPE
         image_path = f'/api/1/iiif/{e.file.id}/image'
+        assert image['@context'] == (
+            'https://iiif.io/api/presentation/3/context.json')
         assert image['body']['service'][0]['type'] == 'ImageService2'
+        assert image['body']['id'].endswith('/full/full/0/default.jpg')
+        assert image['body']['format'] == 'image/jpeg'
         assert image['id'].endswith(image_path)
         assert image['target'].endswith(canvas_path)
         assert canvas['items'][0]['items'][0]['id'].endswith(image_path)
@@ -747,7 +763,10 @@ class ApiV1(ApiTestCase):
                 id=e.file.id))
         assert rv.status_code == HTTPStatus.OK
         annotation_list = rv.get_json()
-        annotation_list_path = f'/api/1/iiif/{e.file.id}/annotation-list'
+        assert rv.headers['Content-Type'] == IIIF_CONTENT_TYPE
+        annotation_list_path = f'/api/1/iiif/{e.file.id}/annotation-page'
+        assert annotation_list['@context'] == (
+            'https://iiif.io/api/presentation/3/context.json')
         assert annotation_list['type'] == 'AnnotationPage'
         assert annotation_list['id'].endswith(annotation_list_path)
         assert canvas['annotations'][0]['id'].endswith(annotation_list_path)
@@ -759,10 +778,19 @@ class ApiV1(ApiTestCase):
                 id=annotation_id))
         assert rv.status_code == HTTPStatus.OK
         annotation = rv.get_json()
-        annotation_path = f'/api/1/iiif/{annotation_id}/annotation'
+        assert rv.headers['Content-Type'] == IIIF_CONTENT_TYPE
+        annotation_path = f'/api/1/iiif/annotation/{annotation_id}'
+        assert annotation['@context'] == (
+            'https://iiif.io/api/presentation/3/context.json')
         assert annotation['type'] == 'Annotation'
         assert annotation['id'].endswith(annotation_path)
+        assert annotation['body'][0]['type'] == 'TextualBody'
+        assert annotation['target']['type'] == 'SpecificResource'
         assert annotation['target']['source'].endswith(canvas_path)
+
+        logo = site_provider['logo'][0]
+        assert logo['format'] == 'image/png'
+        assert 'service' not in logo
 
         with app.test_request_context():
             app.preprocess_request()
@@ -789,27 +817,32 @@ class ApiV1(ApiTestCase):
         iiif_paths = {
             f'/api/1/iiif/{{id}}/{endpoint}'
             for endpoint in (
-                'manifest', 'canvas', 'image', 'annotation-list',
-                'georeference', 'annotation')}
+                'manifest', 'canvas', 'image', 'annotation-page',
+                'georeference')}
+        iiif_paths.add('/api/1/iiif/annotation/{id}')
         assert iiif_paths <= openapi['paths'].keys()
         assert not any(
             path.startswith('/api/1/iiif/') and '{version}' in path
             for path in openapi['paths'])
 
         for path in (
+                f'/api/1/iiif/{e.file.id}/annotation-list',
+                f'/api/1/iiif/{annotation_id}/annotation',
+                f'/api/1/iiif/{e.file.id}/georeference/annotation',
                 f'/api/1/iiif/{e.file.id}/manifest/3',
                 f'/api/1/iiif/{e.file.id}/canvas/3',
                 f'/api/1/iiif/{e.file.id}/image/3',
-                f'/api/1/iiif/{e.file.id}/annotation-list/3',
-                f'/api/1/iiif/{annotation_id}/annotation/3'):
+                f'/api/1/iiif/{e.file.id}/annotation-page/3',
+                f'/api/1/iiif/annotation/{annotation_id}/3'):
             assert c.get(path).status_code == HTTPStatus.NOT_FOUND
 
         rv = c.get('/api/1/iiif/999999/manifest')
         assert rv.status_code == HTTPStatus.NOT_FOUND
+        assert rv.mimetype == 'application/json'
         assert rv.get_json()['details']['provided_id'] == '999999'
 
         for id_ in [0, 999999]:
-            rv = c.get(f'/api/1/iiif/{id_}/annotation')
+            rv = c.get(f'/api/1/iiif/annotation/{id_}')
             assert rv.status_code == HTTPStatus.NOT_FOUND
             assert rv.get_json()['details']['provided_id'] == str(id_)
 
