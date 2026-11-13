@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import re
-import threading
-import time
+from html import escape
+from typing import Any
+from urllib.parse import quote
 
 import requests
 
@@ -12,119 +12,82 @@ from openatlas.display.util import link
 from openatlas.models.entity import Entity
 
 
-_token: str | None = None
-_expires = 0.0
-_credentials: tuple[str, str] | None = None
-_lock = threading.Lock()
-
-
-def _get_token() -> str:
-    global _token, _expires, _credentials  # pylint: disable=global-statement
-    credentials = (
-        app.config.get('ORCID_CLIENT_ID', ''),
-        app.config.get('ORCID_CLIENT_SECRET', ''))
-    if not all(credentials):
-        raise ValueError('ORCID client credentials are not configured')
-    with _lock:
-        if _token and _credentials == credentials and time.monotonic() < _expires:
-            return _token
-        response = requests.post(
-            'https://orcid.org/oauth/token',
-            data={
-                'client_id': credentials[0],
-                'client_secret': credentials[1],
-                'grant_type': 'client_credentials',
-                'scope': '/read-public'},
-            headers={'Accept': 'application/json', **app.config['USER_AGENT']},
-            proxies=app.config['PROXIES'],
-            timeout=10)
-        response.raise_for_status()
-        data = response.json()
-        token = data['access_token']
-        _expires = time.monotonic() + max(0, int(data.get('expires_in', 3600)) - 60)
-        _token = token
-        _credentials = credentials
-        return token
-
-
-def _request(path: str, params: dict[str, object] | None = None) -> object:
-    global _token, _expires  # pylint: disable=global-statement
-    for attempt in range(2):
-        token = _get_token()
-        response = requests.get(
-            f'https://pub.orcid.org/v3.0/{path}',
-            params=params,
-            headers={
-                **app.config['USER_AGENT'],
-                'Accept': 'application/json',
-                'Authorization': f'Bearer {token}'},
-            proxies=app.config['PROXIES'],
-            timeout=10)
-        if response.status_code == 401 and not attempt:
-            with _lock:
-                if _token == token:
-                    _token = None
-                    _expires = 0.0
-            continue
-        response.raise_for_status()
-        return response.json()
-    raise RuntimeError('ORCID request failed')  # pragma: no cover
-
-
-def search(query: str) -> list[dict[str, str]]:
-    terms = [re.sub(r'[^\w]', '', word, flags=re.UNICODE).replace('_', '')
-             for word in query.strip().split()]
-    terms = [term for term in terms if term]
-    if not terms:
-        return []
-    try:
-        data = _request(
-            'expanded-search/',
-            {'q': ' AND '.join(
-                f'(given-names:{term}* OR family-names:{term}* OR '
-                f'credit-name:{term}*)' for term in terms),
-             'rows': 15})
-    except (requests.RequestException, ValueError):
-        return []
-    if not isinstance(data, dict):
-        return []
-    results = []
-    for item in data.get('expanded-result') or []:
-        if not isinstance(item, dict) or not item.get('orcid-id'):
-            continue
-        identifier = item['orcid-id']
-        name = ' '.join(filter(None, [
-            item.get('given-names'), item.get('family-names')]))
-        institutions = item.get('institution-name') or []
-        label = name or item.get('credit-name') or identifier
-        if institutions:
-            label += f" ({', '.join(institutions[:2])})"
-        results.append({
-            'id': identifier,
-            'label': label,
-            'info': '',
-            'detail': ''})
-    return results
-
-
 class ORCID(ExternalApi):  # pylint: disable=too-few-public-methods
 
     @staticmethod
+    def search(term: str) -> list[dict[str, object]]:
+        response = requests.get(
+            'https://pub.orcid.org/v3.0/expanded-search/',
+            params={'q': term, 'rows': 15},
+            headers={
+                'Accept': 'application/json',
+                **app.config['USER_AGENT']},
+            proxies=app.config['PROXIES'],
+            timeout=10)
+        response.raise_for_status()
+
+        results: list[dict[str, object]] = []
+        for item in (response.json().get('expanded-result') or [])[:15]:
+            identifier = item.get('orcid-id', '')
+            if not identifier:  # pragma: no cover
+                continue
+
+            given = item.get('given-names') or ''
+            family = item.get('family-names') or ''
+            full_name = ' '.join(filter(None, [given, family]))
+            if not full_name:  # pragma: no cover
+                full_name = item.get('credit-name') or ''
+
+            institutions = item.get('institution-name') or []
+            other_names = item.get('other-name') or []
+            results.append({
+                'id': identifier,
+                'name': full_name or identifier,
+                'other_names':
+                    other_names if isinstance(other_names, list) else [],
+                'institutions':
+                    institutions[:3] if isinstance(institutions, list) else [],
+                'url': f'https://orcid.org/{identifier}'})
+        return results
+
+    @staticmethod
     def get_info(id_: str, system: Entity) -> dict[str, object]:
-        if not re.fullmatch(r'\d{4}-\d{4}-\d{4}-\d{3}[\dX]', id_):
-            return {}
         try:
-            data = _request(f'{id_}/person')
-            if not isinstance(data, dict):
-                return {}
-            name = data.get('name') or {}
-            given = (name.get('given-names') or {}).get('value', '')
-            family = (name.get('family-name') or {}).get('value', '')
-            title = ' '.join(filter(None, [given, family]))
-            info: dict[str, object] = {
-                'ORCID ID': link(id_, f'https://orcid.org/{id_}', external=True)}
-            if title:
-                info['title'] = title
-            return info
-        except (requests.RequestException, ValueError, KeyError, TypeError):
+            response = requests.get(
+                f'https://pub.orcid.org/v3.0/{quote(id_, safe="")}/person',
+                headers={
+                    'Accept': 'application/json',
+                    **app.config['USER_AGENT']},
+                proxies=app.config['PROXIES'],
+                timeout=10)
+            response.raise_for_status()
+            data: dict[str, Any] = response.json()
+        except requests.exceptions.RequestException:
             return {}
+
+        name = data.get('name') or {}
+        given = (name.get('given-names') or {}).get('value', '')
+        family = (name.get('family-name') or {}).get('value', '')
+        display_name = ' '.join(filter(None, [given, family]))
+        if not display_name:  # pragma: no cover
+            display_name = (name.get('credit-name') or {}).get('value', '')
+
+        info: dict[str, object] = {}
+        info['ORCID ID'] = link(
+            escape(id_),
+            f'{system.resolver_url}{quote(id_, safe="")}',
+            uc_first_=False,
+            external=True)
+        if display_name:
+            info['name'] = escape(display_name)
+
+        emails = (data.get('emails') or {}).get('email') or []
+        if emails and (email := emails[0].get('email')):
+            info['email'] = escape(email)
+
+        addresses = (data.get('addresses') or {}).get('address') or []
+        if addresses and (
+                country := (addresses[0].get('country') or {}).get('value')):
+            info['country'] = escape(country)
+
+        return info

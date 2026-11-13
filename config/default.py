@@ -42,9 +42,6 @@ EXTERNAL_API = [
     'VIAF',
     'Wikidata']
 
-ORCID_CLIENT_ID = ''
-ORCID_CLIENT_SECRET = ''
-
 # Paths are implemented operating system independent using pathlib.
 # To override them (in instance/production.py) either use them like here
 # or use absolute paths like e.g. pathlib.Path('/some/location/somewhere')

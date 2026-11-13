@@ -121,6 +121,20 @@ class ReferenceSystemTest(TestBaseCase):
             data={'id_': '99999999999'})
         assert_ajax_call(rv, '"number_of_results": 0')
 
+        rv = c.post(
+            url_for(
+                'ajax_external_api',
+                system_id=get_reference_system_by_name_safe('ORCID').id),
+            data={'id_': '0000-0001-7608-7446'})
+        assert_ajax_call(rv, 'Bernhard')
+
+        rv = c.post(
+            url_for(
+                'ajax_external_api',
+                system_id=get_reference_system_by_name_safe('ORCID').id),
+            data={'id_': '99999999999'})
+        assert_ajax_call(rv, '<table class="table table-no-style">')
+
         rv = c.get(url_for('insert', class_='reference_system'))
         assert b'resolver URL' in rv.data
 
@@ -176,6 +190,12 @@ class ReferenceSystemTest(TestBaseCase):
         assert_ajax_call(rv, 'ACDH')
 
         rv = c.get(url_for('ror_proxy', query='99999999999999999'))
+        assert_ajax_call(rv, '"items": []')
+
+        rv = c.get(url_for('orcid_proxy', query='0000-0001-7608-7446'))
+        assert_ajax_call(rv, 'Bernhard')
+
+        rv = c.get(url_for('orcid_proxy', query='99999999999999999'))
         assert_ajax_call(rv, '"items": []')
 
         rv = c.get(url_for('chronontology_proxy', size='10', q='Wien*'))
