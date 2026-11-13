@@ -794,6 +794,7 @@ class ApiV1(ApiTestCase):
             insert('person', 'Smithson', 'Prefix match')
             insert('person', 'John Smith', 'Substring match')
             insert('person', 'Smyth', 'Phonetic match')
+            insert('person', '1230', 'Numeric match')
 
         g.pop('types', None)
         rv = c.get(
@@ -812,6 +813,10 @@ class ApiV1(ApiTestCase):
         assert names[:4] == ['Smith', 'Smithson', 'John Smith', 'Smyth']
         assert data['data'][0]['systemClass'] == 'person'
         assert data['data'][0]['description'] == 'Exact match'
+
+        rv = c.get('/api/1/search?search=0')
+        assert rv.status_code == HTTPStatus.OK
+        assert '1230' in [item['name'] for item in rv.get_json()['data']]
 
         rv = c.get(
             url_for(
