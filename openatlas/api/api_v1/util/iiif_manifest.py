@@ -153,12 +153,14 @@ class IIIFBuilder:
             'type': 'ImageService2',
             'profile': profile}
 
+    @cached_property
     def overlay_corners(self) -> list[list[float]] | None:
         overlays = db_overlay.get_by_object([self.entity.id])
         if not overlays:
             return None
         return get_overlay_corners(overlays[0]['bounding_box'])
 
+    @cached_property
     def common_meta(self) -> ManifestMetadata:
         items = []
         lic = get_license_info(self.entity)
