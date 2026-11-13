@@ -1,5 +1,7 @@
+from http import HTTPStatus
 from typing import Any
 
+from flask import Response
 from flask_openapi3 import APIBlueprint
 
 from openatlas.api.api_v1.error_handlers import (
@@ -8,7 +10,8 @@ from openatlas.api.api_v1.models.iiif import (
     AnnotationIiifPath, FileIiifPath)
 from openatlas.api.api_v1.openapi_tags import iiif_tag
 from openatlas.api.api_v1.responses.iiif import (
-    iiif_annotation_list_response, iiif_annotation_response,
+    IIIF_CONTENT_TYPE, iiif_annotation_list_response,
+    iiif_annotation_response,
     iiif_canvas_response, iiif_georeference_response, iiif_image_response,
     iiif_manifest_response)
 from openatlas.api.api_v1.util.files import check_file_access, get_file_entity
@@ -24,6 +27,14 @@ api_v1_iiif = APIBlueprint(
     url_prefix='/api/1/iiif',
     abp_security=[{'bearerAuth': []}])
 register_error_handlers(api_v1_iiif)
+
+
+@api_v1_iiif.after_request
+def set_iiif_content_type(response: Response) -> Response:
+    if (response.status_code == HTTPStatus.OK
+            and response.mimetype == 'application/json'):
+        response.headers['Content-Type'] = IIIF_CONTENT_TYPE
+    return response
 
 
 @api_v1_iiif.get(
@@ -63,8 +74,8 @@ def get_iiif_image(path: FileIiifPath) -> dict[str, Any]:
 
 
 @api_v1_iiif.get(
-    '/<int:id>/annotation-list',
-    summary="Get IIIF Annotation List/Page",
+    '/<int:id>/annotation-page',
+    summary="Get IIIF Annotation Page",
     tags=[iiif_tag],
     responses=iiif_annotation_list_response)  # type: ignore[arg-type]
 def get_iiif_annotation_list(path: FileIiifPath) -> dict[str, Any]:
@@ -87,7 +98,7 @@ def get_iiif_georeference(path: FileIiifPath) -> dict[str, Any]:
 
 
 @api_v1_iiif.get(
-    '/<int:id>/annotation',
+    '/annotation/<int:id>',
     summary="Get IIIF Annotation",
     tags=[iiif_tag],
     responses=iiif_annotation_response)  # type: ignore[arg-type]
