@@ -1,6 +1,7 @@
 import ast
 from dataclasses import dataclass, field
 from functools import cached_property
+from html import escape
 from typing import Any
 
 import requests
@@ -225,7 +226,9 @@ class IIIFBuilder:
         if annotation.entity_id:
             entity = get_entity_by_id(annotation.entity_id)
             url = get_url(entity)
-            entity_link = f'<a href={url} target=_blank>{entity.name}</a>'
+            entity_link = (
+                f'<a href="{escape(url)}" target="_blank" '
+                f'rel="noopener noreferrer">{escape(entity.name)}</a>')
         annotation_url = url_for(
             'api_v1_iiif.get_iiif_annotation',
             id=annotation.id,
@@ -350,7 +353,8 @@ class IIIFBuilder:
                     'selector': {
                         'type': 'SvgSelector',
                         'value': (
-                            f'<svg width="{width}" height="{height}">'
+                            '<svg xmlns="http://www.w3.org/2000/svg" '
+                            f'width="{width}" height="{height}">'
                             f'<polygon points="0,0 {width},0 '
                             f'{width},{height} 0,{height}" /></svg>')}},
                 'body': {

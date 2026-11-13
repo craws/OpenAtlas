@@ -176,18 +176,18 @@ IIIF Presentation API
      - ``/api/1/iiif/{id}/image``
      - IIIF Presentation 3 image resource annotation.
    * - ``GET``
-     - ``/api/1/iiif/{id}/annotation-list``
+     - ``/api/1/iiif/{id}/annotation-page``
      - IIIF Presentation 3 Annotation Page.
    * - ``GET``
      - ``/api/1/iiif/{id}/georeference``
      - IIIF Georeferencing Annotation Page, when the file has map overlay coordinates.
    * - ``GET``
-     - ``/api/1/iiif/{id}/annotation``
-     - Specific IIIF Presentation 3 spatial polygon or point annotation.
+     - ``/api/1/iiif/annotation/{id}``
+     - Specific IIIF Presentation 3 annotation.
 
 The Presentation API version is always 3, so its endpoint paths do not include
-a version segment. The linked Image API service can still be version 2 or 3,
-as indicated by its ``info.json`` metadata.
+a version segment. OpenAtlas currently exposes the linked Image API service
+as version 2.
 
 Query Parameters for Collections
 --------------------------------
