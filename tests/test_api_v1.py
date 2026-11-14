@@ -6,7 +6,9 @@ from rdflib import RDF, Dataset, URIRef
 from openatlas import app
 from openatlas.api.api_v1.formatters.la_formatter import format_la_entities
 from openatlas.api.api_v1.formatters.lod import format_lod_entities
-from openatlas.api.api_v1.responses.iiif import IIIF_CONTENT_TYPE
+from openatlas.api.api_v1.responses.iiif import (
+    IIIF_CONTENT_TYPE, IIIF_GEOREF_CONTEXT, IIIF_PRESENTATION_CONTEXT)
+from openatlas.api.api_v1.util.iiif_manifest import get_overlay_corners
 from openatlas.database import overlay as db_overlay
 from openatlas.models.annotation import AnnotationImage
 from openatlas.models.settings import set_logo
@@ -547,26 +549,36 @@ class ApiV1(ApiTestCase):
             app.preprocess_request()
             lic_ext_ref = insert('external_reference', lic_url)
             lic_ext_ref.link('P67', e.open_license)
+            xss_source = insert(
+                'external_reference',
+                'https://example.org/source',
+                description='&lt;img src=x onerror=alert(1)&gt;')
             e.logo.link('P2', e.open_license)
             e.logo.link('P67', e.actor)
             e.logo.link('P67', lic_ext_ref, inverse=True)
+            e.logo.link('P67', xss_source, description='p."1"', inverse=True)
             set_logo(e.logo.id)
             overlay_data = {
                 'image_id': e.logo.id,
                 'bounding_box': (
                     '[[48.58653, 15.64356], [48.58709, 15.64294]]')}
-            if db_overlay.get_by_object([e.logo.id]):
-                db_overlay.update(overlay_data)
-            else:
-                db_overlay.insert(overlay_data)
+            db_overlay.insert(overlay_data)
 
             AnnotationImage.insert(
                 image_id=e.logo.id,
                 coordinates='10,10,50,50',
                 entity_id=e.place.id,
                 text='Sample IIIF annotation')
+            AnnotationImage.insert(
+                image_id=e.logo.id,
+                coordinates='20,20,40,40',
+                entity_id=e.actor.id,
+                text='Second IIIF annotation')
             annotations = AnnotationImage.get_by_file_id(e.logo.id)
             annotation_id = annotations[0].id
+
+        assert IIIF_CONTENT_TYPE == (
+            f'application/ld+json;profile="{IIIF_PRESENTATION_CONTEXT}"')
 
         rv = c.get(
             url_for(
@@ -577,8 +589,21 @@ class ApiV1(ApiTestCase):
         manifest = rv.get_json()
         assert manifest['type'] == 'Manifest'
         assert manifest['@context'] == [
-            'https://iiif.io/api/extension/georef/1/context.json',
-            'https://iiif.io/api/presentation/3/context.json']
+            IIIF_GEOREF_CONTEXT,
+            IIIF_PRESENTATION_CONTEXT]
+        assert '@context' not in manifest['items'][0]
+        assert '@context' not in manifest['items'][0]['items'][0]['items'][0]
+        assert (
+            '@context' not in
+            manifest['items'][0]['annotations'][0]['items'][0])
+        source_values = [
+            item['value']['en'][0] for item in manifest['metadata']
+            if item['label']['en'][0] == 'Source']
+        xss_value = next(
+            val for val in source_values if '&quot;1&quot;' in val)
+        assert '<img ' not in xss_value
+        assert '&lt;img src=x onerror=alert(1)&gt;' in xss_value
+        assert 'rel="noopener noreferrer"' in xss_value
         assert manifest['id'].endswith(
             f'/api/1/iiif/{e.logo.id}/manifest')
         assert manifest['rights'] == lic_url
@@ -604,9 +629,10 @@ class ApiV1(ApiTestCase):
         georeference_path = f'/api/1/iiif/{e.logo.id}/georeference'
         assert georeference['id'].endswith(georeference_path)
         assert georeference['@context'] == [
-            'https://iiif.io/api/extension/georef/1/context.json',
-            'https://iiif.io/api/presentation/3/context.json']
+            IIIF_GEOREF_CONTEXT,
+            IIIF_PRESENTATION_CONTEXT]
         georeference_annotation = georeference['items'][0]
+        assert '@context' not in georeference_annotation
         assert georeference_annotation['id'].endswith('#annotation')
         assert georeference_annotation['motivation'] == 'georeferencing'
         georeference_source = georeference_annotation['target']['source']
@@ -625,8 +651,9 @@ class ApiV1(ApiTestCase):
             url_for('api_v1_iiif.get_iiif_canvas', id=e.logo.id))
         assert rv.status_code == HTTPStatus.OK
         canvas = rv.get_json()
-        assert canvas['@context'] == (
-            'https://iiif.io/api/presentation/3/context.json')
+        assert canvas['@context'] == IIIF_PRESENTATION_CONTEXT
+        assert '@context' not in canvas['items'][0]['items'][0]
+        assert '@context' not in canvas['annotations'][0]['items'][0]
         canvas_path = f'/api/1/iiif/{e.logo.id}/canvas'
         assert canvas['id'].endswith(canvas_path)
         assert manifest['items'][0]['id'].endswith(canvas_path)
@@ -643,8 +670,7 @@ class ApiV1(ApiTestCase):
         image = rv.get_json()
         assert rv.headers['Content-Type'] == IIIF_CONTENT_TYPE
         image_path = f'/api/1/iiif/{e.logo.id}/image'
-        assert image['@context'] == (
-            'https://iiif.io/api/presentation/3/context.json')
+        assert image['@context'] == IIIF_PRESENTATION_CONTEXT
         assert image['body']['service'][0]['type'] == 'ImageService2'
         assert image['body']['id'].endswith('/full/full/0/default.jpg')
         assert image['body']['format'] == 'image/jpeg'
@@ -661,10 +687,15 @@ class ApiV1(ApiTestCase):
         annotation_list = rv.get_json()
         assert rv.headers['Content-Type'] == IIIF_CONTENT_TYPE
         annotation_list_path = f'/api/1/iiif/{e.logo.id}/annotation-page'
-        assert annotation_list['@context'] == (
-            'https://iiif.io/api/presentation/3/context.json')
+        assert annotation_list['@context'] == IIIF_PRESENTATION_CONTEXT
         assert annotation_list['type'] == 'AnnotationPage'
         assert annotation_list['id'].endswith(annotation_list_path)
+        annotation_texts = {
+            item['body'][-1]['value'] for item in annotation_list['items']}
+        assert annotation_texts == {
+            'Sample IIIF annotation',
+            'Second IIIF annotation'}
+        assert '@context' not in annotation_list['items'][0]
         assert canvas['annotations'][0]['id'].endswith(annotation_list_path)
 
         # Annotation
@@ -676,8 +707,7 @@ class ApiV1(ApiTestCase):
         annotation = rv.get_json()
         assert rv.headers['Content-Type'] == IIIF_CONTENT_TYPE
         annotation_path = f'/api/1/iiif/annotation/{annotation_id}'
-        assert annotation['@context'] == (
-            'https://iiif.io/api/presentation/3/context.json')
+        assert annotation['@context'] == IIIF_PRESENTATION_CONTEXT
         assert annotation['type'] == 'Annotation'
         assert annotation['id'].endswith(annotation_path)
         assert annotation['body'][0]['type'] == 'TextualBody'
@@ -685,7 +715,7 @@ class ApiV1(ApiTestCase):
         assert annotation['target']['source'].endswith(canvas_path)
 
         logo = site_provider['logo'][0]
-        assert logo['format'] == 'image/png'
+        assert logo['format'] == 'image/jpeg'
         assert 'service' not in logo
 
         with app.test_request_context():
@@ -742,6 +772,19 @@ class ApiV1(ApiTestCase):
             assert rv.status_code == HTTPStatus.NOT_FOUND
             assert rv.get_json()['details']['provided_id'] == str(id_)
 
+        for bad_box in ('bad-box[', '123', '[[48, 15]]'):
+            assert get_overlay_corners(bad_box) is None
+
+        with app.test_request_context():
+            app.preprocess_request()
+            db_overlay.update({
+                'image_id': e.logo.id,
+                'bounding_box': 'bad-box['})
+        rv = c.get(
+            url_for('api_v1_iiif.get_iiif_georeference', id=e.logo.id))
+        assert rv.status_code == HTTPStatus.NOT_FOUND
+        assert rv.get_json()['title'] == 'Georeference not found'
+
         with app.test_request_context():
             app.preprocess_request()
             overlay = db_overlay.get_by_object([e.logo.id])[0]
@@ -749,6 +792,7 @@ class ApiV1(ApiTestCase):
         rv = c.get(
             url_for('api_v1_iiif.get_iiif_georeference', id=e.logo.id))
         assert rv.status_code == HTTPStatus.NOT_FOUND
+        assert rv.get_json()['title'] == 'Georeference not found'
 
     def test_docs(self) -> None:
         c = self.client

@@ -109,4 +109,4 @@ def get_iiif_annotation(path: AnnotationIiifPath) -> dict[str, Any]:
     annotation = AnnotationImage(data)
     image_entity = get_file_entity(annotation.image_id)
     check_file_access(image_entity)
-    return build_annotation(annotation)
+    return build_annotation(annotation, image_entity)

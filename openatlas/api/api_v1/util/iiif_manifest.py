@@ -3,18 +3,24 @@ from dataclasses import dataclass, field
 from functools import cached_property
 from html import escape
 from typing import Any
+from urllib.parse import urlparse
 
 import requests
 import svgwrite
 from flask import g, url_for
 from flask_babel import gettext as _
+from werkzeug.exceptions import ImATeapot
 
+from openatlas import app
 from openatlas.api.api_v1.entity import get_entity_by_id
 from openatlas.api.api_v1.error_handlers import (
-    abort_file_not_found, abort_not_found)
+    abort_file_not_found, abort_georeference_not_found)
 from openatlas.api.api_v1.models.files import LicenseItem
+from openatlas.api.api_v1.responses.iiif import (
+    IIIF_GEOREF_CONTEXT, IIIF_PRESENTATION_CONTEXT)
 from openatlas.api.api_v1.util.files import (
-    get_cached_file_path, get_license_item, get_license_type, iiif_file_exists,
+    get_cached_file_path, get_iiif_redirect_url, get_license_item,
+    get_license_type, has_file_access, iiif_file_exists,
     resolve_rights_holders)
 from openatlas.database import overlay as db_overlay
 from openatlas.display.image_processing import get_actual_mime
@@ -73,6 +79,15 @@ def calculate_bounding_box(
     return x, y, max(x_values) - x, max(y_values) - y
 
 
+def format_html_link(url: str, text: str) -> str:
+    safe_text = str(escape(text))
+    if urlparse(url).scheme.lower() not in {'http', 'https'}:
+        return safe_text
+    return (
+        f'<a href="{escape(url)}" target="_blank" '
+        f'rel="noopener noreferrer">{safe_text}</a>')
+
+
 def get_overlay_corners(bounding_box: Any) -> list[list[float]] | None:
     # Overlays are stored as [latitude, longitude], GeoJSON needs [lon, lat]
     try:
@@ -92,9 +107,31 @@ def get_overlay_corners(bounding_box: Any) -> list[list[float]] | None:
     return None
 
 
+def _is_positive_int(value: Any) -> bool:
+    return isinstance(value, int) and not isinstance(value, bool) and value > 0
+
+
+def _fetch_image_info(entity_id: int, image_url: str) -> dict[str, Any]:
+    try:
+        resp = requests.get(
+            f'{image_url}/info.json',
+            proxies=app.config['PROXIES'],
+            timeout=10)
+        resp.raise_for_status()
+        image_api = resp.json()
+    except (requests.exceptions.RequestException, ValueError):
+        abort_file_not_found(entity_id)
+    if (not isinstance(image_api, dict)
+            or not _is_positive_int(image_api.get('width'))
+            or not _is_positive_int(image_api.get('height'))):
+        abort_file_not_found(entity_id)
+    return image_api
+
+
 class IIIFBuilder:
     def __init__(self, entity: Entity) -> None:
         self.entity = entity
+        self._annotation_entities: dict[int, Entity] = {}
         self.manifest_url = url_for(
             'api_v1_iiif.get_iiif_manifest',
             id=entity.id,
@@ -115,24 +152,24 @@ class IIIFBuilder:
             'api_v1_iiif.get_iiif_georeference',
             id=entity.id,
             _external=True)
-        self.file_path = get_cached_file_path(entity.id)
 
     @cached_property
     def image_metadata(self) -> tuple[str, dict[str, Any]]:
-        if (self.entity.class_.group.get('name') != 'file'
-                and not iiif_file_exists(self.entity.id)):
-            abort_file_not_found(self.entity.id)  # pragma: no cover
-        ext = (
-            '.tiff' if g.settings.get('iiif_conversion')
-            else (self.file_path.suffix if self.file_path else 'N/A'))
-        image_url = f"{g.settings.get('iiif_url', '')}{self.entity.id}{ext}"
-        try:
-            resp = requests.get(f'{image_url}/info.json', timeout=30)
-            resp.raise_for_status()
-        except Exception:  # pragma: no cover
+        if (not g.settings.get('iiif')
+                or not g.settings.get('iiif_url')
+                or not iiif_file_exists(self.entity.id)):
             abort_file_not_found(self.entity.id)
-        image_api = resp.json()
-        image_url = image_api.get('id') or image_api.get('@id') or image_url
+        if g.settings.get('iiif_conversion'):
+            ext = '.tiff'
+        elif file_path := get_cached_file_path(self.entity.id):
+            ext = file_path.suffix
+        else:  # pragma: no cover
+            abort_file_not_found(self.entity.id)
+        image_url = f"{g.settings.get('iiif_url', '')}{self.entity.id}{ext}"
+        image_api = _fetch_image_info(self.entity.id, image_url)
+        resolved = image_api.get('id') or image_api.get('@id')
+        if isinstance(resolved, str) and resolved:
+            image_url = resolved
         return image_url, image_api
 
     @property
@@ -180,7 +217,7 @@ class IIIFBuilder:
                     if reference.description else name)
                 items.append({
                     'label': _('source').capitalize(),
-                    'value': f'<a href={url} target=_blank>{text}</a>'})
+                    'value': format_html_link(url, text)})
 
         if rights['creator']:
             for creator in rights['creator']:
@@ -219,16 +256,28 @@ class IIIFBuilder:
             provider['logo'] = [logo]
         return provider
 
+    def preload_annotation_entities(
+            self,
+            annotations: list[AnnotationImage]) -> None:
+        missing_ids = [
+            id_ for id_ in {a.entity_id for a in annotations if a.entity_id}
+            if id_ not in self._annotation_entities]
+        if missing_ids:
+            for entity in Entity.get_by_ids(missing_ids):
+                self._annotation_entities[entity.id] = entity
+
     def get_annotation_details(
             self,
             annotation: AnnotationImage) -> tuple[str, str]:
         entity_link = ''
         if annotation.entity_id:
-            entity = get_entity_by_id(annotation.entity_id)
-            url = get_url(entity)
-            entity_link = (
-                f'<a href="{escape(url)}" target="_blank" '
-                f'rel="noopener noreferrer">{escape(entity.name)}</a>')
+            if not (entity := self._annotation_entities.get(
+                    annotation.entity_id)):
+                entity = get_entity_by_id(
+                    annotation.entity_id,
+                    with_location=False)
+                self._annotation_entities[entity.id] = entity
+            entity_link = format_html_link(get_url(entity), entity.name)
         annotation_url = url_for(
             'api_v1_iiif.get_iiif_annotation',
             id=annotation.id,
@@ -262,13 +311,13 @@ class IIIFBuilder:
 
         manifest: dict[str, Any] = {
             '@context': [
-                'https://iiif.io/api/extension/georef/1/context.json',
-                'https://iiif.io/api/presentation/3/context.json'],
+                IIIF_GEOREF_CONTEXT,
+                IIIF_PRESENTATION_CONTEXT],
             'id': self.manifest_url,
             'type': 'Manifest',
             'label': {'en': [self.entity.name]},
             'metadata': v3_metadata,
-            'items': [self.build_canvas()]}
+            'items': [self.build_canvas(include_context=False)]}
         if self.entity.description:
             manifest['summary'] = {'en': [self.entity.description]}
         if self.common_meta.see_also:
@@ -283,10 +332,12 @@ class IIIFBuilder:
 
         return manifest
 
-    def build_canvas(self) -> dict[str, Any]:
+    def build_canvas(self, include_context: bool = True) -> dict[str, Any]:
         annotations_ = AnnotationImage.get_by_file_id(self.entity.id)
-        canvas: dict[str, Any] = {
-            '@context': 'https://iiif.io/api/presentation/3/context.json',
+        canvas: dict[str, Any] = (
+            {'@context': IIIF_PRESENTATION_CONTEXT}
+            if include_context else {})
+        canvas.update({
             'id': self.canvas_url,
             'type': 'Canvas',
             'label': {'en': [self.entity.name]},
@@ -295,19 +346,21 @@ class IIIFBuilder:
             'items': [{
                 'id': f'{self.canvas_url}#page-1',
                 'type': 'AnnotationPage',
-                'items': [self.build_image()]}],
+                'items': [self.build_image(include_context=False)]}],
             'thumbnail': [{
                 'id': f'{self.image_url}/full/!200,200/0/default.jpg',
                 'type': 'Image',
                 'format': 'image/jpeg',
-                'service': [self.image_service]}]}
+                'service': [self.image_service]}]})
         canvas_annotations = []
         if annotations_:
+            self.preload_annotation_entities(annotations_)
             canvas_annotations.append({
                 'id': self.annotation_list_url,
                 'type': 'AnnotationPage',
                 'items': [
-                    self.build_annotation(a) for a in annotations_]})
+                    self.build_annotation(a, include_context=False)
+                    for a in annotations_]})
         if self.overlay_corners:
             canvas_annotations.append({
                 'id': self.georeference_url,
@@ -318,22 +371,22 @@ class IIIFBuilder:
 
     def build_georeference(self) -> dict[str, Any]:
         if not (coordinates := self.overlay_corners):
-            abort_not_found(self.entity.id)
+            abort_georeference_not_found(self.entity.id)
         width = self.image_api['width']
         height = self.image_api['height']
         resource_coordinates = [[0, 0], [width, 0], [0, height]]
         features = [{
             'type': 'Feature',
-            'properties': {'resourceCoords': resource_coords},
+            'properties': {'resourceCoords': resource_coordinates_item},
             'geometry': {
                 'type': 'Point',
                 'coordinates': georeference_coords}}
-            for resource_coords, georeference_coords
+            for resource_coordinates_item, georeference_coords
             in zip(resource_coordinates, coordinates, strict=True)]
         return {
             '@context': [
-                'https://iiif.io/api/extension/georef/1/context.json',
-                'https://iiif.io/api/presentation/3/context.json'],
+                IIIF_GEOREF_CONTEXT,
+                IIIF_PRESENTATION_CONTEXT],
             'id': self.georeference_url,
             'type': 'AnnotationPage',
             'items': [{
@@ -364,9 +417,11 @@ class IIIFBuilder:
                         'options': {'order': 1}},
                     'features': features}}]}
 
-    def build_image(self) -> dict[str, Any]:
-        return {
-            '@context': 'https://iiif.io/api/presentation/3/context.json',
+    def build_image(self, include_context: bool = True) -> dict[str, Any]:
+        image: dict[str, Any] = (
+            {'@context': IIIF_PRESENTATION_CONTEXT}
+            if include_context else {})
+        image.update({
             'id': self.image_resource_url,
             'type': 'Annotation',
             'motivation': 'painting',
@@ -377,11 +432,13 @@ class IIIFBuilder:
                 'service': [self.image_service],
                 'height': self.image_api['height'],
                 'width': self.image_api['width']},
-            'target': self.canvas_url}
+            'target': self.canvas_url})
+        return image
 
     def build_annotation(
             self,
-            annotation: AnnotationImage) -> dict[str, Any]:
+            annotation: AnnotationImage,
+            include_context: bool = True) -> dict[str, Any]:
         annotation_url, entity_link = self.get_annotation_details(annotation)
         body = []
         if entity_link:
@@ -394,8 +451,10 @@ class IIIFBuilder:
                 'type': 'TextualBody',
                 'value': annotation.text,
                 'format': 'text/plain'})
-        return {
-            '@context': 'https://iiif.io/api/presentation/3/context.json',
+        result: dict[str, Any] = (
+            {'@context': IIIF_PRESENTATION_CONTEXT}
+            if include_context else {})
+        result.update({
             'id': annotation_url,
             'type': 'Annotation',
             'motivation': 'commenting',
@@ -403,22 +462,51 @@ class IIIFBuilder:
             'target': {
                 'type': 'SpecificResource',
                 'source': self.canvas_url,
-                'selector': self.get_selector(annotation.coordinates)}}
+                'selector': self.get_selector(annotation.coordinates)}})
+        return result
+
+    def build_annotation_list(self) -> dict[str, Any]:
+        annotations_ = AnnotationImage.get_by_file_id(self.entity.id)
+        self.preload_annotation_entities(annotations_)
+        return {
+            '@context': IIIF_PRESENTATION_CONTEXT,
+            'id': self.annotation_list_url,
+            'type': 'AnnotationPage',
+            'items': [
+                self.build_annotation(a, include_context=False)
+                for a in annotations_]}
 
     def get_logo(self) -> dict[str, Any]:
         logo_id = g.settings.get('logo_file_id')
         if not logo_id or not str(logo_id).isdigit():
-            return {}  # pragma: no cover
-        if not (logo_path := get_cached_file_path(int(logo_id))):
-            return {}  # pragma: no cover
+            return {}
+        logo_int = int(logo_id)
+        if not (logo_path := get_cached_file_path(logo_int)):
+            return {}
+        try:
+            if self.entity.id == logo_int and has_file_access(self.entity):
+                logo_entity = self.entity
+            else:
+                logo_entity = Entity.get_by_id(
+                    logo_int,
+                    types=True,
+                    with_location=False)
+        except ImATeapot:
+            return {}
+        if logo_entity.class_.name != 'file' or not has_file_access(
+                logo_entity):
+            return {}
         logo_url = url_for(
             'api_v1_files.display_file',
-            id=int(logo_id),
+            id=logo_int,
             _external=True)
+        logo_format = (
+            'image/jpeg' if get_iiif_redirect_url(logo_int, logo_path)
+            else get_actual_mime(logo_path))
         return {
             'id': logo_url,
             'type': 'Image',
-            'format': get_actual_mime(logo_path)}
+            'format': logo_format}
 
 
 def build_manifest(entity: Entity) -> dict[str, Any]:
@@ -433,19 +521,18 @@ def build_image(entity: Entity) -> dict[str, Any]:
     return IIIFBuilder(entity).build_image()
 
 
-def build_annotation(annotation: AnnotationImage) -> dict[str, Any]:
-    entity = get_entity_by_id(annotation.image_id)
-    return IIIFBuilder(entity).build_annotation(annotation)
+def build_annotation(
+        annotation: AnnotationImage,
+        entity: Entity | None = None) -> dict[str, Any]:
+    image_entity = entity or get_entity_by_id(
+        annotation.image_id,
+        types=True,
+        with_location=False)
+    return IIIFBuilder(image_entity).build_annotation(annotation)
 
 
 def build_annotation_list(entity: Entity) -> dict[str, Any]:
-    annotations_ = AnnotationImage.get_by_file_id(entity.id)
-    builder = IIIFBuilder(entity)
-    return {
-        '@context': 'https://iiif.io/api/presentation/3/context.json',
-        'id': builder.annotation_list_url,
-        'type': 'AnnotationPage',
-        'items': [builder.build_annotation(a) for a in annotations_]}
+    return IIIFBuilder(entity).build_annotation_list()
 
 
 def build_georeference(entity: Entity) -> dict[str, Any]:

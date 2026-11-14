@@ -2,9 +2,12 @@ from http import HTTPStatus
 
 from openatlas.api.api_v1.models.util import ErrorResponse
 
+IIIF_PRESENTATION_CONTEXT = (
+    'http://iiif.io/api/presentation/3/context.json')
+IIIF_GEOREF_CONTEXT = (
+    'http://iiif.io/api/extension/georef/1/context.json')
 IIIF_CONTENT_TYPE = (
-    'application/ld+json;profile='
-    '"https://iiif.io/api/presentation/3/context.json"')
+    f'application/ld+json;profile="{IIIF_PRESENTATION_CONTEXT}"')
 
 iiif_manifest_response = {
     HTTPStatus.OK: {

@@ -1,4 +1,6 @@
 import ast
+import math
+from typing import Any
 
 from flask import flash, render_template, url_for
 from flask_babel import lazy_gettext as _
@@ -6,7 +8,7 @@ from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import FloatField
-from wtforms.validators import InputRequired
+from wtforms.validators import InputRequired, NumberRange
 
 from openatlas import app
 from openatlas.display.util import button, link, required_group
@@ -16,17 +18,69 @@ from openatlas.models.entity import Entity
 from openatlas.models.overlay import Overlay
 
 
+
+
+def _has_nonzero_area(coords: tuple[float, ...]) -> bool:
+    x0, y0, x1, y1, x2, y2 = coords
+    area = abs((x1 - x0) * (y2 - y0) - (y1 - y0) * (x2 - x0))
+    min_overlay_area = 1e-15
+    return area > min_overlay_area
+
+
 class OverlayForm(FlaskForm):
+    min_lat = -90
+    max_lat = 90
+    min_lon = -180
+    max_lon = 180
     top_left_easting = FloatField(
         '',
-        [InputRequired()],
+        [InputRequired(), NumberRange(min=min_lon, max=max_lon)],
         render_kw={'autofocus': True})
-    top_left_northing = FloatField('', [InputRequired()])
-    top_right_easting = FloatField('', [InputRequired()])
-    top_right_northing = FloatField('', [InputRequired()])
-    bottom_left_easting = FloatField('', [InputRequired()])
-    bottom_left_northing = FloatField('', [InputRequired()])
+    top_left_northing = FloatField(
+        '',
+        [InputRequired(), NumberRange(min=min_lat, max=max_lat)])
+    top_right_easting = FloatField(
+        '',
+        [InputRequired(), NumberRange(min=min_lon, max=max_lon)])
+    top_right_northing = FloatField(
+        '',
+        [InputRequired(), NumberRange(min=min_lat, max=max_lat)])
+    bottom_left_easting = FloatField(
+        '',
+        [InputRequired(), NumberRange(min=min_lon, max=max_lon)])
+    bottom_left_northing = FloatField(
+        '',
+        [InputRequired(), NumberRange(min=min_lat, max=max_lat)])
     save = SubmitField(_('save'))
+
+    def validate(self, extra_validators: Any = None) -> bool:
+        valid = FlaskForm.validate(self, extra_validators=extra_validators)
+        fields = (
+            self.top_left_easting,
+            self.top_left_northing,
+            self.top_right_easting,
+            self.top_right_northing,
+            self.bottom_left_easting,
+            self.bottom_left_northing)
+        coords: list[float] = []
+        for coord_field in fields:
+            if (coord_field.data is None
+                    or not math.isfinite(coord_field.data)):
+                if coord_field.data is not None:
+                    coord_field.errors = [
+                        *coord_field.errors,
+                        str(_('Invalid geom entered'))]
+                valid = False
+            else:
+                coords.append(coord_field.data)
+        if not valid:
+            return False
+        if not _has_nonzero_area(tuple(coords)):
+            self.top_left_easting.errors = [
+                *self.top_left_easting.errors,
+                str(_('Invalid geom entered'))]
+            return False
+        return True
 
 
 @app.route(
@@ -76,16 +130,18 @@ def overlay_update(place_id: int, overlay_id: int) -> str | Response:
             'bottom_left_easting': form.bottom_left_easting.data})
         flash(_('info update'))
         return redirect(f'{url_for('view', id_=place.id)}#tab-file')
-    bounding = [[0, 0], [0, 0], [0, 0]]  # For data entered before 6.4.0
-    bounding_values = ast.literal_eval(overlay.bounding_box)
-    if len(bounding_values) == 3:
-        bounding = bounding_values
-    form.top_left_easting.data = bounding[0][1]
-    form.top_left_northing.data = bounding[0][0]
-    form.top_right_easting.data = bounding[1][1]
-    form.top_right_northing.data = bounding[1][0]
-    form.bottom_left_easting.data = bounding[2][1]
-    form.bottom_left_northing.data = bounding[2][0]
+    if not form.is_submitted():
+        bounding = [[0, 0], [0, 0], [0, 0]]  # For data entered before 6.4.0
+        bounding_values = ast.literal_eval(overlay.bounding_box)
+        overlay_point_count = 3
+        if len(bounding_values) == overlay_point_count:
+            bounding = bounding_values
+        form.top_left_easting.data = bounding[0][1]
+        form.top_left_northing.data = bounding[0][0]
+        form.top_right_easting.data = bounding[1][1]
+        form.top_right_northing.data = bounding[1][0]
+        form.bottom_left_easting.data = bounding[2][1]
+        form.bottom_left_northing.data = bounding[2][0]
     return render_template(
         'util/overlay.html',
         form=form,

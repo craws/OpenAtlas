@@ -85,6 +85,13 @@ def get_public_share_yes_id() -> int | None:
     return g.public_share_yes_id
 
 
+def has_file_access(file_entity: Entity) -> bool:
+    file_type_ids = {type_.id for type_ in file_entity.types if type_}
+    return (
+        bool(file_type_ids & get_valid_license_ids())
+        and get_public_share_yes_id() in file_type_ids)
+
+
 def check_file_access(file_entity: Entity) -> bool:
     file_type_ids = {type_.id for type_ in file_entity.types if type_}
 
@@ -282,6 +289,30 @@ def get_license_type(entity: Entity) -> Entity | None:
             license_ = type_
             break
     return license_
+
+
+def get_iiif_redirect_url(
+        file_id: int,
+        file_path: Path,
+        is_thumbnail: bool = False) -> str | None:
+    if not g.settings.get('iiif') or not check_iiif_activation():
+        return None  # pragma: no cover
+
+    if file_path.suffix.lower() not in get_display_extensions():
+        return None  # pragma: no cover
+
+    if not iiif_file_exists(file_id):
+        return None  # pragma: no cover
+
+    iiif_ext = '.tiff' if g.settings.get('iiif_conversion') \
+        else file_path.suffix
+    iiif_base = f"{g.settings.get('iiif_url', '')}{file_id}{iiif_ext}"
+
+    if is_thumbnail:
+        size = app.config['IMAGE_SIZE']['thumbnail']
+        return f"{iiif_base}/full/!{size},{size}/0/default.jpg"
+
+    return f"{iiif_base}/full/max/0/default.jpg"
 
 
 def get_iiif_manifest_and_path(img_id: int) -> dict[str, str]:
