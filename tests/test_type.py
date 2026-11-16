@@ -14,7 +14,6 @@ class TypeTest(TestBaseCase):
             dimension_type = get_hierarchy('Dimensions')
             place = insert('place', 'Home')
             place.link('P2', g.types[dimension_type.subs[0]], '46')
-            location = place.get_linked_entity_safe('P53')
             new_type = insert('type', 'Some sub place type')
             new_type.link(
                 'P127',
@@ -158,7 +157,7 @@ class TypeTest(TestBaseCase):
             place.link(
                 'P2',
                 [g.types[place_type.subs[0]], g.types[place_type.subs[1]]])
-            location.link('P89', g.types[admin_unit.subs[0]])
+            place.link('P89', g.types[admin_unit.subs[0]])
 
         rv = c.get(url_for('view', id_=admin_unit.subs[0]))
         assert b'Administrative unit' in rv.data
@@ -182,7 +181,7 @@ class TypeTest(TestBaseCase):
 
         with app.test_request_context():
             app.preprocess_request()
-            actor.link('P74', location, type_id=relation_type.subs[0])
+            actor.link('P74', place, type_id=relation_type.subs[0])
 
         rv = c.get(
             url_for('delete', id_=relation_type.subs[0]),

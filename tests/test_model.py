@@ -30,7 +30,7 @@ class ModelTests(TestBaseCase):
             source = insert('source', 'The source')
             source.link('P67', event)
             place = insert('place', 'Camelot')
-            actor.link('P74', place.get_linked_entity_safe('P53'))
+            actor.link('P74', place)
 
         rv = c.get(url_for('network', dimensions=0, id_=place.id))
         assert b'Depth' in rv.data

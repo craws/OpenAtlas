@@ -79,9 +79,8 @@ class PlaceTest(TestBaseCase):
             places = Entity.get_by_class('place')
             place = places[0]
             place2 = places[1]
-            location = place2.get_linked_entity_safe('P53')
             actor = insert('person', 'Milla Jovovich')
-            actor.link('P74', location)
+            actor.link('P74', place2)
 
         data['continue_'] = ''
         data['alias-1'] = 'Val-hall'
@@ -203,8 +202,8 @@ class PlaceTest(TestBaseCase):
             url_for('change_type', id_=unit_type.subs[0]),
             data={
                 unit_type.id: unit_type.subs[1],
-                'selection': location.id,
-                'checkbox_values': str([location.id])},
+                'selection': place2.id,
+                'checkbox_values': str([place2.id])},
             follow_redirects=True)
         assert b'Entities were updated' in rv.data
 

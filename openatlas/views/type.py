@@ -141,9 +141,8 @@ def type_unset_selectable(id_: int) -> Response:
 @app.route('/type/multiple_linked/<int:id_>')
 @required_group('editor')
 def show_multiple_linked_entities(id_: int) -> str:
-    multiple_linked_entities = [g.types[id_].get_multiple_typed_entities()]
     table = entity_table(
-        multiple_linked_entities,
+        g.types[id_].get_multiple_typed_entities(),
         columns=['name', 'class', 'begin', 'end', 'description'])
     tabs = {
         'multiple_linked': Tab(
