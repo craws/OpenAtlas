@@ -208,7 +208,7 @@ def get_table_cell_content(
         case 'main_image' if origin:
             html = profile_image_table_link(origin, e)
         case 'page':
-            html = str(item.description)
+            html = item.description or ''
         case 'overlay' if origin:
             html = ''
             if is_authorized('editor') and \
