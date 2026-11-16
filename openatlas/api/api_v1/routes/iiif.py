@@ -7,7 +7,7 @@ from flask_openapi3 import APIBlueprint
 from openatlas.api.api_v1.error_handlers import (
     abort_not_found, register_error_handlers)
 from openatlas.api.api_v1.models.iiif import (
-    AnnotationIiifPath, FileIiifPath)
+    AnnotationIiifPath, FileIiifPath, IiifQuery)
 from openatlas.api.api_v1.openapi_tags import iiif_tag
 from openatlas.api.api_v1.responses.iiif import (
     IIIF_CONTENT_TYPE, iiif_annotation_list_response,
@@ -42,11 +42,13 @@ def set_iiif_content_type(response: Response) -> Response:
     summary="Get IIIF Manifest",
     tags=[iiif_tag],
     responses=iiif_manifest_response)  # type: ignore[arg-type]
-def get_iiif_manifest(path: FileIiifPath) -> dict[str, Any]:
+def get_iiif_manifest(
+        path: FileIiifPath,
+        query: IiifQuery) -> dict[str, Any]:
     """Returns the IIIF Presentation 3 manifest for a specific file."""
     entity = get_file_entity(path.id)
     check_file_access(entity)
-    return build_manifest(entity)
+    return build_manifest(entity, url=str(query.url) if query.url else None)
 
 
 @api_v1_iiif.get(
@@ -54,11 +56,13 @@ def get_iiif_manifest(path: FileIiifPath) -> dict[str, Any]:
     summary="Get IIIF Canvas",
     tags=[iiif_tag],
     responses=iiif_canvas_response)  # type: ignore[arg-type]
-def get_iiif_canvas(path: FileIiifPath) -> dict[str, Any]:
+def get_iiif_canvas(
+        path: FileIiifPath,
+        query: IiifQuery) -> dict[str, Any]:
     """Returns the IIIF Presentation 3 canvas for a specific file."""
     entity = get_file_entity(path.id)
     check_file_access(entity)
-    return build_canvas(entity)
+    return build_canvas(entity, url=str(query.url) if query.url else None)
 
 
 @api_v1_iiif.get(
@@ -78,11 +82,15 @@ def get_iiif_image(path: FileIiifPath) -> dict[str, Any]:
     summary="Get IIIF Annotation Page",
     tags=[iiif_tag],
     responses=iiif_annotation_list_response)  # type: ignore[arg-type]
-def get_iiif_annotation_list(path: FileIiifPath) -> dict[str, Any]:
+def get_iiif_annotation_list(
+        path: FileIiifPath,
+        query: IiifQuery) -> dict[str, Any]:
     """Returns the IIIF Presentation 3 annotation page for a file."""
     entity = get_file_entity(path.id)
     check_file_access(entity)
-    return build_annotation_list(entity)
+    return build_annotation_list(
+        entity,
+        url=str(query.url) if query.url else None)
 
 
 @api_v1_iiif.get(
@@ -102,11 +110,16 @@ def get_iiif_georeference(path: FileIiifPath) -> dict[str, Any]:
     summary="Get IIIF Annotation",
     tags=[iiif_tag],
     responses=iiif_annotation_response)  # type: ignore[arg-type]
-def get_iiif_annotation(path: AnnotationIiifPath) -> dict[str, Any]:
+def get_iiif_annotation(
+        path: AnnotationIiifPath,
+        query: IiifQuery) -> dict[str, Any]:
     """Returns a specific IIIF annotation."""
     if not (data := get_annotation_image_by_id(path.id)):
         abort_not_found(path.id)
     annotation = AnnotationImage(data)
     image_entity = get_file_entity(annotation.image_id)
     check_file_access(image_entity)
-    return build_annotation(annotation, image_entity)
+    return build_annotation(
+        annotation,
+        image_entity,
+        url=str(query.url) if query.url else None)

@@ -36,7 +36,9 @@ class ManifestMetadata:
     attribution: str = ''
 
 
-def get_url(entity: Entity) -> str:
+def get_url(entity: Entity, url: str | None = None) -> str:
+    if url:
+        return f'{url}{entity.id}'
     if resolver := g.settings.get('frontend_resolver_url'):
         return f'{resolver}{entity.id}'
     return url_for(  # pragma: no cover
@@ -129,8 +131,9 @@ def _fetch_image_info(entity_id: int, image_url: str) -> dict[str, Any]:
 
 
 class IIIFBuilder:
-    def __init__(self, entity: Entity) -> None:
+    def __init__(self, entity: Entity, url: str | None = None) -> None:
         self.entity = entity
+        self.url = url
         self._annotation_entities: dict[int, Entity] = {}
         self.manifest_url = url_for(
             'api_v1_iiif.get_iiif_manifest',
@@ -147,6 +150,7 @@ class IIIFBuilder:
         self.annotation_list_url = url_for(
             'api_v1_iiif.get_iiif_annotation_list',
             id=entity.id,
+            url=url,
             _external=True)
         self.georeference_url = url_for(
             'api_v1_iiif.get_iiif_georeference',
@@ -210,7 +214,7 @@ class IIIFBuilder:
 
         if references := self.entity.get_links('P67', inverse=True):
             for reference in references:
-                url = get_url(reference.domain)
+                url = get_url(reference.domain, self.url)
                 name = reference.domain.description or reference.domain.name
                 text = (
                     f'{name}, {reference.description}'
@@ -229,7 +233,7 @@ class IIIFBuilder:
         if related_entities := self.entity.get_links('P67'):
             for related_entity in related_entities:
                 see_also.append({
-                    'id': get_url(related_entity.range),
+                    'id': get_url(related_entity.range, self.url),
                     'label': related_entity.range.name.capitalize(),
                     'format': related_entity.range.class_.name.capitalize()})
 
@@ -277,10 +281,13 @@ class IIIFBuilder:
                     annotation.entity_id,
                     with_location=False)
                 self._annotation_entities[entity.id] = entity
-            entity_link = format_html_link(get_url(entity), entity.name)
+            entity_link = format_html_link(
+                get_url(entity, self.url),
+                entity.name)
         annotation_url = url_for(
             'api_v1_iiif.get_iiif_annotation',
             id=annotation.id,
+            url=self.url,
             _external=True)
         return annotation_url, entity_link
 
@@ -509,12 +516,12 @@ class IIIFBuilder:
             'format': logo_format}
 
 
-def build_manifest(entity: Entity) -> dict[str, Any]:
-    return IIIFBuilder(entity).build_manifest()
+def build_manifest(entity: Entity, url: str | None = None) -> dict[str, Any]:
+    return IIIFBuilder(entity, url=url).build_manifest()
 
 
-def build_canvas(entity: Entity) -> dict[str, Any]:
-    return IIIFBuilder(entity).build_canvas()
+def build_canvas(entity: Entity, url: str | None = None) -> dict[str, Any]:
+    return IIIFBuilder(entity, url=url).build_canvas()
 
 
 def build_image(entity: Entity) -> dict[str, Any]:
@@ -523,16 +530,19 @@ def build_image(entity: Entity) -> dict[str, Any]:
 
 def build_annotation(
         annotation: AnnotationImage,
-        entity: Entity | None = None) -> dict[str, Any]:
+        entity: Entity | None = None,
+        url: str | None = None) -> dict[str, Any]:
     image_entity = entity or get_entity_by_id(
         annotation.image_id,
         types=True,
         with_location=False)
-    return IIIFBuilder(image_entity).build_annotation(annotation)
+    return IIIFBuilder(image_entity, url=url).build_annotation(annotation)
 
 
-def build_annotation_list(entity: Entity) -> dict[str, Any]:
-    return IIIFBuilder(entity).build_annotation_list()
+def build_annotation_list(
+        entity: Entity,
+        url: str | None = None) -> dict[str, Any]:
+    return IIIFBuilder(entity, url=url).build_annotation_list()
 
 
 def build_georeference(entity: Entity) -> dict[str, Any]:
