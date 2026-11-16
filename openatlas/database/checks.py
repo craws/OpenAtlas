@@ -57,9 +57,9 @@ def get_cidoc_links() -> list[dict[str, Any]]:
         """
         SELECT DISTINCT
             l.id,
-            l.property_code,
-            dc.cidoc_class_code AS domain_code,
-            rc.cidoc_class_code AS range_code
+            l.property_code AS property,
+            dc.cidoc_class_code AS domain,
+            rc.cidoc_class_code AS range
         FROM model.link l
         JOIN model.entity d ON l.domain_id = d.id
         JOIN model.openatlas_class dc ON d.openatlas_class_name = dc.name

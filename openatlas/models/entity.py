@@ -152,32 +152,16 @@ class Entity:
             inverse: bool = False,
             type_id: Optional[int] = None,
             dates: Optional[dict[str, Any]] = None) -> list[int]:
+        from openatlas.models.checks import link_is_valid
         entities = range_ if isinstance(range_, list) else [range_]
         new_link_ids = []
         for linked_entity in entities:
             domain = linked_entity if inverse else self
             range_ = self if inverse else linked_entity
-            domain_error = True
-            range_error = True
-            if g.properties[code].find_object(
-                    'domain_class_code',
-                    domain.class_.cidoc_class.code) or (
-                        domain.class_.cidoc_class.code in
-                                g.cidoc_class_includes and
-                        g.properties[code].find_object(
-                            'domain_class_code',
-                            g.cidoc_class_includes[domain.class_.cidoc_class.code])):
-                domain_error = False
-            if g.properties[code].find_object(
-                    'range_class_code',
-                    range_.class_.cidoc_class.code) or (
-                        range_.class_.cidoc_class.code in
-                                g.cidoc_class_includes and
-                        g.properties[code].find_object(
-                            'range_class_code',
-                            g.cidoc_class_includes[range_.class_.cidoc_class.code])):
-                range_error = False
-            if domain_error or range_error:  # pragma: no cover
+            if not link_is_valid(
+                    domain.class_.cidoc_class.code,
+                    code,
+                    range_.class_.cidoc_class.code):
                 text = \
                     f'invalid CIDOC link {domain.class_.cidoc_class.code}' \
                     f' > {code} > {range_.class_.cidoc_class.code}'
@@ -542,7 +526,6 @@ class Entity:
             return Entity(data)
         return None
 
-
     @staticmethod
     def get_by_ids(
             ids: Iterable[int],
@@ -836,8 +819,8 @@ def insert(data: dict[str, Any]) -> Entity:
         data['description'] = result['text']
         annotation_data = result['data']
     for item in [
-        'begin_from', 'begin_to', 'begin_comment',
-        'end_from', 'end_to', 'end_comment', 'description']:
+            'begin_from', 'begin_to', 'begin_comment',
+            'end_from', 'end_to', 'end_comment', 'description']:
         data[item] = data.get(item)
     for item in ['name', 'description']:
         data[item] = sanitize(data[item])

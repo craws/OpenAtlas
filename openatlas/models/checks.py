@@ -47,15 +47,27 @@ def entities_linked_to_itself() -> list[Link]:
 def invalid_cidoc_links() -> list[Link]:
     links = []
     for row in db.get_cidoc_links():
-        valid_domain = g.properties[row['property_code']].find_object(
-            'domain_class_code',
-            row['domain_code'])
-        valid_range = g.properties[row['property_code']].find_object(
-            'range_class_code',
-            row['range_code'])
-        if not valid_domain or not valid_range:
+        if not link_is_valid(row['domain'], row['property'], row['range']):
             links.append(row['id'])
     return [Link.get_by_id(id_) for id_ in links]
+
+
+def link_is_valid(domain: str, property_: str, range_: str):
+    valid_domain = g.properties[property_].find_object(
+        'domain_class_code',
+        domain) or (
+            domain in g.cidoc_class_includes and
+            g.properties[property_].find_object(
+                'domain_class_code',
+                g.cidoc_class_includes[domain]))
+    valid_range = g.properties[property_].find_object(
+        'range_class_code',
+        range_) or (
+            range_ in g.cidoc_class_includes and
+            g.properties[property_].find_object(
+                'range_class_code',
+                g.cidoc_class_includes[range_]))
+    return valid_domain and valid_range
 
 
 def similar_named(class_: str, ratio: int) -> dict[int, Any]:
