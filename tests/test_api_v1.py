@@ -1,7 +1,6 @@
 from http import HTTPStatus
-from pathlib import Path
 
-from flask import g, url_for
+from flask import url_for
 from rdflib import RDF, Dataset, URIRef
 
 from openatlas import app
@@ -9,29 +8,10 @@ from openatlas.api.api_v1.formatters.la_formatter import format_la_entities
 from openatlas.api.api_v1.formatters.lod import format_lod_entities
 from openatlas.models.annotation import AnnotationImage
 from openatlas.models.settings import set_logo
-from tests.base import ApiTestCase, get_hierarchy, insert
+from tests.base import ApiTestCase, insert
 
 
 class ApiV1(ApiTestCase):
-
-    def upload_logo(self) -> None:
-        with app.test_request_context():
-            app.preprocess_request()
-            rights_holder_ids = [rh.id for rh in g.rights_holder]
-
-        logo_path = Path(app.root_path) / 'static' / 'images' / 'layout'
-        public_type = get_hierarchy('Public sharing allowed')
-        with open(logo_path / 'logo.png', 'rb') as img:
-            self.client.post(
-                url_for('insert', class_='file'),
-                data={
-                    'name': 'OpenAtlas logo',
-                    'file': img,
-                    'description': 'OpenAtlas logo',
-                    'creator': f'{rights_holder_ids}',
-                    'license_holder': f'{rights_holder_ids}',
-                    str(public_type.id): public_type.subs[1]},
-                follow_redirects=True)
 
     def test_lod(self) -> None:
         c = self.client
@@ -143,8 +123,8 @@ class ApiV1(ApiTestCase):
         e = self.get_api_entities()
         with app.test_request_context():
             app.preprocess_request()
-            e.file.link('P67', e.place)
-            e.file.link('P2', e.open_license)
+            e.logo.link('P67', e.place)
+            e.logo.link('P2', e.open_license)
 
         rv = c.get(url_for('api_v1_la.get_entity', uuid=e.place.uuid))
         response = rv.headers.get('Content-Type')
@@ -239,7 +219,7 @@ class ApiV1(ApiTestCase):
         assert 'residence' in rv_json
         assert 'referred_to_by' in rv_json
 
-        rv = c.get(url_for('api_v1_la.get_entity', uuid=e.file.uuid))
+        rv = c.get(url_for('api_v1_la.get_entity', uuid=e.logo.uuid))
         rv_json = rv.get_json()
         assert rv_json['type'] == 'DigitalObject'
         assert 'dimension' in rv_json
@@ -473,13 +453,13 @@ class ApiV1(ApiTestCase):
             app.preprocess_request()
             lic_ext_ref = insert('external_reference', lic_url)
             lic_ext_ref.link('P67', e.open_license)
-            e.file.link('P2', e.open_license)
-            e.file.link('P67', e.actor)
+            e.logo.link('P2', e.open_license)
+            e.logo.link('P67', e.actor)
             e.file_not_public.link('P67', e.actor)
             e.file_without_licences.link('P67', e.actor)
 
         with c.get(
-                url_for('api_v1_files.display_file', id=e.file.id)) as rv:
+                url_for('api_v1_files.display_file', id=e.logo.id)) as rv:
             assert rv.status_code in (HTTPStatus.OK, HTTPStatus.FOUND)
         with c.get(
                 url_for(
@@ -489,14 +469,14 @@ class ApiV1(ApiTestCase):
         with c.get(
                 url_for(
                     'api_v1_files.display_file',
-                    id=e.file.id,
+                    id=e.logo.id,
                     download=True)) as rv:
             assert rv.status_code == HTTPStatus.OK
-            assert f'filename={e.file.id}.png' in rv.headers.get(
+            assert f'filename={e.logo.id}.png' in rv.headers.get(
                 'Content-Disposition', '')
 
         with c.get(
-                url_for('api_v1_files.display_thumbnail', id=e.file.id)) as rv:
+                url_for('api_v1_files.display_thumbnail', id=e.logo.id)) as rv:
             assert rv.status_code in (HTTPStatus.OK, HTTPStatus.FOUND)
         with c.get(
                 url_for(
@@ -506,10 +486,10 @@ class ApiV1(ApiTestCase):
         with c.get(
                 url_for(
                     'api_v1_files.display_thumbnail',
-                    id=e.file.id,
+                    id=e.logo.id,
                     download=True)) as rv:
             assert rv.status_code == HTTPStatus.OK
-            assert f'filename={e.file.id}.png' in rv.headers.get(
+            assert f'filename={e.logo.id}.png' in rv.headers.get(
                 'Content-Disposition', '')
 
         with c.get(
@@ -540,7 +520,7 @@ class ApiV1(ApiTestCase):
         json_data = rv.get_json()
         assert 'data' in json_data
         file_ids = [item['id'] for item in json_data['data']]
-        assert e.file.id in file_ids
+        assert e.logo.id in file_ids
         assert e.file_not_public.id not in file_ids
         assert e.file_without_licences.id not in file_ids
 
@@ -559,23 +539,23 @@ class ApiV1(ApiTestCase):
             app.preprocess_request()
             lic_ext_ref = insert('external_reference', lic_url)
             lic_ext_ref.link('P67', e.open_license)
-            e.file.link('P2', e.open_license)
-            e.file.link('P67', e.actor)
-            e.file.link('P67', lic_ext_ref, inverse=True)
-            set_logo(e.file.id)
+            e.logo.link('P2', e.open_license)
+            e.logo.link('P67', e.actor)
+            e.logo.link('P67', lic_ext_ref, inverse=True)
+            set_logo(e.logo.id)
 
             AnnotationImage.insert(
-                image_id=e.file.id,
+                image_id=e.logo.id,
                 coordinates='10,10,50,50',
                 entity_id=e.place.id,
                 text='Sample IIIF annotation')
-            annotations = AnnotationImage.get_by_file_id(e.file.id)
+            annotations = AnnotationImage.get_by_file_id(e.logo.id)
             annotation_id = annotations[0].id
 
         rv = c.get(
             url_for(
                 'api_v1_iiif.get_iiif_manifest',
-                id=e.file.id,
+                id=e.logo.id,
                 version='2'))
         assert rv.status_code == HTTPStatus.OK
         manifest_v2 = rv.get_json()
@@ -586,7 +566,7 @@ class ApiV1(ApiTestCase):
         rv = c.get(
             url_for(
                 'api_v1_iiif.get_iiif_manifest',
-                id=e.file.id,
+                id=e.logo.id,
                 version='3'))
         assert rv.status_code == HTTPStatus.OK
         manifest_v3 = rv.get_json()
@@ -598,43 +578,43 @@ class ApiV1(ApiTestCase):
         rv = c.get(
             url_for(
                 'api_v1_iiif.get_iiif_manifest',
-                id=e.file.id,
+                id=e.logo.id,
                 version='99'))
         assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
         rv = c.get(
-            url_for('api_v1_iiif.get_iiif_canvas', id=e.file.id, version='2'))
+            url_for('api_v1_iiif.get_iiif_canvas', id=e.logo.id, version='2'))
         assert rv.status_code == HTTPStatus.OK
 
         rv = c.get(
-            url_for('api_v1_iiif.get_iiif_canvas', id=e.file.id, version='3'))
+            url_for('api_v1_iiif.get_iiif_canvas', id=e.logo.id, version='3'))
         assert rv.status_code == HTTPStatus.OK
 
         rv = c.get(
-            url_for('api_v1_iiif.get_iiif_canvas', id=e.file.id, version='99'))
+            url_for('api_v1_iiif.get_iiif_canvas', id=e.logo.id, version='99'))
         assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
         # Image
         rv = c.get(
-            url_for('api_v1_iiif.get_iiif_image', id=e.file.id, version='2'))
+            url_for('api_v1_iiif.get_iiif_image', id=e.logo.id, version='2'))
         assert rv.status_code == HTTPStatus.OK
 
         rv = c.get(
-            url_for('api_v1_iiif.get_iiif_image', id=e.file.id, version='3'))
+            url_for('api_v1_iiif.get_iiif_image', id=e.logo.id, version='3'))
         assert rv.status_code == HTTPStatus.OK
 
         rv = c.get(
-            url_for('api_v1_iiif.get_iiif_image', id=e.file.id, version='99'))
+            url_for('api_v1_iiif.get_iiif_image', id=e.logo.id, version='99'))
         assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
-        rv = c.get(f'/api/1/iiif/{e.file.id}/image/2')
+        rv = c.get(f'/api/1/iiif/{e.logo.id}/image/2')
         assert rv.status_code == HTTPStatus.OK
 
         # Annotation list
         rv = c.get(
             url_for(
                 'api_v1_iiif.get_iiif_annotation_list',
-                id=e.file.id,
+                id=e.logo.id,
                 version='2'))
         assert rv.status_code == HTTPStatus.OK
         assert rv.get_json()['@type'] == 'sc:AnnotationList'
@@ -642,7 +622,7 @@ class ApiV1(ApiTestCase):
         rv = c.get(
             url_for(
                 'api_v1_iiif.get_iiif_annotation_list',
-                id=e.file.id,
+                id=e.logo.id,
                 version='3'))
         assert rv.status_code == HTTPStatus.OK
         assert rv.get_json()['type'] == 'AnnotationPage'
@@ -650,7 +630,7 @@ class ApiV1(ApiTestCase):
         rv = c.get(
             url_for(
                 'api_v1_iiif.get_iiif_annotation_list',
-                id=e.file.id,
+                id=e.logo.id,
                 version='99'))
         assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
@@ -674,7 +654,7 @@ class ApiV1(ApiTestCase):
         rv = c.get(f'/api/1/iiif/{annotation_id}/annotation/2')
         assert rv.status_code == HTTPStatus.OK
 
-        rv = c.get(f'/api/1/iiif/{e.file.id}/manifest/4')
+        rv = c.get(f'/api/1/iiif/{e.logo.id}/manifest/4')
         assert rv.status_code in (
             HTTPStatus.BAD_REQUEST, HTTPStatus.UNPROCESSABLE_ENTITY)
 
