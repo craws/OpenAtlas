@@ -204,8 +204,7 @@ def generate_feature(geom: dict[str, Any]) -> dict[str, Any]:
             'title': geom['title'],
             'description': geom['description'],
             'shapeType': geom['shapeType'],
-            'entityId': geom['placeId'],
-            'locationId': geom['locationId']}}
+            'entityId': geom['placeId']}}
 
 
 def get_geometries(parser: dict[str, Any]) -> list[dict[str, Any]]:

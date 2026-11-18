@@ -70,7 +70,6 @@ class ExportDatabase(Resource):
     def get_geometries_dict(geom: dict[str, Any]) -> dict[str, Any]:
         return {
             'id': geom['properties']['id'],
-            'locationId': geom['properties']['locationId'],
             'objectId': geom['properties']['objectId'],
             'name': geom['properties']['name'],
             'objectName': geom['properties']['objectName'],

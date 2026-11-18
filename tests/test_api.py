@@ -58,16 +58,16 @@ class Api(ApiTestCase):
                 'api_04.network_visualisation',
                 exclude_system_classes='type'))
         rv = rv.get_json()
-        assert len(rv['results']) == 72
+        assert len(rv['results']) == 71
         rv = c.get(
             url_for(
                 'api_04.network_visualisation',
                 linked_to_ids=e.boundary_mark.id))
         rv = rv.get_json()
-        assert len(rv['results']) == 16
+        assert len(rv['results']) == 23
         rv = c.get(url_for('api_04.network_visualisation', download=True))
         rv = rv.get_json()
-        assert len(rv['results']) == 172
+        assert len(rv['results']) == 173
 
         rv = c.get(
             url_for(
@@ -90,7 +90,7 @@ class Api(ApiTestCase):
                 depth=10,
                 linked_to_ids=e.boundary_mark.id))
         rv = rv.get_json()
-        assert len(rv['results']) == 2
+        assert len(rv['results']) == 0
         rv = c.get(
             url_for(
                 'api_04.ego_network_visualisation',
@@ -139,11 +139,16 @@ class Api(ApiTestCase):
         assert timespan['end']['latest'] == '2019-03-01T00:00:00'
         assert rv['types'][0]['identifier']
         assert rv['types'][0]['label'] == 'Boundary Mark'
-        assert rv['relations'][1]['label'] == 'Height'
-        assert rv['relations'][1]['relationDescription'] == '23.0'
-        assert rv['relations'][0]['relationTo']
-        assert rv['relations'][0]['relationType'] == 'crm:P2 has type'
-        assert rv['relations'][0]['relationSystemClass'] == 'type'
+        height_relation = next(
+            relation for relation in rv['relations']
+            if relation['label'] == 'Height')
+        boundary_mark_relation = next(
+            relation for relation in rv['relations']
+            if relation['label'] == 'Boundary Mark')
+        assert height_relation['relationDescription'] == '23.0'
+        assert boundary_mark_relation['relationTo']
+        assert boundary_mark_relation['relationType'] == 'crm:P2 has type'
+        assert boundary_mark_relation['relationSystemClass'] == 'type'
         assert rv['names'][0]['alias'] == 'Sûza'
         links = rv['links'][0]
         assert links['type'] == 'closeMatch'
@@ -166,11 +171,16 @@ class Api(ApiTestCase):
         assert 'application/json' in rv.headers.get('Content-Type')
         rv = rv.get_json()['features'][0]
 
-        assert rv['relations'][1]['label'] == 'Height'
-        assert rv['relations'][1]['relationDescription'] == '23.0'
-        assert rv['relations'][0]['relationTo']
-        assert rv['relations'][0]['relationType'] == 'crm:P2_has_type'
-        assert rv['relations'][0]['relationTypeLabel'] == 'hat den Typus'
+        height_relation = next(
+            relation for relation in rv['relations']
+            if relation['label'] == 'Height')
+        boundary_mark_relation = next(
+            relation for relation in rv['relations']
+            if relation['label'] == 'Boundary Mark')
+        assert height_relation['relationDescription'] == '23.0'
+        assert boundary_mark_relation['relationTo']
+        assert boundary_mark_relation['relationType'] == 'crm:P2_has_type'
+        assert boundary_mark_relation['relationTypeLabel'] == 'hat den Typus'
 
         geojson_checklist = [
             '@id', 'systemClass', 'name', 'description', 'begin_earliest',

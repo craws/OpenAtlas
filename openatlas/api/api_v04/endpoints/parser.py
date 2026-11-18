@@ -19,7 +19,7 @@ from openatlas.api.api_v04.resources.search_validation import (
     check_if_date_search, validate_search_parameters)
 from openatlas.api.api_v04.resources.util import (
     flatten_list_and_remove_duplicates, geometry_to_geojson,
-    get_location_link, get_value_for_types,
+    get_value_for_types,
     replace_empty_list_values_in_dict_with_none)
 from openatlas.display.table import file_preview
 from openatlas.display.util2 import display_bool
@@ -320,8 +320,6 @@ class Parser:
             entity: Entity,
             links: list[Link]) -> list[dict[str, Any]]:
         types = []
-        if entity.class_.group.get('name') == 'place':
-            entity.types.update(get_location_link(links).range.types)
         for type_ in entity.types:
             type_dict = {
                 'identifier': url_for(
