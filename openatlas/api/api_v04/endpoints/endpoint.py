@@ -29,7 +29,7 @@ from openatlas.api.api_v04.resources.templates import (
     linked_places_template, loud_pagination, loud_template)
 from openatlas.api.api_v04.resources.util import (
     date_to_str, geometry_to_geojson,
-    get_location_link, get_reference_systems,
+    get_reference_systems,
     get_type_references, replace_empty_list_values_in_dict_with_none)
 from openatlas.display.table import entity_table
 from openatlas.models.entity import Entity, Link
@@ -293,9 +293,6 @@ class Endpoint:
     def get_geojson(self) -> dict[str, Any]:
         out = []
         for e in self.entities_with_links.values():
-            if e['entity'].class_.group.get('name') == 'place':
-                e['entity'].types.update(
-                    get_location_link(e['links']).range.types)
             if e['geometry']:
                 for geom in e['geometry']:
                     out.append(self.parser.get_geojson_dict(e, geom))
@@ -306,9 +303,6 @@ class Endpoint:
     def get_geojson_v2(self) -> dict[str, Any]:
         out = []
         for e in self.entities_with_links.values():
-            if e['entity'].class_.group.get('name') == 'place':
-                e['entity'].types.update(
-                    get_location_link(e['links']).range.types)
             out.append(self.parser.get_geojson_dict(e))
         return {'type': 'FeatureCollection', 'features': out}
 

@@ -882,7 +882,7 @@ class LoudFormatter:
             entity.name,
             id_=skolem(entity.id, 'primary_name'))
         properties_set['identified_by'].extend(identifiers)
-        if entity.class_.name == 'object_location':
+        if entity.class_.group.get('name') in ['place', 'item']:
             if geometry := get_wkt_by_id(entity.id):
                 properties_set['defined_by'] = geometry
 

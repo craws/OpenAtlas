@@ -216,7 +216,7 @@ class Api(ApiTestCase):
         assert rv['timespan']['begin_of_the_begin'] == '2018-01-31'
         assert rv['identified_by'][0]['_label'] == 'Sûza'
         assert rv['classified_as'][0]['_label'] == 'Boundary Mark'
-        assert (rv['former_or_current_location']['defined_by'] ==
+        assert (rv['defined_by'] ==
                 'GEOMETRYCOLLECTION (POLYGON ((28.9389559878606 '
                 '41.0290525580955, 28.9409293485759 41.0273124142771, '
                 '28.941969652866 41.0284940983463, 28.9399641177912 '
@@ -234,8 +234,8 @@ class Api(ApiTestCase):
             c.get(url_for('api_04.entity', id_=e.place.id, export='csv')),
             c.get(
                 url_for(
-                    'api_04.query',
-                    entities=e.location.id,
+                'api_04.query',
+                    entities=e.place.id,
                     cidoc_classes='E18',
                     view_classes='artifact',
                     system_classes='person',
@@ -248,8 +248,8 @@ class Api(ApiTestCase):
                 url_for('api_04.entity', id_=e.place.id, export='csvNetwork')),
             c.get(
                 url_for(
-                    'api_04.query',
-                    entities=e.location.id,
+                'api_04.query',
+                    entities=e.place.id,
                     cidoc_classes='E18',
                     view_classes='artifact',
                     system_classes='person',
@@ -354,7 +354,7 @@ class Api(ApiTestCase):
             c.get(
                 url_for(
                     'api_04.query',
-                    entities=e.location.id,
+                    entities=e.place.id,
                     cidoc_classes='E18',
                     view_classes='artifact',
                     sort='desc',
@@ -365,7 +365,7 @@ class Api(ApiTestCase):
             c.get(
                 url_for(
                     'api_04.query',
-                    entities=e.location.id,
+                    entities=e.place.id,
                     cidoc_classes='E18',
                     view_classes='artifact',
                     system_classes='person',
@@ -394,26 +394,26 @@ class Api(ApiTestCase):
         rv = c.get(
             url_for(
                 'api_04.query',
-                entities=e.location.id,
+                entities=e.place.id,
                 cidoc_classes='E18',
                 view_classes='artifact',
                 system_classes='person',
                 limit=0,
                 first=e.actor2.id)).get_json()
-        assert rv['pagination']['entities'] == 10
+        assert rv['pagination']['entities'] == 9
 
         # Test page parameter
         rv = c.get(
             url_for(
                 'api_04.query',
-                entities=e.location.id,
+                entities=e.place.id,
                 cidoc_classes='E18',
                 view_classes='artifact',
                 system_classes='person',
                 limit=1,
                 page=7)).get_json()
         properties = rv['results'][0]['features'][0]['properties']
-        assert properties['title'] == 'Mordor'
+        assert properties['title'] == 'Sam'
         assert len(rv['results']) == 1
 
         rv = c.get(
@@ -427,12 +427,12 @@ class Api(ApiTestCase):
         rv = c.get(
             url_for(
                 'api_04.query',
-                entities=e.location.id,
+                entities=e.place.id,
                 cidoc_classes='E18',
                 view_classes='artifact',
                 system_classes='person',
                 count=True))
-        assert rv.get_json() == 10
+        assert rv.get_json() == 9
 
         rv = c.get(url_for('api_04.geometric_entities', count=True))
         assert rv.get_json() == 6
@@ -442,7 +442,7 @@ class Api(ApiTestCase):
             c.get(
                 url_for(
                     'api_04.query',
-                    entities=e.location.id,
+                    entities=e.place.id,
                     cidoc_classes='E18',
                     view_classes='artifact',
                     system_classes='person',
@@ -450,7 +450,7 @@ class Api(ApiTestCase):
             c.get(
                 url_for(
                     'api_04.query',
-                    entities=e.location.id,
+                    entities=e.place.id,
                     cidoc_classes='E18',
                     view_classes='artifact',
                     system_classes='person',
@@ -467,7 +467,7 @@ class Api(ApiTestCase):
                 format='gpkg'),
             url_for(
                 'api_04.query',
-                entities=e.location.id,
+                entities=e.place.id,
                 cidoc_classes='E18',
                 view_classes='artifact',
                 system_classes='person',
@@ -513,7 +513,7 @@ class Api(ApiTestCase):
         rv = c.get(
             url_for(
                 'api_04.query',
-                entities=e.location.id,
+                entities=e.place.id,
                 cidoc_classes=['E18', 'E53'],
                 view_classes='artifact',
                 system_classes=['person', 'type'],
@@ -672,16 +672,16 @@ class Api(ApiTestCase):
                 "entityDescription": [{
                     "operator": "like",
                     "values": ["FrOdO", "sam"]}]}]),
-            (15, [{
+            (19, [{
                 "relationToID": [{
                     "operator": "equal",
                     "values": [e.place.id]}]}]),
-            (183, [{
+            (177, [{
                 "typeIDWithSubs": [{
                     "operator": "notEqual",
                     "values": [e.boundary_mark.id],
                     "logicalOperator": "and"}]}]),
-            (185, [{
+            (179, [{
                 "typeName": [{
                     "operator": "notEqual",
                     "values": ["Boundary Mark", "Height"],
@@ -813,7 +813,7 @@ class Api(ApiTestCase):
         rv = c.get(
             url_for(
                 'api_04.query',
-                entities=e.location.id,
+                entities=e.place.id,
                 cidoc_classes='E18',
                 view_classes='artifact',
                 system_classes='person',

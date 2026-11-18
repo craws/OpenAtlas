@@ -169,10 +169,6 @@ def get_iiif_manifest_and_path(img_id: int) -> dict[str, str]:
     return {'IIIFManifest': iiif_manifest, 'IIIFBasePath': iiif_base_path}
 
 
-def get_location_link(links: list[Link]) -> Link:
-    return [l_ for l_ in links if l_.property.code == 'P53'][0]
-
-
 def geometry_to_geojson(
         geoms: Optional[list[dict[str, Any]]] = None) \
         -> Optional[dict[str, Any]]:
