@@ -84,8 +84,6 @@ class LoudFormatter:
                 else 'refers_to')
         elif not is_inverse and code == 'P73':
             key = 'referred_to_by'
-        elif code == 'P53' and link_.domain.class_.name == 'artifact':
-            key = 'current_location'
         elif code == 'P2' and link_.description:
             key = 'dimension'
         elif code == 'P127':
@@ -734,16 +732,6 @@ class LoudFormatter:
             root_entity: Entity) -> None:
         code = link_.property.code
         is_domain = is_inverse
-        if code == 'P53':
-            base_property = self.format_link(link_, is_domain=is_domain)
-            key = self.get_property_key(link_, is_inverse)
-            if not is_inverse:
-                if geometry := get_wkt_by_id(link_.range.id):
-                    base_property['defined_by'] = geometry
-                properties_set[key] = base_property
-            else:
-                properties_set[key].append(base_property)
-            return
         if is_inverse and code == 'P67' \
                 and link_.domain.cidoc_class.code == 'E32':
             self.handle_authority_reference(link_, properties_set, root_entity)

@@ -57,7 +57,6 @@ LA_TYPES: Final[dict[str, str]] = {
     'move': 'Activity',
     'production': 'Activity',
     'administrative_unit': 'Place',
-    'object_location': 'Place',
     'place': 'HumanMadeObject',
     'artifact': 'HumanMadeObject',
     'feature': 'HumanMadeObject',

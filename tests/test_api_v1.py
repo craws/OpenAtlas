@@ -135,6 +135,10 @@ class ApiV1(ApiTestCase):
         assert '@graph' not in rv_json
         assert rv_json['type'] == 'HumanMadeObject'
         assert rv_json['current_location']['type'] == 'Place'
+        shire_location = rv_json['current_location']
+        assert shire_location['id'] != rv_json['id']
+        assert 'POLYGON' in shire_location['defined_by']
+        assert 'POINT' in shire_location['defined_by']
         assert rv_json['_label'] == 'Shire'
 
         rv = c.get(
@@ -183,6 +187,8 @@ class ApiV1(ApiTestCase):
         assert part['moved'][0]['id'].endswith(e.artifact.uuid)
         assert part['moved_to']['type'] == 'Place'
         assert part['moved_from']['type'] == 'Place'
+        assert part['moved_to']['id'] == shire_location['id']
+        assert part['moved_from']['id'] == shire_location['id']
         assert 'influenced_by' in rv.get_json()
 
         rv = c.get(url_for('api_v1_la.get_entity', uuid=e.empty_move.uuid))
@@ -200,6 +206,7 @@ class ApiV1(ApiTestCase):
         rv_json = rv.get_json()
         assert rv_json['type'] == 'Activity'
         assert 'took_place_at' in rv_json
+        assert rv_json['took_place_at'][0]['type'] == 'Place'
         assert 'carried_out_by' in rv_json
         assert 'participant' in rv_json
         assert 'before' in rv_json
@@ -217,6 +224,9 @@ class ApiV1(ApiTestCase):
         assert 'member_of' in rv_json
         assert 'participated_in' in rv_json
         assert 'residence' in rv_json
+        assert rv_json['residence'][0]['id'] == shire_location['id']
+        assert rv_json['born']['took_place_at'][0]['id'] == shire_location['id']
+        assert rv_json['died']['took_place_at'][0]['id'] == shire_location['id']
         assert 'referred_to_by' in rv_json
 
         rv = c.get(url_for('api_v1_la.get_entity', uuid=e.logo.uuid))
@@ -239,12 +249,9 @@ class ApiV1(ApiTestCase):
             'api_v1_la.get_entity', uuid=e.stratigraphic_unit.uuid))
         assert 'attributed_by' in rv.get_json()
 
-        rv = c.get(url_for('api_v1_la.get_entity', uuid=e.location.uuid))
-        assert 'defined_by' in rv.get_json()
-
         rv = c.get(
             url_for('api_v1_la.get_entity', uuid=e.administrative_unit.uuid))
-        assert 'defined_by' in rv.get_json()
+        assert 'defined_by' not in rv.get_json()
 
         for entity in (e.group, e.production, e.translation):
             rv = c.get(url_for('api_v1_la.get_entity', uuid=entity.uuid))

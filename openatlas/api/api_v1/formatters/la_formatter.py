@@ -52,9 +52,9 @@ OBJECT_LIFE_EVENTS = {
     'begin_type': 'Production',
     'end_key': 'destroyed_by',
     'end_type': 'Destruction'}
-LIFE_EVENTS |= dict.fromkeys(
-    ['artifact', 'feature', 'human_remains', 'place', 'stratigraphic_unit'],
-    OBJECT_LIFE_EVENTS)
+PHYSICAL_CLASSES = {
+    'artifact', 'feature', 'human_remains', 'place', 'stratigraphic_unit'}
+LIFE_EVENTS |= dict.fromkeys(PHYSICAL_CLASSES, OBJECT_LIFE_EVENTS)
 
 MOVE_KEYS = {'P25': 'moved', 'P26': 'moved_to', 'P27': 'moved_from'}
 
@@ -166,7 +166,6 @@ class LaFormatter:
             'P31': self.object_event,
             'P46': self.p46,
             'P52': self.p52,
-            'P53': self.p53,
             'P67': self.p67,
             'P73': self.p73,
             'P74': self.p74,
@@ -192,11 +191,11 @@ class LaFormatter:
                 'Internal Database ID',
                 aat_type('300417447', 'internal identification')),
             unique_identifier(entity_uri(entity))]
-        if entity.class_.name == 'object_location' \
-                and (geometry := self.geometries.get(entity.id)):
-            record['defined_by'] = geometry
         for link_ in data.links:
             self.process_link(link_, record, False)
+        if entity.class_.name in PHYSICAL_CLASSES \
+                and entity.id in self.geometries:
+            record['current_location'] = self.place_ref(entity)
         file_links = []
         for link_ in data.links_inverse:
             if link_.property.code == 'P67' \
@@ -233,6 +232,17 @@ class LaFormatter:
             allowed: set[str]) -> dict[str, Any] | None:
         ref = self.ref(entity)
         return ref if ref['type'] in allowed else None
+
+    def place_ref(self, entity: Entity) -> dict[str, Any] | None:
+        if entity.class_.name not in PHYSICAL_CLASSES:
+            return self.typed_ref(entity, {'Place'})
+        ref: dict[str, Any] = {
+            'id': generate_skolem_id(entity.id, 'Place'),
+            'type': 'Place',
+            '_label': entity.name}
+        if geometry := self.geometries.get(entity.id):
+            ref['defined_by'] = geometry
+        return ref
 
     def type_ref(self, type_: Entity) -> dict[str, Any]:
         ref: dict[str, Any] = {
@@ -349,7 +359,7 @@ class LaFormatter:
 
     def p7(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if not inverse and record['type'] == 'Activity' \
-                and (ref := self.typed_ref(link_.range, {'Place'})):
+                and (ref := self.place_ref(link_.range)):
             la_append(record, 'took_place_at', ref)
 
     def p9(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
@@ -410,7 +420,7 @@ class LaFormatter:
         if key == 'moved':
             if ref := self.typed_ref(link_.range, {'HumanMadeObject'}):
                 la_append(part, key, ref)
-        elif ref := self.typed_ref(link_.range, {'Place'}):
+        elif ref := self.place_ref(link_.range):
             part.setdefault(key, ref)
 
     @staticmethod
@@ -434,19 +444,9 @@ class LaFormatter:
                 and (ref := self.typed_ref(link_.range, ACTORS)):
             la_append(record, 'current_owner', ref)
 
-    def p53(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
-        if inverse:
-            return
-        if record['type'] == 'HumanMadeObject' \
-                and (ref := self.typed_ref(link_.range, {'Place'})):
-            record.setdefault('current_location', ref)
-        elif record['type'] == 'Place' \
-                and (geometry := self.geometries.get(link_.range.id)):
-            record.setdefault('defined_by', geometry)
-
     def p74(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if not inverse and record['type'] in ACTORS \
-                and (ref := self.typed_ref(link_.range, {'Place'})):
+                and (ref := self.place_ref(link_.range)):
             la_append(record, 'residence', ref)
 
     def p127(
@@ -818,7 +818,7 @@ class LaFormatter:
                                     } | span
             for link_ in links:
                 if link_.property.code == code \
-                        and (ref := self.typed_ref(link_.range, {'Place'})):
+                        and (ref := self.place_ref(link_.range)):
                     la_append(event, 'took_place_at', ref)
             if comment:
                 event['referred_to_by'] = [statement(

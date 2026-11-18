@@ -55,7 +55,8 @@ def get_links_for_entities(
                 preloaded_entities=preloaded):
             entities_with_links[link_.domain.id].links.append(link_)
             preloaded[link_.range.id] = link_.range
-            if include_geometries and link_.property.code == 'P53':
+            if include_geometries and link_.property.code in {
+                    'P7', 'P26', 'P27', 'P74', 'OA8', 'OA9'}:
                 geom_ids.add(link_.range.id)
 
     if include_inverse:
