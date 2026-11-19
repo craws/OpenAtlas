@@ -245,8 +245,8 @@ def process_relations(
 def delete_links(entity: Entity) -> None:
     if entity.class_.hierarchies:
         entity.delete_links('P2', ['type'])
-        if entity.location:
-            entity.location.delete_links('P89', ['administrative_unit'])
+        if entity.class_.name == 'place':
+            entity.delete_links('P89', ['administrative_unit'])
     for r in entity.class_.relations.values():
         if r.mode == 'direct':
             entity.delete_links(r.property, r.classes, r.inverse)

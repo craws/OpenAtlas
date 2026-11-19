@@ -10,7 +10,7 @@ WHERE
     l.property_code != 'P53' AND
     range_id IN (
        SELECT e.id
-       FROM entity e
+       FROM model.entity e
        WHERE e.openatlas_class_name = 'object_location');
 
 UPDATE model.link l SET domain_id = (
@@ -21,7 +21,7 @@ WHERE
     l.property_code = 'P89' AND
     domain_id IN (
        SELECT e.id
-       FROM entity e
+       FROM model.entity e
        WHERE e.openatlas_class_name = 'object_location');
 
 ---- Update GIS data to use place instead of location
@@ -31,4 +31,4 @@ UPDATE model.gis SET entity_id = (
     WHERE range_id = entity_id AND property_code='P53');
 
 ---- Delete object_location
-DELETE FROM openatlas_class WHERE name = 'object_location';
+DELETE FROM model.openatlas_class WHERE name = 'object_location';

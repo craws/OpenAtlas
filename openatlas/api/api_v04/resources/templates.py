@@ -71,7 +71,6 @@ def geometries_template() -> dict[str, Any]:
         'id': fields.Integer,
         'name': fields.String,
         'description': fields.String,
-        'locationId': fields.Integer,
         'objectId': fields.Integer,
         'objectDescription': fields.String,
         'objectName': fields.String,
