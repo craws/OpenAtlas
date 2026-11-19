@@ -86,6 +86,15 @@ class Api(ApiTestCase):
         rv = c.get(
             url_for(
                 'api_04.ego_network_visualisation',
+                id_=e.feature.id,
+                depth=10,
+                linked_to_ids=e.case_study.id))
+        rv = rv.get_json()
+        assert {e.feature.name, e.place.name}.issubset(
+            {item['label'] for item in rv['results']})
+        rv = c.get(
+            url_for(
+                'api_04.ego_network_visualisation',
                 id_=e.place.id,
                 depth=10,
                 linked_to_ids=e.boundary_mark.id))

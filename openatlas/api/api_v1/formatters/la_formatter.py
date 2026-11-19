@@ -47,13 +47,16 @@ LIFE_EVENTS = {
         'begin_type': 'Formation',
         'end_key': 'dissolved_by',
         'end_type': 'Dissolution'}}
+
 OBJECT_LIFE_EVENTS = {
     'begin_key': 'produced_by',
     'begin_type': 'Production',
     'end_key': 'destroyed_by',
     'end_type': 'Destruction'}
+
 PHYSICAL_CLASSES = {
     'artifact', 'feature', 'human_remains', 'place', 'stratigraphic_unit'}
+
 LIFE_EVENTS |= dict.fromkeys(PHYSICAL_CLASSES, OBJECT_LIFE_EVENTS)
 
 MOVE_KEYS = {'P25': 'moved', 'P26': 'moved_to', 'P27': 'moved_from'}
@@ -234,8 +237,6 @@ class LaFormatter:
         return ref if ref['type'] in allowed else None
 
     def place_ref(self, entity: Entity) -> dict[str, Any] | None:
-        if entity.class_.name not in PHYSICAL_CLASSES:
-            return self.typed_ref(entity, {'Place'})
         ref: dict[str, Any] = {
             'id': generate_skolem_id(entity.id, 'Place'),
             'type': 'Place',

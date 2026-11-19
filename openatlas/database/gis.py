@@ -87,8 +87,6 @@ def get_geometry_dict(row: dict[str, Any]) -> dict[str, Any]:
 
 
 def get_centroids_by_entities(ids: list[int]) -> dict[int, list[Any]]:
-    if not ids:
-        return {}
     g.cursor.execute(
         TARGETS + """
         SELECT
