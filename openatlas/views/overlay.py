@@ -18,39 +18,26 @@ from openatlas.models.entity import Entity
 from openatlas.models.overlay import Overlay
 
 
-
-
-def _has_nonzero_area(coords: tuple[float, ...]) -> bool:
-    x0, y0, x1, y1, x2, y2 = coords
-    area = abs((x1 - x0) * (y2 - y0) - (y1 - y0) * (x2 - x0))
-    min_overlay_area = 1e-15
-    return area > min_overlay_area
-
-
 class OverlayForm(FlaskForm):
-    min_lat = -90
-    max_lat = 90
-    min_lon = -180
-    max_lon = 180
     top_left_easting = FloatField(
         '',
-        [InputRequired(), NumberRange(min=min_lon, max=max_lon)],
+        [InputRequired(), NumberRange(*Overlay.lon_range)],
         render_kw={'autofocus': True})
     top_left_northing = FloatField(
         '',
-        [InputRequired(), NumberRange(min=min_lat, max=max_lat)])
+        [InputRequired(), NumberRange(*Overlay.lat_range)])
     top_right_easting = FloatField(
         '',
-        [InputRequired(), NumberRange(min=min_lon, max=max_lon)])
+        [InputRequired(), NumberRange(*Overlay.lon_range)])
     top_right_northing = FloatField(
         '',
-        [InputRequired(), NumberRange(min=min_lat, max=max_lat)])
+        [InputRequired(), NumberRange(*Overlay.lat_range)])
     bottom_left_easting = FloatField(
         '',
-        [InputRequired(), NumberRange(min=min_lon, max=max_lon)])
+        [InputRequired(), NumberRange(*Overlay.lon_range)])
     bottom_left_northing = FloatField(
         '',
-        [InputRequired(), NumberRange(min=min_lat, max=max_lat)])
+        [InputRequired(), NumberRange(*Overlay.lat_range)])
     save = SubmitField(_('save'))
 
     def validate(self, extra_validators: Any = None) -> bool:
@@ -75,7 +62,10 @@ class OverlayForm(FlaskForm):
                 coords.append(coord_field.data)
         if not valid:
             return False
-        if not _has_nonzero_area(tuple(coords)):
+        if not Overlay.has_nonzero_area([
+                (coords[0], coords[1]),
+                (coords[2], coords[3]),
+                (coords[4], coords[5])]):
             self.top_left_easting.errors = [
                 *self.top_left_easting.errors,
                 str(_('Invalid geom entered'))]

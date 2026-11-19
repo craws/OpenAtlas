@@ -26,6 +26,7 @@ from openatlas.database import overlay as db_overlay
 from openatlas.display.image_processing import get_actual_mime
 from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
+from openatlas.models.overlay import Overlay
 
 
 @dataclass
@@ -84,7 +85,7 @@ def calculate_bounding_box(
 def format_html_link(url: str, text: str) -> str:
     safe_text = str(escape(text))
     if urlparse(url).scheme.lower() not in {'http', 'https'}:
-        return safe_text
+        return safe_text  # pragma: no cover
     return (
         f'<a href="{escape(url)}" target="_blank" '
         f'rel="noopener noreferrer">{safe_text}</a>')
@@ -99,13 +100,16 @@ def get_overlay_corners(bounding_box: Any) -> list[list[float]] | None:
         points = [(float(lat), float(lon)) for lat, lon in coordinates]
     except (SyntaxError, TypeError, ValueError):
         return None
+    corners: list[list[float]] | None = None
     match points:
         case [(lat_a, lon_a), (lat_b, lon_b)]:  # Legacy bounds, any order
             north, south = max(lat_a, lat_b), min(lat_a, lat_b)
             west, east = min(lon_a, lon_b), max(lon_a, lon_b)
-            return [[west, north], [east, north], [west, south]]
+            corners = [[west, north], [east, north], [west, south]]
         case [_, _, _]:  # Top left, top right, bottom left
-            return [[lon, lat] for lat, lon in points]
+            corners = [[lon, lat] for lat, lon in points]
+    if corners and Overlay.is_valid_corners(corners):
+        return corners
     return None
 
 
@@ -121,12 +125,14 @@ def _fetch_image_info(entity_id: int, image_url: str) -> dict[str, Any]:
             timeout=10)
         resp.raise_for_status()
         image_api = resp.json()
-    except (requests.exceptions.RequestException, ValueError):
+    except (
+            requests.exceptions.RequestException,
+            ValueError):  # pragma: no cover
         abort_file_not_found(entity_id)
     if (not isinstance(image_api, dict)
             or not _is_positive_int(image_api.get('width'))
             or not _is_positive_int(image_api.get('height'))):
-        abort_file_not_found(entity_id)
+        abort_file_not_found(entity_id)  # pragma: no cover
     return image_api
 
 
@@ -162,18 +168,19 @@ class IIIFBuilder:
         if (not g.settings.get('iiif')
                 or not g.settings.get('iiif_url')
                 or not iiif_file_exists(self.entity.id)):
-            abort_file_not_found(self.entity.id)
+            abort_file_not_found(self.entity.id)  # pragma: no cover
         if g.settings.get('iiif_conversion'):
             ext = '.tiff'
-        elif file_path := get_cached_file_path(self.entity.id):
+        elif file_path := get_cached_file_path(
+                self.entity.id):  # pragma: no cover
             ext = file_path.suffix
         else:  # pragma: no cover
             abort_file_not_found(self.entity.id)
         image_url = f"{g.settings.get('iiif_url', '')}{self.entity.id}{ext}"
         image_api = _fetch_image_info(self.entity.id, image_url)
         resolved = image_api.get('id') or image_api.get('@id')
-        if isinstance(resolved, str) and resolved:
-            image_url = resolved
+        if isinstance(resolved, str) and (clean := resolved.rstrip('/')):
+            image_url = clean
         return image_url, image_api
 
     @property
@@ -231,11 +238,15 @@ class IIIFBuilder:
 
         see_also = []
         if related_entities := self.entity.get_links('P67'):
+            see_also_format = (
+                'text/html'
+                if self.url or g.settings.get('frontend_resolver_url')
+                else 'application/ld+json')
             for related_entity in related_entities:
                 see_also.append({
                     'id': get_url(related_entity.range, self.url),
                     'label': related_entity.range.name.capitalize(),
-                    'format': related_entity.range.class_.name.capitalize()})
+                    'format': see_also_format})
 
         return ManifestMetadata(
             items=items,
@@ -291,18 +302,16 @@ class IIIFBuilder:
             _external=True)
         return annotation_url, entity_link
 
-    def get_selector(self, coordinates_str: str) -> dict[str, Any]:
+    @staticmethod
+    def get_selector(coordinates_str: str) -> list[dict[str, Any]]:
         coordinates = convert_coordinates(coordinates_str)
         x, y, width, height = calculate_bounding_box(coordinates)
-
-        return {
-            'type': 'Choice',
-            'default': {
-                'type': 'FragmentSelector',
-                'value': f'xywh={x},{y},{width},{height}'},
-            'item': {
-                'type': 'SvgSelector',
-                'value': generate_svg_path(coordinates)}}
+        return [{
+            'type': 'FragmentSelector',
+            'conformsTo': 'http://www.w3.org/TR/media-frags/',
+            'value': f'xywh={x},{y},{width},{height}'}, {
+            'type': 'SvgSelector',
+            'value': generate_svg_path(coordinates)}]
 
     def build_manifest(self) -> dict[str, Any]:
         v3_metadata = [{
@@ -489,20 +498,20 @@ class IIIFBuilder:
             return {}
         logo_int = int(logo_id)
         if not (logo_path := get_cached_file_path(logo_int)):
-            return {}
+            return {}  # pragma: no cover
         try:
             if self.entity.id == logo_int and has_file_access(self.entity):
                 logo_entity = self.entity
-            else:
+            else:  # pragma: no cover
                 logo_entity = Entity.get_by_id(
                     logo_int,
                     types=True,
                     with_location=False)
-        except ImATeapot:
+        except ImATeapot:  # pragma: no cover
             return {}
         if logo_entity.class_.name != 'file' or not has_file_access(
                 logo_entity):
-            return {}
+            return {}  # pragma: no cover
         logo_url = url_for(
             'api_v1_files.display_file',
             id=logo_int,

@@ -1,4 +1,6 @@
-from pydantic import AnyHttpUrl, Field
+from typing import Annotated
+
+from pydantic import AnyHttpUrl, Field, WithJsonSchema
 
 from openatlas.api.api_v1.models.util import BaseSchema
 
@@ -12,7 +14,13 @@ class AnnotationIiifPath(BaseSchema):
 
 
 class IiifQuery(BaseSchema):
-    url: AnyHttpUrl | None = Field(
+    url: Annotated[
+        AnyHttpUrl,
+        WithJsonSchema({
+            'type': 'string',
+            'format': 'uri',
+            'pattern': '^https?://',
+            'minLength': 1})] | None = Field(
         default=None,
         description="Base URL used to override entity links (e.g. for "
                     "presentation sites); the entity ID is appended.")
