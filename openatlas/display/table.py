@@ -184,7 +184,7 @@ def get_table_cell_content(
         case 'domain' | 'name' | 'preceding' | 'super':
             html = format_name_and_aliases(e, str(table_id), forms)
         case 'end':
-            html = table_date('last', e, range_, item)
+            html = table_date('last', e, range_, item, relation)
         case 'example_id':
             html = e.example_id
         case 'extension':
@@ -208,7 +208,7 @@ def get_table_cell_content(
         case 'main_image' if origin:
             html = profile_image_table_link(origin, e)
         case 'page':
-            html = str(item.description)
+            html = item.description or ''
         case 'overlay' if origin:
             html = ''
             if is_authorized('editor') and \
