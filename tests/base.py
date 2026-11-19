@@ -116,8 +116,6 @@ class ApiTestCase(TestBaseCase):
             app.preprocess_request()
             for entity in ApiEntity.get_by_cidoc_classes(['all']):
                 match entity.name:
-                    case 'Location of Shire':
-                        entities.location = entity
                     case 'Shire':
                         entities.place = entity
                     case 'Boundary Mark':

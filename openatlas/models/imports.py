@@ -227,8 +227,8 @@ def link_types(
     for type_tuple in sorted_type_ids['types']:
         entity.link('P2', g.types[int(type_tuple[0])], type_tuple[1])
     for type_tuple in sorted_type_ids['administrative_units']:
-        if entity.location:
-            entity.location.link(
+        if entity.class_.name == 'place':
+            entity.link(
                 'P89',
                 g.types[int(type_tuple[0])],
                 type_tuple[1])
