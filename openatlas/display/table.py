@@ -184,7 +184,7 @@ def get_table_cell_content(
         case 'domain' | 'name' | 'preceding' | 'super':
             html = format_name_and_aliases(e, str(table_id), forms)
         case 'end':
-            html = table_date('last', e, range_, item)
+            html = table_date('last', e, range_, item, relation)
         case 'example_id':
             html = e.example_id
         case 'extension':

@@ -41,12 +41,13 @@ two major generations:
      - **Beta**
      - The next-generation API based on OpenAPI 3.1 and Pydantic. Features
        strictly compliant Linked Art profiles, SKOS thesauri, IIIF Presentation
-       API v2/v3, and preliminary OpenAtlas LOD stubs.
+       API 3, and preliminary OpenAtlas LOD stubs. IIIF Image API services are
+       exposed as version 2.
 
 Interactive Documentation UIs
 -----------------------------
 For API v1, OpenAtlas provides three interactive browser interfaces that let
-you explore, inspect, and test all 31 endpoints directly without writing a
+you explore, inspect, and test all 32 endpoints directly without writing a
 single line of code:
 
 .. grid:: 1 3 3 3
@@ -83,5 +84,5 @@ Guide Contents
 --------------
 * :doc:`getting_started` - Access modes, JWT Bearer tokens, and first requests.
 * :doc:`lod` - Semantic Web concepts, CIDOC CRM, CRMarchaeo, Linked Art, and SKOS.
-* :doc:`reference` - Complete index of all 31 endpoints, parameters, and error codes.
+* :doc:`reference` - Complete index of all 32 endpoints, parameters, and error codes.
 * :doc:`api_04` - Documentation for the current stable API v0.4.

@@ -1,7 +1,7 @@
 API v1 (Beta)
 =============
 
-This section provides a quick-reference index of all 31 endpoints available in
+This section provides a quick-reference index of all 32 endpoints available in
 OpenAtlas API v1, organized by feature area.
 
 .. tip::
@@ -167,20 +167,31 @@ IIIF Presentation API
      - Endpoint
      - Description
    * - ``GET``
-     - ``/api/1/iiif/{id}/manifest/{version}``
-     - IIIF Manifest (version ``2`` or ``3``).
+     - ``/api/1/iiif/{id}/manifest``
+     - IIIF Presentation 3 Manifest.
    * - ``GET``
-     - ``/api/1/iiif/{id}/canvas/{version}``
-     - IIIF Canvas for a specific file and version.
+     - ``/api/1/iiif/{id}/canvas``
+     - IIIF Presentation 3 Canvas.
    * - ``GET``
-     - ``/api/1/iiif/{id}/image/{version}``
-     - IIIF Image resource annotation.
+     - ``/api/1/iiif/{id}/image``
+     - IIIF Presentation 3 image resource annotation.
    * - ``GET``
-     - ``/api/1/iiif/{id}/annotation-list/{version}``
-     - IIIF Annotation List (v2) or Annotation Page (v3).
+     - ``/api/1/iiif/{id}/annotation-page``
+     - IIIF Presentation 3 Annotation Page.
    * - ``GET``
-     - ``/api/1/iiif/{id}/annotation/{version}``
-     - Specific IIIF spatial polygon or point annotation.
+     - ``/api/1/iiif/{id}/georeference``
+     - IIIF Georeferencing Annotation Page, when the file has map overlay coordinates.
+   * - ``GET``
+     - ``/api/1/iiif/annotation/{id}``
+     - Specific IIIF Presentation 3 annotation.
+
+The Presentation API version is always 3, so its endpoint paths do not include
+a version segment. OpenAtlas currently exposes the linked Image API service
+as version 2.
+
+The manifest, canvas, annotation page, and annotation endpoints also accept an
+optional ``url`` query parameter (an HTTP or HTTPS base URL) to override entity
+links by appending the entity ID.
 
 Query Parameters for Collections
 --------------------------------
