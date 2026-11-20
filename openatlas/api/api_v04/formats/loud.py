@@ -105,7 +105,7 @@ class LoudFormatter:
             'type': self._resolve_type(target),
             '_label': target.name,
             'identified_by': self._inline_identifiers(target)}
-        if link_.dates.begin_from or link_.dates.end_from:
+        if link_.dates.dates_available():
             property_ = property_ | self.get_loud_timespan(link_)
         code_ = link_.property.code
         if code_ != 'P2' and link_.type:
@@ -438,7 +438,7 @@ class LoudFormatter:
             'id': entity_uri(type_),
             'type': self._resolve_type(type_),
             '_label': type_.name}
-        if type_.dates.begin_from or type_.dates.end_from:
+        if type_.dates.dates_available():
             property_ = property_ | self.get_loud_timespan(type_)
         equivalents: list[dict[str, Any]] = []
         attributed_by: list[dict[str, Any]] = []

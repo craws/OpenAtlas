@@ -21,23 +21,23 @@ from openatlas.models.overlay import Overlay
 class OverlayForm(FlaskForm):
     top_left_easting = FloatField(
         '',
-        [InputRequired(), NumberRange(*Overlay.lon_range)],
+        [InputRequired(), NumberRange(*Overlay.LON_RANGE)],
         render_kw={'autofocus': True})
     top_left_northing = FloatField(
         '',
-        [InputRequired(), NumberRange(*Overlay.lat_range)])
+        [InputRequired(), NumberRange(*Overlay.LAT_RANGE)])
     top_right_easting = FloatField(
         '',
-        [InputRequired(), NumberRange(*Overlay.lon_range)])
+        [InputRequired(), NumberRange(*Overlay.LON_RANGE)])
     top_right_northing = FloatField(
         '',
-        [InputRequired(), NumberRange(*Overlay.lat_range)])
+        [InputRequired(), NumberRange(*Overlay.LAT_RANGE)])
     bottom_left_easting = FloatField(
         '',
-        [InputRequired(), NumberRange(*Overlay.lon_range)])
+        [InputRequired(), NumberRange(*Overlay.LON_RANGE)])
     bottom_left_northing = FloatField(
         '',
-        [InputRequired(), NumberRange(*Overlay.lat_range)])
+        [InputRequired(), NumberRange(*Overlay.LAT_RANGE)])
     save = SubmitField(_('save'))
 
     def validate(self, extra_validators: Any = None) -> bool:
