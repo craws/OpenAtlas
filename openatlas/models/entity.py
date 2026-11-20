@@ -161,7 +161,7 @@ class Entity:
             if not link_is_valid(
                     domain.class_.cidoc_class.code,
                     code,
-                    range_.class_.cidoc_class.code):
+                    range_.class_.cidoc_class.code): # pragma: no cover
                 text = \
                     f'invalid CIDOC link {domain.class_.cidoc_class.code}' \
                     f' > {code} > {range_.class_.cidoc_class.code}'

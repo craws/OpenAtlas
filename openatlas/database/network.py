@@ -40,15 +40,3 @@ def get_entities(classes: list[str]) -> list[dict[str, Any]]:
         """,
         {'classes': tuple(classes)})
     return list(g.cursor)
-
-
-def get_object_mapping() -> dict[int, int]:
-    g.cursor.execute(
-        """
-        SELECT e.id, l.range_id
-        FROM model.entity e
-        JOIN model.link l ON e.id = l.domain_id AND l.property_code = 'P53'
-        JOIN model.entity e2 ON l.range_id = e2.id
-            AND e.openatlas_class_name = 'place';
-        """)
-    return {row['range_id']: row['id'] for row in list(g.cursor)}
