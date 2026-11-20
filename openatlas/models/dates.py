@@ -16,12 +16,10 @@ class Dates:
         self.end_from = timestamp_to_datetime64(data.get('end_from'))
         self.end_to = timestamp_to_datetime64(data.get('end_to'))
         self.end_comment = data.get('end_comment')
-        self.first = format_date_part(self.begin_from, 'year') \
-            if self.begin_from else None
-        self.last = format_date_part(self.end_from, 'year') \
-            if self.end_from else None
-        if self.end_from and self.end_to:
-            self.last = format_date_part(self.end_to, 'year')
+        begin = self.begin_from or self.begin_to
+        self.first = format_date_part(begin, 'year') if begin else None
+        end = self.end_to or self.end_from
+        self.last = format_date_part(end, 'year') if end else None
 
     def to_timestamp(self) -> dict[str, Any]:
         return {
@@ -99,17 +97,20 @@ def format_date(value: datetime | numpy.datetime64 | None) -> str:
         return ''
     if isinstance(value, numpy.datetime64):
         date_ = datetime64_to_timestamp(value)
-        return date_.lstrip('0').replace(' 00:00:00', '') if date_ else ''
+        return (
+            date_.lstrip('0')
+            .replace(' 00:00:00', '')
+            .replace(' 23:59:59', '')
+            if date_ else '')
     return value.date().isoformat().replace(' 00:00:00', '')
 
 
 def check_if_entity_has_time(dates: Dates) -> bool:
-    for date_ in [
-            dates.begin_from,
-            dates.begin_to,
-            dates.end_from,
-            dates.end_to]:
+    for date_ in [dates.begin_from, dates.end_from]:
         if date_ and '00:00:00' not in str(date_):
+            return True
+    for date_ in [dates.begin_to, dates.end_to]:
+        if date_ and '23:59:59' not in str(date_):
             return True
     return False
 
@@ -144,7 +145,7 @@ def form_to_datetime64(
             10: 31, 11: 30, 12: 31}
         date_lookup = months_days_leap \
             if is_leap_year(year_) else months_days
-        return date_lookup[month_]
+        return date_lookup.get(month_, 31)
 
     if month:
         month = f'{month:02}'
@@ -160,9 +161,15 @@ def form_to_datetime64(
     else:
         day = '01'
 
-    hour = f'{hour:02}' if hour else '00'
-    minute = f'{minute:02}' if minute else '00'
-    second = f'{second:02}' if second else '00'
+    hour = (
+        f'{int(hour):02}' if hour not in (None, '')
+        else ('23' if to_date else '00'))
+    minute = (
+        f'{int(minute):02}' if minute not in (None, '')
+        else ('59' if to_date else '00'))
+    second = (
+        f'{int(second):02}' if second not in (None, '')
+        else ('59' if to_date else '00'))
     try:
         date_time = numpy.datetime64(
             f'{year}-{month}-{day}T{hour}:{minute}:{second}')

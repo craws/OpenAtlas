@@ -18,9 +18,8 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.display.image_processing import (check_iiif_activation,
-                                                check_iiif_file_exist,
-                                                check_processed_image)
+from openatlas.display.image_processing import (
+    check_iiif_activation, check_iiif_file_exist, check_processed_image)
 from openatlas.display.util2 import (
     convert_size, get_file_path, is_authorized, uc_first)
 from openatlas.models.cidoc import CidocClass, CidocProperty
@@ -212,15 +211,22 @@ def format_entity_date(
         object_: Optional[Entity] = None,
         with_comment: Optional[bool] = False) -> str:
     html = link(object_) if object_ else ''
-    if getattr(dates, f'{mode}_from'):
+    from_ = getattr(dates, f'{mode}_from')
+    to = getattr(dates, f'{mode}_to')
+    if from_ or to:
         html += ', ' if html else ''
-        if getattr(dates, f'{mode}_to'):
-            html += _(
-                'between %(begin)s and %(end)s',
-                begin=format_date(getattr(dates, f'{mode}_from')),
-                end=format_date(getattr(dates, f'{mode}_to')))
+        if from_ and to:
+            if format_date(from_) == format_date(to):
+                html += format_date(from_)
+            else:
+                html += _(
+                    'between %(begin)s and %(end)s',
+                    begin=format_date(from_),
+                    end=format_date(to))
+        elif from_:
+            html += f'{_('from')} {format_date(from_)}'
         else:
-            html += format_date(getattr(dates, f'{mode}_from'))
+            html += f'{_('by')} {format_date(to)}'
         if with_comment and (comment := getattr(dates, f'{mode}_comment')):
             html += f' ({comment})'
     return html
@@ -289,7 +295,7 @@ def profile_image(
     else:
         url = url_for('view', id_=entity.image_id)
     max_width = '100%' if max_width_100 else f'{width}px'
-    html =  \
+    html = \
         f'<img style="max-width:{max_width}" alt="{entity.name}" src="{src}">'
     if not link_image:
         return html

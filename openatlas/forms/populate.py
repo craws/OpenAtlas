@@ -54,35 +54,37 @@ def populate_reference_systems(form: Any, entity: Entity) -> None:
 
 def populate_dates(form: Any, dates: Dates) -> None:
     for item in ['begin', 'end']:
-        from_ = getattr(dates, f'{item}_from')
-        to = getattr(dates, f'{item}_to')
-        if from_:
-            getattr(form, f'{item}_year_from').data = \
-                format_date_part(from_, 'year')
-            getattr(form, f'{item}_month_from').data = \
-                format_date_part(from_, 'month')
-            getattr(form, f'{item}_day_from').data = \
-                format_date_part(from_, 'day')
-            if 'begin_hour_from' in form:
+        if (from_ := getattr(dates, f'{item}_from')) is not None:
+            if hasattr(form, f'{item}_year_from'):
+                getattr(form, f'{item}_year_from').data = \
+                    format_date_part(from_, 'year')
+                getattr(form, f'{item}_month_from').data = \
+                    format_date_part(from_, 'month')
+                getattr(form, f'{item}_day_from').data = \
+                    format_date_part(from_, 'day')
+            if f'{item}_hour_from' in form:
                 getattr(form, f'{item}_hour_from').data = \
                     format_date_part(from_, 'hour')
                 getattr(form, f'{item}_minute_from').data = \
                     format_date_part(from_, 'minute')
                 getattr(form, f'{item}_second_from').data = \
                     format_date_part(from_, 'second')
-            form.begin_comment.data = dates.begin_comment
-            if to:
+        if (to := getattr(dates, f'{item}_to')) is not None:
+            if hasattr(form, f'{item}_year_to'):
                 getattr(form, f'{item}_year_to').data = \
                     format_date_part(to, 'year')
                 getattr(form, f'{item}_month_to').data = \
                     format_date_part(to, 'month')
                 getattr(form, f'{item}_day_to').data = \
                     format_date_part(to, 'day')
-                if 'begin_hour_from' in form:
-                    getattr(form, f'{item}_hour_to').data = \
-                        format_date_part(to, 'hour')
-                    getattr(form, f'{item}_minute_to').data = \
-                        format_date_part(to, 'minute')
-                    getattr(form, f'{item}_second_to').data = \
-                        format_date_part(to, 'second')
-                form.end_comment.data = dates.end_comment
+            if f'{item}_hour_to' in form:
+                getattr(form, f'{item}_hour_to').data = \
+                    format_date_part(to, 'hour')
+                getattr(form, f'{item}_minute_to').data = \
+                    format_date_part(to, 'minute')
+                getattr(form, f'{item}_second_to').data = \
+                    format_date_part(to, 'second')
+    if hasattr(form, 'begin_comment'):
+        form.begin_comment.data = dates.begin_comment
+    if hasattr(form, 'end_comment'):
+        form.end_comment.data = dates.end_comment
