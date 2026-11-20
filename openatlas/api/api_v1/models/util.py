@@ -102,7 +102,6 @@ class OpenAtlasClassEnum(str, Enum):
     HUMAN_REMAINS = 'human_remains'
     MODIFICATION = 'modification'
     MOVE = 'move'
-    # OBJECT_LOCATION = 'object_location'
     PERSON = 'person'
     PLACE = 'place'
     PRODUCTION = 'production'
