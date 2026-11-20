@@ -1,7 +1,6 @@
-from pathlib import Path
 from typing import Any
 
-from flask import g, redirect, send_file
+from flask import redirect, send_file
 from flask_openapi3 import APIBlueprint
 from werkzeug.wrappers import Response
 
@@ -15,10 +14,9 @@ from openatlas.api.api_v1.openapi_tags import file_tag
 from openatlas.api.api_v1.responses.files import (
     display_file_response, public_files_response, thumbnail_response)
 from openatlas.api.api_v1.util.files import (
-    check_file_access, get_display_extensions, get_file_entity, get_file_item,
-    get_file_path, get_mime_type, get_public_share_yes_id,
-    get_valid_license_ids, iiif_file_exists, resolve_file_paths,
-    resolve_rights_holders)
+    check_file_access, get_file_entity, get_file_item, get_file_path,
+    get_iiif_redirect_url, get_mime_type, get_public_share_yes_id,
+    get_valid_license_ids, resolve_file_paths, resolve_rights_holders)
 from openatlas.api.api_v1.util.pagination import get_pagination
 from openatlas.database.api import get_public_files_api
 from openatlas.display.image_processing import check_iiif_activation
@@ -30,30 +28,6 @@ api_v1_files = APIBlueprint(
     url_prefix='/api/1/files',
     abp_security=[{'bearerAuth': []}])
 register_error_handlers(api_v1_files)
-
-
-def get_iiif_redirect_url(
-        file_id: int,
-        file_path: Path,
-        is_thumbnail: bool = False) -> str | None:
-    if not g.settings.get('iiif') or not check_iiif_activation():
-        return None  # pragma: no cover
-
-    if file_path.suffix.lower() not in get_display_extensions():
-        return None  # pragma: no cover
-
-    if not iiif_file_exists(file_id):
-        return None  # pragma: no cover
-
-    iiif_ext = '.tiff' if g.settings.get('iiif_conversion') \
-        else file_path.suffix
-    iiif_base = f"{g.settings.get('iiif_url', '')}{file_id}{iiif_ext}"
-
-    if is_thumbnail:
-        size = app.config['IMAGE_SIZE']['thumbnail']
-        return f"{iiif_base}/full/!{size},{size}/0/default.jpg"
-
-    return f"{iiif_base}/full/max/0/default.jpg"
 
 
 @api_v1_files.get(

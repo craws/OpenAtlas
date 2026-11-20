@@ -1,4 +1,16 @@
 {% extends 'layout.html' %}
+{% macro coord_cell(field) %}
+  <div>
+    {{ field(class_='number') }}
+    {% if field.errors %}
+      <span class="error">
+        {% for error in field.errors %}
+          {{ error|uc_first }}
+        {% endfor %}
+      </span>
+    {% endif %}
+  </div>
+{% endmacro %}
 {% block content %}
     {{ buttons|button_bar|safe }}
     <form method="post">
@@ -11,18 +23,18 @@
         </div>
         <div class="table-row">
           <div>{{ _('top left')|uc_first }}</div>
-          <div>{{ form.top_left_easting(class_='number') }}</div>
-          <div>{{ form.top_left_northing(class_='number') }}</div>
+          {{ coord_cell(form.top_left_easting) }}
+          {{ coord_cell(form.top_left_northing) }}
         </div>
         <div class="table-row">
           <div>{{ _('top right')|uc_first }}</div>
-          <div>{{ form.top_right_easting(class_='number') }}</div>
-          <div>{{ form.top_right_northing(class_='number') }}</div>
+          {{ coord_cell(form.top_right_easting) }}
+          {{ coord_cell(form.top_right_northing) }}
         </div>
         <div class="table-row">
           <div>{{ _('bottom left')|uc_first }}</div>
-          <div>{{ form.bottom_left_easting(class_='number') }}</div>
-          <div>{{ form.bottom_left_northing(class_='number') }}</div>
+          {{ coord_cell(form.bottom_left_easting) }}
+          {{ coord_cell(form.bottom_left_northing) }}
         </div>
       </div>
       {{ form.save(class=config.CSS.button.primary) }}
