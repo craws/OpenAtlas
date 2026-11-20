@@ -13,8 +13,7 @@ class ApiEntity(Entity):
     def get_by_id(
             id_: int,
             types: bool = False,
-            aliases: bool = False,
-            with_location: bool = True) -> Entity:
+            aliases: bool = False) -> Entity:
         try:
             entity = Entity.get_by_id(id_, types=types, aliases=aliases)
         except Exception as e:
@@ -25,8 +24,7 @@ class ApiEntity(Entity):
     def get_by_uuid(
             uuid: UUID | str,
             types: bool = False,
-            aliases: bool = False,
-            with_location: bool = True) -> Entity:
+            aliases: bool = False) -> Entity:
         entity = Entity.get_by_uuid(uuid, types=types, aliases=aliases)
         if not entity:
             raise EntityDoesNotExistError

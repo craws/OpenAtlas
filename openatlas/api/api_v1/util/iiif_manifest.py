@@ -288,9 +288,7 @@ class IIIFBuilder:
         if annotation.entity_id:
             if not (entity := self._annotation_entities.get(
                     annotation.entity_id)):
-                entity = get_entity_by_id(
-                    annotation.entity_id,
-                    with_location=False)
+                entity = get_entity_by_id(annotation.entity_id)
                 self._annotation_entities[entity.id] = entity
             entity_link = format_html_link(
                 get_url(entity, self.url),
@@ -503,10 +501,7 @@ class IIIFBuilder:
             if self.entity.id == logo_int and has_file_access(self.entity):
                 logo_entity = self.entity
             else:  # pragma: no cover
-                logo_entity = Entity.get_by_id(
-                    logo_int,
-                    types=True,
-                    with_location=False)
+                logo_entity = Entity.get_by_id(logo_int, types=True)
         except ImATeapot:  # pragma: no cover
             return {}
         if logo_entity.class_.name != 'file' or not has_file_access(
@@ -541,10 +536,7 @@ def build_annotation(
         annotation: AnnotationImage,
         entity: Entity | None = None,
         url: str | None = None) -> dict[str, Any]:
-    image_entity = entity or get_entity_by_id(
-        annotation.image_id,
-        types=True,
-        with_location=False)
+    image_entity = entity or get_entity_by_id(annotation.image_id, types=True)
     return IIIFBuilder(image_entity, url=url).build_annotation(annotation)
 
 

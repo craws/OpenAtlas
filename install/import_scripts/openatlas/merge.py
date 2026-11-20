@@ -253,8 +253,7 @@ def entities() -> None:
                'begin_comment': row['begin_comment'],
                'end_from': row['end_from'],
                'end_to': row['end_to'],
-               'end_comment': row['end_comment']}),
-            with_location=False)
+               'end_comment': row['end_comment']}))
         track(row['id'], entity.id)
         if row['openatlas_class_name'] in case_study_hierarchy.classes:
             entity.link('P2', case_study)

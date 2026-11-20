@@ -144,7 +144,7 @@ def import_data_(project: Project, class_: str, data: list[Any]) -> None:
                     gis_data = get_coordinates_from_wkt(coordinates)
                 insert_data['gis'] = gis_data
             tmp_entity = insert(insert_data)
-            entity = Entity.get_by_id(tmp_entity.id, with_location=True)
+            entity = Entity.get_by_id(tmp_entity.id)
             db.import_data(
                 project.id,
                 entity.id,

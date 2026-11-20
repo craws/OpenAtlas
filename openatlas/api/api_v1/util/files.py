@@ -108,7 +108,7 @@ def check_file_access(file_entity: Entity) -> bool:
 
 
 def get_file_entity(file_id: int) -> Entity:
-    entity = get_entity_by_id(file_id, types=True, with_location=False)
+    entity = get_entity_by_id(file_id, types=True)
     if entity.class_.name != 'file':
         abort_id_not_a_file(file_id)
     return entity

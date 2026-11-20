@@ -44,7 +44,6 @@ class Entity:
         self.modified = None
         self.origin_id: int | None = None  # When coming from another entity
         self.image_id: int | None = None  # Profile image
-        self.location: Entity | None = None  # Respective location if place
         self.types = {}
         self.standard_type: Entity | None = None
         self.root: list[int] = []
@@ -503,8 +502,7 @@ class Entity:
     def get_by_id(
             id_: int,
             types: bool = False,
-            aliases: bool = False,
-            with_location: bool = True) -> Entity:
+            aliases: bool = False) -> Entity:
         if id_ in g.types:
             return g.types[id_]
         if id_ in g.reference_systems:
@@ -520,8 +518,7 @@ class Entity:
     def get_by_uuid(
             uuid: UUID | str,
             types: bool = False,
-            aliases: bool = False,
-            with_location: bool = True) -> Entity | None:
+            aliases: bool = False) -> Entity | None:
         if data := db.get_by_uuid(uuid, types, aliases):
             return Entity(data)
         return None
@@ -824,7 +821,7 @@ def insert(data: dict[str, Any]) -> Entity:
         data[item] = data.get(item)
     for item in ['name', 'description']:
         data[item] = sanitize(data[item])
-    entity = Entity.get_by_id(db.insert(data), with_location=False)
+    entity = Entity.get_by_id(db.insert(data))
     for attribute in attributes:
         match attribute:
             case 'alias' if 'alias' in data:

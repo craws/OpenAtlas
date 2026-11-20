@@ -52,7 +52,7 @@ def invalid_cidoc_links() -> list[Link]:
     return [Link.get_by_id(id_) for id_ in links]
 
 
-def link_is_valid(domain: str, property_: str, range_: str):
+def link_is_valid(domain: str, property_: str, range_: str) -> bool:
     valid_domain = g.properties[property_].find_object(
         'domain_class_code',
         domain) or (

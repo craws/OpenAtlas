@@ -12,14 +12,9 @@ from openatlas.models.rights_holder import RightsHolder
 def get_entity_by_id(
         id_: int,
         types: bool = False,
-        aliases: bool = False,
-        with_location: bool = True) -> Entity:
+        aliases: bool = False) -> Entity:
     try:
-        return Entity.get_by_id(
-            id_,
-            types=types,
-            aliases=aliases,
-            with_location=with_location)
+        return Entity.get_by_id(id_, types=types, aliases=aliases)
     except ImATeapot:
         abort_not_found(id_)
 
@@ -27,13 +22,8 @@ def get_entity_by_id(
 def get_entity_by_uuid(
         uuid: UUID,
         types: bool = False,
-        aliases: bool = False,
-        with_location: bool = True) -> Entity | None:
-    return Entity.get_by_uuid(
-        uuid,
-        types=types,
-        aliases=aliases,
-        with_location=with_location)
+        aliases: bool = False) -> Entity | None:
+    return Entity.get_by_uuid(uuid, types=types, aliases=aliases)
 
 
 def get_rightsholder_by_id(id_: int) -> RightsHolder:

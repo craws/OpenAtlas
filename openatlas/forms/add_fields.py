@@ -183,7 +183,6 @@ def add_relations(
         validators = [InputRequired()] if relation.required else None
         items = []
         for class_ in relation.classes:
-            class_ = 'place' if class_ == 'object_location' else class_
             if class_ not in entities:
                 entities[class_] = Entity.get_by_class(class_, True, True)
             items += entities[class_]
@@ -252,11 +251,7 @@ def add_relations(
                     origin,
                     origin_relation):
                 selection = origin
-            add_dynamic = []
-            if relation.add_dynamic:
-                add_dynamic = [
-                    item.replace('object_location', 'place')
-                    for item in relation.classes]
+            add_dynamic = relation.classes if relation.add_dynamic else []
             setattr(
                 form,
                 name,
@@ -277,8 +272,7 @@ def selection_available(
     if not origin:
         return False
     if origin.class_.name not in relation.classes \
-            and origin.class_.name.replace('place', 'object_location') \
-            not in relation.classes:
+            and origin.class_.name not in relation.classes:
         return False
     reverse_relation = get_reverse_relation(
         entity.class_,

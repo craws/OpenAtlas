@@ -622,10 +622,6 @@ with (app.test_request_context()):
             feature,
             str(fe_entry.obj_id),
             type_id=exact_match.id)
-        location = insert({
-            'name': f'Location of {fe_entry.name}',
-            'openatlas_class_name': 'object_location'})
-        feature.link('P53', location)
         added_features[fe_entry.id_] = feature
 
     added_stratigraphic: dict[str, Entity] = {}
@@ -648,10 +644,6 @@ with (app.test_request_context()):
                 su,
                 str(entry.individual_id),
                 type_id=exact_match.id)
-        location = insert({
-            'name': f'Location of {entry.name}',
-            'openatlas_class_name': 'object_location'})
-        su.link('P53', location)
 
         if entry.type:
             su.link('P2', su_types[entry.type])
@@ -740,10 +732,6 @@ with (app.test_request_context()):
             find,
             str(fi_entry.f_id),
             type_id=exact_match.id)
-        location = insert({
-            'name': f'Location of {fi_entry.name}',
-            'openatlas_class_name': 'object_location'})
-        find.link('P53', location)
 
         for fund_foto, path_ in fundfotos.items():
             fund_foto_name = fund_foto.split('_')[0]
@@ -793,9 +781,6 @@ with (app.test_request_context()):
 
             additional_find.link('P2', case_study)
             additional_find.link('P46', find_entity, inverse=True)
-            location = insert({
-                'name': f'Location of {new_name}',
-                'openatlas_class_name': 'object_location'})
 
             if fundkatalog_entry.weight:
                 additional_find.link(

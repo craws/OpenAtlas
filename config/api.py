@@ -113,7 +113,6 @@ API_PRESENTATION_EXCLUDE_RELATION = [
     'type',
     'type_tools',
     'alias',
-    'object_location',
     'reference_system',
     'administrative_unit',
     'bibliography',

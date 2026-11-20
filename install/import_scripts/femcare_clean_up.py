@@ -24,7 +24,7 @@ def add_new_hierarchy(name_: str) -> Entity:
 with app.test_request_context():
     total_start_time = time.perf_counter()
     app.preprocess_request()
-    elisabethinen_location = Entity.get_by_id(145, with_location=True).location
+    elisabethinen_location = Entity.get_by_id(145)
 
     # Patients #
     start_time = time.perf_counter()
