@@ -14,6 +14,9 @@ function onActivateKeyInput(event) {
 }
 
 function validateSubmitHandler (form) {
+  if (form.dataset.dateInvalid === 'true') {
+    return;
+  }
   if (typeof this.submitButton !== 'undefined') {
       if (this.submitButton.id === "insert_and_continue") $('#continue_').val('yes');
       if (this.submitButton.id === "insert_continue_sub") $('#continue_').val('sub');
@@ -73,37 +76,6 @@ $(document).ready(function () {
     })
   });
 
-  /* Show and hide function for date input fields */
-  $("#date-switcher").attr(
-    "aria-pressed",
-    !$(".date-switch").hasClass('d-none')
-  );
-
-  $("#date-switcher").click(function () {
-    toggleDateFieldVisible(this);
-  });
-  $("#date-switcher").on('keydown', function (event) {
-    if (!onActivateKeyInput(event)) return;
-    toggleDateFieldVisible(this);
-  });
-
-  function toggleDateFieldVisible(el) {
-    $(".date-switch").toggleClass('d-none');
-    $("#date-switcher").attr(
-      "aria-pressed",
-      !$(".date-switch").hasClass('d-none')
-    );
-    $(el).text(function (i, text) {
-      return $.trim(text) === translate.show ? translate.hide : translate.show;
-    })
-  }
-
-  /* Hide date fields if there are any and if they are empty */
-  if ($('#begin_year_from').length &&
-    $('#begin_year_from').val() == '' && $('#end_year_from').val() == '') {
-    $('.date-switch').addClass('d-none');
-  }
-
   /* Hide value type fields with class* wildcard selector */
   $('[class*="value-type-switch"]').addClass('display-none');
 
@@ -117,19 +89,12 @@ $(document).ready(function () {
   });
 
   /* Below section sets up validation for various forms */
-  // Enable validation for hidden fields
   let v = $.validator;
   v.setDefaults({
-    ignore: [],
+    ignore: ".date-switch input, .year, .month, .day, .hour, .minute, .second",
   });
 
   v.addClassRules({
-    year: {number: true, min: -4713, max: 9999},
-    month: {digits: true, min: 1, max: 12},
-    day: {digits: true, min: 1, max: 31},
-    hour: {digits: true, min: 0, max: 23},
-    minute: {digits: true, min: 0, max: 59},
-    second: {digits: true, min: 0, max: 59},
     integer: {digits: true},
     signed_integer: {signedInteger: true},
     email: {email: true},
@@ -183,7 +148,7 @@ $(document).ready(function () {
   // Adding a generic submit handler to form validation
   .each(function () {
     $(this).validate({
-      errorClass: "d-block error",
+      errorClass: "error",
       submitHandler: validateSubmitHandler,
     });
   });
