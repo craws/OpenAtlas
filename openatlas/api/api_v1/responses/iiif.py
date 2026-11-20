@@ -2,11 +2,18 @@ from http import HTTPStatus
 
 from openatlas.api.api_v1.models.util import ErrorResponse
 
+IIIF_PRESENTATION_CONTEXT = (
+    'http://iiif.io/api/presentation/3/context.json')
+IIIF_GEOREF_CONTEXT = (
+    'http://iiif.io/api/extension/georef/1/context.json')
+IIIF_CONTENT_TYPE = (
+    f'application/ld+json;profile="{IIIF_PRESENTATION_CONTEXT}"')
+
 iiif_manifest_response = {
     HTTPStatus.OK: {
-        "description": "IIIF Manifest JSON (v2 or v3)",
+        "description": "IIIF Presentation 3 Manifest JSON",
         "content": {
-            "application/json": {}}},
+            IIIF_CONTENT_TYPE: {}}},
     HTTPStatus.FORBIDDEN: {
         "description": "Forbidden: file without license or not marked as "
                        "publicly shareable.",
@@ -17,16 +24,13 @@ iiif_manifest_response = {
         "description": "File or annotation not found.",
         "content": {
             "application/json": {
-                "schema": ErrorResponse.model_json_schema()}}},
-    HTTPStatus.UNPROCESSABLE_ENTITY: {
-        "description": "Validation error: unsupported IIIF version "
-                       "(must be '2' or '3')."}}
+                "schema": ErrorResponse.model_json_schema()}}}}
 
 iiif_canvas_response = {
     HTTPStatus.OK: {
         "description": "IIIF Canvas JSON",
         "content": {
-            "application/json": {}}},
+            IIIF_CONTENT_TYPE: {}}},
     HTTPStatus.FORBIDDEN: {
         "description": "Forbidden: file without license or not marked "
                        "as publicly shareable.",
@@ -37,16 +41,13 @@ iiif_canvas_response = {
         "description": "File not found.",
         "content": {
             "application/json": {
-                "schema": ErrorResponse.model_json_schema()}}},
-    HTTPStatus.UNPROCESSABLE_CONTENT: {
-        "description": "Validation error: unsupported IIIF version "
-                       "(must be '2' or '3')."}}
+                "schema": ErrorResponse.model_json_schema()}}}}
 
 iiif_image_response = {
     HTTPStatus.OK: {
         "description": "IIIF Image annotation JSON",
         "content": {
-            "application/json": {}}},
+            IIIF_CONTENT_TYPE: {}}},
     HTTPStatus.FORBIDDEN: {
         "description": "Forbidden: file without license or not marked as "
                        "publicly shareable.",
@@ -57,16 +58,13 @@ iiif_image_response = {
         "description": "File not found.",
         "content": {
             "application/json": {
-                "schema": ErrorResponse.model_json_schema()}}},
-    HTTPStatus.UNPROCESSABLE_CONTENT: {
-        "description": "Validation error: unsupported IIIF version "
-                       "(must be '2' or '3')."}}
+                "schema": ErrorResponse.model_json_schema()}}}}
 
 iiif_annotation_list_response = {
     HTTPStatus.OK: {
-        "description": "IIIF Annotation List (v2) or Annotation Page (v3)",
+        "description": "IIIF Presentation 3 Annotation Page",
         "content": {
-            "application/json": {}}},
+            IIIF_CONTENT_TYPE: {}}},
     HTTPStatus.FORBIDDEN: {
         "description": "Forbidden: file without license or not marked as "
                        "publicly shareable.",
@@ -77,16 +75,30 @@ iiif_annotation_list_response = {
         "description": "File not found.",
         "content": {
             "application/json": {
+                "schema": ErrorResponse.model_json_schema()}}}}
+
+iiif_georeference_response = {
+    HTTPStatus.OK: {
+        "description": "IIIF Georeference Annotation Page JSON",
+        "content": {
+            IIIF_CONTENT_TYPE: {}}},
+    HTTPStatus.FORBIDDEN: {
+        "description": "Forbidden: file without license or not marked "
+                       "as publicly shareable.",
+        "content": {
+            "application/json": {
                 "schema": ErrorResponse.model_json_schema()}}},
-    HTTPStatus.UNPROCESSABLE_CONTENT: {
-        "description": "Validation error: unsupported IIIF version "
-                       "(must be '2' or '3')."}}
+    HTTPStatus.NOT_FOUND: {
+        "description": "File or georeference not found.",
+        "content": {
+            "application/json": {
+                "schema": ErrorResponse.model_json_schema()}}}}
 
 iiif_annotation_response = {
     HTTPStatus.OK: {
         "description": "IIIF Annotation JSON",
         "content": {
-            "application/json": {}}},
+            IIIF_CONTENT_TYPE: {}}},
     HTTPStatus.FORBIDDEN: {
         "description": "Forbidden: file without license or not marked as "
                        "publicly shareable.",
@@ -97,7 +109,4 @@ iiif_annotation_response = {
         "description": "Annotation or file not found.",
         "content": {
             "application/json": {
-                "schema": ErrorResponse.model_json_schema()}}},
-    HTTPStatus.UNPROCESSABLE_CONTENT: {
-        "description": "Validation error: unsupported IIIF version "
-                       "(must be '2' or '3')."}}
+                "schema": ErrorResponse.model_json_schema()}}}}

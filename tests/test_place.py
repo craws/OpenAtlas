@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from pathlib import Path
 from typing import Any
 
@@ -154,12 +155,24 @@ class PlaceTest(TestBaseCase):
             'top_right_northing': 13,
             'bottom_left_easting': 10,
             'bottom_left_northing': 20}
+        insert_url = url_for(
+            'overlay_insert',
+            image_id=file.id,
+            place_id=place.id,
+            link_id=link_id)
+        for bad_overlay, msg in (
+                ({**data, 'top_left_easting': 181, 'top_left_northing': 91},
+                 b'Number must be between -180 and 180.'),
+                ({**data, 'top_left_easting': 'nan'},
+                 b'An invalid geometry was entered'),
+                (dict.fromkeys(data, 0),
+                 b'An invalid geometry was entered')):
+            rv = c.post(insert_url, data=bad_overlay)
+            assert rv.status_code == HTTPStatus.OK
+            assert msg in rv.data
+
         rv = c.post(
-            url_for(
-                'overlay_insert',
-                image_id=file.id,
-                place_id=place.id,
-                link_id=link_id),
+            insert_url,
             data=data,
             follow_redirects=True)
         assert b'Edit' in rv.data
@@ -174,6 +187,16 @@ class PlaceTest(TestBaseCase):
                 overlay_id=overlay_id,
                 place_id=place.id))
         assert b'42' in rv.data
+
+        rv = c.post(
+            url_for(
+                'overlay_update',
+                overlay_id=overlay_id,
+                place_id=place.id),
+            data={**data, 'top_left_easting': 181})
+        assert rv.status_code == HTTPStatus.OK
+        assert b'Number must be between -180 and 180.' in rv.data
+        assert b'181' in rv.data
 
         rv = c.post(
             url_for(
