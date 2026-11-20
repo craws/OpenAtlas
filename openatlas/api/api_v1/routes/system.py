@@ -42,7 +42,7 @@ def get_system_info() -> dict[str, Any]:
     logo_id = g.settings.get('logo_file_id')
     logo_id_clean = int(logo_id) if logo_id else None
     img_enabled = bool(g.settings['image_processing'])
-    iiif_version_raw = g.settings.get('iiif_version')
+    iiif_enabled = bool(g.settings['iiif'])
 
     map_conf = MapConfig(
         zoom_default=int(g.settings['map_zoom_default']),
@@ -55,9 +55,9 @@ def get_system_info() -> dict[str, Any]:
         available_image_sizes=app.config['IMAGE_SIZE'] if img_enabled else {})
 
     iiif_conf = IiifInfo(
-        enabled=bool(g.settings['iiif']),
+        enabled=iiif_enabled,
         url=g.settings.get('iiif_url'),
-        version=str(iiif_version_raw) if iiif_version_raw else None)
+        version='3' if iiif_enabled else None)
 
     response = SystemInfoResponse(
         version=app.config['VERSION'],

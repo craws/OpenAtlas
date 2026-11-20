@@ -118,3 +118,15 @@ def abort_file_not_found(id_: int) -> NoReturn:
         'File not found on disk',
         f'No physical file was found for the requested ID {id_}.',
         details)
+
+
+def abort_georeference_not_found(id_: int) -> NoReturn:
+    details = {
+        'provided_id': str(id_),
+        'hint': 'Add valid map overlay coordinates for this file entity '
+                'to expose a georeference annotation page.'}
+    abort_with_error(
+        404,
+        'Georeference not found',
+        f'No valid georeference overlay was found for file ID {id_}.',
+        details)

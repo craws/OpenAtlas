@@ -13,6 +13,7 @@ from openatlas.api.api_v1.formatters.la_helpers import \
     primary_name, statement, unique_identifier
 from openatlas.api.api_v1.formatters.util import \
     EntityLinks, entity_uri, get_links_for_entities, get_type_references
+from openatlas.api.api_v1.responses.iiif import IIIF_CONTENT_TYPE
 from openatlas.api.api_v1.util.files import \
     get_cached_file_path, get_file_size, get_iiif_manifest_and_path, \
     get_license_type, get_mime_type, prefetch_files, resolve_rights_holders
@@ -754,7 +755,6 @@ class LaFormatter:
     @staticmethod
     def iiif_subject_of(file_links: list[Link]) -> list[dict[str, Any]]:
         subject_of = []
-        version = str(g.settings.get('iiif_version', 2))
         for link_ in file_links:
             manifest_path = get_iiif_manifest_and_path(link_.domain.id)
             if not (manifest_path.get('IIIFManifest')
@@ -775,12 +775,10 @@ class LaFormatter:
                         'type': 'DigitalObject',
                         '_label': label}],
                     'conforms_to': [{
-                        'id': f'https://iiif.io/api/presentation/{version}.0/',
+                        'id': 'https://iiif.io/api/presentation/3.0/',
                         'type': 'InformationObject',
-                        '_label': f'IIIF Presentation API {version}.0'}],
-                    'format':
-                        f"application/ld+json;profile='https://iiif.io"
-                        f"/api/presentation/{version}/context.json'"}]})
+                        '_label': 'IIIF Presentation API 3.0'}],
+                    'format': IIIF_CONTENT_TYPE}]})
         return subject_of
 
     def add_dates(self, links: list[Link], record: dict[str, Any]) -> None:
