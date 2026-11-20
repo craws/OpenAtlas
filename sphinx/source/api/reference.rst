@@ -1,7 +1,7 @@
 API v1 (Beta)
 =============
 
-This section provides a quick-reference index of all 32 endpoints available in
+This section provides a quick-reference index of all 33 endpoints available in
 OpenAtlas API v1, organized by feature area.
 
 .. tip::
@@ -193,10 +193,24 @@ The manifest, canvas, annotation page, and annotation endpoints also accept an
 optional ``url`` query parameter (an HTTP or HTTPS base URL) to override entity
 links by appending the entity ID.
 
+Frontend & Search
+^^^^^^^^^^^^^^^^^
+.. list-table::
+   :header-rows: 1
+   :widths: 15 40 45
+
+   * - Method
+     - Endpoint
+     - Description
+   * - ``GET``
+     - ``/api/1/search``
+     - Paginated entity search across system classes with substring and phonetic (``daitch_mokotoff``) matching, relevance ranking, and filters.
+
 Query Parameters for Collections
 --------------------------------
-The collection endpoints (``/api/1/linked-art/entities/{entity_class}`` and
-``/api/1/entities/{entity_class}``) support the following query parameters:
+The collection endpoints (``/api/1/linked-art/entities/{entity_class}``,
+``/api/1/entities/{entity_class}``, and ``/api/1/search``) support the following
+query parameters:
 
 .. list-table::
    :header-rows: 1
@@ -206,6 +220,10 @@ The collection endpoints (``/api/1/linked-art/entities/{entity_class}`` and
      - Type
      - Default
      - Description
+   * - ``entityClass``
+     - String
+     - ``None``
+     - Optional OpenAtlas system class filter (only on ``/api/1/search``).
    * - ``page``
      - Integer
      - ``1``
@@ -217,7 +235,7 @@ The collection endpoints (``/api/1/linked-art/entities/{entity_class}`` and
    * - ``search``
      - String
      - ``None``
-     - Case-insensitive substring match on the entity label/name.
+     - Case-insensitive substring match on the entity label/name (on ``/api/1/search``, also includes phonetic ``daitch_mokotoff`` matching and ranks by exact, prefix, substring, and phonetic match before alphabetical order).
    * - ``startDate``
      - String
      - ``None``

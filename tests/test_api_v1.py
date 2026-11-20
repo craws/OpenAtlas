@@ -1,9 +1,11 @@
 from http import HTTPStatus
+from typing import Any
 
 from flask import g, url_for
 from rdflib import Dataset, RDF, URIRef
 
 from openatlas import app
+from openatlas.api.api_v1.entity import resolve_type_ids
 from openatlas.api.api_v1.formatters.la_formatter import format_la_entities
 from openatlas.api.api_v1.formatters.lod import format_lod_entities
 from openatlas.api.api_v1.responses.iiif import (
@@ -39,19 +41,21 @@ class ApiV1(ApiTestCase):
             {'caseStudy': e.case_study.id, 'limit': 1, 'page': 2},
             {'caseStudy': e.place.uuid, 'limit': 5, 'offset': 2},
             {'startDate': '1988-02-03', 'endDate': '1988-04-03'},
-            {'startDate': '-400',
-            'endDate': '2000-05',
-            'caseStudy': e.case_study.uuid,
-            'sortBy': 'name',
-            'sort': 'desc'},
+            {
+                'startDate': '-400',
+                'endDate': '2000-05',
+                'caseStudy': e.case_study.uuid,
+                'sortBy': 'name',
+                'sort': 'desc'},
             {'startDate': '2000', 'endDate': '-500'},
             {'startDate': '2000-02', 'endDate': '1900-02'},
             {'endDate': '2004-02'},
             {'endDate': '2001-02', 'search': e.place.name},
             {'endDate': '2020-04'},
-            {'startDate': '-400-02-28',
-            'endDate': '-500-03-15',
-            'typeId': e.boundary_mark.id},
+            {
+                'startDate': '-400-02-28',
+                'endDate': '-500-03-15',
+                'typeId': e.boundary_mark.id},
             {'startDate': '   '}]:
             rv = c.get(
                 url_for(
@@ -863,14 +867,15 @@ class ApiV1(ApiTestCase):
         assert place_data[0]['name'] == 'Shire'
         assert place_data[0]['timespan'] is not None
 
-        for params in [
+        search_params: list[dict[str, Any]] = [
             {'entityClass': 'place', 'limit': 1, 'page': 2},
             {'startDate': '-400', 'endDate': '2050-05'},
             {'typeId': e.boundary_mark.id},
             {'typeId': str(e.boundary_mark.uuid)},
             {'caseStudy': e.case_study.id},
             {'caseStudy': str(e.case_study.uuid)},
-            {'sortBy': 'startDate', 'sort': 'desc'}]:
+            {'sortBy': 'startDate', 'sort': 'desc'}]
+        for params in search_params:
             rv = c.get(
                 url_for('api_v1_frontend.search_entities', **params))
             assert rv.status_code == HTTPStatus.OK
@@ -886,6 +891,31 @@ class ApiV1(ApiTestCase):
         assert rv.status_code == HTTPStatus.OK
         assert rv.get_json()['data'] == []
         assert rv.get_json()['totalItems'] == 0
+
+        rv = c.get('/api/1/search?search=%25')
+        assert rv.status_code == HTTPStatus.OK
+        assert rv.get_json()['totalItems'] == 0
+
+        rv = c.get('/api/1/search?search=_')
+        assert rv.status_code == HTTPStatus.OK
+        underscore_data = rv.get_json()
+        assert underscore_data['totalItems'] == 1
+        assert '_' in underscore_data['data'][0]['name']
+
+        rv = c.get('/api/1/search?search=foo%00bar')
+        assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+
+        rv = c.get('/api/1/search?startDate=999999-01-01')
+        assert rv.status_code == HTTPStatus.BAD_REQUEST
+
+        with app.test_request_context():
+            app.preprocess_request()
+            unit_type = g.types[e.unit_node.id]
+            expected_ids = sorted(
+                [unit_type.id, *unit_type.get_sub_ids_recursive()])
+            resolved_ids = sorted(resolve_type_ids(e.unit_node.id) or [])
+            assert resolved_ids == expected_ids
+            assert e.location.id not in resolved_ids
 
     def test_docs(self) -> None:
         c = self.client

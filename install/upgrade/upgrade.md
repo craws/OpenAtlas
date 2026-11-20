@@ -27,7 +27,16 @@ their specific directories and execute:
     sudo python3 database_upgrade.py
 
 ### 9.5.x to 9.6.0
-9.6.0.sql is needed but will be taken care of by the database upgrade script.
+Before running the database upgrade script, activate the **fuzzystrmatch** and
+**pg_trgm** extensions as **postgres** user:
+
+    psql openatlas -c "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch; CREATE EXTENSION IF NOT EXISTS pg_trgm;"
+
+If you are running tests, also activate them in the test database as **postgres** user:
+
+    psql openatlas_test -c "CREATE EXTENSION IF NOT EXISTS fuzzystrmatch; CREATE EXTENSION IF NOT EXISTS pg_trgm;"
+
+9.6.0.sql is needed and will be taken care of by the database upgrade script.
 
 ### 9.4.x to 9.5.0
 9.5.0.sql is needed but will be taken care of by the database upgrade script.

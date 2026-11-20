@@ -68,9 +68,17 @@ def _format_date_for_sql(date: str) -> str | None:
 _END_COALESCE = 'COALESCE(e.end_to, e.end_from, e.begin_to, e.begin_from)'
 
 
+def _escape_like(value: str) -> str:
+    return (
+        value.replace('\\', '\\\\')
+        .replace('%', '\\%')
+        .replace('_', '\\_'))
+
+
 def _build_entity_filter_sql(
         where_sql: str,
         params: dict[str, Any],
+        *,
         start_date: str | None = None,
         end_date: str | None = None,
         type_ids: list[int] | None = None,
@@ -174,6 +182,7 @@ def get_by_class_api(
 
 def search_entities_api(
         classes: list[str],
+        *,
         order_by: str | None = None,
         limit: int = 50,
         offset: int = 0,
@@ -190,13 +199,14 @@ def search_entities_api(
         'offset': offset}
 
     if search_name:
+        escaped = _escape_like(search_name)
         where_sql += (
             ' AND (e.name ILIKE %(search_like)s '
             'OR public.daitch_mokotoff(e.name) '
             '&& public.daitch_mokotoff(%(search)s))')
         params['search'] = search_name
-        params['search_prefix'] = f'{search_name}%'
-        params['search_like'] = f'%{search_name}%'
+        params['search_prefix'] = f'{escaped}%'
+        params['search_like'] = f'%{escaped}%'
 
     where_sql = _build_entity_filter_sql(
         where_sql,
@@ -252,7 +262,10 @@ def get_type_sub_ids_api(identifier: int | UUID) -> list[int]:
             SELECT l.domain_id
             FROM model.link l
             JOIN type_tree tt ON l.range_id = tt.id
+            JOIN model.entity e ON l.domain_id = e.id
             WHERE l.property_code IN ('P127', 'P89')
+              AND e.openatlas_class_name IN (
+                  'administrative_unit', 'type', 'type_tools')
         )
         SELECT id FROM type_tree;
         """,

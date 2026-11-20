@@ -27,14 +27,16 @@ register_error_handlers(api_v1_frontend)
     '/search',
     summary='Search entities with phonetic fuzzy matching and filters',
     tags=[frontend_tag],
-    responses=search_response)
+    responses=search_response)  # type: ignore[arg-type]
 def search_entities(query: SearchQuery) -> dict[str, Any]:
     """
     Searches entities across one or all OpenAtlas system classes using
-    phonetic matching (`daitch_mokotoff`) when a `search` query is provided,
-    ranking exact matches first, prefix matches second, and alphabetical
-    matches third. Supports filtering by system class, historical date range,
-    type ID/UUID, and case study ID/UUID.
+    case-insensitive substring and phonetic (`daitch_mokotoff`) matching
+    when a `search` query is provided, ranking exact matches first, prefix
+    matches second, substring matches third, and phonetic-only matches fourth
+    (tie-broken alphabetically). When `search` is omitted, results are ordered
+    by `sortBy` and `sort`. Supports filtering by system class, historical
+    date range, type ID/UUID, and case study ID/UUID.
     """
     type_ids = resolve_type_ids(query.type_id)
     case_study_ids = resolve_type_ids(query.case_study)

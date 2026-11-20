@@ -8,6 +8,10 @@ from openatlas.api.api_v1.models.util import (
 
 
 class SearchQuery(EntityCollectionQuery):
+    search: str | None = Field(
+        None,
+        description='Filter entities by name using case-insensitive '
+                    'substring and phonetic (Daitch-Mokotoff) matching.')
     entity_class: OpenAtlasClassEnum | None = Field(
         None,
         description='Optional OpenAtlas system class filter.')

@@ -119,8 +119,10 @@ SET end_to = end_to + INTERVAL '23 hours 59 minutes 59 seconds'
 WHERE end_to IS NOT NULL
   AND end_to::time = '00:00:00';
 
--- Add fuzzystrmatch extension and phonetic GIN index on model.entity.name
+-- Add fuzzystrmatch and pg_trgm extensions and search indexes on model.entity.name
 CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;
+CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
 CREATE INDEX IF NOT EXISTS entity_name_dm_idx ON model.entity USING gin (public.daitch_mokotoff(name));
+CREATE INDEX IF NOT EXISTS entity_name_trgm_idx ON model.entity USING gin (name public.gin_trgm_ops);
 
 END;

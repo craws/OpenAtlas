@@ -93,6 +93,8 @@ DROP INDEX IF EXISTS model.link_property_code_idx;
 DROP INDEX IF EXISTS model.link_domain_id_idx;
 DROP INDEX IF EXISTS model.gis_entity_id_idx;
 DROP INDEX IF EXISTS model.entity_openatlas_class_name_idx;
+DROP INDEX IF EXISTS model.entity_name_trgm_idx;
+DROP INDEX IF EXISTS model.entity_name_dm_idx;
 DROP INDEX IF EXISTS model.cidoc_class_code_idx;
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_username_key;
 ALTER TABLE IF EXISTS ONLY web.user_tokens DROP CONSTRAINT IF EXISTS user_tokens_pkey;
@@ -2303,6 +2305,13 @@ CREATE INDEX entity_openatlas_class_name_idx ON model.entity USING btree (openat
 --
 
 CREATE INDEX entity_name_dm_idx ON model.entity USING gin (public.daitch_mokotoff(name));
+
+
+--
+-- Name: entity_name_trgm_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX entity_name_trgm_idx ON model.entity USING gin (name public.gin_trgm_ops);
 
 
 --
