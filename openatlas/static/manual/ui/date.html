@@ -102,57 +102,102 @@
 <div class="toctree-wrapper compound">
 </div>
 <p>CIDOC based OpenAtlas shortcuts: OA8 (begins in) and OA9 (ends in)</p>
-<p>Date input fields in forms are initially hidden and can be shown after
-clicking on the <strong>Show</strong> button next to the <strong>Date</strong> label.</p>
-<p>To manage uncertainty in time up to four dates can be used: a time span for the
-beginning with start and end date as well as and a time span for the end,
-also with a beginning and end date. Find detailed examples here:
-<a class="reference internal" href="../examples/time_spans.html"><span class="doc">Time Spans</span></a></p>
+<p>Date fields are initially hidden. Click <strong>Show</strong> next to the <strong>Date</strong> label to
+open them; click <strong>Hide</strong> to close them again. If an entity already has dates
+or the form contains a date error, the date section opens automatically. The
+form also selects <strong>Advanced</strong> when the stored dates cannot be represented by
+the simple fields or when there is a date error.</p>
+<p>There are two date-entry views:</p>
 <img alt="../_images/date1.png" src="../_images/date1.png" />
-<p><strong>Exact date</strong></p>
-<p>If you know the exact birth of an actor you could enter
-<strong>1356-12-23</strong> in the first row of the date field.</p>
-<p><strong>Time span</strong></p>
-<p>If you are unsure when e.g. a Church was destroyed, you can use both end
-dates to enter a timespan. Chose a wide enough range to make sure the event
-lies in between those dates with 100% certainty. So, to record a date within
-the fist decade of 1800, enter:
-* <strong>1800</strong> into the first end row of the date field
-* <strong>1809</strong> into the second end row of the date field</p>
-<p>Days and months are filled in automatically if not stated by you. The result
-will therefor be <strong>1800-01-01</strong> to <strong>1809-12-31</strong>.</p>
-<p><strong>Autocomplete dates</strong></p>
-<p>If a date but not an exact date was entered into the form, the system
-automatically creates a <strong>time span</strong>. For example, if only a year is
-entered in the first row, a timespan of this year will be saved.
-For example:</p>
+<p>The screenshot shows the earlier four-row layout. In the current form, choose
+between <strong>Simple</strong> and <strong>Advanced</strong> after opening the date fields.</p>
+<p><strong>Simple and Advanced views</strong></p>
+<p>In <strong>Simple</strong>, enter one date for <strong>Begin</strong> and one for <strong>End</strong>. In
+<strong>Advanced</strong>, each of those dates has two independent bounds:</p>
 <ul class="simple">
-<li><p><strong>800</strong> will generate: <strong>800-1-1</strong> to <strong>800-12-31</strong>.</p></li>
-<li><p><strong>800-5</strong> will generate <strong>800-5-1</strong> to <strong>800-5-31</strong></p></li>
+<li><p><strong>Begin — Earliest / Latest</strong> bounds the uncertain date on which an event
+began.</p></li>
+<li><p><strong>End — Earliest / Latest</strong> bounds the uncertain date on which it ended.</p></li>
 </ul>
-<p><strong>Input values</strong></p>
+<p>These are bounds for the beginning and ending dates, not a way to say that a
+process (such as destruction) lasted for the entire interval. Either bound may
+be left empty when that limit is unknown. Find detailed examples here:
+<a class="reference internal" href="../examples/time_spans.html"><span class="doc">Time Spans</span></a>.</p>
+<p><strong>Simple dates and precision</strong></p>
+<p>In <strong>Simple</strong>, an entered date represents the whole period at that precision;
+the system fills both bounds for the date:</p>
 <ul class="simple">
-<li><p><strong>Year</strong>: -4713 to 9999 but not zero</p></li>
-<li><p><strong>Month</strong>: 1 to 12</p></li>
-<li><p><strong>Day</strong>: 1 to 31</p></li>
-<li><p><strong>Comment</strong>: add additional information for begin or end</p></li>
+<li><p>Entering year <strong>800</strong> gives <strong>800-01-01</strong> through <strong>800-12-31</strong>.</p></li>
+<li><p>Entering year <strong>800</strong> and month <strong>05</strong> gives <strong>800-05-01</strong> through
+<strong>800-05-31</strong>.</p></li>
+<li><p>Entering <strong>800-05-17</strong> gives that whole calendar day.</p></li>
 </ul>
-<p>Additional fields for hour, minute and second appear if the time module is
-activated in the <a class="reference internal" href="../tools/profile.html"><span class="doc">Profile</span></a> or if that information was already
-entered for that entity:</p>
-<p>Possible values:</p>
+<p>Thus, entering a year or month in <strong>Simple</strong> does create a full year or month
+interval for that Begin or End date.</p>
+<p>To record an exact calendar day, enter the full date in <strong>Simple</strong>. In
+<strong>Advanced</strong>, enter the same full date in both bounds of the relevant pair—for
+example, in both <strong>Begin Earliest</strong> and <strong>Begin Latest</strong> for an exact beginning
+date. A date without a specific time covers the whole day, not a single
+instant. For a birth date, for example, enter <strong>1356-12-23</strong> as the Begin date
+in <strong>Simple</strong>.</p>
+<p><strong>Advanced bounds and open dates</strong></p>
+<p>In <strong>Advanced</strong>, each bound is completed only toward its own side. An
+<strong>Earliest</strong> value is completed to the earliest day at that precision (for
+example, year <strong>800</strong> becomes <strong>800-01-01</strong>); a <strong>Latest</strong> value is completed
+to the latest day (year <strong>800</strong> becomes <strong>800-12-31</strong>). The opposite bound
+remains empty unless you enter it. Therefore, a single <strong>Begin Earliest</strong> value
+of <strong>800</strong> is an open lower bound, not a date covering the whole year. Enter
+<strong>800</strong> in both <strong>Begin Earliest</strong> and <strong>Begin Latest</strong> to bound the beginning
+date to that year. By contrast, entering <strong>800</strong> in the <strong>Simple Begin</strong> field
+sets both bounds for the whole year automatically.</p>
+<p>Either side can be open:</p>
 <ul class="simple">
-<li><p><strong>Hour</strong>: 0 to 23</p></li>
-<li><p><strong>Minute</strong>: 0 to 59</p></li>
-<li><p><strong>Second</strong>: 0 to 59</p></li>
+<li><p><strong>Latest only</strong> gives an upper limit: for example, <strong>Begin Latest</strong> means
+the beginning occurred by that date at the latest; <strong>End Latest</strong> means the
+ending occurred by then. The displayed date uses <strong>by …</strong>.</p></li>
+<li><p><strong>Earliest only</strong> gives a lower limit: for example, <strong>Begin Earliest</strong> means
+the beginning occurred on or after that date; <strong>End Earliest</strong> means the
+ending occurred on or after then. The displayed date uses <strong>from …</strong>.</p></li>
+<li><p>With both bounds set, the display gives the date or interval (for example,
+<strong>between … and …</strong>). Both limits are inclusive.</p></li>
 </ul>
+<p>If an Advanced date cannot be represented by a single Simple date, switching
+to <strong>Simple</strong> does not discard it. The corresponding Simple date fields are
+disabled and a message offers <strong>Edit in advanced view</strong>; return to <strong>Advanced</strong>
+to edit the stored bounds.</p>
+<p>The preview below each date pair updates as you enter values. It shows the
+interpreted date, full year or month, open bound, or interval, and reports
+invalid dates or ordering errors. Invalid fields are highlighted, and an
+invalid date prevents the form from being submitted.</p>
+<p><strong>Input values and validation</strong></p>
+<ul class="simple">
+<li><p><strong>Year</strong>: -4713 to 9999, but not zero. Negative years represent BC dates;
+there is no year zero.</p></li>
+<li><p><strong>Month</strong>: 1 to 12.</p></li>
+<li><p><strong>Day</strong>: 1 to 31, subject to the valid number of days in the selected month
+and year (including leap years).</p></li>
+<li><p><strong>Comment</strong>: add additional information for the Begin or End date.</p></li>
+</ul>
+<p>The <cite>YYYY</cite>, <cite>MM</cite> and <cite>DD</cite> placeholders illustrate the date parts; they do not
+require four- or two-digit input. A year is required for every populated date
+bound, and a month is required when entering a day. If time fields are
+available, a minute requires an hour and a second requires a minute. The
+earliest bound must not be later than its corresponding latest bound, and the
+Begin date must not be later than the End date.</p>
+<p><strong>Time fields</strong></p>
+<p>Hour, minute and second fields appear in <strong>Advanced</strong> when the time module is
+activated in the <a class="reference internal" href="../tools/profile.html"><span class="doc">Profile</span></a> or when time information already exists
+for the entity. Empty time fields are completed according to the bound: an
+<strong>Earliest</strong> bound fills omitted parts with <strong>00</strong> (defaulting to
+<strong>00:00:00</strong>, <strong>12:00:00</strong> for hour <strong>12</strong>, or <strong>12:30:00</strong> for <strong>12:30</strong>),
+while a <strong>Latest</strong> bound fills an omitted hour with <strong>23</strong> and omitted minutes
+and seconds with <strong>59</strong> (defaulting to <strong>23:59:59</strong>, <strong>12:59:59</strong> for hour
+<strong>12</strong>, or <strong>12:30:59</strong> for <strong>12:30</strong>).</p>
 <p><strong>Background</strong></p>
-<p>Dates will be validated so you can just try if you aren’t sure about a leap
-year or similar. Most limitations come from the database
-<a class="reference external" href="https://www.postgresql.org/">PostgreSQL</a> which in turn uses the
-<a class="reference external" href="https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar">Proleptic Gregorian calendar</a>.
-So there is no year zero (one year before year 1 is the year 1 BC) and dates
-before the year 4713 BC can not be recorded.</p>
+<p>Dates are validated, including calendar validity and leap years. The system
+uses the <a class="reference external" href="https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar">Proleptic Gregorian calendar</a>.
+There is no year zero: one year before year 1 is year 1 BC. Dates before
+4713 BC cannot be recorded.</p>
 </section>
 
 
