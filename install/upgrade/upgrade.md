@@ -26,7 +26,7 @@ their specific directories and execute:
 
     sudo python3 database_upgrade.py
 
-### 9.5.x to 9.6.0
+### 9.5.0 to 9.6.0
 Before running the database upgrade script, activate the **fuzzystrmatch** and
 **pg_trgm** extensions as **postgres** user:
 
@@ -38,7 +38,7 @@ If you are running tests, also activate them in the test database as **postgres*
 
 9.6.0.sql is needed and will be taken care of by the database upgrade script.
 
-### 9.4.x to 9.5.0
+### 9.4.0 to 9.5.0
 9.5.0.sql is needed but will be taken care of by the database upgrade script.
 New NPM packages and security updates are available:
 

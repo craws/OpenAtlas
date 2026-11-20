@@ -12,9 +12,9 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 class Overlay:
-    lat_range: Final[tuple[float, float]] = (-90, 90)
-    lon_range: Final[tuple[float, float]] = (-180, 180)
-    min_area: Final[float] = 1e-15
+    LAT_RANGE: Final[tuple[float, float]] = (-90, 90)
+    LON_RANGE: Final[tuple[float, float]] = (-180, 180)
+    MIN_AREA: Final[float] = 1e-15
 
     def __init__(self, row: dict[str, Any]) -> None:
         self.id = row['id']
@@ -28,12 +28,12 @@ class Overlay:
     def has_nonzero_area(cls, corners: Sequence[Sequence[float]]) -> bool:
         (x0, y0), (x1, y1), (x2, y2) = corners
         area = abs((x1 - x0) * (y2 - y0) - (y1 - y0) * (x2 - x0))
-        return area > cls.min_area
+        return area > cls.MIN_AREA
 
     @classmethod
     def is_valid_corners(cls, corners: Sequence[Sequence[float]]) -> bool:
-        min_lon, max_lon = cls.lon_range
-        min_lat, max_lat = cls.lat_range
+        min_lon, max_lon = cls.LON_RANGE
+        min_lat, max_lat = cls.LAT_RANGE
         return (
             all(
                 math.isfinite(lon) and math.isfinite(lat)

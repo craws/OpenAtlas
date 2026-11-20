@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+from config.default import FILES_PATH
+
 # ---------------------------------------------------------------------
 # Network and Security Configuration
 # ---------------------------------------------------------------------
@@ -42,7 +44,7 @@ OPENAPI_FILE = \
     Path(__file__).parent.parent / 'openatlas' / 'api' / 'openapi.json'
 
 # Path to the instance-specific OpenAPI definition file
-OPENAPI_INSTANCE_FILE = Path(__file__).parent.parent / 'files' / 'openapi.json'
+OPENAPI_INSTANCE_FILE = Path(FILES_PATH) / 'openapi.json'
 
 # JSON-LD contexts used for semantic enrichment in API responses
 API_CONTEXT = {
