@@ -8,13 +8,13 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Date &mdash; OpenAtlas 9.5.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
 
   
-      <script src="../_static/jquery.js?v=8dae8fb0"></script>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=d9c24813"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
@@ -107,10 +107,19 @@ open them; click <strong>Hide</strong> to close them again. If an entity already
 or the form contains a date error, the date section opens automatically. The
 form also selects <strong>Advanced</strong> when the stored dates cannot be represented by
 the simple fields or when there is a date error.</p>
-<p>There are two date-entry views:</p>
-<img alt="../_images/date1.png" src="../_images/date1.png" />
-<p>The screenshot shows the earlier four-row layout. In the current form, choose
-between <strong>Simple</strong> and <strong>Advanced</strong> after opening the date fields.</p>
+<p>There are two date-entry views, <strong>Simple</strong> and <strong>Advanced</strong>:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" data-sync-group="tab" data-sync-id="simple" for="sd-tab-item-0">
+Simple</label><div class="sd-tab-content docutils">
+<img alt="../_images/date_simple.png" src="../_images/date_simple.png" />
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" data-sync-group="tab" data-sync-id="advanced" for="sd-tab-item-1">
+Advanced</label><div class="sd-tab-content docutils">
+<img alt="../_images/date_advanced.png" src="../_images/date_advanced.png" />
+</div>
+</div>
 <p><strong>Simple and Advanced views</strong></p>
 <p>In <strong>Simple</strong>, enter one date for <strong>Begin</strong> and one for <strong>End</strong>. In
 <strong>Advanced</strong>, each of those dates has two independent bounds:</p>
@@ -193,6 +202,7 @@ for the entity. Empty time fields are completed according to the bound: an
 while a <strong>Latest</strong> bound fills an omitted hour with <strong>23</strong> and omitted minutes
 and seconds with <strong>59</strong> (defaulting to <strong>23:59:59</strong>, <strong>12:59:59</strong> for hour
 <strong>12</strong>, or <strong>12:30:59</strong> for <strong>12:30</strong>).</p>
+<img alt="../_images/date_time_advanced.png" src="../_images/date_time_advanced.png" />
 <p><strong>Background</strong></p>
 <p>Dates are validated, including calendar validity and leap years. The system
 uses the <a class="reference external" href="https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar">Proleptic Gregorian calendar</a>.

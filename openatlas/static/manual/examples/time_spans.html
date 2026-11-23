@@ -8,13 +8,13 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Time Spans &mdash; OpenAtlas 9.5.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
 
   
-      <script src="../_static/jquery.js?v=8dae8fb0"></script>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=d9c24813"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
@@ -134,17 +134,25 @@ are already present or when a date error needs attention.</p>
 </section>
 <section id="how-to-enter-dates-and-time-spans">
 <h2>How to enter dates and time spans<a class="headerlink" href="#how-to-enter-dates-and-time-spans" title="Link to this heading"></a></h2>
-<img alt="../_images/date.png" src="../_images/date.png" />
-<p>The current form has two views. <strong>Simple</strong> provides one date for <strong>Begin</strong> and
-one for <strong>End</strong>. <strong>Advanced</strong> provides two bounds for each date:</p>
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-0" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" data-sync-group="tab" data-sync-id="simple" for="sd-tab-item-0">
+Simple</label><div class="sd-tab-content docutils">
+<img alt="../_images/date_simple.png" src="../_images/date_simple.png" />
+</div>
+<input id="sd-tab-item-1" name="sd-tab-set-0" type="radio">
+<label class="sd-tab-label" data-sync-group="tab" data-sync-id="advanced" for="sd-tab-item-1">
+Advanced</label><div class="sd-tab-content docutils">
+<img alt="../_images/date_advanced.png" src="../_images/date_advanced.png" />
+</div>
+</div>
+<p>The date form has two views. <strong>Simple</strong> provides one date for <strong>Begin</strong> and one
+for <strong>End</strong>. <strong>Advanced</strong> provides two bounds for each date:</p>
 <ul class="simple">
 <li><p><strong>Begin — Earliest / Latest</strong> bounds the uncertain date on which the event
 began.</p></li>
 <li><p><strong>End — Earliest / Latest</strong> bounds the uncertain date on which it ended.</p></li>
 </ul>
-<p>The screenshots in this section show the earlier four-row layout. The current
-form labels those rows <strong>Earliest</strong> and <strong>Latest</strong> in the <strong>Advanced</strong> view; the
-screenshots are retained unchanged.</p>
 <p>Each pair describes uncertainty in that particular date, not the duration of a
 process between the two bounds. A single bound can be left open when its limit
 is unknown. The detailed form behavior is described in <a class="reference internal" href="../ui/date.html"><span class="doc">Date</span></a>.</p>
@@ -167,17 +175,15 @@ recorded.</p>
 <p>For an exact calendar day, enter the full date in <strong>Simple</strong>. For the Battle of
 Hastings, enter <strong>1066-10-14</strong> as both <strong>Begin</strong> and <strong>End</strong>. A date without a
 specific time represents the whole day, not one instant.</p>
-<p>In <strong>Advanced</strong>, enter that same date in both bounds of each exact date: put
-<strong>1066-10-14</strong> in <strong>Begin Earliest</strong> and <strong>Begin Latest</strong>, and in <strong>End
-Earliest</strong> and <strong>End Latest</strong>. A date entered in only one Advanced bound is an
-open earliest or latest limit, not an exact date.</p>
 <img alt="../_images/date_hastings.png" src="../_images/date_hastings.png" />
+<p>If you enter the same exact date in <strong>Advanced</strong>, put <strong>1066-10-14</strong> in both
+bounds of each pair (<strong>Begin Earliest</strong> and <strong>Begin Latest</strong>, as well as <strong>End
+Earliest</strong> and <strong>End Latest</strong>). Entering a date in only one Advanced bound
+creates an open earliest or latest limit, not an exact date.</p>
 <p>The Peace of Westphalia refers to two peace treaties, signed in Osnabrück on
 <strong>1648-05-15</strong> and in Münster on <strong>1648-10-24</strong>. In <strong>Simple</strong>, enter
-<strong>1648-05-15</strong> as <strong>Begin</strong> and <strong>1648-10-24</strong> as <strong>End</strong>. In <strong>Advanced</strong>,
-enter each date in both bounds of its pair: <strong>Begin Earliest</strong> and <strong>Begin
-Latest</strong> for <strong>1648-05-15</strong>, then <strong>End Earliest</strong> and <strong>End Latest</strong> for
-<strong>1648-10-24</strong>.</p>
+<strong>1648-05-15</strong> as <strong>Begin</strong> and <strong>1648-10-24</strong> as <strong>End</strong> (or, in <strong>Advanced</strong>,
+enter each date in both bounds of its pair).</p>
 <img alt="../_images/date_westphalia.png" src="../_images/date_westphalia.png" />
 </section>
 <section id="uncertain-dates-and-ranges">
@@ -209,7 +215,18 @@ Earliest</strong> and <strong>1809</strong> in <strong>Begin Latest</strong>.</p
 Latest</strong> to express the birth-year interval. For the exact death day, enter
 <strong>1038-08-15</strong> in both <strong>End Earliest</strong> and <strong>End Latest</strong>; filling only
 <strong>End Earliest</strong> would instead leave the latest end date unknown.</p>
-<img alt="../_images/date_stephen.png" src="../_images/date_stephen.png" />
+<div class="sd-tab-set docutils">
+<input checked="checked" id="sd-tab-item-2" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" data-sync-group="tab" data-sync-id="simple" for="sd-tab-item-2">
+Simple</label><div class="sd-tab-content docutils">
+<img alt="../_images/date_stephen_simple.png" src="../_images/date_stephen_simple.png" />
+</div>
+<input id="sd-tab-item-3" name="sd-tab-set-1" type="radio">
+<label class="sd-tab-label" data-sync-group="tab" data-sync-id="advanced" for="sd-tab-item-3">
+Advanced</label><div class="sd-tab-content docutils">
+<img alt="../_images/date_stephen_advanced.png" src="../_images/date_stephen_advanced.png" />
+</div>
+</div>
 </section>
 <section id="one-sided-bounds">
 <h3>One-sided bounds<a class="headerlink" href="#one-sided-bounds" title="Link to this heading"></a></h3>
@@ -222,6 +239,7 @@ unknown. The displayed value uses <strong>by …</strong>.</p>
 destroyed or was no longer standing, enter that date in <strong>End Latest</strong> and
 leave <strong>End Earliest</strong> empty. This means the end occurred by <strong>1220-10-04</strong> at
 the latest; it does not assert how long a destruction process lasted.</p>
+<img alt="../_images/date_church_advanced.png" src="../_images/date_church_advanced.png" />
 <p>The inverse is also possible. If a source establishes that a beginning date
 was no earlier than <strong>1150-06-15</strong>, enter it in <strong>Begin Earliest</strong> and leave
 <strong>Begin Latest</strong> empty. The displayed value uses <strong>from …</strong>; the latest limit
@@ -245,7 +263,7 @@ are completed according to the bound: <strong>Earliest</strong> fills missing va
 <strong>12:30:00</strong> for <strong>12:30</strong>), whereas <strong>Latest</strong> fills a missing hour with
 <strong>23</strong> and missing minutes and seconds with <strong>59</strong> (for example, <strong>23:59:59</strong>
 when blank, <strong>12:59:59</strong> for hour <strong>12</strong>, or <strong>12:30:59</strong> for <strong>12:30</strong>).</p>
-<img alt="../_images/date_hours.png" src="../_images/date_hours.png" />
+<img alt="../_images/date_time_advanced.png" src="../_images/date_time_advanced.png" />
 </section>
 </section>
 
