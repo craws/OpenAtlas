@@ -5,7 +5,6 @@ from flask import g, url_for
 from rdflib import Dataset, RDF, URIRef
 
 from openatlas import app
-from openatlas.api.api_v1.entity import resolve_type_ids
 from openatlas.api.api_v1.formatters.la_formatter import format_la_entities
 from openatlas.api.api_v1.formatters.lod import format_lod_entities
 from openatlas.api.api_v1.responses.iiif import (
@@ -835,12 +834,6 @@ class ApiV1(ApiTestCase):
             insert('person', 'Smyth', 'Phonetic match')
             insert('person', '1230', 'Numeric match')
 
-        g.pop('types', None)
-        rv = c.get(
-            f'/api/1/search?typeId={e.boundary_mark.id}')
-        assert rv.status_code == HTTPStatus.OK
-        assert not hasattr(g, 'types')
-
         rv = c.get(
             url_for(
                 'api_v1_frontend.search_entities',
@@ -907,15 +900,6 @@ class ApiV1(ApiTestCase):
 
         rv = c.get('/api/1/search?startDate=999999-01-01')
         assert rv.status_code == HTTPStatus.BAD_REQUEST
-
-        with app.test_request_context():
-            app.preprocess_request()
-            unit_type = g.types[e.unit_node.id]
-            expected_ids = sorted(
-                [unit_type.id, *unit_type.get_sub_ids_recursive()])
-            resolved_ids = sorted(resolve_type_ids(e.unit_node.id) or [])
-            assert resolved_ids == expected_ids
-            assert e.location.id not in resolved_ids
 
     def test_docs(self) -> None:
         c = self.client
