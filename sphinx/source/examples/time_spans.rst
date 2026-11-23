@@ -31,18 +31,24 @@ are already present or when a date error needs attention.
 How to enter dates and time spans
 ---------------------------------
 
-.. image:: date.png
+.. tab-set::
 
-The current form has two views. **Simple** provides one date for **Begin** and
-one for **End**. **Advanced** provides two bounds for each date:
+   .. tab-item:: Simple
+      :sync: simple
+
+      .. image:: date_simple.png
+
+   .. tab-item:: Advanced
+      :sync: advanced
+
+      .. image:: date_advanced.png
+
+The date form has two views. **Simple** provides one date for **Begin** and one
+for **End**. **Advanced** provides two bounds for each date:
 
 * **Begin — Earliest / Latest** bounds the uncertain date on which the event
   began.
 * **End — Earliest / Latest** bounds the uncertain date on which it ended.
-
-The screenshots in this section show the earlier four-row layout. The current
-form labels those rows **Earliest** and **Latest** in the **Advanced** view; the
-screenshots are retained unchanged.
 
 Each pair describes uncertainty in that particular date, not the duration of a
 process between the two bounds. A single bound can be left open when its limit
@@ -70,19 +76,17 @@ For an exact calendar day, enter the full date in **Simple**. For the Battle of
 Hastings, enter **1066-10-14** as both **Begin** and **End**. A date without a
 specific time represents the whole day, not one instant.
 
-In **Advanced**, enter that same date in both bounds of each exact date: put
-**1066-10-14** in **Begin Earliest** and **Begin Latest**, and in **End
-Earliest** and **End Latest**. A date entered in only one Advanced bound is an
-open earliest or latest limit, not an exact date.
-
 .. image:: date_hastings.png
+
+If you enter the same exact date in **Advanced**, put **1066-10-14** in both
+bounds of each pair (**Begin Earliest** and **Begin Latest**, as well as **End
+Earliest** and **End Latest**). Entering a date in only one Advanced bound
+creates an open earliest or latest limit, not an exact date.
 
 The Peace of Westphalia refers to two peace treaties, signed in Osnabrück on
 **1648-05-15** and in Münster on **1648-10-24**. In **Simple**, enter
-**1648-05-15** as **Begin** and **1648-10-24** as **End**. In **Advanced**,
-enter each date in both bounds of its pair: **Begin Earliest** and **Begin
-Latest** for **1648-05-15**, then **End Earliest** and **End Latest** for
-**1648-10-24**.
+**1648-05-15** as **Begin** and **1648-10-24** as **End** (or, in **Advanced**,
+enter each date in both bounds of its pair).
 
 .. image:: date_westphalia.png
 
@@ -119,7 +123,17 @@ Latest** to express the birth-year interval. For the exact death day, enter
 **1038-08-15** in both **End Earliest** and **End Latest**; filling only
 **End Earliest** would instead leave the latest end date unknown.
 
-.. image:: date_stephen.png
+.. tab-set::
+
+   .. tab-item:: Simple
+      :sync: simple
+
+      .. image:: date_stephen_simple.png
+
+   .. tab-item:: Advanced
+      :sync: advanced
+
+      .. image:: date_stephen_advanced.png
 
 
 One-sided bounds
@@ -135,6 +149,8 @@ Similarly, if an itinerary dated **1220-10-04** says a church had already been
 destroyed or was no longer standing, enter that date in **End Latest** and
 leave **End Earliest** empty. This means the end occurred by **1220-10-04** at
 the latest; it does not assert how long a destruction process lasted.
+
+.. image:: date_church_advanced.png
 
 The inverse is also possible. If a source establishes that a beginning date
 was no earlier than **1150-06-15**, enter it in **Begin Earliest** and leave
@@ -161,4 +177,4 @@ are completed according to the bound: **Earliest** fills missing values with
 **23** and missing minutes and seconds with **59** (for example, **23:59:59**
 when blank, **12:59:59** for hour **12**, or **12:30:59** for **12:30**).
 
-.. image:: date_hours.png
+.. image:: date_time_advanced.png

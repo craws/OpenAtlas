@@ -13,12 +13,19 @@ or the form contains a date error, the date section opens automatically. The
 form also selects **Advanced** when the stored dates cannot be represented by
 the simple fields or when there is a date error.
 
-There are two date-entry views:
+There are two date-entry views, **Simple** and **Advanced**:
 
-.. image:: date.png
+.. tab-set::
 
-The screenshot shows the earlier four-row layout. In the current form, choose
-between **Simple** and **Advanced** after opening the date fields.
+   .. tab-item:: Simple
+      :sync: simple
+
+      .. image:: /examples/date_simple.png
+
+   .. tab-item:: Advanced
+      :sync: advanced
+
+      .. image:: /examples/date_advanced.png
 
 **Simple and Advanced views**
 
@@ -113,6 +120,8 @@ for the entity. Empty time fields are completed according to the bound: an
 while a **Latest** bound fills an omitted hour with **23** and omitted minutes
 and seconds with **59** (defaulting to **23:59:59**, **12:59:59** for hour
 **12**, or **12:30:59** for **12:30**).
+
+.. image:: /examples/date_time_advanced.png
 
 **Background**
 
