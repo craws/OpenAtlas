@@ -4,7 +4,7 @@ from flask import g
 from werkzeug.exceptions import ImATeapot
 
 from openatlas.api.api_v1.error_handlers import abort_not_found
-from openatlas.database.api import get_by_class_api, get_type_sub_ids_api
+from openatlas.database.api import get_entities_api, get_type_sub_ids_api
 from openatlas.models.entity import Entity
 from openatlas.models.rights_holder import RightsHolder
 
@@ -64,8 +64,8 @@ def get_by_system_class(
     if type_ids == [] or case_study_ids == []:
         return [], 0
     aliases = bool(g.classes[class_name].attributes.get('alias'))
-    rows, total = get_by_class_api(
-        class_name,
+    rows, total = get_entities_api(
+        [class_name],
         types=True,
         aliases=aliases,
         order_by=order_by,

@@ -12,7 +12,7 @@ from openatlas.api.api_v1.openapi_tags import frontend_tag
 from openatlas.api.api_v1.responses.frontend import search_response
 from openatlas.api.api_v1.util.date_util import get_timespan_dict
 from openatlas.api.api_v1.util.pagination import get_pagination
-from openatlas.database.api import search_entities_api
+from openatlas.database.api import get_entities_api
 from openatlas.models.dates import Dates
 
 api_v1_frontend = APIBlueprint(
@@ -50,12 +50,13 @@ def search_entities(query: SearchQuery) -> dict[str, Any]:
             if query.entity_class
             else [cls.value for cls in OpenAtlasClassEnum])
         order_by = f'{query.sort_by}_{query.sort}'
-        rows, total = search_entities_api(
-            classes=classes,
+        rows, total = get_entities_api(
+            classes,
             order_by=order_by,
             limit=query.limit,
             offset=(query.page - 1) * query.limit,
             search_name=query.search,
+            phonetic=True,
             start_date=query.start_date,
             end_date=query.end_date,
             type_ids=type_ids,

@@ -115,6 +115,25 @@ class ApiV1(ApiTestCase):
         assert rv.status_code == HTTPStatus.OK
         assert 'prev' in rv.get_json()
 
+        rv = c.get(
+            url_for(
+                'api_v1_lod.get_entities',
+                entity_class='place',
+                search='%'))
+        assert rv.status_code == HTTPStatus.OK
+        assert rv.get_json()['partOf']['totalItems'] == 0
+
+        rv = c.get(
+            url_for(
+                'api_v1_lod.get_entities',
+                entity_class='place',
+                limit=1,
+                page=999))
+        assert rv.status_code == HTTPStatus.OK
+        out_of_range = rv.get_json()
+        assert out_of_range['partOf']['totalItems'] > 0
+        assert out_of_range['orderedItems'] == []
+
         assert format_lod_entities([]) == {
             '@context': [
                 'https://linked.art/ns/v1/linked-art.json',
