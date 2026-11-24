@@ -45,29 +45,65 @@ def validate_dates(form: FlaskForm) -> bool:
     valid = True
     dates = {}
     for prefix in ['begin_', 'end_']:
-        if getattr(form, f'{prefix}year_to').data \
-                and not getattr(form, f'{prefix}year_from').data:
-            getattr(form, f'{prefix}year_from').errors.append(
-                _("Required for time span"))
-            valid = False
         for postfix in ['_from', '_to']:
-            if getattr(form, f'{prefix}year{postfix}').data:
-                date = form_to_datetime64(
-                    getattr(form, f'{prefix}year{postfix}').data,
-                    getattr(form, f'{prefix}month{postfix}').data,
-                    getattr(form, f'{prefix}day{postfix}').data,
-                    getattr(form, f'{prefix}hour{postfix}').data
-                    if f'{prefix}hour{postfix}' in form else None,
-                    getattr(form, f'{prefix}minute{postfix}').data
-                    if f'{prefix}minute{postfix}' in form else None,
-                    getattr(form, f'{prefix}second{postfix}').data
-                    if f'{prefix}second{postfix}' in form else None)
-                if not date:
-                    getattr(form, f'{prefix}day{postfix}').errors.append(
+            parts = ['year', 'month', 'day']
+            if f'{prefix}hour{postfix}' in form:
+                parts += ['hour', 'minute', 'second']
+            if any(
+                    getattr(form, f'{prefix}{part}{postfix}').errors
+                    for part in parts):
+                valid = False
+                continue
+            if getattr(form, f'{prefix}year{postfix}').data is None:
+                if any(
+                        getattr(form, f'{prefix}{part}{postfix}').data
+                        is not None
+                        for part in parts[1:]):
+                    getattr(form, f'{prefix}year{postfix}').errors.append(
                         _('not a valid date'))
                     valid = False
+                continue
+            if getattr(form, f'{prefix}day{postfix}').data \
+                    and not getattr(form, f'{prefix}month{postfix}').data:
+                getattr(form, f'{prefix}month{postfix}').errors.append(
+                    _('not a valid date'))
+                valid = False
+                continue
+            if f'{prefix}hour{postfix}' in form:
+                hour = getattr(form, f'{prefix}hour{postfix}').data
+                minute = getattr(form, f'{prefix}minute{postfix}').data
+                second = getattr(form, f'{prefix}second{postfix}').data
+                if second is not None and minute is None:
+                    getattr(
+                        form,
+                        f'{prefix}minute{postfix}').errors.append(
+                            _('not a valid date'))
+                    valid = False
                     continue
-                dates[prefix + postfix.replace('_', '')] = date
+                if minute is not None and hour is None:
+                    getattr(
+                        form,
+                        f'{prefix}hour{postfix}').errors.append(
+                            _('not a valid date'))
+                    valid = False
+                    continue
+            date = form_to_datetime64(
+                getattr(form, f'{prefix}year{postfix}').data,
+                getattr(form, f'{prefix}month{postfix}').data,
+                getattr(form, f'{prefix}day{postfix}').data,
+                getattr(form, f'{prefix}hour{postfix}').data
+                if f'{prefix}hour{postfix}' in form else None,
+                getattr(form, f'{prefix}minute{postfix}').data
+                if f'{prefix}minute{postfix}' in form else None,
+                getattr(form, f'{prefix}second{postfix}').data
+                if f'{prefix}second{postfix}' in form else None,
+                to_date=postfix == '_to')
+            if not date:
+                getattr(form, f'{prefix}day{postfix}').errors.append(
+                    _('not a valid date'))
+                valid = False
+                continue
+            dates[prefix + postfix.replace('_', '')] = date
 
     # Check for valid date combination e.g. begin not after end
     if valid:
@@ -78,20 +114,20 @@ def validate_dates(form: FlaskForm) -> bool:
                 field = getattr(form, f'{prefix}_year_from')
                 field.errors.append(_('First date cannot be after second.'))
                 valid = False
-    if 'begin_from' in dates and 'end_from' in dates:
-        field = getattr(form, 'begin_year_from')
-        if len(dates) == 4 and (
-                dates['begin_from'] > dates['end_from']
-                or dates['begin_to'] > dates['end_to']):
+    if valid:
+        begin_from = dates.get('begin_from')
+        begin_to = dates.get('begin_to')
+        end_from = dates.get('end_from')
+        end_to = dates.get('end_to')
+        begin = begin_from or begin_to
+        end = end_to or end_from
+        if (begin_from and end_from and begin_from > end_from) \
+                or (begin_to and end_to and begin_to > end_to) \
+                or (begin and end and begin > end):
+            field = (
+                getattr(form, 'begin_year_from')
+                if getattr(form, 'begin_year_from').data
+                else getattr(form, 'begin_year_to'))
             field.errors.append(_('Begin dates cannot start after end dates.'))
             valid = False
-        elif len(dates) != 4:
-            first = dates['begin_to'] \
-                if 'begin_to' in dates else dates['begin_from']
-            second = dates['end_from'] \
-                if 'end_from' in dates else dates['end_to']
-            if first > second:
-                field.errors.append(
-                    _('Begin dates cannot start after end dates.'))
-                valid = False
     return valid

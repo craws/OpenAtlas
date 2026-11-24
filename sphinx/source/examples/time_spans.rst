@@ -24,98 +24,157 @@ It is not provided for the input of:
 * :doc:`Sources</entity/source>`
 * :doc:`References</entity/reference>`
 
-The **Date** field itself can be found at the bottom of the form, its input
-field is initially hidden. It can be used by clicking the **Show** button.
+The **Date** field is at the bottom of the form and is initially hidden. Click
+**Show** to open it and **Hide** to close it. It opens automatically when dates
+are already present or when a date error needs attention.
 
 How to enter dates and time spans
 ---------------------------------
 
-.. image:: date.png
+.. tab-set::
 
-The form consists of two parts:
+   .. tab-item:: Simple
+      :sync: simple
 
-* **Begin**
-* **End**
+      .. image:: date_simple.png
 
-Begin and end each provide two lines for data entry. This can be used for
-entering precise, known data as well as for tracking time spans.
+   .. tab-item:: Advanced
+      :sync: advanced
 
-The following values can be put in:
-* Year (YYYY) as four digits: -4713 to 9999, **the year 0 is not allowed**
-* Month (MM) as two digits: 01 to 12
-* Day (DD) as two digits: 01 to 31
-* Hour (hh) as two digits: 00 to 23
-* Minute (mm) as two digits: 00 to 59
-* Seconds (ss) as two digits: 00 to 59
-* Comments as free text for additional information
+      .. image:: date_advanced.png
 
-Years before the year 0 can be indicated by a preceding minus. Please note that
-years before the year 4713 BC (spelling -4713) cannot be entered at the moment
-due to software restrictions by `PostgreSQL <https://www.postgresql.org/>`_.
-Furthermore, as PostgreSQL uses the
+The date form has two views. **Simple** provides one date for **Begin** and one
+for **End**. **Advanced** provides two bounds for each date:
+
+* **Begin — Earliest / Latest** bounds the uncertain date on which the event
+  began.
+* **End — Earliest / Latest** bounds the uncertain date on which it ended.
+
+Each pair describes uncertainty in that particular date, not the duration of a
+process between the two bounds. A single bound can be left open when its limit
+is unknown. The detailed form behavior is described in :doc:`Date</ui/date>`.
+
+**Input values**
+
+* **Year**: -4713 to 9999, except 0. Use a minus sign for BC dates; for example,
+  -1 is 1 BC.
+* **Month**: 1 to 12.
+* **Day**: 1 to 31, subject to the valid number of days in that month and year.
+* **Comment**: free text for additional information about the Begin or End date.
+
+The `YYYY`, `MM` and `DD` placeholders do not require four- or two-digit input;
+leading zeroes are optional. A year is required for every populated bound, and
+a month is required when entering a day. Dates are validated against the
 `Proleptic Gregorian calendar <https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar>`_,
-the year 0 cannot be entered either.
+including leap years; year 0 does not exist and dates before 4713 BC cannot be
+recorded.
 
 Precise dates
 ^^^^^^^^^^^^^
 
-If precise dates are known, enter the beginning into the first line of
-**Begin** and the end date into the first line of **End**. You can add comments
-in the comment field.
-Think of a historic battle with known dates, e.g. the Battle of Hastings which
-was fought between William Duke of Normandy with his Norman-French troops and
-King Harold Godwinson and his English army on the 14th of October 1066.
-To track this dates, fill in 1066 as year, 10 as month and 14 as day for
-**Begin** and **End** alike.
+For an exact calendar day, enter the full date in **Simple**. For the Battle of
+Hastings, enter **1066-10-14** as both **Begin** and **End**. A date without a
+specific time represents the whole day, not one instant.
 
 .. image:: date_hastings.png
 
-Or think of the Peace of Westphalia as collective name for two peace treaties,
-signed in 1648 in Osnabrück (15th of May 1648) and Münster (24th of October
-1648). The treaties ended the Thirty Years' War as well as the Eighty Years'
-War. To track those dates add 1648 - 05 - 15 into the first row of **Begin**
-and 1648 - 10 - 24 into the first row of **End**.
+If you enter the same exact date in **Advanced**, put **1066-10-14** in both
+bounds of each pair (**Begin Earliest** and **Begin Latest**, as well as **End
+Earliest** and **End Latest**). Entering a date in only one Advanced bound
+creates an open earliest or latest limit, not an exact date.
+
+The Peace of Westphalia refers to two peace treaties, signed in Osnabrück on
+**1648-05-15** and in Münster on **1648-10-24**. In **Simple**, enter
+**1648-05-15** as **Begin** and **1648-10-24** as **End** (or, in **Advanced**,
+enter each date in both bounds of its pair).
 
 .. image:: date_westphalia.png
 
-Time spans
-^^^^^^^^^^
+Uncertain dates and ranges
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If dating is uncertain, time spans for the beginning, end or beginning and end
-of the time span can be given.
-This is possible via the four input fields of the date field - two for begin
-and two for end:
+Use **Advanced** when the date of the beginning, the date of the end, or both
+are uncertain. The four bounds are:
 
-* The first line represents the **beginning of the begin**
-* The second line represents the **end of the begin**
-* The third line represents the **beginning of the end**
-* The fourth line represents the **ending of the end**
+* **Begin Earliest**: earliest possible date on which the event began.
+* **Begin Latest**: latest possible date on which it began.
+* **End Earliest**: earliest possible date on which it ended.
+* **End Latest**: latest possible date on which it ended.
 
-In the case of unknown start and end dates, the time span must be selected
-big enough to be sure the actual time frame lies within the specified
-span with a 100 % certainty.
+An **Earliest** value is completed toward the start of its precision: for
+example, year **800** becomes **800-01-01**, and month **800-05** becomes
+**800-05-01**. A **Latest** value is completed toward the end: year **800**
+becomes **800-12-31**, and month **800-05** becomes **800-05-31**. If all time
+fields are blank, the corresponding time is **00:00:00** for **Earliest** and
+**23:59:59** for **Latest**. The bounds are inclusive.
 
-Example: The exact date of death of King Stephen I of Hungary is known - 15
-August 1038 AD - but for the date of birth only a time span from 01.01.975 AD
-to 31.12.975 AD can be given. As first input field corresponds to the earliest
-possible start of the time span, 975 - 01 - 01 should be entered. The second
-line corresponds to the latest possible end of the time span, in this case 975
-- 12 - 31.
-As end 15 August 1038 can be stated in the third line (the fourth line will
-be filled automatically).
+For example, entering **800** as **Simple Begin** gives a beginning date
+anywhere in that year, from **800-01-01** through **800-12-31**. Entering
+**800-05** gives the whole month. In **Advanced**, entering **800** only in
+**Begin Earliest** sets a lower bound of **800-01-01** and leaves the latest
+bound unknown; it does not represent the whole year. To record a beginning date
+known to fall between **1800** and **1809**, enter **1800** in **Begin
+Earliest** and **1809** in **Begin Latest**.
 
-.. image:: date_stephen.png
+King Stephen I of Hungary was born at an unknown time in **975** and died on
+**1038-08-15**. In **Simple**, enter **975** as **Begin** and **1038-08-15** as
+**End**. In **Advanced**, enter **975** in both **Begin Earliest** and **Begin
+Latest** to express the birth-year interval. For the exact death day, enter
+**1038-08-15** in both **End Earliest** and **End Latest**; filling only
+**End Earliest** would instead leave the latest end date unknown.
 
+.. tab-set::
+
+   .. tab-item:: Simple
+      :sync: simple
+
+      .. image:: date_stephen_simple.png
+
+   .. tab-item:: Advanced
+      :sync: advanced
+
+      .. image:: date_stephen_advanced.png
+
+
+One-sided bounds
+^^^^^^^^^^^^^^^^
+
+When only the **Latest** bound is known, leave **Earliest** empty. For example,
+if a charter records that a church was consecrated on **1150-06-15**, enter that
+date in **Begin Latest** and leave **Begin Earliest** empty. The beginning is
+known to have occurred by that date at the latest; its earliest limit is
+unknown. The displayed value uses **by …**.
+
+Similarly, if an itinerary dated **1220-10-04** says a church had already been
+destroyed or was no longer standing, enter that date in **End Latest** and
+leave **End Earliest** empty. This means the end occurred by **1220-10-04** at
+the latest; it does not assert how long a destruction process lasted.
+
+.. image:: date_church_advanced.png
+
+The inverse is also possible. If a source establishes that a beginning date
+was no earlier than **1150-06-15**, enter it in **Begin Earliest** and leave
+**Begin Latest** empty. The displayed value uses **from …**; the latest limit
+remains unknown. **End Earliest** can be used in the same way when only a lower
+bound for the ending date is known. When both bounds are present, the display
+shows **between … and …**. If both bounds describe the same full calendar day
+without different custom times, the display shows a single date.
 
 Activate hours, minutes, and seconds
 ------------------------------------
 
-By default, years, months and days can be entered into the date input field.
-However, some projects might need to also track hours, minutes, and seconds.
-Those additional input fields can be activated in your
-:doc:`profile</tools/profile>`. To do so click the **gear** and go to
-**Profile**. Here click **Modules**. Click on the **Edit** button and check
-**Time** to turn it on. You might have to refresh your form page afterwards
-(keyboard buttons ctrl + F5).
+Time fields are available in **Advanced** when the **Time** module is enabled
+in your :doc:`profile</tools/profile>` or when the entity already has date
+values that require time fields. To enable the module, click the **gear**, open
+**Profile**, choose **Modules**, click **Edit**, and select **Time**. You may
+need to refresh the form afterwards. The time fields do not appear in **Simple**.
 
-.. image:: date_hours.png
+Hour values range from 0 to 23; minutes and seconds range from 0 to 59. A
+minute requires an hour, and a second requires a minute. Omitted time fields
+are completed according to the bound: **Earliest** fills missing values with
+**00** (for example, **00:00:00** when blank, **12:00:00** for hour **12**, or
+**12:30:00** for **12:30**), whereas **Latest** fills a missing hour with
+**23** and missing minutes and seconds with **59** (for example, **23:59:59**
+when blank, **12:59:59** for hour **12**, or **12:30:59** for **12:30**).
+
+.. image:: date_time_advanced.png

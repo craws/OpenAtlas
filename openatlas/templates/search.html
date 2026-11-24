@@ -14,18 +14,17 @@
             <p class="fs-5 mb-0">{{ _('date')|uc_first }}</p>
             <span style="display:inline-block;width:3em;">{{ _('from')|uc_first }}</span>
             <div class="row g-1">
-              <div class="col-4">{{ form.begin_year(class_='year ' + config.CSS.string_field) }}</div>
-              <div class="col-4">{{ form.begin_month(class_='month ' + config.CSS.string_field) }}</div>
-              <div class="col-4">{{ form.begin_day(class_='day ' + config.CSS.string_field) }}</div>
-              {% if form.errors.begin_year %}
-                <span class="error">{{ form.errors.begin_year[0]|safe }}</span>
-              {% endif %}
+              <div class="col-4">{{ form.begin_year(class_='year ' + config.CSS.string_field + (' error' if form.errors.begin_year else '')) }}</div>
+              <div class="col-4">{{ form.begin_month(class_='month ' + config.CSS.string_field + (' error' if form.errors.begin_month else '')) }}</div>
+              <div class="col-4">{{ form.begin_day(class_='day ' + config.CSS.string_field + (' error' if form.errors.begin_day else '')) }}</div>
             </div>
             <span style="display:inline-block;width:3em;">{{ _('to')|uc_first }}</span>
             <div class="row g-1">
-              <div class="col-4">{{ form.end_year(class_='year ' + config.CSS.string_field) }}</div>
-              <div class="col-4">{{ form.end_month(class_='month ' + config.CSS.string_field) }}</div>
-              <div class="col-4">{{ form.end_day(class_='day ' + config.CSS.string_field) }}</div>
+              <div class="col-4">{{ form.end_year(class_='year ' + config.CSS.string_field + (' error' if form.errors.end_year else '')) }}</div>
+              <div class="col-4">{{ form.end_month(class_='month ' + config.CSS.string_field + (' error' if form.errors.end_month else '')) }}</div>
+              <div class="col-4">{{ form.end_day(class_='day ' + config.CSS.string_field + (' error' if form.errors.end_day else '')) }}</div>
+              {% set search_date_error = (form.errors.begin_year or form.errors.begin_month or form.errors.begin_day or form.errors.end_year or form.errors.end_month or form.errors.end_day or []) %}
+              <div id="search-date-feedback" class="col-12 small mt-1 {{ 'text-danger fw-semibold' if search_date_error else 'd-none' }}">{{ search_date_error[0]|uc_first if search_date_error else '' }}</div>
               <div class="col-12 d-flex">
                 {{ form.include_dateless(class_="me-1") }} {{ form.include_dateless.label }}
               </div>
@@ -52,6 +51,7 @@
 {% endblock %}
 
 {% block script %}
+  <script src="/static/js/dates.js"></script>
   <script>
       $(document).ready(function () {
           $("#classes :checkbox").change(function () {

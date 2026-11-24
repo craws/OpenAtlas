@@ -1,30 +1,13 @@
-from pathlib import Path
-
-from flask import g, url_for
+from flask import url_for
 
 from openatlas import app
-from tests.base import ApiTestCase, get_hierarchy
+from tests.base import ApiTestCase
 
 
 class Api(ApiTestCase):
     def test_api(self) -> None:
         c = self.client
-        with app.test_request_context():
-            app.preprocess_request()
-            rights_holder_ids = [rh.id for rh in g.rights_holder]
-
-        logo_path = Path(app.root_path) / 'static' / 'images' / 'layout'
-        public_type = get_hierarchy('Public sharing allowed')
-        with open(logo_path / 'logo.png', 'rb') as img:
-            c.post(
-                url_for('insert', class_='file'),
-                data={
-                    'name': 'OpenAtlas logo',
-                    'file': img,
-                    'creator': f'{rights_holder_ids}',
-                    'license_holder': f'{rights_holder_ids}',
-                    str(public_type.id): public_type.subs[1]},
-                follow_redirects=True)
+        self.upload_logo()
 
         c.get(url_for('logout'))
 
@@ -32,7 +15,7 @@ class Api(ApiTestCase):
 
         with app.test_request_context():
             app.preprocess_request()
-            e.file.link('P2', e.open_license)
+            e.logo.link('P2', e.open_license)
 
         # ---Content Endpoints---
         rv = c.get(url_for('api_04.classes')).get_json()
@@ -64,8 +47,8 @@ class Api(ApiTestCase):
             url_for('api_04.system_class_count', type_id=e.boundary_mark.id))
         assert rv.get_json()['place']
 
-        rv = c.get(url_for('api.licensed_file_overview', file_id=e.file.id))
-        assert rv.get_json()[str(e.file.id)]['license'] == 'Public domain'
+        rv = c.get(url_for('api.licensed_file_overview', file_id=e.logo.id))
+        assert rv.get_json()[str(e.logo.id)]['license'] == 'Public domain'
 
         rv = c.get(url_for('api.licensed_file_overview'))
         assert len(rv.get_json().keys()) == 5
@@ -151,9 +134,9 @@ class Api(ApiTestCase):
         assert desc['value'] == 'The Shire was the homeland of the hobbits.'
         timespan = rv['when']['timespans'][0]
         assert timespan['start']['earliest'] == '2018-01-31T00:00:00'
-        assert timespan['start']['latest'] == '2018-03-01T00:00:00'
+        assert timespan['start']['latest'] == '2018-03-01T23:59:59'
         assert timespan['end']['earliest'] == '2019-01-31T00:00:00'
-        assert timespan['end']['latest'] == '2019-03-01T00:00:00'
+        assert timespan['end']['latest'] == '2019-03-01T23:59:59'
         assert rv['types'][0]['identifier']
         assert rv['types'][0]['label'] == 'Boundary Mark'
         assert rv['relations'][1]['label'] == 'Height'
@@ -221,6 +204,9 @@ class Api(ApiTestCase):
         assert rv['type'] == 'Site'
         assert rv['_label'] == 'Shire'
         assert rv['timespan']['begin_of_the_begin'] == '2018-01-31'
+        assert rv['timespan']['end_of_the_begin'] == '2018-03-01'
+        assert rv['timespan']['begin_of_the_end'] == '2019-01-31'
+        assert rv['timespan']['end_of_the_end'] == '2019-03-01'
         assert rv['identified_by'][0]['_label'] == 'Sûza'
         assert rv['classified_as'][0]['_label'] == 'Boundary Mark'
         assert (rv['former_or_current_location']['defined_by'] ==
@@ -328,10 +314,10 @@ class Api(ApiTestCase):
         rv = c.get(
             url_for(
                 'api_04.entity_presentation_view',
-                id_=e.file.id))
+                id_=e.logo.id))
         rv = rv.get_json()
-        assert rv['id'] == e.file.id
-        assert rv['title'] == e.file.name
+        assert rv['id'] == e.logo.id
+        assert rv['title'] == e.logo.name
 
         for rv in [
             c.get(url_for('api_04.cidoc_class', class_='E21')),
@@ -683,12 +669,12 @@ class Api(ApiTestCase):
                 "relationToID": [{
                     "operator": "equal",
                     "values": [e.place.id]}]}]),
-            (181, [{
+            (183, [{
                 "typeIDWithSubs": [{
                     "operator": "notEqual",
                     "values": [e.boundary_mark.id],
                     "logicalOperator": "and"}]}]),
-            (183, [{
+            (185, [{
                 "typeName": [{
                     "operator": "notEqual",
                     "values": ["Boundary Mark", "Height"],
@@ -784,7 +770,7 @@ class Api(ApiTestCase):
         with c.get(
                 url_for(
                     'api_04.display',
-                    filename=e.file.id,
+                    filename=e.logo.id,
                     image_size='table')) as rv:
             self.assertTrue(rv.headers['Content-Type'].startswith('image'))
 

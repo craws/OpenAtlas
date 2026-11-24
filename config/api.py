@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+from config.default import FILES_PATH
+
 # ---------------------------------------------------------------------
 # Network and Security Configuration
 # ---------------------------------------------------------------------
@@ -35,14 +37,14 @@ VOCABS_PASS = ''
 # API Versioning and OpenAPI Documentation
 # ---------------------------------------------------------------------
 
-API_VERSIONS = {'0.4': '0.4.16a', '1': '1.0.0-beta'}
+API_VERSIONS = {'0.4': '0.4.16a', '1': '1.0.0-beta.2'}
 
 # Path to the main OpenAPI definition file
 OPENAPI_FILE = \
     Path(__file__).parent.parent / 'openatlas' / 'api' / 'openapi.json'
 
 # Path to the instance-specific OpenAPI definition file
-OPENAPI_INSTANCE_FILE = Path(__file__).parent.parent / 'files' / 'openapi.json'
+OPENAPI_INSTANCE_FILE = Path(FILES_PATH) / 'openapi.json'
 
 # JSON-LD contexts used for semantic enrichment in API responses
 API_CONTEXT = {

@@ -16,7 +16,15 @@ def index_changelog() -> str:
 
 versions = {
     '9.6.0': ['TBA', {
-        'feature': {}}],
+        'feature': {
+            '2156': 'Expanded date options',
+            '2885': 'API: Phonetic name search',
+            '2894': 'ORCID external reference system',
+            '2895': 'ROR as external reference system',
+            '2899': 'IIIF georeferencing and Allmaps',
+            '2898': 'Refactor and minor improvements'},
+        'fix': {
+            '2908': 'Inconsistent end date display at involvement'}}],
     '9.5.0': ['2026-11-06', {
         'feature': {
             '2743': 'Add creation event for sources',
