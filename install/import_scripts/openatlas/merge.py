@@ -371,7 +371,7 @@ def add_gis() -> None:
         """)
     for row in list(cursor):
         g.cursor.execute(
-            f"""
+            """
             INSERT INTO model.gis (
                 entity_id, name, description, type,
                 geom_point, geom_polygon, geom_linestring

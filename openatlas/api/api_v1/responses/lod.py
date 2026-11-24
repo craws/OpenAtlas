@@ -44,6 +44,11 @@ lod_collection_responses = {
             'text/turtle': {'schema': {'type': 'string'}},
             'application/n-triples': {'schema': {'type': 'string'}},
             'application/rdf+xml': {'schema': {'type': 'string'}}}},
+    HTTPStatus.BAD_REQUEST: {
+        'description': 'Invalid request parameter value.',
+        'content': {
+            'application/json': {
+                'schema': ErrorResponse.model_json_schema()}}},
     HTTPStatus.NOT_FOUND: {
         'description': 'Entity class not found',
         'content': {

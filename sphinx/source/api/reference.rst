@@ -1,7 +1,7 @@
 API v1 (Beta)
 =============
 
-This section provides a quick-reference index of all 36 endpoints available in
+This section provides a quick-reference index of all 38 endpoints available in
 OpenAtlas API v1, organized by feature area.
 
 .. tip::
@@ -183,24 +183,41 @@ IIIF Presentation API
      - ``/api/1/iiif/{id}/image``
      - IIIF Presentation 3 image resource annotation.
    * - ``GET``
-     - ``/api/1/iiif/{id}/annotation-list``
+     - ``/api/1/iiif/{id}/annotation-page``
      - IIIF Presentation 3 Annotation Page.
    * - ``GET``
      - ``/api/1/iiif/{id}/georeference``
      - IIIF Georeferencing Annotation Page, when the file has map overlay coordinates.
    * - ``GET``
-     - ``/api/1/iiif/{id}/annotation``
-     - Specific IIIF Presentation 3 spatial polygon or point annotation.
+     - ``/api/1/iiif/annotation/{id}``
+     - Specific IIIF Presentation 3 annotation.
 
 The Presentation API version is always 3, so its endpoint paths do not include
-a version segment. The linked Image API service can still be version 2 or 3,
-as indicated by its ``info.json`` metadata.
+a version segment. OpenAtlas currently exposes the linked Image API service
+as version 2.
+
+The manifest, canvas, annotation page, and annotation endpoints also accept an
+optional ``url`` query parameter (an HTTP or HTTPS base URL) to override entity
+links by appending the entity ID.
+
+Frontend & Search
+^^^^^^^^^^^^^^^^^
+.. list-table::
+   :header-rows: 1
+   :widths: 15 40 45
+
+   * - Method
+     - Endpoint
+     - Description
+   * - ``GET``
+     - ``/api/1/search``
+     - Paginated entity search across system classes with substring and phonetic (``daitch_mokotoff``) matching, relevance ranking, and filters.
 
 Query Parameters for Collections
 --------------------------------
-The collection endpoints (``/api/1/entities/{entity_class}`` and
-``/api/1/linked-art/entities/{entity_class}``) support the following query
-parameters:
+The collection endpoints (``/api/1/linked-art/entities/{entity_class}``,
+``/api/1/entities/{entity_class}``, and ``/api/1/search``) support the following
+query parameters:
 
 .. list-table::
    :header-rows: 1
@@ -210,6 +227,10 @@ parameters:
      - Type
      - Default
      - Description
+   * - ``entityClass``
+     - String
+     - ``None``
+     - Optional OpenAtlas system class filter (only on ``/api/1/search``).
    * - ``page``
      - Integer
      - ``1``
@@ -221,7 +242,7 @@ parameters:
    * - ``search``
      - String
      - ``None``
-     - Case-insensitive substring match on the entity label/name.
+     - Case-insensitive substring match on the entity label/name (on ``/api/1/search``, also includes phonetic ``daitch_mokotoff`` matching and ranks by exact, prefix, substring, and phonetic match before alphabetical order).
    * - ``startDate``
      - String
      - ``None``

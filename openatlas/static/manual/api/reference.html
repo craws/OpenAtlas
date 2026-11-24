@@ -8,13 +8,13 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>API v1 (Beta) &mdash; OpenAtlas 9.5.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=f5127f15" />
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
 
   
-      <script src="../_static/jquery.js?v=8dae8fb0"></script>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=d9c24813"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
@@ -106,7 +106,7 @@
              
   <section id="api-v1-beta">
 <h1>API v1 (Beta)<a class="headerlink" href="#api-v1-beta" title="Link to this heading"></a></h1>
-<p>This section provides a quick-reference index of all 31 endpoints available in
+<p>This section provides a quick-reference index of all 32 endpoints available in
 OpenAtlas API v1, organized by feature area.</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
@@ -350,27 +350,37 @@ For stable, production-ready semantic graphs, please use the
 </thead>
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/iiif/{id}/manifest/{version}</span></code></p></td>
-<td><p>IIIF Manifest (version <code class="docutils literal notranslate"><span class="pre">2</span></code> or <code class="docutils literal notranslate"><span class="pre">3</span></code>).</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/iiif/{id}/manifest</span></code></p></td>
+<td><p>IIIF Presentation 3 Manifest.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/iiif/{id}/canvas/{version}</span></code></p></td>
-<td><p>IIIF Canvas for a specific file and version.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/iiif/{id}/canvas</span></code></p></td>
+<td><p>IIIF Presentation 3 Canvas.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/iiif/{id}/image/{version}</span></code></p></td>
-<td><p>IIIF Image resource annotation.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/iiif/{id}/image</span></code></p></td>
+<td><p>IIIF Presentation 3 image resource annotation.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/iiif/{id}/annotation-list/{version}</span></code></p></td>
-<td><p>IIIF Annotation List (v2) or Annotation Page (v3).</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/iiif/{id}/annotation-page</span></code></p></td>
+<td><p>IIIF Presentation 3 Annotation Page.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/iiif/{id}/annotation/{version}</span></code></p></td>
-<td><p>Specific IIIF spatial polygon or point annotation.</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/iiif/{id}/georeference</span></code></p></td>
+<td><p>IIIF Georeferencing Annotation Page, when the file has map overlay coordinates.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">GET</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">/api/1/iiif/annotation/{id}</span></code></p></td>
+<td><p>Specific IIIF Presentation 3 annotation.</p></td>
 </tr>
 </tbody>
 </table>
+<p>The Presentation API version is always 3, so its endpoint paths do not include
+a version segment. OpenAtlas currently exposes the linked Image API service
+as version 2.</p>
+<p>The manifest, canvas, annotation page, and annotation endpoints also accept an
+optional <code class="docutils literal notranslate"><span class="pre">url</span></code> query parameter (an HTTP or HTTPS base URL) to override entity
+links by appending the entity ID.</p>
 </section>
 </section>
 <section id="query-parameters-for-collections">

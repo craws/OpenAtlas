@@ -4,7 +4,7 @@ from typing import Any
 
 from flask import g, url_for
 
-from openatlas.database.api import get_wkts_by_ids
+from openatlas.database.gis import get_wkts_by_ids
 from openatlas.models.entity import Entity, Link
 
 

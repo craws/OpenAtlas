@@ -17,8 +17,8 @@ from flask_login import login_user
 from openatlas import app
 from openatlas.api.api_v1.models.util import OpenAtlasClassEnum
 from openatlas.api.api_v1.util.files import (
-    get_display_extensions, get_multiple_file_paths, get_public_share_yes_id,
-    get_valid_license_ids, iiif_file_exists)
+    get_display_extensions, get_multiple_file_paths, has_file_access,
+    iiif_file_exists)
 from openatlas.display.image_processing import (
     check_iiif_activation, is_supported_image, safe_resize_image)
 from openatlas.models.entity import Entity
@@ -50,13 +50,6 @@ SCHEMATHESIS_ARGUMENTS = (
     '--checks',
     ('not_a_server_error,status_code_conformance,content_type_conformance,'
      'response_headers_conformance,positive_data_acceptance'))
-
-
-def has_file_access(file_entity: Entity) -> bool:
-    file_type_ids = {type_.id for type_ in file_entity.types if type_}
-    has_license = bool(file_type_ids & get_valid_license_ids())
-    is_public_shareable = get_public_share_yes_id() in file_type_ids
-    return has_license and is_public_shareable
 
 
 def prepare_thumbnails(
@@ -112,7 +105,8 @@ def get_database_examples() -> dict[str, Any]:
         thumbnails = [
             file_.id for file_ in public_files
             if file_.id in existing_thumbnails]
-        if not thumbnails and g.settings.get('iiif') and check_iiif_activation():
+        if (not thumbnails and g.settings.get('iiif')
+                and check_iiif_activation()):
             thumbnails = [
                 file_.id for file_ in public_files[:100]
                 if iiif_file_exists(file_.id)]
@@ -134,16 +128,30 @@ def get_database_examples() -> dict[str, Any]:
                     break
 
         file_entities = [e.id for e in classes.values()]
+        iiif_files = [
+            file_.id for file_ in public_files
+            if iiif_file_exists(file_.id)] or [e.id for e in public_files[:3]]
+        overlays: list[int] = []
         if public_files:
+            file_ids = tuple(e.id for e in public_files)
             g.cursor.execute(
                 """
                 SELECT DISTINCT range_id FROM model.link
                 WHERE domain_id IN %(file_ids)s AND property_code = 'P67'
                 ORDER BY range_id LIMIT 3;
                 """,
-                {'file_ids': tuple(e.id for e in public_files)})
+                {'file_ids': file_ids})
             if linked_ids := [row['range_id'] for row in g.cursor]:
                 file_entities = linked_ids
+
+            g.cursor.execute(
+                """
+                SELECT DISTINCT image_id FROM web.map_overlay
+                WHERE image_id IN %(file_ids)s
+                ORDER BY image_id LIMIT 3;
+                """,
+                {'file_ids': file_ids})
+            overlays = [row['image_id'] for row in g.cursor]
 
         return {
             'classes': classes,
@@ -153,15 +161,23 @@ def get_database_examples() -> dict[str, Any]:
             'agents': [e.id for e in RightsHolder.get_rights_holders()],
             'files': [e.id for e in public_files],
             'file_entities': file_entities,
+            'iiif_files': iiif_files,
+            'overlays': overlays,
             'thumbnails': thumbnails,
             'annotations': annotations}
 
 
 def get_path_examples(path: str) -> Iterator[dict[str, Any]]:
+    data = get_database_examples()
     if path.startswith('/api/1/iiif/'):
         if path == '/api/1/iiif/annotation/{id}':
-            for id_ in get_database_examples()['annotations']:
-                yield {'id': id_}
+            ids = data['annotations']
+        elif path == '/api/1/iiif/{id}/georeference':
+            ids = data['overlays'] or data['iiif_files']
+        else:
+            ids = data['iiif_files']
+        for id_ in ids[:3]:
+            yield {'id': id_}
         return
 
     if path == '/api/1/ontology.{ext}':
@@ -169,7 +185,6 @@ def get_path_examples(path: str) -> Iterator[dict[str, Any]]:
             yield {'ext': ext}
         return
 
-    data = get_database_examples()
     ext_param = {'ext': 'json'} if '{ext}' in path else {}
 
     if '{uuid}' in path:
@@ -206,9 +221,6 @@ def get_path_examples(path: str) -> Iterator[dict[str, Any]]:
 @schemathesis.hook
 def before_add_examples(context: Any, examples: list[Any]) -> None:
     path = context.operation.path
-    if (path.startswith('/api/1/iiif/')
-            and path != '/api/1/iiif/annotation/{id}'):
-        return
     case_studies = get_database_examples()['case_studies']
     for params in get_path_examples(path):
         kwargs: dict[str, Any] = {}
@@ -234,7 +246,7 @@ def map_case(_context: Any, case: Any) -> Any:
             and case.meta.generation.mode == GenerationMode.POSITIVE
             and case.path_parameters
             and (examples := list(get_path_examples(case.operation.path)))):
-        skip = {'ext', 'version', 'entity_class', 'openatlas_class'}
+        skip = {'ext', 'entity_class', 'openatlas_class'}
         for name, value in examples[0].items():
             if name in case.path_parameters and name not in skip:
                 valid = {ex[name] for ex in examples if name in ex}

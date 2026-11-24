@@ -1,39 +1,22 @@
 from http import HTTPStatus
-from pathlib import Path
+from typing import Any
 
-from flask import g, url_for
-from rdflib import RDF, Dataset, URIRef
+from flask import url_for
+from rdflib import Dataset, RDF, URIRef
 
 from openatlas import app
 from openatlas.api.api_v1.formatters.la_formatter import format_la_entities
 from openatlas.api.api_v1.formatters.lod import format_lod_entities
-from openatlas.api.api_v1.responses.iiif import IIIF_CONTENT_TYPE
+from openatlas.api.api_v1.responses.iiif import (
+    IIIF_CONTENT_TYPE, IIIF_GEOREF_CONTEXT, IIIF_PRESENTATION_CONTEXT)
+from openatlas.api.api_v1.util.iiif_manifest import get_overlay_corners
 from openatlas.database import overlay as db_overlay
 from openatlas.models.annotation import AnnotationImage, AnnotationText
 from openatlas.models.settings import set_logo
-from tests.base import ApiTestCase, get_hierarchy, insert
+from tests.base import ApiTestCase, insert
 
 
 class ApiV1(ApiTestCase):
-
-    def upload_logo(self) -> None:
-        with app.test_request_context():
-            app.preprocess_request()
-            rights_holder_ids = [rh.id for rh in g.rights_holder]
-
-        logo_path = Path(app.root_path) / 'static' / 'images' / 'layout'
-        public_type = get_hierarchy('Public sharing allowed')
-        with open(logo_path / 'logo.png', 'rb') as img:
-            self.client.post(
-                url_for('insert', class_='file'),
-                data={
-                    'name': 'OpenAtlas logo',
-                    'file': img,
-                    'description': 'OpenAtlas logo',
-                    'creator': f'{rights_holder_ids}',
-                    'license_holder': f'{rights_holder_ids}',
-                    str(public_type.id): public_type.subs[1]},
-                follow_redirects=True)
 
     def test_lod(self) -> None:
         c = self.client
@@ -113,48 +96,54 @@ class ApiV1(ApiTestCase):
             {'caseStudy': e.case_study.id, 'limit': 1, 'page': 2},
             {'caseStudy': e.place.uuid, 'limit': 5, 'offset': 2},
             {'startDate': '1988-02-03', 'endDate': '1988-04-03'},
-            {'startDate': '-400',
-             'endDate': '2000-05',
-             'caseStudy': e.case_study.uuid,
-             'sortBy': 'name',
-             'sort': 'desc'},
+            {
+                'startDate': '-400',
+                'endDate': '2000-05',
+                'caseStudy': e.case_study.uuid,
+                'sortBy': 'name',
+                'sort': 'desc'},
             {'startDate': '2000', 'endDate': '-500'},
             {'startDate': '2000-02', 'endDate': '1900-02'},
             {'endDate': '2004-02'},
             {'endDate': '2001-02', 'search': e.place.name},
             {'endDate': '2020-04'},
-            {'startDate': '-400-02-28',
-             'endDate': '-500-03-15',
-             'typeId': e.boundary_mark.id},
+            {
+                'startDate': '-400-02-28',
+                'endDate': '-500-03-15',
+                'typeId': e.boundary_mark.id},
             {'startDate': '   '}]:
-            rv = c.get(url_for(
-                'api_v1_lod.get_entities',
-                entity_class='acquisition',
-                **params))
+            rv = c.get(
+                url_for(
+                    'api_v1_lod.get_entities',
+                    entity_class='acquisition',
+                    **params))
             assert rv.status_code == HTTPStatus.OK
 
         for sort_field, sort_order in [
-                ('startDate', 'asc'),
-                ('start_date', 'desc'),
-                ('endDate', 'asc'),
-                ('end_date', 'desc')]:
-            rv = c.get(url_for(
-                'api_v1_lod.get_entities',
-                entity_class='acquisition',
-                sortBy=sort_field,
-                sort=sort_order))
+            ('startDate', 'asc'),
+            ('start_date', 'desc'),
+            ('endDate', 'asc'),
+            ('end_date', 'desc')]:
+            rv = c.get(
+                url_for(
+                    'api_v1_lod.get_entities',
+                    entity_class='acquisition',
+                    sortBy=sort_field,
+                    sort=sort_order))
             assert rv.status_code == HTTPStatus.OK
 
-        rv = c.get(url_for(
-            'api_v1_lod.get_entities',
-            entity_class='acquisition',
-            sortBy='invalid_field'))
+        rv = c.get(
+            url_for(
+                'api_v1_lod.get_entities',
+                entity_class='acquisition',
+                sortBy='invalid_field'))
         assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
-        rv = c.get(url_for(
-            'api_v1_lod.get_entities',
-            entity_class='acquisition',
-            startDate='0'))
+        rv = c.get(
+            url_for(
+                'api_v1_lod.get_entities',
+                entity_class='acquisition',
+                startDate='0'))
         assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
         assert b'There is no year 0' in rv.data
 
@@ -182,6 +171,25 @@ class ApiV1(ApiTestCase):
         assert rv.status_code == HTTPStatus.OK
         assert 'prev' in rv.get_json()
 
+        rv = c.get(
+            url_for(
+                'api_v1_lod.get_entities',
+                entity_class='place',
+                search='%'))
+        assert rv.status_code == HTTPStatus.OK
+        assert rv.get_json()['partOf']['totalItems'] == 0
+
+        rv = c.get(
+            url_for(
+                'api_v1_lod.get_entities',
+                entity_class='place',
+                limit=1,
+                page=999))
+        assert rv.status_code == HTTPStatus.OK
+        out_of_range = rv.get_json()
+        assert out_of_range['partOf']['totalItems'] > 0
+        assert out_of_range['orderedItems'] == []
+
         assert format_lod_entities([]) == {
             '@context': url_for('api_v1_lod.get_context', _external=True),
             'type': 'OrderedCollection',
@@ -190,8 +198,8 @@ class ApiV1(ApiTestCase):
 
         # Context endpoint test
         rv = c.get(url_for('api_v1_lod.get_context'))
-        assert rv.status_code == 200
-        assert 'application/ld+json' in rv.headers.get('Content-Type')
+        assert rv.status_code == HTTPStatus.OK
+        assert 'application/ld+json' in rv.headers.get('Content-Type', '')
         ctx = rv.get_json()
         assert '@context' in ctx
         assert 'crm' in ctx['@context']
@@ -206,16 +214,23 @@ class ApiV1(ApiTestCase):
 
         # Ontology endpoint test
         rv = c.get(url_for('api_v1_lod.get_ontology'))
-        assert rv.status_code == 200
+        assert rv.status_code == HTTPStatus.OK
         rv_ttl = c.get(url_for('api_v1_lod.get_ontology_ext', ext='ttl'))
-        assert rv_ttl.status_code == 200
-        assert 'text/turtle' in rv_ttl.headers.get('Content-Type')
+        assert rv_ttl.status_code == HTTPStatus.OK
+        assert 'text/turtle' in rv_ttl.headers.get('Content-Type', '')
         assert b'has_relationship_to' in rv_ttl.data
 
         rv = c.get(url_for(
             'api_v1_lod.get_entities', entity_class='acquisition',
             startDate='999999999'))
-        assert rv.status_code == 422
+        assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+
+        rv = c.get(
+            url_for(
+                'api_v1_lod.get_entities',
+                entity_class='place',
+                startDate='999999-01-01'))
+        assert rv.status_code == HTTPStatus.BAD_REQUEST
 
         rv = c.get(
             url_for(
@@ -229,8 +244,8 @@ class ApiV1(ApiTestCase):
         e = self.get_api_entities()
         with app.test_request_context():
             app.preprocess_request()
-            e.file.link('P67', e.place)
-            e.file.link('P2', e.open_license)
+            e.logo.link('P67', e.place)
+            e.logo.link('P2', e.open_license)
 
         rv = c.get(url_for('api_v1_la.get_entity', uuid=e.place.uuid))
         response = rv.headers.get('Content-Type')
@@ -325,7 +340,7 @@ class ApiV1(ApiTestCase):
         assert 'residence' in rv_json
         assert 'referred_to_by' in rv_json
 
-        rv = c.get(url_for('api_v1_la.get_entity', uuid=e.file.uuid))
+        rv = c.get(url_for('api_v1_la.get_entity', uuid=e.logo.uuid))
         rv_json = rv.get_json()
         assert rv_json['type'] == 'DigitalObject'
         assert 'dimension' in rv_json
@@ -341,8 +356,9 @@ class ApiV1(ApiTestCase):
         rv_json = rv.get_json()
         assert 'about' in rv_json
 
-        rv = c.get(url_for(
-            'api_v1_la.get_entity', uuid=e.stratigraphic_unit.uuid))
+        rv = c.get(
+            url_for(
+                'api_v1_la.get_entity', uuid=e.stratigraphic_unit.uuid))
         assert 'attributed_by' in rv.get_json()
 
         rv = c.get(url_for('api_v1_la.get_entity', uuid=e.location.uuid))
@@ -469,10 +485,12 @@ class ApiV1(ApiTestCase):
         skos = 'http://www.w3.org/2004/02/skos/core#'
         c = self.client
         e = self.get_api_entities()
-        root_uri = URIRef(url_for(
-            'api.entity_uuid', uuid=e.license.uuid, _external=True))
-        sub_uri = URIRef(url_for(
-            'api.entity_uuid', uuid=e.open_license.uuid, _external=True))
+        root_uri = URIRef(
+            url_for(
+                'api.entity_uuid', uuid=e.license.uuid, _external=True))
+        sub_uri = URIRef(
+            url_for(
+                'api.entity_uuid', uuid=e.open_license.uuid, _external=True))
 
         rv = c.get(
             url_for(
@@ -561,13 +579,13 @@ class ApiV1(ApiTestCase):
             app.preprocess_request()
             lic_ext_ref = insert('external_reference', lic_url)
             lic_ext_ref.link('P67', e.open_license)
-            e.file.link('P2', e.open_license)
-            e.file.link('P67', e.actor)
+            e.logo.link('P2', e.open_license)
+            e.logo.link('P67', e.actor)
             e.file_not_public.link('P67', e.actor)
             e.file_without_licences.link('P67', e.actor)
 
         with c.get(
-                url_for('api_v1_files.display_file', id=e.file.id)) as rv:
+                url_for('api_v1_files.display_file', id=e.logo.id)) as rv:
             assert rv.status_code in (HTTPStatus.OK, HTTPStatus.FOUND)
         with c.get(
                 url_for(
@@ -577,14 +595,14 @@ class ApiV1(ApiTestCase):
         with c.get(
                 url_for(
                     'api_v1_files.display_file',
-                    id=e.file.id,
+                    id=e.logo.id,
                     download=True)) as rv:
             assert rv.status_code == HTTPStatus.OK
-            assert f'filename={e.file.id}.png' in rv.headers.get(
+            assert f'filename={e.logo.id}.png' in rv.headers.get(
                 'Content-Disposition', '')
 
         with c.get(
-                url_for('api_v1_files.display_thumbnail', id=e.file.id)) as rv:
+                url_for('api_v1_files.display_thumbnail', id=e.logo.id)) as rv:
             assert rv.status_code in (HTTPStatus.OK, HTTPStatus.FOUND)
         with c.get(
                 url_for(
@@ -594,10 +612,10 @@ class ApiV1(ApiTestCase):
         with c.get(
                 url_for(
                     'api_v1_files.display_thumbnail',
-                    id=e.file.id,
+                    id=e.logo.id,
                     download=True)) as rv:
             assert rv.status_code == HTTPStatus.OK
-            assert f'filename={e.file.id}.png' in rv.headers.get(
+            assert f'filename={e.logo.id}.png' in rv.headers.get(
                 'Content-Disposition', '')
 
         with c.get(
@@ -628,13 +646,13 @@ class ApiV1(ApiTestCase):
         json_data = rv.get_json()
         assert 'data' in json_data
         file_ids = [item['id'] for item in json_data['data']]
-        assert e.file.id in file_ids
+        assert e.logo.id in file_ids
         assert e.file_not_public.id not in file_ids
         assert e.file_without_licences.id not in file_ids
         file_item = next(
-            item for item in json_data['data'] if item['id'] == e.file.id)
+            item for item in json_data['data'] if item['id'] == e.logo.id)
         assert file_item['iiifManifestUrl'].endswith(
-            f'/api/1/iiif/{e.file.id}/manifest')
+            f'/api/1/iiif/{e.logo.id}/manifest')
 
         rv = c.get(
             url_for('api_v1_files.get_public_files_by_entity', id=e.weight.id))
@@ -651,41 +669,57 @@ class ApiV1(ApiTestCase):
             app.preprocess_request()
             lic_ext_ref = insert('external_reference', lic_url)
             lic_ext_ref.link('P67', e.open_license)
-            e.file.link('P2', e.open_license)
-            e.file.link('P67', e.actor)
-            e.file.link('P67', lic_ext_ref, inverse=True)
-            set_logo(e.file.id)
+            xss_source = insert(
+                'external_reference',
+                'https://example.org/source',
+                description='&lt;img src=x onerror=alert(1)&gt;')
+            e.logo.link('P2', e.open_license)
+            e.logo.link('P67', e.actor)
+            e.logo.link('P67', lic_ext_ref, inverse=True)
+            e.logo.link('P67', xss_source, description='p."1"', inverse=True)
+            set_logo(e.logo.id)
             overlay_data = {
-                'image_id': e.file.id,
+                'image_id': e.logo.id,
                 'bounding_box': (
                     '[[48.58653, 15.64356], [48.58709, 15.64294]]')}
-            if db_overlay.get_by_object([e.file.id]):
-                db_overlay.update(overlay_data)
-            else:
-                db_overlay.insert(overlay_data)
+            db_overlay.insert(overlay_data)
 
             AnnotationImage.insert(
-                image_id=e.file.id,
+                image_id=e.logo.id,
                 coordinates='10,10,50,50',
                 entity_id=e.place.id,
                 text='Sample IIIF annotation')
-            annotations = AnnotationImage.get_by_file_id(e.file.id)
+            AnnotationImage.insert(
+                image_id=e.logo.id,
+                coordinates='20,20,40,40',
+                entity_id=e.actor.id,
+                text='Second IIIF annotation')
+            annotations = AnnotationImage.get_by_file_id(e.logo.id)
             annotation_id = annotations[0].id
+
+        assert IIIF_CONTENT_TYPE == (
+            f'application/ld+json;profile="{IIIF_PRESENTATION_CONTEXT}"')
 
         rv = c.get(
             url_for(
                 'api_v1_iiif.get_iiif_manifest',
-                id=e.file.id))
+                id=e.logo.id))
         assert rv.status_code == HTTPStatus.OK
         assert rv.headers['Content-Type'] == IIIF_CONTENT_TYPE
         manifest = rv.get_json()
         assert manifest['type'] == 'Manifest'
         assert manifest['@context'] == [
-            'https://iiif.io/api/extension/georef/1/context.json',
-            'https://iiif.io/api/presentation/3/context.json']
+            IIIF_GEOREF_CONTEXT,
+            IIIF_PRESENTATION_CONTEXT]
+        assert '@context' not in manifest['items'][0]
+        assert '@context' not in manifest['items'][0]['items'][0]['items'][0]
+        assert (
+            '@context' not in
+            manifest['items'][0]['annotations'][0]['items'][0])
         assert manifest['id'].endswith(
-            f'/api/1/iiif/{e.file.id}/manifest')
+            f'/api/1/iiif/{e.logo.id}/manifest')
         assert manifest['rights'] == lic_url
+        assert manifest['seeAlso'][0]['format'] == 'text/html'
         site_provider = manifest['provider'][0]
         assert site_provider['type'] == 'Agent'
         assert site_provider['label']['en'] == [
@@ -701,37 +735,41 @@ class ApiV1(ApiTestCase):
         assert 'Public domain' in statement
 
         rv = c.get(
-            url_for('api_v1_iiif.get_iiif_georeference', id=e.file.id))
+            url_for('api_v1_iiif.get_iiif_georeference', id=e.logo.id))
         assert rv.status_code == HTTPStatus.OK
         assert rv.headers['Content-Type'] == IIIF_CONTENT_TYPE
         georeference = rv.get_json()
-        georeference_path = f'/api/1/iiif/{e.file.id}/georeference'
+        georeference_path = f'/api/1/iiif/{e.logo.id}/georeference'
         assert georeference['id'].endswith(georeference_path)
         assert georeference['@context'] == [
-            'https://iiif.io/api/extension/georef/1/context.json',
-            'https://iiif.io/api/presentation/3/context.json']
+            IIIF_GEOREF_CONTEXT,
+            IIIF_PRESENTATION_CONTEXT]
         georeference_annotation = georeference['items'][0]
+        assert '@context' not in georeference_annotation
         assert georeference_annotation['id'].endswith('#annotation')
         assert georeference_annotation['motivation'] == 'georeferencing'
         georeference_source = georeference_annotation['target']['source']
         assert georeference_source['type'] == 'ImageService2'
-        assert georeference_source['partOf'] == [{
-            'id': manifest['id'],
-            'type': 'Manifest'}]
+        assert georeference_source['partOf'] == [
+            {
+                'id': manifest['id'],
+                'type': 'Manifest'}]
         assert georeference_source['provider'] == [site_provider]
         features = georeference_annotation['body']['features']
         assert (
             [feature['geometry']['coordinates'] for feature in features]
-            == [[15.64294, 48.58709], [15.64356, 48.58709],
+            == [
+                [15.64294, 48.58709], [15.64356, 48.58709],
                 [15.64294, 48.58653]])
 
         rv = c.get(
-            url_for('api_v1_iiif.get_iiif_canvas', id=e.file.id))
+            url_for('api_v1_iiif.get_iiif_canvas', id=e.logo.id))
         assert rv.status_code == HTTPStatus.OK
         canvas = rv.get_json()
-        assert canvas['@context'] == (
-            'https://iiif.io/api/presentation/3/context.json')
-        canvas_path = f'/api/1/iiif/{e.file.id}/canvas'
+        assert canvas['@context'] == IIIF_PRESENTATION_CONTEXT
+        assert '@context' not in canvas['items'][0]['items'][0]
+        assert '@context' not in canvas['annotations'][0]['items'][0]
+        canvas_path = f'/api/1/iiif/{e.logo.id}/canvas'
         assert canvas['id'].endswith(canvas_path)
         assert manifest['items'][0]['id'].endswith(canvas_path)
         assert canvas['items'][0]['id'].endswith(f'{canvas_path}#page-1')
@@ -742,13 +780,12 @@ class ApiV1(ApiTestCase):
 
         # Image
         rv = c.get(
-            url_for('api_v1_iiif.get_iiif_image', id=e.file.id))
+            url_for('api_v1_iiif.get_iiif_image', id=e.logo.id))
         assert rv.status_code == HTTPStatus.OK
         image = rv.get_json()
         assert rv.headers['Content-Type'] == IIIF_CONTENT_TYPE
-        image_path = f'/api/1/iiif/{e.file.id}/image'
-        assert image['@context'] == (
-            'https://iiif.io/api/presentation/3/context.json')
+        image_path = f'/api/1/iiif/{e.logo.id}/image'
+        assert image['@context'] == IIIF_PRESENTATION_CONTEXT
         assert image['body']['service'][0]['type'] == 'ImageService2'
         assert image['body']['id'].endswith('/full/full/0/default.jpg')
         assert image['body']['format'] == 'image/jpeg'
@@ -760,15 +797,20 @@ class ApiV1(ApiTestCase):
         rv = c.get(
             url_for(
                 'api_v1_iiif.get_iiif_annotation_list',
-                id=e.file.id))
+                id=e.logo.id))
         assert rv.status_code == HTTPStatus.OK
         annotation_list = rv.get_json()
         assert rv.headers['Content-Type'] == IIIF_CONTENT_TYPE
-        annotation_list_path = f'/api/1/iiif/{e.file.id}/annotation-page'
-        assert annotation_list['@context'] == (
-            'https://iiif.io/api/presentation/3/context.json')
+        annotation_list_path = f'/api/1/iiif/{e.logo.id}/annotation-page'
+        assert annotation_list['@context'] == IIIF_PRESENTATION_CONTEXT
         assert annotation_list['type'] == 'AnnotationPage'
         assert annotation_list['id'].endswith(annotation_list_path)
+        annotation_texts = {
+            item['body'][-1]['value'] for item in annotation_list['items']}
+        assert annotation_texts == {
+            'Sample IIIF annotation',
+            'Second IIIF annotation'}
+        assert '@context' not in annotation_list['items'][0]
         assert canvas['annotations'][0]['id'].endswith(annotation_list_path)
 
         # Annotation
@@ -780,23 +822,38 @@ class ApiV1(ApiTestCase):
         annotation = rv.get_json()
         assert rv.headers['Content-Type'] == IIIF_CONTENT_TYPE
         annotation_path = f'/api/1/iiif/annotation/{annotation_id}'
-        assert annotation['@context'] == (
-            'https://iiif.io/api/presentation/3/context.json')
+        assert annotation['@context'] == IIIF_PRESENTATION_CONTEXT
         assert annotation['type'] == 'Annotation'
         assert annotation['id'].endswith(annotation_path)
         assert annotation['body'][0]['type'] == 'TextualBody'
         assert annotation['target']['type'] == 'SpecificResource'
         assert annotation['target']['source'].endswith(canvas_path)
+        assert [s['type'] for s in annotation['target']['selector']] == [
+            'FragmentSelector', 'SvgSelector']
+
+        rv = c.get(
+            url_for(
+                'api_v1_iiif.get_iiif_manifest',
+                id=e.logo.id,
+                url='https://front.example/entity/'))
+        assert rv.status_code == HTTPStatus.OK
+        override = rv.get_json()
+        assert override['seeAlso'][0]['id'] == (
+            f'https://front.example/entity/{e.actor.id}')
+        assert 'url=' in override['items'][0]['annotations'][0]['id']
+
+        rv = c.get(f'/api/1/iiif/{e.logo.id}/manifest?url=ftp://example.org/')
+        assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
         logo = site_provider['logo'][0]
-        assert logo['format'] == 'image/png'
+        assert logo['format'] == 'image/jpeg'
         assert 'service' not in logo
 
         with app.test_request_context():
             app.preprocess_request()
             set_logo()
         no_logo_manifest = c.get(
-            url_for('api_v1_iiif.get_iiif_manifest', id=e.file.id)).get_json()
+            url_for('api_v1_iiif.get_iiif_manifest', id=e.logo.id)).get_json()
         no_logo_provider = no_logo_manifest['provider'][0]
         assert no_logo_provider['label'] == site_provider['label']
         assert no_logo_provider['homepage'] == site_provider['homepage']
@@ -804,14 +861,14 @@ class ApiV1(ApiTestCase):
         no_logo_georeference = c.get(
             url_for(
                 'api_v1_iiif.get_iiif_georeference',
-                id=e.file.id)).get_json()
+                id=e.logo.id)).get_json()
         no_logo_source = no_logo_georeference['items'][0][
             'target']['source']
         assert no_logo_source['provider'] == [no_logo_provider]
 
         with app.test_request_context():
             app.preprocess_request()
-            set_logo(e.file.id)
+            set_logo(e.logo.id)
 
         openapi = c.get('/api/1/docs/openapi.json').get_json()
         iiif_paths = {
@@ -826,13 +883,13 @@ class ApiV1(ApiTestCase):
             for path in openapi['paths'])
 
         for path in (
-                f'/api/1/iiif/{e.file.id}/annotation-list',
+                f'/api/1/iiif/{e.logo.id}/annotation-list',
                 f'/api/1/iiif/{annotation_id}/annotation',
-                f'/api/1/iiif/{e.file.id}/georeference/annotation',
-                f'/api/1/iiif/{e.file.id}/manifest/3',
-                f'/api/1/iiif/{e.file.id}/canvas/3',
-                f'/api/1/iiif/{e.file.id}/image/3',
-                f'/api/1/iiif/{e.file.id}/annotation-page/3',
+                f'/api/1/iiif/{e.logo.id}/georeference/annotation',
+                f'/api/1/iiif/{e.logo.id}/manifest/3',
+                f'/api/1/iiif/{e.logo.id}/canvas/3',
+                f'/api/1/iiif/{e.logo.id}/image/3',
+                f'/api/1/iiif/{e.logo.id}/annotation-page/3',
                 f'/api/1/iiif/annotation/{annotation_id}/3'):
             assert c.get(path).status_code == HTTPStatus.NOT_FOUND
 
@@ -846,13 +903,34 @@ class ApiV1(ApiTestCase):
             assert rv.status_code == HTTPStatus.NOT_FOUND
             assert rv.get_json()['details']['provided_id'] == str(id_)
 
+        for bad_box in (
+                'bad-box[',
+                '123',
+                '[[48, 15]]',
+                '[[0, 0], [0, 0], [0, 0]]',
+                '[[95, 15], [96, 16], [95, 17]]',
+                '[[1e309, 0], [1, 0], [0, 1]]'):
+            assert get_overlay_corners(bad_box) is None
+
         with app.test_request_context():
             app.preprocess_request()
-            overlay = db_overlay.get_by_object([e.file.id])[0]
+            db_overlay.update(
+                {
+                    'image_id': e.logo.id,
+                    'bounding_box': 'bad-box['})
+        rv = c.get(
+            url_for('api_v1_iiif.get_iiif_georeference', id=e.logo.id))
+        assert rv.status_code == HTTPStatus.NOT_FOUND
+        assert rv.get_json()['title'] == 'Georeference not found'
+
+        with app.test_request_context():
+            app.preprocess_request()
+            overlay = db_overlay.get_by_object([e.logo.id])[0]
             db_overlay.remove(overlay['id'])
         rv = c.get(
-            url_for('api_v1_iiif.get_iiif_georeference', id=e.file.id))
+            url_for('api_v1_iiif.get_iiif_georeference', id=e.logo.id))
         assert rv.status_code == HTTPStatus.NOT_FOUND
+        assert rv.get_json()['title'] == 'Georeference not found'
 
     def test_search(self) -> None:
         c = self.client
@@ -864,12 +942,6 @@ class ApiV1(ApiTestCase):
             insert('person', 'John Smith', 'Substring match')
             insert('person', 'Smyth', 'Phonetic match')
             insert('person', '1230', 'Numeric match')
-
-        g.pop('types', None)
-        rv = c.get(
-            f'/api/1/search?typeId={e.boundary_mark.id}')
-        assert rv.status_code == HTTPStatus.OK
-        assert not hasattr(g, 'types')
 
         rv = c.get(
             url_for(
@@ -897,14 +969,15 @@ class ApiV1(ApiTestCase):
         assert place_data[0]['name'] == 'Shire'
         assert place_data[0]['timespan'] is not None
 
-        for params in [
+        search_params: list[dict[str, Any]] = [
             {'entityClass': 'place', 'limit': 1, 'page': 2},
             {'startDate': '-400', 'endDate': '2050-05'},
             {'typeId': e.boundary_mark.id},
             {'typeId': str(e.boundary_mark.uuid)},
             {'caseStudy': e.case_study.id},
             {'caseStudy': str(e.case_study.uuid)},
-            {'sortBy': 'startDate', 'sort': 'desc'}]:
+            {'sortBy': 'startDate', 'sort': 'desc'}]
+        for params in search_params:
             rv = c.get(
                 url_for('api_v1_frontend.search_entities', **params))
             assert rv.status_code == HTTPStatus.OK
@@ -921,6 +994,21 @@ class ApiV1(ApiTestCase):
         assert rv.get_json()['data'] == []
         assert rv.get_json()['totalItems'] == 0
 
+        rv = c.get('/api/1/search?search=%25')
+        assert rv.status_code == HTTPStatus.OK
+        assert rv.get_json()['totalItems'] == 0
+
+        rv = c.get('/api/1/search?search=_')
+        assert rv.status_code == HTTPStatus.OK
+        underscore_data = rv.get_json()
+        assert underscore_data['totalItems'] == 1
+        assert '_' in underscore_data['data'][0]['name']
+
+        rv = c.get('/api/1/search?search=foo%00bar')
+        assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+
+        rv = c.get('/api/1/search?startDate=999999-01-01')
+        assert rv.status_code == HTTPStatus.BAD_REQUEST
     def test_docs(self) -> None:
         c = self.client
         for url in [

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from typing import Any, TYPE_CHECKING
+import math
+from collections.abc import Sequence
+from typing import Any, Final, TYPE_CHECKING
 
 from openatlas.database import overlay as db
 from openatlas.display.util2 import get_file_path
@@ -10,6 +12,10 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 class Overlay:
+    LAT_RANGE: Final[tuple[float, float]] = (-90, 90)
+    LON_RANGE: Final[tuple[float, float]] = (-180, 180)
+    MIN_AREA: Final[float] = 1e-15
+
     def __init__(self, row: dict[str, Any]) -> None:
         self.id = row['id']
         self.name = row.get('name')
@@ -17,6 +23,24 @@ class Overlay:
         self.bounding_box = row['bounding_box']
         path = get_file_path(row['image_id'])
         self.image_name = path.name if path else False
+
+    @classmethod
+    def has_nonzero_area(cls, corners: Sequence[Sequence[float]]) -> bool:
+        (x0, y0), (x1, y1), (x2, y2) = corners
+        area = abs((x1 - x0) * (y2 - y0) - (y1 - y0) * (x2 - x0))
+        return area > cls.MIN_AREA
+
+    @classmethod
+    def is_valid_corners(cls, corners: Sequence[Sequence[float]]) -> bool:
+        min_lon, max_lon = cls.LON_RANGE
+        min_lat, max_lat = cls.LAT_RANGE
+        return (
+            all(
+                math.isfinite(lon) and math.isfinite(lat)
+                and min_lon <= lon <= max_lon
+                and min_lat <= lat <= max_lat
+                for lon, lat in corners)
+            and cls.has_nonzero_area(corners))
 
     @staticmethod
     def insert(data: dict[str, Any]) -> None:
