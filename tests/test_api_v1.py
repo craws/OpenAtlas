@@ -7,10 +7,12 @@ from rdflib import Dataset, RDF, URIRef
 from openatlas import app
 from openatlas.api.api_v1.formatters.la_formatter import format_la_entities
 from openatlas.api.api_v1.formatters.lod import format_lod_entities
+from openatlas.api.api_v1.models.geographic import GeoJsonFeatureCollection
 from openatlas.api.api_v1.responses.iiif import (
     IIIF_CONTENT_TYPE, IIIF_GEOREF_CONTEXT, IIIF_PRESENTATION_CONTEXT)
 from openatlas.api.api_v1.util.iiif_manifest import (
     get_overlay_corners)
+from openatlas.database import gis as db_gis
 from openatlas.database import overlay as db_overlay
 from openatlas.models.annotation import AnnotationImage
 from openatlas.models.settings import set_logo
@@ -919,6 +921,222 @@ class ApiV1(ApiTestCase):
 
         rv = c.get('/api/1/search?startDate=999999-01-01')
         assert rv.status_code == HTTPStatus.BAD_REQUEST
+
+    def test_geographic(self) -> None:
+        c = self.client
+
+        openapi = c.get('/api/1/docs/openapi.json').get_json()
+        assert 'Geographic' in [t['name'] for t in openapi['tags']]
+        bbox_op = openapi['paths']['/api/1/geographic/bbox']['get']
+        assert bbox_op['tags'] == ['Geographic']
+
+        rv = c.get('/api/1/geographic/bbox?bbox=-180,-90,180,90')
+        assert rv.status_code == HTTPStatus.OK
+        data = rv.get_json()
+        GeoJsonFeatureCollection.model_validate(data)
+        assert data['type'] == 'FeatureCollection'
+        features = data['features']
+        expected_total = 6
+        point_dims = 2
+        assert len(features) == expected_total
+        names = {f['properties']['name'] for f in features}
+        assert names == {'Shire', 'Mordor', 'Home of Baggins', 'Bar'}
+        assert 'Gondor' not in names
+
+        expected_keys = {
+            'id', 'uuid', 'name', 'systemClass', 'description', 'timespan',
+            'locationId', 'geometryId', 'geometryName', 'geometryDescription',
+            'shapeType'}
+        for feature in features:
+            assert feature['type'] == 'Feature'
+            assert expected_keys <= feature['properties'].keys()
+
+        shire_features = [
+            f for f in features if f['properties']['name'] == 'Shire']
+        assert len(shire_features) == point_dims
+        assert {f['geometry']['type'] for f in shire_features} == {
+            'Point', 'Polygon'}
+        assert shire_features[0]['properties']['timespan'] is not None
+
+        mordor_features = [
+            f for f in features if f['properties']['name'] == 'Mordor']
+        assert {f['geometry']['type'] for f in mordor_features} == {
+            'LineString', 'Polygon'}
+
+        baggins = next(
+            f for f in features
+            if f['properties']['name'] == 'Home of Baggins')
+        assert baggins['properties']['systemClass'] == 'feature'
+        assert baggins['geometry']['type'] == 'Polygon'
+
+        bar = next(f for f in features if f['properties']['name'] == 'Bar')
+        assert bar['properties']['systemClass'] == 'stratigraphic_unit'
+        assert bar['geometry']['type'] == 'LineString'
+
+        rv = c.get(
+            url_for(
+                'api_v1_geographic.get_bbox',
+                bbox='16.0,48.0,16.5,48.5'))
+        assert rv.status_code == HTTPStatus.OK
+        vienna_names = {
+            f['properties']['name'] for f in rv.get_json()['features']}
+        assert vienna_names == {'Shire', 'Bar'}
+
+        for param in ('centroid_only', 'centroidOnly'):
+            rv = c.get(f'/api/1/geographic/bbox?bbox=5,57,21,64&{param}=true')
+            assert rv.status_code == HTTPStatus.OK
+            scand = rv.get_json()['features']
+            assert len(scand) == 1
+            assert scand[0]['properties']['name'] == 'Home of Baggins'
+            assert scand[0]['geometry']['type'] == 'Point'
+            assert len(scand[0]['geometry']['coordinates']) == point_dims
+
+        rv = c.get(
+            '/api/1/geographic/bbox?bbox=5,57,21,64&centroid_only=false')
+        assert rv.status_code == HTTPStatus.OK
+        assert rv.get_json()['features'][0]['geometry']['type'] == 'Polygon'
+
+        rv = c.get(
+            '/api/1/geographic/bbox?bbox=-180,-90,180,90&centroid_only=true')
+        assert rv.status_code == HTTPStatus.OK
+        centroid_features = rv.get_json()['features']
+        assert len(centroid_features) == len(features)
+        for feature in centroid_features:
+            assert feature['geometry']['type'] == 'Point'
+            coords = feature['geometry']['coordinates']
+            assert len(coords) == point_dims
+            assert all(isinstance(v, float) for v in coords)
+
+        rv = c.get('/api/1/geographic/bbox?bbox=-170,-80,-160,-70')
+        assert rv.status_code == HTTPStatus.OK
+        assert rv.get_json() == {'type': 'FeatureCollection', 'features': []}
+
+        point_bbox = (
+            '16.370696110389183,48.20857123273274,'
+            '16.370696110389183,48.20857123273274')
+        rv = c.get(f'/api/1/geographic/bbox?bbox={point_bbox}')
+        assert rv.status_code == HTTPStatus.OK
+        assert any(
+            f['properties']['name'] == 'Shire'
+            for f in rv.get_json()['features'])
+
+        line_bbox = '16.370696110389183,48.0,16.370696110389183,49.0'
+        rv = c.get(f'/api/1/geographic/bbox?bbox={line_bbox}')
+        assert rv.status_code == HTTPStatus.OK
+        assert any(
+            f['properties']['name'] == 'Shire'
+            for f in rv.get_json()['features'])
+
+        rv = c.get(
+            '/api/1/geographic/bbox?bbox=-180,-90,180,90&cluster=true&zoom=2')
+        assert rv.status_code == HTTPStatus.OK
+        clustered = rv.get_json()
+        GeoJsonFeatureCollection.model_validate(clustered)
+        cluster_feats = clustered['features']
+        assert len(cluster_feats) < expected_total
+        clusters = [
+            f for f in cluster_feats if f['properties'].get('cluster')]
+        assert clusters
+        assert sum(
+            f['properties'].get('pointCount', 1)
+            for f in cluster_feats) == expected_total
+        bbox_len = 4
+        for cl in clusters:
+            assert cl['geometry']['type'] == 'Point'
+            assert cl['properties']['pointCount'] > 1
+            exp_bbox = cl['properties']['expansionBbox']
+            assert len(exp_bbox) == bbox_len
+            assert exp_bbox[0] <= exp_bbox[2]
+            assert exp_bbox[1] <= exp_bbox[3]
+
+        rv = c.get(
+            '/api/1/geographic/bbox?bbox=-180,-90,180,90&cluster=true')
+        assert rv.status_code == HTTPStatus.OK
+        auto_clustered = rv.get_json()
+        GeoJsonFeatureCollection.model_validate(auto_clustered)
+        assert sum(
+            f['properties'].get('pointCount', 1)
+            for f in auto_clustered['features']) == expected_total
+
+        rv = c.get(f'/api/1/geographic/bbox?bbox={point_bbox}&cluster=true')
+        assert rv.status_code == HTTPStatus.OK
+        assert any(
+            f['properties'].get('name') == 'Shire'
+            for f in rv.get_json()['features'])
+
+        rv = c.get(
+            '/api/1/geographic/bbox?bbox=-180,-90,180,90&cluster=true&zoom=12')
+        assert rv.status_code == HTTPStatus.OK
+        unclustered_at_12 = rv.get_json()['features']
+        assert len(unclustered_at_12) == expected_total
+        assert not any(
+            f['properties'].get('cluster') for f in unclustered_at_12)
+
+        for centroid, expected_type in (
+                ('false', 'Polygon'),
+                ('true', 'Point')):
+            rv = c.get(
+                f'/api/1/geographic/bbox?bbox=5,57,21,64'
+                f'&cluster=true&zoom=5&centroidOnly={centroid}')
+            assert rv.status_code == HTTPStatus.OK
+            singleton = rv.get_json()['features']
+            assert len(singleton) == 1
+            assert singleton[0]['properties']['name'] == 'Home of Baggins'
+            assert singleton[0]['geometry']['type'] == expected_type
+
+        for bad_zoom in ('-1', '26'):
+            rv = c.get(
+                f'/api/1/geographic/bbox?bbox=0,0,10,10'
+                f'&cluster=true&zoom={bad_zoom}')
+            assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+
+        with app.test_request_context():
+            app.preprocess_request()
+            direct_place = insert('place', 'Direct GIS Place')
+            db_gis.insert(
+                {
+                    'entity_id': direct_place.id,
+                    'name': 'Direct Point',
+                    'description': '',
+                    'type': 'centerpoint',
+                    'geojson': (
+                        '{"type": "Point", "coordinates": [11.5, 48.1]}')},
+                'point')
+        rv = c.get('/api/1/geographic/bbox?bbox=11.0,48.0,12.0,48.5')
+        assert rv.status_code == HTTPStatus.OK
+        direct_data = rv.get_json()
+        GeoJsonFeatureCollection.model_validate(direct_data)
+        assert len(direct_data['features']) == 1
+        direct_feat = direct_data['features'][0]
+        assert direct_feat['properties']['name'] == 'Direct GIS Place'
+        assert direct_feat['properties']['locationId'] is None
+        assert direct_feat['geometry'] == {
+            'type': 'Point',
+            'coordinates': [11.5, 48.1]}
+
+        rv = c.get(
+            '/api/1/geographic/bbox?bbox=%2016.0,%2048.0,%2017.0,%2049.0%20')
+        assert rv.status_code == HTTPStatus.OK
+
+        rv = c.get('/api/1/geographic/bbox')
+        assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+
+        for bad_bbox in (
+                'null',
+                '16,48,17',
+                '1,2,3,4,5',
+                'a,b,c,d',
+                'nan,0,1,1',
+                'inf,0,1,1',
+                '-181,0,10,10',
+                '0,0,181,10',
+                '0,-91,10,10',
+                '0,0,10,91',
+                '17,48,16,49',
+                '16,49,17,48'):
+            rv = c.get(
+                url_for('api_v1_geographic.get_bbox', bbox=bad_bbox))
+            assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
     def test_docs(self) -> None:
         c = self.client

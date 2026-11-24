@@ -27,3 +27,7 @@ metadata_tag = Tag(
 frontend_tag = Tag(
     name='Frontend',
     description='Frontend search and discovery endpoints.')
+
+geographic_tag = Tag(
+    name='Geographic',
+    description='Geographic and spatial query endpoints.')

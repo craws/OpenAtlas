@@ -205,6 +205,8 @@ def before_add_examples(context: Any, examples: list[Any]) -> None:
             kwargs['path_parameters'] = params
         if path.startswith('/api/1/entities/'):
             kwargs['query'] = {'limit': 5, 'page': 1}
+        elif path == '/api/1/geographic/bbox':
+            kwargs['query'] = {'bbox': '-180,-90,180,90'}
         elif (path in (
                 '/api/1/vocabulary/standard/{openatlas_class}',
                 '/api/1/system/count/entities')

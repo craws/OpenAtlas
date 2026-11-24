@@ -265,3 +265,211 @@ def get_overview_counts_by_case_study(
         """,
         params)
     return {row['name']: row['count'] for row in list(g.cursor)}
+
+
+## Geographic ##
+
+SPATIAL_CLASSES = [
+    'place',
+    'feature',
+    'stratigraphic_unit',
+    'artifact',
+    'human_remains']
+
+ENTITY_SELECT_SQL = """
+    e.id,
+    e.uuid,
+    e.name,
+    e.description,
+    e.openatlas_class_name,
+    COALESCE(to_char(e.begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+        AS begin_from,
+    e.begin_comment,
+    COALESCE(to_char(e.begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+        AS begin_to,
+    COALESCE(to_char(e.end_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+        AS end_from,
+    e.end_comment,
+    COALESCE(to_char(e.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+        AS end_to"""
+
+
+def envelope_sql(bbox: tuple[float, float, float, float]) -> str:
+    min_lon, min_lat, max_lon, max_lat = bbox
+    if min_lon == max_lon and min_lat == max_lat:
+        return (
+            'public.ST_SetSRID('
+            'public.ST_MakePoint(%(min_lon)s, %(min_lat)s), 4326)')
+    if min_lon == max_lon or min_lat == max_lat:
+        return (
+            'public.ST_SetSRID(public.ST_MakeLine('
+            'public.ST_MakePoint(%(min_lon)s, %(min_lat)s), '
+            'public.ST_MakePoint(%(max_lon)s, %(max_lat)s)), 4326)')
+    return (
+        'public.ST_MakeEnvelope('
+        '%(min_lon)s, %(min_lat)s, %(max_lon)s, %(max_lat)s, 4326)')
+
+
+def geom_sql(centroid_only: bool) -> str:
+    if centroid_only:
+        return """
+            public.ST_AsGeoJSON(
+                COALESCE(
+                    g.geom_point,
+                    public.ST_PointOnSurface(g.geom_linestring),
+                    public.ST_PointOnSurface(g.geom_polygon)))"""
+    return """
+        public.ST_AsGeoJSON(
+            COALESCE(
+                g.geom_point,
+                g.geom_linestring,
+                public.ST_ForcePolygonCCW(g.geom_polygon)))"""
+
+
+def get_by_bbox(
+        bbox: tuple[float, float, float, float],
+        centroid_only: bool = False) -> list[dict[str, Any]]:
+    min_lon, min_lat, max_lon, max_lat = bbox
+    bbox_sql = envelope_sql(bbox)
+    geometry_sql = geom_sql(centroid_only)
+    g.cursor.execute(
+        f"""
+        WITH bbox AS (
+            SELECT {bbox_sql} AS geom
+        ),
+        matched_gis AS (
+            SELECT
+                g.id AS geometry_id,
+                g.entity_id,
+                g.name AS geometry_name,
+                g.description AS geometry_description,
+                g.type AS shape_type,
+                {geometry_sql} AS geometry
+            FROM model.gis g
+            CROSS JOIN bbox
+            WHERE (
+                public.ST_Intersects(g.geom_point, bbox.geom)
+                OR public.ST_Intersects(g.geom_linestring, bbox.geom)
+                OR public.ST_Intersects(g.geom_polygon, bbox.geom))
+        )
+        SELECT
+            {ENTITY_SELECT_SQL},
+            CASE WHEN loc.openatlas_class_name = 'object_location'
+                THEN loc.id ELSE NULL END AS location_id,
+            mg.geometry_id,
+            mg.geometry_name,
+            mg.geometry_description,
+            mg.shape_type,
+            mg.geometry
+        FROM matched_gis mg
+        JOIN model.entity loc ON loc.id = mg.entity_id
+        LEFT JOIN model.link l ON l.range_id = loc.id
+            AND l.property_code = 'P53'
+            AND loc.openatlas_class_name = 'object_location'
+        JOIN model.entity e ON e.id = COALESCE(l.domain_id, loc.id)
+            AND e.openatlas_class_name = ANY(%(classes)s)
+        ORDER BY e.id, mg.geometry_id;
+        """,
+        {
+            'min_lon': min_lon,
+            'min_lat': min_lat,
+            'max_lon': max_lon,
+            'max_lat': max_lat,
+            'classes': SPATIAL_CLASSES})
+    return list(g.cursor)
+
+
+def get_clustered_by_bbox(
+        bbox: tuple[float, float, float, float],
+        grid_size: float,
+        centroid_only: bool = False) -> list[dict[str, Any]]:
+    min_lon, min_lat, max_lon, max_lat = bbox
+    bbox_sql = envelope_sql(bbox)
+    geometry_sql = geom_sql(centroid_only)
+    g.cursor.execute(
+        f"""
+        WITH bbox AS (
+            SELECT {bbox_sql} AS geom
+        ),
+        matched AS (
+            SELECT
+                e.id AS entity_id,
+                g.id AS geometry_id,
+                CASE WHEN loc.openatlas_class_name = 'object_location'
+                    THEN loc.id ELSE NULL END AS location_id,
+                COALESCE(
+                    g.geom_point,
+                    public.ST_PointOnSurface(g.geom_linestring),
+                    public.ST_PointOnSurface(g.geom_polygon)) AS pt
+            FROM model.gis g
+            CROSS JOIN bbox
+            JOIN model.entity loc ON loc.id = g.entity_id
+            LEFT JOIN model.link l ON l.range_id = loc.id
+                AND l.property_code = 'P53'
+                AND loc.openatlas_class_name = 'object_location'
+            JOIN model.entity e ON e.id = COALESCE(l.domain_id, loc.id)
+                AND e.openatlas_class_name = ANY(%(classes)s)
+            WHERE (
+                public.ST_Intersects(g.geom_point, bbox.geom)
+                OR public.ST_Intersects(g.geom_linestring, bbox.geom)
+                OR public.ST_Intersects(g.geom_polygon, bbox.geom))
+        ),
+        cells AS (
+            SELECT
+                public.ST_SnapToGrid(
+                    public.ST_Transform(
+                        public.ST_SetSRID(
+                            public.ST_MakePoint(
+                                public.ST_X(pt),
+                                LEAST(
+                                    85.0511287,
+                                    GREATEST(-85.0511287, public.ST_Y(pt)))),
+                            4326),
+                        3857),
+                    %(grid_size)s) AS cell,
+                COUNT(*) AS point_count,
+                MIN(entity_id) AS single_entity_id,
+                MIN(geometry_id) AS single_geometry_id,
+                MIN(location_id) AS single_location_id,
+                public.ST_AsGeoJSON(
+                    public.ST_Centroid(public.ST_Collect(pt))
+                ) AS cluster_geom,
+                MIN(public.ST_X(pt)) AS min_lon,
+                MIN(public.ST_Y(pt)) AS min_lat,
+                MAX(public.ST_X(pt)) AS max_lon,
+                MAX(public.ST_Y(pt)) AS max_lat
+            FROM matched
+            GROUP BY cell
+        )
+        SELECT
+            c.point_count,
+            c.min_lon,
+            c.min_lat,
+            c.max_lon,
+            c.max_lat,
+            {ENTITY_SELECT_SQL},
+            c.single_location_id AS location_id,
+            g.id AS geometry_id,
+            g.name AS geometry_name,
+            g.description AS geometry_description,
+            g.type AS shape_type,
+            CASE WHEN c.point_count = 1
+                THEN {geometry_sql}
+                ELSE c.cluster_geom
+            END AS geometry
+        FROM cells c
+        LEFT JOIN model.entity e
+            ON c.point_count = 1 AND e.id = c.single_entity_id
+        LEFT JOIN model.gis g
+            ON c.point_count = 1 AND g.id = c.single_geometry_id
+        ORDER BY c.point_count DESC, c.min_lon, c.min_lat,
+            c.single_geometry_id;
+        """,
+        {
+            'min_lon': min_lon,
+            'min_lat': min_lat,
+            'max_lon': max_lon,
+            'max_lat': max_lat,
+            'grid_size': grid_size,
+            'classes': SPATIAL_CLASSES})
+    return list(g.cursor)
