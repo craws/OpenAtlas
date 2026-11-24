@@ -18,6 +18,7 @@ versions = {
     '9.6.0': ['TBA', {
         'feature': {
             '2156': 'Expanded date options',
+            '2885': 'API: Phonetic name search',
             '2894': 'ORCID external reference system',
             '2895': 'ROR as external reference system',
             '2899': 'IIIF georeferencing and Allmaps',

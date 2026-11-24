@@ -38,20 +38,20 @@ two major generations:
      - The proven RESTful API (Flask-RESTful). Provides endpoints for
        entities, types, GeoJSON, and LPF. Documented in :doc:`/api/api_04`.
    * - **1.0**
-     - **Beta**
+     - **Beta (1.0.0-beta.2)**
      - The next-generation API based on OpenAPI 3.1 and Pydantic. Features
-       native Linked Open Data graphs, Linked Art profiles, SKOS thesauri,
-       IIIF Presentation API 3, and high-performance streaming dumps. IIIF
-       Image API services are exposed as version 2.
+       strictly compliant Linked Art profiles, SKOS thesauri, IIIF Presentation
+       API 3, and preliminary OpenAtlas LOD stubs. IIIF Image API services are
+       exposed as version 2.
 
-Interactive Documentation UIs
------------------------------
-For API v1, OpenAtlas provides three interactive browser interfaces that let
-you explore, inspect, and test all 38 endpoints directly without writing a
+Interactive Documentation UI
+----------------------------
+For API v1, OpenAtlas provides an interactive browser interface that lets
+you explore, inspect, and test all 33 endpoints directly without writing a
 single line of code (works only with an OpenAtlas instance, not with the
 standalone manual):
 
-.. grid:: 1 3 3 3
+.. grid:: 1 1 1 1
    :gutter: 2
 
    .. grid-item-card:: Swagger UI
@@ -60,20 +60,6 @@ standalone manual):
 
       Interactive testing sandbox. Try out endpoints, enter parameters,
       authorize with a token, and execute live requests.
-
-   .. grid-item-card:: ReDoc
-      :link: /api/1/docs/redoc
-      :link-type: url
-
-      Clean, publication-ready three-panel documentation focusing on
-      schemas, types, and response models.
-
-   .. grid-item-card:: Scalar
-      :link: /api/1/docs/scalar
-      :link-type: url
-
-      Modern, responsive API client interface with instant code snippets
-      in various programming languages.
 
 Machine-Readable OpenAPI Specification
 --------------------------------------
@@ -85,5 +71,5 @@ Guide Contents
 --------------
 * :doc:`getting_started` - Access modes, JWT Bearer tokens, and first requests.
 * :doc:`lod` - Semantic Web concepts, CIDOC CRM, CRMarchaeo, Linked Art, and SKOS.
-* :doc:`reference` - Complete index of all 38 endpoints, parameters, and error codes.
+* :doc:`reference` - Complete index of all 33 endpoints, parameters, and error codes.
 * :doc:`api_04` - Documentation for the current stable API v0.4.
