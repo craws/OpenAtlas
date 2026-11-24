@@ -1,6 +1,7 @@
 from http import HTTPStatus
+from typing import Any
 
-from flask import url_for
+from flask import g, url_for
 from rdflib import Dataset, RDF, URIRef
 
 from openatlas import app
@@ -113,6 +114,25 @@ class ApiV1(ApiTestCase):
                 page=2))
         assert rv.status_code == HTTPStatus.OK
         assert 'prev' in rv.get_json()
+
+        rv = c.get(
+            url_for(
+                'api_v1_lod.get_entities',
+                entity_class='place',
+                search='%'))
+        assert rv.status_code == HTTPStatus.OK
+        assert rv.get_json()['partOf']['totalItems'] == 0
+
+        rv = c.get(
+            url_for(
+                'api_v1_lod.get_entities',
+                entity_class='place',
+                limit=1,
+                page=999))
+        assert rv.status_code == HTTPStatus.OK
+        out_of_range = rv.get_json()
+        assert out_of_range['partOf']['totalItems'] > 0
+        assert out_of_range['orderedItems'] == []
 
         assert format_lod_entities([]) == {
             '@context': [
@@ -821,6 +841,84 @@ class ApiV1(ApiTestCase):
             url_for('api_v1_iiif.get_iiif_georeference', id=e.logo.id))
         assert rv.status_code == HTTPStatus.NOT_FOUND
         assert rv.get_json()['title'] == 'Georeference not found'
+
+    def test_search(self) -> None:
+        c = self.client
+        e = self.get_api_entities()
+        with app.test_request_context():
+            app.preprocess_request()
+            insert('person', 'Smith', 'Exact match')
+            insert('person', 'Smithson', 'Prefix match')
+            insert('person', 'John Smith', 'Substring match')
+            insert('person', 'Smyth', 'Phonetic match')
+            insert('person', '1230', 'Numeric match')
+
+        rv = c.get(
+            url_for(
+                'api_v1_frontend.search_entities',
+                search='Smith',
+                entityClass='person'))
+        assert rv.status_code == HTTPStatus.OK
+        data = rv.get_json()
+        names = [item['name'] for item in data['data']]
+        assert names[:4] == ['Smith', 'Smithson', 'John Smith', 'Smyth']
+        assert data['data'][0]['systemClass'] == 'person'
+        assert data['data'][0]['description'] == 'Exact match'
+
+        rv = c.get('/api/1/search?search=0')
+        assert rv.status_code == HTTPStatus.OK
+        assert '1230' in [item['name'] for item in rv.get_json()['data']]
+
+        rv = c.get(
+            url_for(
+                'api_v1_frontend.search_entities',
+                search='Shire',
+                entityClass='place'))
+        assert rv.status_code == HTTPStatus.OK
+        place_data = rv.get_json()['data']
+        assert place_data[0]['name'] == 'Shire'
+        assert place_data[0]['timespan'] is not None
+
+        search_params: list[dict[str, Any]] = [
+            {'entityClass': 'place', 'limit': 1, 'page': 2},
+            {'startDate': '-400', 'endDate': '2050-05'},
+            {'typeId': e.boundary_mark.id},
+            {'typeId': str(e.boundary_mark.uuid)},
+            {'caseStudy': e.case_study.id},
+            {'caseStudy': str(e.case_study.uuid)},
+            {'sortBy': 'startDate', 'sort': 'desc'}]
+        for params in search_params:
+            rv = c.get(
+                url_for('api_v1_frontend.search_entities', **params))
+            assert rv.status_code == HTTPStatus.OK
+            res = rv.get_json()
+            assert 'totalItems' in res
+            assert 'first' in res
+            assert 'last' in res
+
+        rv = c.get(
+            url_for(
+                'api_v1_frontend.search_entities',
+                typeId=999999))
+        assert rv.status_code == HTTPStatus.OK
+        assert rv.get_json()['data'] == []
+        assert rv.get_json()['totalItems'] == 0
+
+        rv = c.get('/api/1/search?search=%25')
+        assert rv.status_code == HTTPStatus.OK
+        assert rv.get_json()['totalItems'] == 0
+
+        rv = c.get('/api/1/search?search=_')
+        assert rv.status_code == HTTPStatus.OK
+        underscore_data = rv.get_json()
+        assert underscore_data['totalItems'] == 1
+        assert '_' in underscore_data['data'][0]['name']
+
+        rv = c.get('/api/1/search?search=foo%00bar')
+        assert rv.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+
+        rv = c.get('/api/1/search?startDate=999999-01-01')
+        assert rv.status_code == HTTPStatus.BAD_REQUEST
 
     def test_docs(self) -> None:
         c = self.client

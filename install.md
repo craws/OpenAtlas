@@ -62,9 +62,9 @@ Create an openatlas database, make openatlas the owner of it
 
     createdb openatlas -O openatlas
 
-Add the [PostGIS](https://postgis.net/) and unaccent extension to the database
+Add the [PostGIS](https://postgis.net/), unaccent, fuzzystrmatch, and pg_trgm extensions to the database
 
-    psql openatlas -c "CREATE EXTENSION postgis; CREATE EXTENSION unaccent;"
+    psql openatlas -c "CREATE EXTENSION postgis; CREATE EXTENSION unaccent; CREATE EXTENSION fuzzystrmatch; CREATE EXTENSION pg_trgm;"
 
 Import the SQL files:
 
@@ -177,7 +177,7 @@ Install required packages:
 As postgres:
 
     createdb openatlas_test -O openatlas
-    psql openatlas_test -c "CREATE EXTENSION postgis; CREATE EXTENSION unaccent;"
+    psql openatlas_test -c "CREATE EXTENSION postgis; CREATE EXTENSION unaccent; CREATE EXTENSION fuzzystrmatch; CREATE EXTENSION pg_trgm;"
 
 Copy instance/example_testing.py to instance/testing.py and adapt as needed:
 
