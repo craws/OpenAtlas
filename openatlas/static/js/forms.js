@@ -187,7 +187,252 @@ $(document).ready(function () {
     $(`#${this.id} input`)?.get(0)?.focus()
   });
 
+  initDuplicateNameCheck();
+
 });
+
+function initDuplicateNameCheck() {
+  const inputs = document.querySelectorAll('input[data-duplicate-check-class]');
+  if (!inputs.length) return;
+
+  const instances = [];
+
+  inputs.forEach((input) => {
+    if (input.dataset.duplicateCheckBound) return;
+    input.dataset.duplicateCheckBound = 'true';
+
+    const container = input.parentElement;
+    if (!container) return;
+
+    const host = input.closest('.modal') || document.body;
+    const bubble = document.createElement('div');
+    bubble.className = 'duplicate-check-bubble';
+    bubble.setAttribute('role', 'status');
+    bubble.setAttribute('aria-live', 'polite');
+    bubble.hidden = true;
+    host.appendChild(bubble);
+
+    const entityClass = input.dataset.duplicateCheckClass;
+    const excludeId = input.dataset.excludeId || '';
+    const MIN_SIDE_WIDTH = 260;
+    const MAX_SIDE_WIDTH = 380;
+    const MAX_BELOW_WIDTH = 420;
+    const GAP = 10;
+    const VIEWPORT_MARGIN = 12;
+
+    let debounceTimer = null;
+    let abortController = null;
+    let requestCounter = 0;
+    let lastQuery = '';
+    let hasResults = false;
+    let dismissedQuery = null;
+
+    const positionBubble = () => {
+      if (bubble.hidden) return;
+      const rect = input.getBoundingClientRect();
+      if (rect.width === 0 && rect.height === 0) {
+        bubble.hidden = true;
+        return;
+      }
+
+      const spaceRight = window.innerWidth - rect.right - GAP - VIEWPORT_MARGIN;
+      if (spaceRight >= MIN_SIDE_WIDTH) {
+        bubble.classList.add('duplicate-check-bubble--right');
+        bubble.classList.remove('duplicate-check-bubble--below-end');
+        const width = Math.min(MAX_SIDE_WIDTH, spaceRight);
+        bubble.style.width = `${width}px`;
+
+        const left = rect.right + GAP;
+        const bubbleHeight = bubble.offsetHeight || 0;
+        let top = rect.top - 4;
+        if (top + bubbleHeight > window.innerHeight - VIEWPORT_MARGIN) {
+          top = Math.max(VIEWPORT_MARGIN, window.innerHeight - bubbleHeight - VIEWPORT_MARGIN);
+        }
+        top = Math.max(VIEWPORT_MARGIN, top);
+
+        const inputCenterY = rect.top + rect.height / 2;
+        const arrowTop = Math.max(
+          14,
+          Math.min(Math.max(14, bubbleHeight - 14), inputCenterY - top)
+        );
+        bubble.style.setProperty('--duplicate-arrow-top', `${arrowTop}px`);
+        bubble.style.left = `${left}px`;
+        bubble.style.top = `${top}px`;
+      } else {
+        bubble.classList.add('duplicate-check-bubble--below-end');
+        bubble.classList.remove('duplicate-check-bubble--right');
+        const width = Math.min(MAX_BELOW_WIDTH, window.innerWidth - VIEWPORT_MARGIN * 2);
+        bubble.style.width = `${width}px`;
+        const left = Math.max(
+          VIEWPORT_MARGIN,
+          Math.min(window.innerWidth - width - VIEWPORT_MARGIN, rect.right - width)
+        );
+        const top = rect.bottom + 8;
+        bubble.style.left = `${left}px`;
+        bubble.style.top = `${top}px`;
+      }
+    };
+
+    const resetState = () => {
+      clearTimeout(debounceTimer);
+      if (abortController) {
+        abortController.abort();
+        abortController = null;
+      }
+      requestCounter++;
+      lastQuery = '';
+      hasResults = false;
+      dismissedQuery = null;
+      bubble.hidden = true;
+      bubble.innerHTML = '';
+    };
+
+    const fetchDuplicateHtml = async (query, offset = 0) => {
+      if (abortController) {
+        abortController.abort();
+      }
+      abortController = new AbortController();
+      const currentCounter = ++requestCounter;
+      const params = new URLSearchParams({
+        search: query,
+        class_: entityClass,
+        offset: String(offset),
+        ...(excludeId ? { exclude_id: String(excludeId) } : {})
+      });
+      const response = await fetch(`/ajax/duplicate_check?${params.toString()}`, {
+        credentials: 'same-origin',
+        signal: abortController.signal
+      });
+      if (!response.ok) return null;
+      const html = await response.text();
+      if (currentCounter !== requestCounter || input.value.trim() !== query) {
+        return null;
+      }
+      return html;
+    };
+
+    bubble.addEventListener('click', async (event) => {
+      if (event.target.closest('.duplicate-check-close')) {
+        event.stopPropagation();
+        bubble.hidden = true;
+        dismissedQuery = lastQuery;
+        return;
+      }
+
+      const loadMoreBtn = event.target.closest('.duplicate-check-load-more');
+      if (!loadMoreBtn || loadMoreBtn.disabled) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const originalText = loadMoreBtn.textContent;
+      loadMoreBtn.disabled = true;
+      loadMoreBtn.textContent = `${translate.inProgress}…`;
+      try {
+        const html = await fetchDuplicateHtml(
+          lastQuery,
+          loadMoreBtn.dataset.offset || '0'
+        );
+        if (html === null) return;
+        loadMoreBtn.closest('.duplicate-check-footer')?.remove();
+        if (html.trim()) {
+          bubble
+            .querySelector('.duplicate-check-list')
+            ?.insertAdjacentHTML('beforeend', html);
+        }
+        positionBubble();
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          loadMoreBtn.disabled = false;
+          loadMoreBtn.textContent = originalText;
+        }
+      }
+    });
+
+    input.addEventListener('input', () => {
+      const query = input.value.trim();
+      if (query.length < 2) {
+        resetState();
+        return;
+      }
+      if (query !== dismissedQuery) {
+        dismissedQuery = null;
+      }
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(async () => {
+        try {
+          const html = await fetchDuplicateHtml(query, 0);
+          if (html === null) return;
+          lastQuery = query;
+          if (!html.trim()) {
+            hasResults = false;
+            bubble.hidden = true;
+            bubble.innerHTML = '';
+            return;
+          }
+          hasResults = true;
+          bubble.innerHTML = html;
+          if (dismissedQuery !== query) {
+            bubble.hidden = false;
+            positionBubble();
+          }
+        } catch (err) {
+          if (err.name !== 'AbortError') {
+            bubble.hidden = true;
+          }
+        }
+      }, 300);
+    });
+
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !bubble.hidden) {
+        event.stopPropagation();
+        bubble.hidden = true;
+        dismissedQuery = lastQuery;
+      }
+    });
+
+    input.addEventListener('focus', () => {
+      if (input.value.trim() === lastQuery && hasResults && dismissedQuery !== lastQuery) {
+        bubble.hidden = false;
+        positionBubble();
+      }
+    });
+
+    instances.push({ input, container, bubble, positionBubble });
+  });
+
+  if (instances.length) {
+    document.addEventListener('mousedown', (event) => {
+      instances.forEach(({ input, container, bubble }) => {
+        if (
+          !bubble.hidden
+          && event.target !== input
+          && !container.contains(event.target)
+          && !bubble.contains(event.target)
+        ) {
+          bubble.hidden = true;
+        }
+      });
+    });
+
+    const repositionAll = (event) => {
+      if (event?.target?.classList?.contains('duplicate-check-list')) return;
+      instances.forEach(({ bubble, positionBubble }) => {
+        if (!bubble.hidden) {
+          positionBubble();
+        }
+      });
+    };
+
+    window.addEventListener('resize', repositionAll, { passive: true });
+    window.addEventListener('scroll', repositionAll, true);
+
+    $(document).on('hidden.bs.modal', '.modal', function () {
+      this.querySelectorAll('.duplicate-check-bubble').forEach((bubble) => {
+        bubble.hidden = true;
+      });
+    });
+  }
+}
 
 const closableBadge = (name, onclick = '') => `
   <div onclick="event.stopPropagation()" class="badge col-auto bg-gray">

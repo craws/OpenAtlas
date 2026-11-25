@@ -56,8 +56,9 @@ class User(UserMixin):
         if settings:
             for name, value in settings.items():
                 db.update_settings(self.id, name, value)
-                if name == 'language':
-                    current_user.settings['language'] = value
+                self.settings[name] = value
+                if current_user.id == self.id:
+                    current_user.settings[name] = value
 
     def delete(self) -> None:
         db.delete(self.id)
@@ -150,6 +151,7 @@ class User(UserMixin):
             'language': session['language'],
             'newsletter': False,
             'table_show_aliases': True,
+            'check_duplicates': True,
             'show_email': False}
         for key, value in g.settings.items():
             if key in [

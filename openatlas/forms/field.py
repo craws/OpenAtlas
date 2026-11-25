@@ -8,6 +8,7 @@ from typing import Any, Optional
 
 from flask import g, render_template, request
 from flask_babel import gettext as _
+from flask_login import current_user
 from flask_wtf import FlaskForm
 from markupsafe import Markup
 from wtforms import (
@@ -245,8 +246,14 @@ class TableSelect(HiddenInput):
     def __call__(self, field: Any, **kwargs: Any) -> str:
 
         def get_form(class_name_: str) -> Any:
+            render_kw: dict[str, Any] = {}
+            if current_user.settings['check_duplicates']:
+                render_kw = {
+                    'data-duplicate-check-class': class_name_,
+                    'autocomplete': 'off'}
+
             class SimpleEntityForm(FlaskForm):
-                name_dynamic = StringField(_('name'))
+                name_dynamic = StringField(_('name'), render_kw=render_kw)
 
             if class_name_ in g.classes \
                     and g.classes[class_name_].hierarchies \

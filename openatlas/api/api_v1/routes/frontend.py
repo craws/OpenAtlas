@@ -60,7 +60,8 @@ def search_entities(query: SearchQuery) -> dict[str, Any]:
             start_date=query.start_date,
             end_date=query.end_date,
             type_ids=type_ids,
-            case_study_ids=case_study_ids)
+            case_study_ids=case_study_ids,
+            exclude_id=query.exclude_id)
 
     items = [
         SearchResultItem(

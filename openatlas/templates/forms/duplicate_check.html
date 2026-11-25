@@ -1,0 +1,33 @@
+{% if offset == 0 %}
+  <div class="duplicate-check-header d-flex align-items-center justify-content-between">
+    <span class="fw-semibold small">
+      <i class="fas fa-exclamation-triangle text-warning me-1"></i>{{ _('possible duplicates')|uc_first }}
+      <span class="badge rounded-pill bg-secondary ms-1">{{ total }}</span>
+    </span>
+    <button type="button" class="btn-close duplicate-check-close" aria-label="{{ _('close')|uc_first }}"></button>
+  </div>
+  <ul class="duplicate-check-list">
+{% endif %}
+{% for row in rows %}
+  <li class="duplicate-check-item{% if row.name.strip().lower() == search_lower %} duplicate-check-exact{% endif %}">
+    <a href="{{ url_for('view', id_=row.id) }}" target="_blank" rel="noopener noreferrer" class="duplicate-check-link">
+      {{ row.name }} <i class="fas fa-external-link-alt small ms-1 text-muted"></i>
+    </a>
+    {% if row.description %}
+      <small class="d-block text-muted text-truncate">{{ row.description }}</small>
+    {% endif %}
+  </li>
+{% endfor %}
+{% if remaining > 0 %}
+  <li class="duplicate-check-footer">
+    <button
+      type="button"
+      class="{{ config.CSS.button.secondary }} w-100 duplicate-check-load-more"
+      data-offset="{{ next_offset }}">
+      {{ _('show more')|uc_first }} ({{ remaining }})
+    </button>
+  </li>
+{% endif %}
+{% if offset == 0 %}
+  </ul>
+{% endif %}

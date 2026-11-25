@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections import OrderedDict
 from typing import Any, Optional
 
-from flask import g
+from flask import g, request
 from flask_babel import gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
@@ -49,19 +49,39 @@ def filter_entities(
     return [item for item in items if item.id not in filter_ids]
 
 
+def duplicate_check_kw(
+        class_name: str,
+        exclude_id: int | None = None) -> dict[str, Any]:
+    if not current_user.settings['check_duplicates']:
+        return {}
+    kw: dict[str, Any] = {
+        'data-duplicate-check-class': class_name,
+        'autocomplete': 'off'}
+    if exclude_id:
+        kw['data-exclude-id'] = exclude_id
+    return kw
+
+
 def add_name_fields(form: Any, entity: Entity) -> None:
     if 'name' in entity.class_.attributes:
+        is_readonly = bool(
+            entity.system or (
+                entity.class_.name == 'type'
+                and entity.name == 'Case study'))
+        render_kw: dict[str, Any] = {
+            'readonly' if is_readonly else 'autofocus': True}
+        if not is_readonly:
+            is_copy = bool(request.view_args and request.view_args.get('copy'))
+            exclude_id = entity.id if entity.id and not is_copy else None
+            render_kw.update(
+                duplicate_check_kw(entity.class_.name, exclude_id))
         setattr(
             form,
             'name',
             StringField(
                 entity.class_.attributes['name']['label'],
                 validators=get_validators(entity.class_.attributes['name']),
-                render_kw={
-                    'readonly' if entity.system or (
-                        entity.class_.name == 'type'
-                        and entity.name == 'Case study')
-                    else 'autofocus': True}))
+                render_kw=render_kw))
     if 'alias' in entity.class_.attributes:
         setattr(form, 'alias', FieldList(RemovableListField()))
 
@@ -149,7 +169,12 @@ def add_type(form: Any, type_: Entity) -> None:
         class AddDynamicType(FlaskForm):
             pass
 
-        setattr(AddDynamicType, 'name-dynamic', StringField(_('name')))
+        setattr(
+            AddDynamicType,
+            'name-dynamic',
+            StringField(
+                _('name'),
+                render_kw=duplicate_check_kw(type_.class_.name)))
         setattr(
             AddDynamicType,
             f'{type_.id}-dynamic',

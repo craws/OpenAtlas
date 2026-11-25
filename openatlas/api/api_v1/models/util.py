@@ -94,6 +94,7 @@ class OpenAtlasClassEnum(str, Enum):
     # ALIAS = 'alias'
     ARTIFACT = 'artifact'
     BIBLIOGRAPHY = 'bibliography'
+    CREATION = 'creation'
     EDITION = 'edition'
     EXTERNAL_REFERENCE = 'external_reference'
     FEATURE = 'feature'

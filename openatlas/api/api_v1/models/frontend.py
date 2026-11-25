@@ -15,6 +15,10 @@ class SearchQuery(EntityCollectionQuery):
     entity_class: OpenAtlasClassEnum | None = Field(
         None,
         description='Optional OpenAtlas system class filter.')
+    exclude_id: int | None = Field(
+        None,
+        ge=1,
+        description='Optional entity ID to exclude from search results.')
 
 
 class SearchResultItem(BaseSchema):

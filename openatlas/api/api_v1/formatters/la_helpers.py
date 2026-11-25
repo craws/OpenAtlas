@@ -53,6 +53,7 @@ UNIT_MAP: Final[dict[str, str]] = {
 LA_TYPES: Final[dict[str, str]] = {
     'acquisition': 'Activity',
     'activity': 'Activity',
+    'creation': 'Activity',
     'modification': 'Activity',
     'move': 'Activity',
     'production': 'Activity',
@@ -114,6 +115,7 @@ CLASS_TYPES: Final[dict[str, list[dict[str, str]]]] = {
         'type': 'Type',
         '_label': 'Stratigraphic Unit'}],
     'acquisition': [crm_type('E8', 'Acquisition')],
+    'creation': [crm_type('E65', 'Creation')],
     'modification': [crm_type('E11', 'Modification')],
     'move': [crm_type('E9', 'Move')],
     'production': [crm_type('E12', 'Production')],

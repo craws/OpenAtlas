@@ -1,8 +1,9 @@
 from typing import Optional
 import requests
-from flask import Response, g, jsonify, request
+from flask import Response, g, jsonify, render_template, request
 from flask_babel import gettext as _
 
+from config.model.class_groups import class_groups
 from openatlas import app
 # pylint: disable=unused-import
 from openatlas.api.external.apis import APIS  # noqa
@@ -18,10 +19,46 @@ from openatlas.api.external.orcid import ORCID  # noqa
 from openatlas.api.external.ror import ROR  # noqa
 from openatlas.api.external.wikidata import Wikidata  # noqa
 from openatlas.api.external.viaf import VIAF  # noqa
+from openatlas.database.api import get_entities_api
 from openatlas.display.util import display_info, required_group
 from openatlas.display.util2 import uc_first
 from openatlas.models.entity import Entity, insert
 from openatlas.models.user import User
+
+
+@app.route('/ajax/duplicate_check')
+@required_group('contributor')
+def ajax_duplicate_check() -> str:
+    search = request.args.get('search', '').strip()
+    class_ = request.args.get('class_', '')
+    min_length = 2
+    search_classes = {
+        cls for group in class_groups.values() for cls in group['classes']}
+    if (len(search) < min_length
+            or '\x00' in search
+            or class_ not in search_classes):
+        return ''
+    limit = 6
+    offset = max(0, request.args.get('offset', 0, type=int))
+    exclude_id = request.args.get('exclude_id', type=int)
+    rows, total = get_entities_api(
+        [class_],
+        limit=limit,
+        offset=offset,
+        search_name=search,
+        phonetic=True,
+        exclude_id=exclude_id)
+    if not rows:
+        return ''
+    next_offset = offset + len(rows)
+    return render_template(
+        'forms/duplicate_check.html',
+        rows=rows,
+        total=total,
+        search_lower=search.lower(),
+        offset=offset,
+        next_offset=next_offset,
+        remaining=max(0, total - next_offset))
 
 
 @app.route('/ajax/bookmark', methods=['POST'])

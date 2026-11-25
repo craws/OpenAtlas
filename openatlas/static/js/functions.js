@@ -59,7 +59,7 @@ $(document).ready(function () {
     setFilesOfDropField([...$('#file')[0].files])
     if ($('#name').val() == '') {
       var filename = $('#file')[0].files.length ? $('#file')[0].files[0].name : '';
-      $('#name').val(filename.replace(/\.[^/.]+$/, ""));
+      $('#name').val(filename.replace(/\.[^/.]+$/, "")).trigger('input');
     }
   });
 
@@ -423,7 +423,7 @@ function addDragNDropListeners(dropContainer,allowedTypes) {
 
       if ($('#name').val() == '') {
         const filename = allowedFiles[0].name;
-        $('#name').val(filename.replace(/\.[^/.]+$/, ""));
+        $('#name').val(filename.replace(/\.[^/.]+$/, "")).trigger('input');
       }
     }
     dropContainer.classList.remove('highlight')

@@ -48,6 +48,9 @@ class EntityCollectionPath(BaseSchema):
                 "acquisition": {
                     "summary": "Acquisition (E8 Acquisition)",
                     "value": "acquisition"},
+                "creation": {
+                    "summary": "Creation (E65 Creation)",
+                    "value": "creation"},
                 "move": {
                     "summary": "Move (E9 Move)",
                     "value": "move"},

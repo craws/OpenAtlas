@@ -101,6 +101,8 @@ def before_request() -> Response | None:
         return None  # Avoid overheads for swagger and docs
 
     session['language'] = get_locale()
+    if request.path.startswith('/ajax/duplicate_check'):
+        return None
     setup_api()
     if request.path.startswith('/api/1'):
         setup_files()

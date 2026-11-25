@@ -145,10 +145,15 @@ def get_entities_api(
         start_date: str | None = None,
         end_date: str | None = None,
         type_ids: list[int] | None = None,
-        case_study_ids: list[int] | None = None) \
+        case_study_ids: list[int] | None = None,
+        exclude_id: int | None = None) \
         -> tuple[list[dict[str, Any]], int]:
     conditions = ['e.openatlas_class_name = ANY(%(classes)s)']
     params: dict[str, Any] = {'classes': classes}
+
+    if exclude_id is not None:
+        conditions.append('e.id != %(exclude_id)s')
+        params['exclude_id'] = exclude_id
 
     if search_name:
         escaped = escape_like(search_name)
