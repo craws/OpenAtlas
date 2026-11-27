@@ -99,18 +99,33 @@ CSP_HEADER = "frame-ancestors 'self'"
 
 # ARCHE export
 ACDH = Namespace("https://vocabs.acdh.oeaw.ac.at/schema#")
+ACDHI = Namespace("https://id.acdh.oeaw.ac.at/")
 ARCHE_URI_RULES = \
     'https://raw.githubusercontent.com/acdh-oeaw/arche-assets' \
     '/refs/heads/master/AcdhArcheAssets/uriNormRules.json'
 ARCHE_METADATA = {
+    'projectAcronym': '',
     'topCollection': '',
+    'description': '',
     'language': 'en',
     'depositor': [],
     'acceptedDate': '',
+    'submissionDate': '',
     'hasMetadataCreator': [],
     'curator': [],
+    'editor': [],
+    'contact': [],
+    'owner': [],
+    'rightsHolder': [],
+    'licensor': [],
     'principalInvestigator': [],
     'relatedDiscipline': [],
+    'subject': [],
+    'licenseSummary': '',
+    'datasetLicense': 'https://creativecommons.org/licenses/by/4.0/',
+    'lifeCycleStatus':
+        'https://vocabs.acdh.oeaw.ac.at/archelifecyclestatus/completed',
+    'url': '',
     'typeIds': [],
     'excludeReferenceSystems': []}
 

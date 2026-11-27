@@ -15,16 +15,20 @@ from typing import Any, Optional, cast
 from flask import Response, g, url_for
 from rdflib import Graph
 
-from config.default import ACDH
+from config.default import ACDH, ACDHI
 from openatlas import app
 from openatlas.api.api_v04.endpoints.endpoint import Endpoint
-from openatlas.api.api_v1.util.files import get_license_url_mapping
-from openatlas.api.external.arche import add_arche_file_metadata_to_graph
-from openatlas.api.external.arche_class import ArcheFileMetadata
 from openatlas.api.api_v04.formats.rdf import rdf_export_to_file
 from openatlas.api.api_v04.resources.api_entity import ApiEntity
-from openatlas.api.api_v04.resources.util import \
-    filter_by_type, get_reference_systems
+from openatlas.api.api_v04.resources.util import (
+    filter_by_type, get_reference_systems)
+from openatlas.api.api_v1.util.files import get_license_url_mapping
+from openatlas.api.external.arche import (
+    add_arche_collection_to_graph, add_arche_file_metadata_to_graph,
+    add_arche_top_collection_to_graph)
+from openatlas.api.external.arche_class import (
+    ArcheCollection, ArcheFileMetadata, ArcheTopCollection, get_arche_slug,
+    get_arche_top_uri, normalize_extension, slugify_arche_segment)
 from openatlas.display.image_processing import get_binary_path
 from openatlas.models.entity import Entity
 
@@ -84,28 +88,30 @@ def sql_export(format_: str, postfix: Optional[str] = '') -> bool:
     return True
 
 
-def arche_export() -> bool:
+def arche_export() -> Path:
     external_metadata = app.config['ARCHE_METADATA']
     file_entities = Entity.get_by_class(['file'], types=True, aliases=True)
     type_ids = external_metadata.get('typeIds')
     if type_ids:
         file_entities = filter_by_type(file_entities, type_ids)
 
-    sorted_files = sort_files_by_types(
-        file_entities,
-        type_ids,
-        external_metadata['topCollection'])
+    license_urls = get_license_url_mapping()
+    sorted_files = sort_files_by_types(file_entities, type_ids, license_urls)
 
     files_by_extension: dict[str, dict[str, set[Path]]] = defaultdict(
         lambda: defaultdict(set))
-    for entity_id, path_set in sorted_files.items():
+    for type_slug, path_set in sorted_files.items():
         for f in path_set:
             ext = normalize_extension(f.suffix)
-            files_by_extension[entity_id][ext].add(f)
+            files_by_extension[type_slug][ext].add(f)
 
+    slug = get_arche_slug(external_metadata)
+    sql_filename = f'{slug}_database.sql' if slug else 'database.sql'
+    rdf_filename = f'{slug}_rdf.ttl' if slug else 'rdf.ttl'
+    metadata_filename = f'{slug}_metadata.ttl' if slug else 'metadata.ttl'
     archive_name = (
-        f'{current_date_for_filename()}_'
-        f'{external_metadata['topCollection'].replace(' ', '_')}.zip')
+        f'{current_date_for_filename()}_{slug}.zip'
+        if slug else f'{current_date_for_filename()}_arche.zip')
 
     arche_dir = app.config['ARCHE_PATH']
     arche_dir.mkdir(parents=True, exist_ok=True)
@@ -121,44 +127,48 @@ def arche_export() -> bool:
             failed_files_md,
             encoding='utf-8')
 
-        if file_entities:
-            files_arche_turtle = get_arche_file_turtle_graph(
-                file_entities,
-                set(type_ids) if type_ids else set(),
-                external_metadata['topCollection'])
-            (temp_path / 'files.ttl').write_text(
-                files_arche_turtle,
-                encoding='utf-8')
-
+        sql_dump_path = Path(open_tmp_sql_file())
+        rdf_dump_path = temp_path / rdf_filename
         rdf_dump = cast(Response, Endpoint(
             ApiEntity.get_by_system_classes(['all']),
             {'type_id': type_ids, 'limit': 0, 'format': 'turtle'}).resolve())
-        rdf_content = rdf_dump.get_data(as_text=True)
-        (temp_path / 'rdf_dump.ttl').write_text(rdf_content, encoding='utf-8')
+        rdf_dump_path.write_text(
+            rdf_dump.get_data(as_text=True),
+            encoding='utf-8')
+
+        metadata_ttl = get_arche_metadata_turtle(
+            file_entities,
+            set(type_ids) if type_ids else set(),
+            files_by_extension,
+            license_urls,
+            [
+                (sql_filename, sql_dump_path, 'Database SQL dump'),
+                (rdf_filename, rdf_dump_path, 'Database RDF dump')])
+        (temp_path / metadata_filename).write_text(
+            metadata_ttl,
+            encoding='utf-8')
 
         with zipfile.ZipFile(
                 tmp_archive_path,
                 'w',
                 compression=zipfile.ZIP_DEFLATED) as archive:
-            archive.write(open_tmp_sql_file(), arcname='data/database.sql')
+            archive.write(sql_dump_path, arcname=f'data/{sql_filename}')
             archive.write(
                 temp_path / 'problematic_files.md',
                 arcname='debug/problematic_files.md')
-            if file_entities:
-                archive.write(
-                    temp_path / 'files.ttl',
-                    arcname='metadata/files.ttl')
             archive.write(
-                temp_path / 'rdf_dump.ttl',
-                arcname='data/rdf_dump.ttl')
+                temp_path / metadata_filename,
+                arcname=f'metadata/{metadata_filename}')
+            archive.write(rdf_dump_path, arcname=f'data/{rdf_filename}')
 
-            for type_name, ext_map in files_by_extension.items():
+            for type_slug, ext_map in files_by_extension.items():
                 for ext, files_set in ext_map.items():
                     for file_path in files_set:
+                        arcname = (
+                            f'data/{type_slug}/{ext}/{file_path.name}'
+                            if type_slug else f'data/{ext}/{file_path.name}')
                         with file_path.open('rb') as file:
-                            archive.writestr(
-                                f'data/{type_name}/{ext}/{file_path.name}',
-                                file.read())
+                            archive.writestr(arcname, file.read())
 
             infos = archive.infolist()
             staged_size = sum(info.file_size for info in infos)
@@ -219,11 +229,6 @@ def create_failed_files_md(
     return text
 
 
-def normalize_extension(ext: str) -> str:
-    ext = ext.lower().lstrip('.')
-    return 'jpeg' if ext == 'jpg' else ext
-
-
 def get_place_and_actor_relations(
         entities: list[Entity]) -> dict[int, list[dict[str, Any]]]:
     linked_entities = Entity.get_links_of_entities(
@@ -268,6 +273,7 @@ def get_publications(
     linked_publications = Entity.get_links_of_entities(
         [e.id for e in entities],
         'P67',
+        classes=g.class_groups['reference']['classes'],
         inverse=True)
     publications: dict[int, list[tuple[Entity, str]]] = defaultdict(list)
     for link in linked_publications:
@@ -278,18 +284,25 @@ def get_publications(
 def sort_files_by_types(
         entities: list[Entity],
         type_ids: set[int] | list[int] | None,
-        top_collection: str) -> dict[str, set[Path]]:
-    files_by_types = defaultdict(set)
+        license_urls: dict[int, list[str]] | None = None) \
+        -> dict[str, set[Path]]:
+    files_by_types: dict[str, set[Path]] = defaultdict(set)
     for entity in entities:
-        if not g.files.get(entity.id) or not entity.standard_type:
+        file_path = g.files.get(entity.id)
+        if not file_path or not entity.standard_type:
+            continue
+        if license_urls is not None and not license_urls.get(
+                entity.standard_type.id):
             continue
         if type_ids:
             for type_ in entity.types:
                 if type_.id in type_ids:
-                    type_name = g.types[type_.id].name.replace(' ', '_')
-                    files_by_types[type_name].add(g.files.get(entity.id))
+                    type_slug = (
+                        slugify_arche_segment(g.types[type_.id].name)
+                        or str(type_.id))
+                    files_by_types[type_slug].add(file_path)
         else:
-            files_by_types[top_collection].add(g.files.get(entity.id))
+            files_by_types[''].add(file_path)
     return dict(files_by_types)
 
 
@@ -315,7 +328,7 @@ def create_checksum_manifest(
 
     infos = sorted(archive.infolist(), key=operator.attrgetter('filename'))
 
-    for a, b in zip(infos, infos[1:]):
+    for a, b in zip(infos, infos[1:], strict=False):
         if a.filename == b.filename:  # pragma: no cover
             raise ValueError(f'Duplicate ZIP member name: {a.filename}')
 
@@ -356,25 +369,123 @@ def check_files_for_arche(
     return dict(missing)
 
 
-def get_arche_file_turtle_graph(
+def _format_extent(counts: dict[str, int]) -> str:
+    return ', '.join(
+        f'{count} {ext.upper()}' for ext, count in sorted(counts.items()))
+
+
+def _build_arche_collections(
+        type_ids: set[int] | list[int] | None,
+        files_by_extension: dict[str, dict[str, set[Path]]],
+        type_titles: dict[str, str],
+        license_summary: str) -> list[ArcheCollection]:
+    top_uri = get_arche_top_uri(app.config['ARCHE_METADATA'])
+    collections: list[ArcheCollection] = []
+    for type_slug, ext_map in sorted(files_by_extension.items()):
+        parent_uri = top_uri
+        if type_ids and type_slug:
+            type_counts = {
+                ext: len(paths) for ext, paths in ext_map.items()}
+            type_uri = f'{top_uri}/{type_slug}'
+            collections.append(ArcheCollection.construct(
+                uri=type_uri,
+                is_part_of=top_uri,
+                filename=type_slug,
+                title=type_titles.get(type_slug, type_slug),
+                extent=_format_extent(type_counts),
+                license_summary=license_summary))
+            parent_uri = type_uri
+        for ext, paths in sorted(ext_map.items()):
+            collections.append(ArcheCollection.construct(
+                uri=f'{parent_uri}/{ext}',
+                is_part_of=parent_uri,
+                filename=ext,
+                title=ext.upper(),
+                extent=f'{len(paths)} {ext.upper()}',
+                license_summary=license_summary))
+    return collections
+
+
+def get_arche_metadata_turtle(
         entities: list[Entity],
         type_ids: set[int] | list[int] | None,
-        top_collection: str) -> str:
+        files_by_extension: dict[str, dict[str, set[Path]]],
+        license_urls: dict[int, list[str]],
+        dump_files: list[tuple[str, Path, str]]) -> str:
+    graph = Graph()
+    graph.bind('acdh', ACDH)
+    graph.bind('acdhi', ACDHI)
+    emitted: set[str] = set()
+
+    total_counts: dict[str, int] = defaultdict(int)
+    for ext_map in files_by_extension.values():
+        for ext, paths in ext_map.items():
+            total_counts[ext] += len(paths)
+    for _name, path, _title in dump_files:
+        total_counts[normalize_extension(path.suffix)] += 1
+
+    license_names = sorted({
+        e.standard_type.name
+        for e in entities
+        if g.files.get(e.id)
+        and e.standard_type
+        and license_urls.get(e.standard_type.id)})
+    license_summary = ', '.join(license_names) or 'See individual resources'
+    type_titles = {
+        slugify_arche_segment(g.types[id_].name) or str(id_):
+            g.types[id_].name
+        for id_ in (type_ids or [])
+        if id_ in g.types}
+
+    top = ArcheTopCollection.construct(
+        _format_extent(total_counts),
+        license_summary)
+    add_arche_top_collection_to_graph(graph, top, emitted)
+
+    for collection in _build_arche_collections(
+            type_ids,
+            files_by_extension,
+            type_titles,
+            license_summary):
+        add_arche_collection_to_graph(graph, collection, emitted)
+
+    for dump_name, dump_path, dump_title in dump_files:
+        add_arche_file_metadata_to_graph(
+            graph,
+            ArcheFileMetadata.construct_dump(dump_name, dump_path, dump_title),
+            emitted)
+
+    for metadata_obj in get_arche_file_metadata(
+            entities,
+            type_ids,
+            license_urls):
+        add_arche_file_metadata_to_graph(graph, metadata_obj, emitted)
+
+    return graph.serialize(format="turtle")
+
+
+def get_arche_file_turtle_graph(
+        entities: list[Entity],
+        type_ids: set[int] | list[int] | None) -> str:
     graph = Graph()
     graph.bind("acdh", ACDH)
-    metadata = get_arche_file_metadata(entities, type_ids, top_collection)
+    graph.bind("acdhi", ACDHI)
+    emitted: set[str] = set()
+    metadata = get_arche_file_metadata(entities, type_ids)
     for metadata_obj in metadata:
-        add_arche_file_metadata_to_graph(graph, metadata_obj)
+        add_arche_file_metadata_to_graph(graph, metadata_obj, emitted)
     return graph.serialize(format="turtle")
 
 
 def get_arche_file_metadata(
         entities: list[Entity],
         type_ids: set[int] | list[int] | None,
-        top_collection: str) -> list[ArcheFileMetadata]:
+        license_urls: dict[int, list[str]] | None = None) \
+        -> list[ArcheFileMetadata]:
     publications = get_publications(entities)
     relations = get_place_and_actor_relations(entities)
-    license_urls = get_license_url_mapping()
+    if license_urls is None:
+        license_urls = get_license_url_mapping()
     arche_metadata_list = []
     for entity in entities:
         if not g.files.get(entity.id):
@@ -389,11 +500,13 @@ def get_arche_file_metadata(
         if type_ids:
             for type_ in entity.types:
                 if type_.id in type_ids:
-                    type_name = g.types[type_.id].name.replace(' ', '_')
+                    type_slug = (
+                        slugify_arche_segment(g.types[type_.id].name)
+                        or str(type_.id))
                     arche_metadata_list.append(
                         ArcheFileMetadata.construct(
                             entity,
-                            type_name,
+                            type_slug,
                             relations.get(entity.id, []),
                             publications.get(entity.id, []),
                             license_url_list))
@@ -401,7 +514,7 @@ def get_arche_file_metadata(
             arche_metadata_list.append(
                 ArcheFileMetadata.construct(
                     entity,
-                    top_collection,
+                    None,
                     relations.get(entity.id, []),
                     publications.get(entity.id, []),
                     license_url_list))

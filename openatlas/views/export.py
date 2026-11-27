@@ -94,17 +94,30 @@ def export_sql() -> str:
 def export_arche() -> str:
     metadata = app.config['ARCHE_METADATA']
     info_content = {
+        'projectAcronym': metadata.get('projectAcronym'),
         'topCollection': metadata.get('topCollection'),
+        'description': metadata.get('description'),
         'language': metadata.get('language'),
         'depositor': ', '.join(metadata.get('depositor', [])),
         'acceptedDate': metadata.get('acceptedDate'),
+        'submissionDate': metadata.get('submissionDate'),
         'curator': ', '.join(metadata.get('curator', [])),
+        'editor': ', '.join(metadata.get('editor', [])),
+        'contact': ', '.join(metadata.get('contact', [])),
+        'owner': ', '.join(metadata.get('owner', [])),
+        'rightsHolder': ', '.join(metadata.get('rightsHolder', [])),
+        'licensor': ', '.join(metadata.get('licensor', [])),
         'principalInvestigator':
             ', '.join(metadata.get('principalInvestigator', [])),
         'hasMetadataCreator':
             ', '.join(metadata.get('hasMetadataCreator', [])),
         'relatedDiscipline': ', '.join(
             metadata.get('relatedDiscipline', [])),
+        'subject': ', '.join(metadata.get('subject', [])),
+        'licenseSummary': metadata.get('licenseSummary'),
+        'datasetLicense': metadata.get('datasetLicense'),
+        'lifeCycleStatus': metadata.get('lifeCycleStatus'),
+        'url': metadata.get('url'),
         'excludeReferenceSystems':
             ', '.join(metadata.get('excludeReferenceSystems', [])),
         'typeIds':

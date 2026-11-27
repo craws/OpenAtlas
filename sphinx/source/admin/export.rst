@@ -144,7 +144,9 @@ Here is an example configuration:
 .. code-block:: python
 
     ARCHE_METADATA = {
+        'projectAcronym': 'oa_collection',
         'topCollection': 'OpenAtlas collection',
+        'description': 'Collection description',
         'language': 'en',
         'depositor': [
             'Jane Doe',
@@ -153,6 +155,7 @@ Here is an example configuration:
             'https://d-nb.info/gnd/123456789'
         ],
         'acceptedDate': "2024-01-01",
+        'submissionDate': "2024-01-01",
         'hasMetadataCreator': [
             'https://orcid.org/0000-0000-0000-1111',
             'https://orcid.org/0000-0000-0000-0000',
@@ -164,6 +167,11 @@ Here is an example configuration:
             'https://d-nb.info/gnd/123456789',
             'Jane Doe'
         ],
+        'editor': ['Jane Doe'],
+        'contact': ['Jane Doe'],
+        'owner': ['https://d-nb.info/gnd/123456789'],
+        'rightsHolder': ['https://d-nb.info/gnd/123456789'],
+        'licensor': ['https://d-nb.info/gnd/123456789'],
         'principalInvestigator': [
             'Researcher A',
             'Researcher B',
@@ -173,10 +181,16 @@ Here is an example configuration:
             'https://vocabs.acdh.oeaw.ac.at/oefosdisciplines/601003',
             'https://vocabs.acdh.oeaw.ac.at/oefosdisciplines/602001'
         ],
+        'subject': ['Archaeology', 'Cultural Heritage'],
+        'licenseSummary': 'CC BY 4.0',
+        'datasetLicense': 'https://creativecommons.org/licenses/by/4.0/',
+        'lifeCycleStatus':
+            'https://vocabs.acdh.oeaw.ac.at/archelifecyclestatus/completed',
+        'url': '',
         'typeIds': [
             1234, 4567, 87656, 3252, 234
         ],
-        'exclude_reference_systems': [
+        'excludeReferenceSystems': [
             'Internal catalogue', 'Inventory numbers'
         ]
     }
@@ -194,16 +208,30 @@ Description of fields
    or a **plain name**. Use persistent identifiers whenever possible for
    better interoperability.
 
-* ``topCollection``: ARCHE top-level collection identifier
-  (usually provided in coordination with the ARCHE team)
-* ``language``: Language code of the metadata (e.g. ``'en'``)
-* ``depositor``: List of persons responsible for the deposit
+* ``projectAcronym`` *(optional)*: Short lowercase project slug used for
+  URIs, ZIP filename, ``<slug>_database.sql``, ``<slug>_rdf.ttl``, and
+  ``metadata/<slug>_metadata.ttl`` (falls back to ``topCollection``)
+* ``topCollection``: Human-readable title of the ARCHE top-level collection
+* ``description`` *(optional)*: Description of the top-level collection
+* ``language``: Language code or ACDH language URI (e.g. ``'en'``)
+* ``depositor``: List of persons/organisations responsible for the deposit
 * ``acceptedDate``: ISO date string of when the data was accepted for deposit
+* ``submissionDate`` *(optional)*: ISO date string of submission
 * ``hasMetadataCreator``: List of people responsible for the ARCHE metadata
 * ``curator``: List of ARCHE curators
+* ``editor`` *(optional)*: List of collection editors
+* ``contact`` *(optional)*: List of contact persons or organisations
+* ``owner`` *(optional)*: List of resource owners
+* ``rightsHolder`` *(optional)*: Default rights holders for collections/dumps
+* ``licensor`` *(optional)*: Default licensors for collections/dumps
 * ``principalInvestigator``: List of principal investigators for this project
 * ``relatedDiscipline``: URLs to vocabularies defining the
   `related disciplines <https://vocabs.acdh.oeaw.ac.at/oefos/en/>`_
+* ``subject`` *(optional)*: List of subject keywords for the top collection
+* ``licenseSummary`` *(optional)*: License summary for collections
+* ``datasetLicense`` *(optional)*: License URI for SQL and RDF dump files
+* ``lifeCycleStatus`` *(optional)*: ACDH life-cycle status URI
+* ``url`` *(optional)*: External project URL for the top collection
 * ``typeIds`` *(optional)*: Restrict exported files to those linked
   with specific type IDs
 * ``excludeReferenceSystems`` *(optional)*: List of reference system
@@ -211,5 +239,5 @@ Description of fields
 
 .. note::
 
-   If ``typeIds`` or ``exclude_reference_systems`` are empty, all files
+   If ``typeIds`` or ``excludeReferenceSystems`` are empty, all files
    and reference systems are considered.
