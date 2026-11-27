@@ -7,12 +7,13 @@ from werkzeug.wrappers import Response
 from openatlas import app
 from openatlas.api.api_v1.error_handlers import register_error_handlers
 from openatlas.api.api_v1.models.files import (
-    EntityFilesPath, FileIdPath, PublicFileOverviewResponse,
-    PublicFilesQuery)
+    EntityFilesPath, FileIdPath, OverlayFilesResponse,
+    PublicFileOverviewResponse, PublicFilesQuery)
 from openatlas.api.api_v1.models.util import DownloadQuery
 from openatlas.api.api_v1.openapi_tags import file_tag
 from openatlas.api.api_v1.responses.files import (
-    display_file_response, public_files_response, thumbnail_response)
+    display_file_response, overlay_files_response, public_files_response,
+    thumbnail_response)
 from openatlas.api.api_v1.util.files import (
     check_file_access, get_file_entity, get_file_item, get_file_path,
     get_iiif_redirect_url, get_mime_type, get_public_share_yes_id,
@@ -105,8 +106,8 @@ def get_public_files_response(
     rows, total = get_public_files_api(
         get_valid_license_ids(),
         get_public_share_yes_id(),
-        query.limit,
-        (query.page - 1) * query.limit,
+        limit=query.limit,
+        offset=(query.page - 1) * query.limit,
         entity_id=entity_id)
     entities = [Entity(row) for row in rows]
     entity_ids = [entity.id for entity in entities]
@@ -149,3 +150,27 @@ def get_public_files_by_entity(
         query,
         entity_id=path.id,
         id=path.id)
+
+
+@api_v1_files.get(
+    '/overlays',
+    summary="Get files with map overlays",
+    tags=[file_tag],
+    responses=overlay_files_response)  # type: ignore[arg-type]
+def get_overlay_files() -> dict[str, Any]:
+    """Retrieves all publicly shareable, licensed files that have a map
+    overlay."""
+    rows, _ = get_public_files_api(
+        get_valid_license_ids(),
+        get_public_share_yes_id(),
+        overlays_only=True)
+    entities = [Entity(row) for row in rows]
+    bounds = resolve_overlay_bounds([entity.id for entity in entities])
+    valid_entities = [
+        entity for entity in entities if bounds.get(entity.id) is not None]
+    valid_ids = [entity.id for entity in valid_entities]
+    resolve_file_paths(valid_ids)
+    resolve_rights_holders(valid_ids)
+    return OverlayFilesResponse(
+        data=[get_file_item(entity) for entity in valid_entities]
+    ).model_dump(by_alias=True)

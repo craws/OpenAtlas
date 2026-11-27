@@ -101,6 +101,12 @@ class PublicFileOverviewResponse(BaseSchema):
     last: str = Field(description="URL to the last page of results.")
 
 
+class OverlayFilesResponse(BaseSchema):
+    data: list[FileItem] = Field(
+        description="List of publicly shareable, licensed files "
+                    "with a map overlay.")
+
+
 class FileIdPath(BaseSchema):
     id: int = Field(description="The ID of the file.")
 

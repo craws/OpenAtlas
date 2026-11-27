@@ -1,9 +1,11 @@
 from http import HTTPStatus
 
-from openatlas.api.api_v1.models.files import PublicFileOverviewResponse
+from openatlas.api.api_v1.models.files import (
+    OverlayFilesResponse, PublicFileOverviewResponse)
 from openatlas.api.api_v1.models.util import ErrorResponse
 
 public_files_response = {HTTPStatus.OK: PublicFileOverviewResponse}
+overlay_files_response = {HTTPStatus.OK: OverlayFilesResponse}
 
 display_file_response = {
     HTTPStatus.OK: {

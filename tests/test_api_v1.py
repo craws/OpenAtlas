@@ -569,6 +569,12 @@ class ApiV1(ApiTestCase):
         assert rv.get_json()['data'] == []
         assert rv.get_json()['totalItems'] == 0
 
+        rv = c.get(url_for('api_v1_files.get_overlay_files'))
+        assert rv.status_code == HTTPStatus.OK
+        overlay_json = rv.get_json()
+        assert list(overlay_json.keys()) == ['data']
+        assert e.logo.id not in [item['id'] for item in overlay_json['data']]
+
     def test_iiif(self) -> None:
         c = self.client
         self.upload_logo()

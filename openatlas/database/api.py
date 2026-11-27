@@ -92,9 +92,11 @@ def execute_paginated_entities(
 def get_public_files_api(
         license_ids: set[int],
         public_share_id: int | None,
-        limit: int,
-        offset: int,
-        entity_id: int | None = None) -> tuple[list[dict[str, Any]], int]:
+        *,
+        limit: int | None = None,
+        offset: int | None = None,
+        entity_id: int | None = None,
+        overlays_only: bool = False) -> tuple[list[dict[str, Any]], int]:
     if not license_ids or public_share_id is None:
         return [], 0  # pragma: no cover
 
@@ -120,6 +122,10 @@ def get_public_files_api(
               AND l.property_code = 'P67'
               AND l.range_id = %(entity_id)s)""")
         params['entity_id'] = entity_id
+    if overlays_only:
+        conditions.append("""EXISTS (
+            SELECT 1 FROM web.map_overlay o
+            WHERE o.image_id = e.id)""")
 
     return execute_paginated_entities(
         conditions,
