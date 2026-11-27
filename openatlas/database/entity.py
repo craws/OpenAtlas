@@ -408,6 +408,8 @@ def get_links_of_entities(
         codes: str | list[str] | None,
         classes: list[str] | None,
         inverse: bool = False) -> list[dict[str, Any]]:
+    if not ids:  # pragma: no cover
+        return []
     sql = f"""
         SELECT
             l.id,

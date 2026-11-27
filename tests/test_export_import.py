@@ -34,7 +34,7 @@ class ImportTest(ImportTestCase):
         assert b'Export SQL' in c.get(url_for('export_sql')).data
 
         date_ = current_date_for_filename()
-        rv: Any = c.get(
+        rv: Any = c.post(
             url_for('export_execute', format_='sql'),
             follow_redirects=True)
         assert b'Data was exported' in rv.data
@@ -47,7 +47,7 @@ class ImportTest(ImportTestCase):
             assert b'7z' in rv.data
 
         date_ = current_date_for_filename()
-        rv = c.get(
+        rv = c.post(
             url_for('export_execute', format_='dump'),
             follow_redirects=True)
         assert b'Data was exported' in rv.data
@@ -340,7 +340,7 @@ class ImportTest(ImportTestCase):
             follow_redirects=True)
         assert b'Project deleted' in rv.data
 
-        rv = c.get(
+        rv = c.post(
             url_for(
                 'delete_export',
                 view='sql',
@@ -348,7 +348,7 @@ class ImportTest(ImportTestCase):
             follow_redirects=True)
         assert b'File deleted' in rv.data
 
-        rv = c.get(
+        rv = c.post(
             url_for(
                 'delete_export',
                 view='sql',
@@ -356,7 +356,7 @@ class ImportTest(ImportTestCase):
             follow_redirects=True)
         assert b'File deleted' in rv.data
 
-        rv = c.get(
+        rv = c.post(
             url_for(
                 'delete_export',
                 view='sql',

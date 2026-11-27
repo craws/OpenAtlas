@@ -192,8 +192,9 @@ def create_invalid_config_md(
     return text
 
 
-def arche_export() -> Path:
-    external_metadata = app.config['ARCHE_METADATA']
+def prepare_arche_files(
+        external_metadata: dict[str, Any]) \
+        -> tuple[list[Entity], list[int], list[Any], list[Any]]:
     file_entities = Entity.get_by_class(['file'], types=True, aliases=True)
     case_study_ids, invalid_case_study_ids = validate_case_study_ids(
         external_metadata.get('caseStudyIds'))
@@ -216,19 +217,106 @@ def arche_export() -> Path:
         file_entities = exclude_files_by_license(
             file_entities,
             exclude_license_ids)
+    return (
+        file_entities,
+        case_study_ids,
+        invalid_case_study_ids,
+        invalid_license_ids)
+
+
+def group_files_by_extension(
+        sorted_files: dict[str, set[Path]]) \
+        -> dict[str, dict[str, set[Path]]]:
+    files_by_extension: dict[str, dict[str, set[Path]]] = defaultdict(
+        lambda: defaultdict(set))
+    for type_slug, path_set in sorted_files.items():
+        for file_path in path_set:
+            ext = normalize_extension(file_path.suffix)
+            files_by_extension[type_slug][ext].add(file_path)
+    return files_by_extension
+
+
+def write_arche_media_files(
+        archive: zipfile.ZipFile,
+        files_by_extension: dict[str, dict[str, set[Path]]],
+        checksums: dict[str, str]) -> None:
+    for type_slug, ext_map in files_by_extension.items():
+        for ext, files_set in ext_map.items():
+            compress_type = (
+                zipfile.ZIP_STORED
+                if ext in ALREADY_COMPRESSED_EXTENSIONS
+                else zipfile.ZIP_DEFLATED)
+            for file_path in files_set:
+                arcname = (
+                    f'data/{type_slug}/{ext}/{file_path.name}'
+                    if type_slug else f'data/{ext}/{file_path.name}')
+                try:
+                    write_file_to_archive(
+                        archive,
+                        file_path,
+                        arcname,
+                        checksums,
+                        compress_type=compress_type)
+                except OSError as e:  # pragma: no cover
+                    g.logger.log(
+                        'warn',
+                        'file',
+                        f'Skipped unreadable ARCHE file {file_path}: {e}')
+
+
+def build_archive_statistics_md(archive: zipfile.ZipFile) -> str:
+    infos = archive.infolist()
+    staged_size = sum(info.file_size for info in infos)
+    manifest_member_names = ['debug/file_statistic.md'] + [
+        info.filename for info in infos if not info.is_dir()]
+    manifest_size = sum(
+        len(format_checksum_line(name, '0' * 64).encode('utf-8'))
+        for name in manifest_member_names)
+
+    all_entries = ['debug/file_statistic.md', 'checksums.sha256'] + [
+        info.filename for info in infos]
+    all_dirs: set[Path] = set()
+    for entry_name in all_entries:
+        all_dirs.update(Path(entry_name).parents)
+    all_dirs.discard(Path('.'))
+
+    total_entries = len(all_entries)
+    total_files = sum(
+        1 for name in all_entries if not name.endswith('/'))
+    total_dirs = len(all_dirs)
+
+    base_size = staged_size + manifest_size
+    total_size = base_size
+    stat_md = ''
+    for _ in range(10):
+        stat_md = (
+            f'# Archive Statistics\n'
+            f'- **Total size**: {total_size} bytes\n'
+            f'- **Total entries**: {total_entries}\n'
+            f'- **Files**: {total_files}\n'
+            f'- **Directories**: {total_dirs}\n')
+        stat_size = len(stat_md.encode('utf-8'))
+        new_total_size = base_size + stat_size
+        if new_total_size == total_size:
+            break
+        total_size = new_total_size
+    return stat_md
+
+
+def arche_export() -> Path:
+    external_metadata = app.config['ARCHE_METADATA']
+    (
+        file_entities,
+        case_study_ids,
+        invalid_case_study_ids,
+        invalid_license_ids) = prepare_arche_files(external_metadata)
 
     license_urls = get_license_url_mapping()
     sorted_files = sort_files_by_types(
         file_entities,
         case_study_ids,
         license_urls)
-
-    files_by_extension: dict[str, dict[str, set[Path]]] = defaultdict(
-        lambda: defaultdict(set))
-    for type_slug, path_set in sorted_files.items():
-        for f in path_set:
-            ext = normalize_extension(f.suffix)
-            files_by_extension[type_slug][ext].add(f)
+    files_by_extension = group_files_by_extension(sorted_files)
 
     slug = get_arche_slug(external_metadata)
     sql_filename = f'{slug}_database.sql' if slug else 'database.sql'
@@ -251,9 +339,8 @@ def arche_export() -> Path:
             + create_invalid_config_md(
                 invalid_case_study_ids,
                 invalid_license_ids))
-        failed_files_md = "\n".join(problematic_lines)
         (temp_path / 'problematic_files.md').write_text(
-            failed_files_md,
+            "\n".join(problematic_lines),
             encoding='utf-8')
 
         sql_dump_path = write_tmp_sql_file(temp_path / sql_filename)
@@ -305,63 +392,9 @@ def arche_export() -> Path:
                 rdf_dump_path,
                 f'data/{rdf_filename}',
                 checksums)
+            write_arche_media_files(archive, files_by_extension, checksums)
 
-            for type_slug, ext_map in files_by_extension.items():
-                for ext, files_set in ext_map.items():
-                    compress_type = (
-                        zipfile.ZIP_STORED
-                        if ext in ALREADY_COMPRESSED_EXTENSIONS
-                        else zipfile.ZIP_DEFLATED)
-                    for file_path in files_set:
-                        arcname = (
-                            f'data/{type_slug}/{ext}/{file_path.name}'
-                            if type_slug else f'data/{ext}/{file_path.name}')
-                        write_file_to_archive(
-                            archive,
-                            file_path,
-                            arcname,
-                            checksums,
-                            compress_type=compress_type)
-
-            infos = archive.infolist()
-            staged_size = sum(info.file_size for info in infos)
-            manifest_member_names = ['debug/file_statistic.md'] + [
-                info.filename for info in infos if not info.is_dir()]
-
-            manifest_size = 0
-            for name in manifest_member_names:
-                manifest_size += len(
-                    format_checksum_line(name, '0' * 64).encode('utf-8'))
-
-            all_entries = ['debug/file_statistic.md', 'checksums.sha256'] + [
-                info.filename for info in infos]
-            all_dirs: set[Path] = set()
-            for entry_name in all_entries:
-                all_dirs.update(Path(entry_name).parents)
-            all_dirs.discard(Path('.'))
-
-            total_entries = len(all_entries)
-            total_files = sum(
-                1 for name in all_entries if not name.endswith('/'))
-            total_dirs = len(all_dirs)
-
-            base_size = staged_size + manifest_size
-            total_size = base_size
-            stat_md = ''
-            for _ in range(10):
-                stat_md = (
-                    f'# Archive Statistics\n'
-                    f'- **Total size**: {total_size} bytes\n'
-                    f'- **Total entries**: {total_entries}\n'
-                    f'- **Files**: {total_files}\n'
-                    f'- **Directories**: {total_dirs}\n')
-                stat_size = len(stat_md.encode('utf-8'))
-                new_total_size = base_size + stat_size
-                if new_total_size == total_size:
-                    break
-                total_size = new_total_size
-
-            stat_bytes = stat_md.encode('utf-8')
+            stat_bytes = build_archive_statistics_md(archive).encode('utf-8')
             checksums['debug/file_statistic.md'] = hashlib.sha256(
                 stat_bytes).hexdigest()
             archive.writestr('debug/file_statistic.md', stat_bytes)

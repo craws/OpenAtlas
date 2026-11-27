@@ -6,8 +6,8 @@ from flask import g, url_for
 
 from openatlas import app
 from openatlas.api.api_v04.resources.api_entity import ApiEntity
-from openatlas.models.export import (
-    current_date_for_filename)
+from openatlas.models.arche_worker import get_status_path
+from openatlas.models.export import current_date_for_filename
 from tests.base import ImportTestCase, get_hierarchy
 
 
@@ -17,7 +17,7 @@ class ImportTest(ImportTestCase):
         assert b'Export SQL' in c.get(url_for('export_sql')).data
 
         date_ = current_date_for_filename()
-        rv: Any = c.get(
+        rv: Any = c.post(
             url_for('export_execute', format_='sql'),
             follow_redirects=True)
         assert b'Data was exported' in rv.data
@@ -29,7 +29,7 @@ class ImportTest(ImportTestCase):
                     filename=f'{date_}_export.sql.7z')) as rv:
             assert b'7z' in rv.data
 
-        rv = c.get(
+        rv = c.post(
             url_for('export_execute', format_='dump'),
             follow_redirects=True)
         assert b'Data was exported' in rv.data
@@ -41,7 +41,7 @@ class ImportTest(ImportTestCase):
                     filename=f'{date_}_export.dump.7z')) as rv:
             assert b'7z' in rv.data
 
-        rv = c.get(
+        rv = c.post(
             url_for(
                 'delete_export',
                 view='sql',
@@ -49,7 +49,7 @@ class ImportTest(ImportTestCase):
             follow_redirects=True)
         assert b'File deleted' in rv.data
 
-        rv = c.get(
+        rv = c.post(
             url_for(
                 'delete_export',
                 view='sql',
@@ -57,7 +57,7 @@ class ImportTest(ImportTestCase):
             follow_redirects=True)
         assert b'File deleted' in rv.data
 
-        rv = c.get(
+        rv = c.post(
             url_for('delete_export', view='sql', filename='non_existing'),
             follow_redirects=True)
         assert b'An error occurred when trying to delete the f' in rv.data
@@ -131,18 +131,20 @@ class ImportTest(ImportTestCase):
         shutil.copy(openatlas_logo_path, file_with_license_path)
         shutil.copy(logo_path / '422.jpg', file_not_public_path)
 
-        with c.get(url_for('arche_execute'), follow_redirects=True) as rv:
+        with c.post(url_for('arche_execute'), follow_redirects=True) as rv:
             assert b'Data was exported' in rv.data
+        first_filename = c.get(
+            url_for('arche_export_status')).get_json()['filename']
+        (app.config['ARCHE_PATH'] / first_filename).unlink(missing_ok=True)
 
-        # Run ARCHE export again with typeIds and without GeoNames
-        app.config['ARCHE_METADATA']['typeIds'] = [case_study.id]
+        # Run ARCHE export again with caseStudyIds and without GeoNames
+        app.config['ARCHE_METADATA']['caseStudyIds'] = [case_study.id]
         app.config['ARCHE_METADATA']['excludeReferenceSystems'] = ['GeoNames']
-        with c.get(url_for('arche_execute'), follow_redirects=True) as rv:
+        with c.post(url_for('arche_execute'), follow_redirects=True) as rv:
             assert b'Data was exported' in rv.data
 
-        date_ = current_date_for_filename()
-        collection_name = app.config["ARCHE_METADATA"]["topCollection"]
-        filename = f'{date_}_{collection_name.replace(" ", "_")}.zip'
+        filename = c.get(
+            url_for('arche_export_status')).get_json()['filename']
         with c.get(
                 url_for(
                     'download_export',
@@ -150,7 +152,7 @@ class ImportTest(ImportTestCase):
                     filename=filename)) as rv:
             assert b'PK' in rv.data
 
-        with c.get(
+        with c.post(
                 url_for('delete_export', view='arche', filename=filename),
                 follow_redirects=True) as rv_:
             assert b'File deleted' in rv_.data
@@ -162,10 +164,11 @@ class ImportTest(ImportTestCase):
 
         assert b'Export RDF/NT' in c.get(url_for('export_rdf')).data
 
-        with c.get(url_for('rdf_execute'), follow_redirects=True) as rv_:
+        date_ = current_date_for_filename()
+        with c.post(url_for('rdf_execute'), follow_redirects=True) as rv_:
             assert b'Data was exported' in rv_.data
 
-        with c.get(
+        with c.post(
                 url_for(
                     'delete_export',
                     view='rdf',
@@ -173,6 +176,9 @@ class ImportTest(ImportTestCase):
                 follow_redirects=True) as rv_:
             assert b'File deleted' in rv_.data
 
+        app.config['ARCHE_METADATA']['caseStudyIds'] = []
+        app.config['ARCHE_METADATA']['excludeReferenceSystems'] = []
+        get_status_path().unlink(missing_ok=True)
         openatlas_logo_path.unlink()
         file_without_license_path.unlink()
         file_with_license_path.unlink()
