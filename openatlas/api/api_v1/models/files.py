@@ -57,9 +57,15 @@ class FileItem(BaseSchema):
         examples=["https://example.org/iiif/image/123"])
     bounds: list[list[float]] | None = Field(
         default=None,
-        description="Leaflet image bounds in the form "
-                    "[[lat_sw, lon_sw], [lat_ne, lon_ne]].",
-        examples=[[[48.58653, 15.64356], [48.58709, 15.64294]]])
+        description="Leaflet rotated image overlay bounds as three "
+                    "[lat, lon] corner coordinates in the form "
+                    "[[top_left_lat, top_left_lon], "
+                    "[top_right_lat, top_right_lon], "
+                    "[bottom_left_lat, bottom_left_lon]].",
+        examples=[[
+            [48.791618385483204, 15.505868280413463],
+            [48.791630290810446, 15.5147623351736],
+            [48.78714630103536, 15.505882388158021]]])
     inherited_from: int | None = Field(
         default=None,
         description="The ID of the parent entity in the archaeological "

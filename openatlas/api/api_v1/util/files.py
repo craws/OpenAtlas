@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import mimetypes
 import os
 from collections import defaultdict
@@ -17,9 +18,11 @@ from openatlas.api.api_v1.error_handlers import (
     abort_id_not_a_file)
 from openatlas.api.api_v1.models.agent import AgentItem
 from openatlas.api.api_v1.models.files import FileItem, LicenseItem
+from openatlas.database import overlay as db_overlay
 from openatlas.display.image_processing import check_iiif_activation
 from openatlas.display.util2 import convert_size
 from openatlas.models.entity import Entity
+from openatlas.models.overlay import Overlay
 from openatlas.models.rights_holder import RightsHolder
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -212,6 +215,50 @@ def resolve_rights_holders(
     return {id_: cache[id_] for id_ in ids}
 
 
+def get_overlay_corners(bounding_box: Any) -> list[list[float]] | None:
+    try:
+        coordinates = (
+            ast.literal_eval(bounding_box)
+            if isinstance(bounding_box, str) else bounding_box)
+        points = [(float(lat), float(lon)) for lat, lon in coordinates]
+    except (SyntaxError, TypeError, ValueError):
+        return None
+    corners: list[tuple[float, float]] | None = None
+    match points:
+        case [(lat_a, lon_a), (lat_b, lon_b)]:  # Legacy bounds, any order
+            north, south = max(lat_a, lat_b), min(lat_a, lat_b)
+            west, east = min(lon_a, lon_b), max(lon_a, lon_b)
+            corners = [(north, west), (north, east), (south, west)]
+        case [_, _, _]:  # Top left, top right, bottom left
+            corners = points
+    if corners and Overlay.is_valid_corners(
+            [(lon, lat) for lat, lon in corners]):
+        return [[lat, lon] for lat, lon in corners]
+    return None
+
+
+def resolve_overlay_bounds(
+        ids: Iterable[int],
+        lon_lat: bool = False) -> dict[int, list[list[float]] | None]:
+    if not hasattr(g, 'api_overlay_bounds'):
+        g.api_overlay_bounds = {}  # pragma: no cover
+    cache: dict[int, list[list[float]] | None] = g.api_overlay_bounds
+    ids = set(ids)
+    if missing := [id_ for id_ in ids if id_ not in cache]:
+        overlays = {
+            row['image_id']: get_overlay_corners(row['bounding_box'])
+            for row in db_overlay.get_by_object(missing)}
+        for id_ in missing:
+            cache[id_] = overlays.get(id_)
+    if lon_lat:
+        return {
+            id_: (
+                [[lon, lat] for lat, lon in bounds]
+                if (bounds := cache[id_]) else None)
+            for id_ in ids}
+    return {id_: cache[id_] for id_ in ids}
+
+
 def prefetch_files(links_data: dict[int, EntityLinks]) -> None:
     file_ids = set()
     for item in links_data.values():
@@ -224,6 +271,7 @@ def prefetch_files(links_data: dict[int, EntityLinks]) -> None:
     if file_ids:
         resolve_file_paths(file_ids)
         resolve_rights_holders(file_ids)
+        resolve_overlay_bounds(file_ids)
 
 
 def get_display_extensions() -> list[str]:
@@ -277,6 +325,7 @@ def get_file_item(entity: Entity) -> FileItem:
             'api_v1_files.display_thumbnail', id=entity.id, _external=True),
         iiif_manifest_url=iiif['IIIFManifest'] or None,
         iiif_base_url=iiif['IIIFBasePath'] or None,
+        bounds=resolve_overlay_bounds([entity.id])[entity.id],
         creators=[get_agent_item(rh) for rh in rights['creator']],
         license_holders=[
             get_agent_item(rh) for rh in rights['license_holder']])

@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from typing import Any
 
-from flask import g, url_for
+from flask import url_for
 from rdflib import Dataset, RDF, URIRef
 
 from openatlas import app
@@ -9,8 +9,7 @@ from openatlas.api.api_v1.formatters.la_formatter import format_la_entities
 from openatlas.api.api_v1.formatters.lod import format_lod_entities
 from openatlas.api.api_v1.responses.iiif import (
     IIIF_CONTENT_TYPE, IIIF_GEOREF_CONTEXT, IIIF_PRESENTATION_CONTEXT)
-from openatlas.api.api_v1.util.iiif_manifest import (
-    get_overlay_corners)
+from openatlas.api.api_v1.util.files import get_overlay_corners
 from openatlas.database import overlay as db_overlay
 from openatlas.models.annotation import AnnotationImage
 from openatlas.models.settings import set_logo
@@ -824,8 +823,7 @@ class ApiV1(ApiTestCase):
 
         with app.test_request_context():
             app.preprocess_request()
-            db_overlay.update(
-                {
+            db_overlay.update({
                     'image_id': e.logo.id,
                     'bounding_box': 'bad-box['})
         rv = c.get(

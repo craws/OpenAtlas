@@ -16,7 +16,8 @@ from openatlas.api.api_v1.responses.files import (
 from openatlas.api.api_v1.util.files import (
     check_file_access, get_file_entity, get_file_item, get_file_path,
     get_iiif_redirect_url, get_mime_type, get_public_share_yes_id,
-    get_valid_license_ids, resolve_file_paths, resolve_rights_holders)
+    get_valid_license_ids, resolve_file_paths, resolve_overlay_bounds,
+    resolve_rights_holders)
 from openatlas.api.api_v1.util.pagination import get_pagination
 from openatlas.database.api import get_public_files_api
 from openatlas.display.image_processing import check_iiif_activation
@@ -108,8 +109,10 @@ def get_public_files_response(
         (query.page - 1) * query.limit,
         entity_id=entity_id)
     entities = [Entity(row) for row in rows]
-    resolve_file_paths([entity.id for entity in entities])
-    resolve_rights_holders([entity.id for entity in entities])
+    entity_ids = [entity.id for entity in entities]
+    resolve_file_paths(entity_ids)
+    resolve_rights_holders(entity_ids)
+    resolve_overlay_bounds(entity_ids)
     pagination = get_pagination(
         endpoint,
         total,
