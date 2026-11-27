@@ -572,8 +572,35 @@ class ApiV1(ApiTestCase):
         rv = c.get(url_for('api_v1_files.get_overlay_files'))
         assert rv.status_code == HTTPStatus.OK
         overlay_json = rv.get_json()
-        assert list(overlay_json.keys()) == ['data']
+        assert 'data' in overlay_json
+        assert overlay_json['totalItems'] == len(overlay_json['data'])
+        assert overlay_json['first'] is not None
+        assert overlay_json['last'] is not None
         assert e.logo.id not in [item['id'] for item in overlay_json['data']]
+
+        with app.test_request_context():
+            app.preprocess_request()
+            db_overlay.insert({
+                'image_id': e.logo.id,
+                'bounding_box': (
+                    '[[48.791618, 15.505868], '
+                    '[48.791630, 15.514762], '
+                    '[48.787146, 15.505882]]')})
+
+        rv = c.get(url_for('api_v1_files.get_overlay_files', limit=1, page=1))
+        assert rv.status_code == HTTPStatus.OK
+        page1 = rv.get_json()
+        assert page1['totalItems'] == overlay_json['totalItems'] + 1
+        assert len(page1['data']) == 1
+        assert page1['previous'] is None
+        assert page1['next'] is not None
+
+        rv = c.get(url_for('api_v1_files.get_overlay_files', limit=1, page=2))
+        assert rv.status_code == HTTPStatus.OK
+        page2 = rv.get_json()
+        assert len(page2['data']) == 1
+        assert page2['previous'] is not None
+        assert page2['data'][0]['id'] != page1['data'][0]['id']
 
     def test_iiif(self) -> None:
         c = self.client

@@ -158,7 +158,7 @@ Digital Assets & Files
      - Paginated overview of public files linked to a specific entity.
    * - ``GET``
      - ``/api/1/files/overlays``
-     - List of all publicly shareable, licensed files that have a map overlay.
+     - Paginated overview of publicly shareable, licensed files that have a map overlay.
 
 IIIF Presentation API
 ^^^^^^^^^^^^^^^^^^^^^
