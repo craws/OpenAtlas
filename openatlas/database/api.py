@@ -244,16 +244,16 @@ def get_vocab_ids_for_case_study(case_study_id: int) -> set[int]:
 
 def get_overview_counts_by_case_study(
         classes: list[str],
-        case_study_id: int | None = None) -> dict[str, int]:
+        case_study_ids: list[int] | None = None) -> dict[str, int]:
     conditions = ['e.openatlas_class_name = ANY(%(classes)s)']
     params: dict[str, Any] = {'classes': classes}
-    if case_study_id is not None:
+    if case_study_ids is not None:
         conditions.append("""EXISTS (
             SELECT 1 FROM model.link l
             WHERE l.domain_id = e.id
               AND l.property_code = 'P2'
-              AND l.range_id = %(case_study_id)s)""")
-        params['case_study_id'] = case_study_id
+              AND l.range_id = ANY(%(case_study_ids)s))""")
+        params['case_study_ids'] = case_study_ids
 
     where_sql = 'WHERE ' + ' AND '.join(conditions)
     g.cursor.execute(
