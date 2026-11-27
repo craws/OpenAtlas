@@ -21,7 +21,8 @@ from openatlas.api.api_v04.formats.rdf import rdf_export_to_file
 from openatlas.api.api_v04.resources.api_entity import ApiEntity
 from openatlas.api.api_v04.resources.util import (
     filter_by_type, get_reference_systems)
-from openatlas.api.api_v1.util.files import get_license_url_mapping
+from openatlas.api.api_v1.util.files import (
+    get_license_url_mapping, get_valid_license_ids)
 from openatlas.api.external.arche import (
     add_arche_collection_to_graph, add_arche_file_metadata_to_graph,
     add_arche_top_collection_to_graph)
@@ -41,6 +42,13 @@ def current_date_for_filename() -> str:
     return \
         f'{today.year}-{today.month:02}-{today.day:02}_' \
         f'{today.hour:02}{today.minute:02}'
+
+
+def current_datetime_for_filename() -> str:
+    now = datetime.today()
+    return (
+        f'{now.year}-{now.month:02}-{now.day:02}_'
+        f'{now.hour:02}{now.minute:02}{now.second:02}')
 
 
 def sql_export(format_: str, postfix: Optional[str] = '') -> bool:
@@ -91,15 +99,129 @@ def sql_export(format_: str, postfix: Optional[str] = '') -> bool:
     return True
 
 
+def validate_case_study_ids(
+        configured_ids: list[Any] | None) -> tuple[list[int], list[Any]]:
+    valid_ids: list[int] = []
+    invalid_ids: list[Any] = []
+    if not configured_ids:
+        return valid_ids, invalid_ids
+    case_study_type = getattr(g, 'case_study_type', None)
+    case_study_root_id = case_study_type.id if case_study_type else None
+    seen: set[int] = set()
+    for raw_id in configured_ids:
+        if isinstance(raw_id, bool) or not isinstance(raw_id, int):
+            invalid_ids.append(raw_id)
+            continue
+        type_entity = g.types.get(raw_id)
+        if (case_study_root_id is not None
+                and type_entity is not None
+                and case_study_root_id in type_entity.root):
+            if raw_id not in seen:
+                seen.add(raw_id)
+                valid_ids.append(raw_id)
+        else:
+            invalid_ids.append(raw_id)
+    return valid_ids, invalid_ids
+
+
+def validate_license_ids(
+        configured_ids: list[Any] | None) -> tuple[set[int], list[Any]]:
+    excluded_ids: set[int] = set()
+    invalid_ids: list[Any] = []
+    if not configured_ids:
+        return excluded_ids, invalid_ids
+    valid_license_ids = get_valid_license_ids()
+    for raw_id in configured_ids:
+        if (isinstance(raw_id, bool)
+                or not isinstance(raw_id, int)
+                or raw_id not in valid_license_ids):
+            invalid_ids.append(raw_id)
+            continue
+        stack = [raw_id]
+        while stack:
+            current_id = stack.pop()
+            if current_id in excluded_ids:
+                continue
+            excluded_ids.add(current_id)
+            entity = g.types.get(current_id)
+            if entity and getattr(entity, 'subs', None):
+                stack.extend(entity.subs)
+    return excluded_ids, invalid_ids
+
+
+def exclude_files_by_license(
+        entities: list[Entity],
+        exclude_license_ids: set[int]) -> list[Entity]:
+    if not exclude_license_ids:
+        return entities
+    return [
+        e for e in entities
+        if not ((e.standard_type and e.standard_type.id in exclude_license_ids)
+                or any(t.id in exclude_license_ids for t in e.types))]
+
+
+def create_invalid_config_md(
+        invalid_case_study_ids: list[Any],
+        invalid_license_ids: list[Any]) -> list[str]:
+    text: list[str] = []
+    sections = [
+        (
+            invalid_case_study_ids,
+            'Invalid caseStudyIds (ignored)',
+            'not a case study',
+            'not a valid case study ID'),
+        (
+            invalid_license_ids,
+            'Invalid excludeLicenseIds (ignored)',
+            'not a license',
+            'not a valid license ID')]
+    for invalid_ids, header, type_suffix, generic_suffix in sections:
+        if not invalid_ids:
+            continue
+        text.append(f'# {header} ({len(invalid_ids)})')
+        for raw_id in invalid_ids:
+            if (isinstance(raw_id, int)
+                    and not isinstance(raw_id, bool)
+                    and raw_id in g.types):
+                url = url_for('view', id_=raw_id, _external=True)
+                text.append(
+                    f'\t* {raw_id} - {g.types[raw_id].name} '
+                    f'({type_suffix}) - {url}')
+            else:
+                text.append(f'\t* {raw_id} - {generic_suffix}')
+    return text
+
+
 def arche_export() -> Path:
     external_metadata = app.config['ARCHE_METADATA']
     file_entities = Entity.get_by_class(['file'], types=True, aliases=True)
-    type_ids = external_metadata.get('typeIds')
-    if type_ids:
-        file_entities = filter_by_type(file_entities, type_ids)
+    case_study_ids, invalid_case_study_ids = validate_case_study_ids(
+        external_metadata.get('caseStudyIds'))
+    exclude_license_ids, invalid_license_ids = validate_license_ids(
+        external_metadata.get('excludeLicenseIds'))
+    if invalid_case_study_ids:
+        g.logger.log(
+            'warn',
+            'database',
+            f'Ignored invalid ARCHE caseStudyIds: {invalid_case_study_ids}')
+    if invalid_license_ids:
+        g.logger.log(
+            'warn',
+            'database',
+            'Ignored invalid ARCHE excludeLicenseIds: '
+            f'{invalid_license_ids}')
+    if case_study_ids:
+        file_entities = filter_by_type(file_entities, case_study_ids)
+    if exclude_license_ids:
+        file_entities = exclude_files_by_license(
+            file_entities,
+            exclude_license_ids)
 
     license_urls = get_license_url_mapping()
-    sorted_files = sort_files_by_types(file_entities, type_ids, license_urls)
+    sorted_files = sort_files_by_types(
+        file_entities,
+        case_study_ids,
+        license_urls)
 
     files_by_extension: dict[str, dict[str, set[Path]]] = defaultdict(
         lambda: defaultdict(set))
@@ -112,9 +234,9 @@ def arche_export() -> Path:
     sql_filename = f'{slug}_database.sql' if slug else 'database.sql'
     rdf_filename = f'{slug}_rdf.ttl' if slug else 'rdf.ttl'
     metadata_filename = f'{slug}_metadata.ttl' if slug else 'metadata.ttl'
+    timestamp = current_datetime_for_filename()
     archive_name = (
-        f'{current_date_for_filename()}_{slug}.zip'
-        if slug else f'{current_date_for_filename()}_arche.zip')
+        f'{timestamp}_{slug}.zip' if slug else f'{timestamp}_arche.zip')
 
     arche_dir = app.config['ARCHE_PATH']
     arche_dir.mkdir(parents=True, exist_ok=True)
@@ -124,8 +246,12 @@ def arche_export() -> Path:
     with tempfile.TemporaryDirectory(dir=app.config['TMP_PATH']) as temp_dir:
         temp_path = Path(temp_dir)
         tmp_archive_path = temp_path / archive_name
-        failed_files_md = "\n".join(
-            create_failed_files_md(check_files_for_arche(file_entities)))
+        problematic_lines = (
+            create_failed_files_md(check_files_for_arche(file_entities))
+            + create_invalid_config_md(
+                invalid_case_study_ids,
+                invalid_license_ids))
+        failed_files_md = "\n".join(problematic_lines)
         (temp_path / 'problematic_files.md').write_text(
             failed_files_md,
             encoding='utf-8')
@@ -134,14 +260,17 @@ def arche_export() -> Path:
         rdf_dump_path = temp_path / rdf_filename
         rdf_dump = cast(Response, Endpoint(
             ApiEntity.get_by_system_classes(['all']),
-            {'type_id': type_ids, 'limit': 0, 'format': 'turtle'}).resolve())
+            {
+                'type_id': case_study_ids,
+                'limit': 0,
+                'format': 'turtle'}).resolve())
         rdf_dump_path.write_text(
             rdf_dump.get_data(as_text=True),
             encoding='utf-8')
 
         metadata_ttl = get_arche_metadata_turtle(
             file_entities,
-            set(type_ids) if type_ids else set(),
+            set(case_study_ids),
             files_by_extension,
             license_urls,
             [
@@ -310,7 +439,7 @@ def get_publications(
 
 def sort_files_by_types(
         entities: list[Entity],
-        type_ids: set[int] | list[int] | None,
+        case_study_ids: set[int] | list[int] | None,
         license_urls: dict[int, list[str]] | None = None) \
         -> dict[str, set[Path]]:
     files_by_types: dict[str, set[Path]] = defaultdict(set)
@@ -321,9 +450,9 @@ def sort_files_by_types(
         if license_urls is not None and not license_urls.get(
                 entity.standard_type.id):
             continue
-        if type_ids:
+        if case_study_ids:
             for type_ in entity.types:
-                if type_.id in type_ids:
+                if type_.id in case_study_ids:
                     type_slug = (
                         slugify_arche_segment(g.types[type_.id].name)
                         or str(type_.id))
@@ -404,7 +533,7 @@ def format_extent(counts: dict[str, int]) -> str:
 
 
 def build_arche_collections(
-        type_ids: set[int] | list[int] | None,
+        case_study_ids: set[int] | list[int] | None,
         files_by_extension: dict[str, dict[str, set[Path]]],
         type_titles: dict[str, str],
         license_summary: str) -> list[ArcheCollection]:
@@ -412,7 +541,7 @@ def build_arche_collections(
     collections: list[ArcheCollection] = []
     for type_slug, ext_map in sorted(files_by_extension.items()):
         parent_uri = top_uri
-        if type_ids and type_slug:
+        if case_study_ids and type_slug:
             type_counts = {
                 ext: len(paths) for ext, paths in ext_map.items()}
             type_uri = f'{top_uri}/{type_slug}'
@@ -437,7 +566,7 @@ def build_arche_collections(
 
 def get_arche_metadata_turtle(
         entities: list[Entity],
-        type_ids: set[int] | list[int] | None,
+        case_study_ids: set[int] | list[int] | None,
         files_by_extension: dict[str, dict[str, set[Path]]],
         license_urls: dict[int, list[str]],
         dump_files: list[tuple[str, Path, str]]) -> str:
@@ -463,7 +592,7 @@ def get_arche_metadata_turtle(
     type_titles = {
         slugify_arche_segment(g.types[id_].name) or str(id_):
             g.types[id_].name
-        for id_ in (type_ids or [])
+        for id_ in (case_study_ids or [])
         if id_ in g.types}
 
     top = ArcheTopCollection.construct(
@@ -472,7 +601,7 @@ def get_arche_metadata_turtle(
     add_arche_top_collection_to_graph(graph, top, emitted)
 
     for collection in build_arche_collections(
-            type_ids,
+            case_study_ids,
             files_by_extension,
             type_titles,
             license_summary):
@@ -486,7 +615,7 @@ def get_arche_metadata_turtle(
 
     for metadata_obj in get_arche_file_metadata(
             entities,
-            type_ids,
+            case_study_ids,
             license_urls):
         add_arche_file_metadata_to_graph(graph, metadata_obj, emitted)
 
@@ -495,12 +624,12 @@ def get_arche_metadata_turtle(
 
 def get_arche_file_turtle_graph(
         entities: list[Entity],
-        type_ids: set[int] | list[int] | None) -> str:
+        case_study_ids: set[int] | list[int] | None) -> str:
     graph = Graph()
     graph.bind("acdh", ACDH)
     graph.bind("acdhi", ACDHI)
     emitted: set[str] = set()
-    metadata = get_arche_file_metadata(entities, type_ids)
+    metadata = get_arche_file_metadata(entities, case_study_ids)
     for metadata_obj in metadata:
         add_arche_file_metadata_to_graph(graph, metadata_obj, emitted)
     return graph.serialize(format="turtle")
@@ -508,7 +637,7 @@ def get_arche_file_turtle_graph(
 
 def get_arche_file_metadata(
         entities: list[Entity],
-        type_ids: set[int] | list[int] | None,
+        case_study_ids: set[int] | list[int] | None,
         license_urls: dict[int, list[str]] | None = None) \
         -> list[ArcheFileMetadata]:
     publications = get_publications(entities)
@@ -526,9 +655,9 @@ def get_arche_file_metadata(
         if not license_url_list:  # pragma: no cover
             continue
 
-        if type_ids:
+        if case_study_ids:
             for type_ in entity.types:
-                if type_.id in type_ids:
+                if type_.id in case_study_ids:
                     type_slug = (
                         slugify_arche_segment(g.types[type_.id].name)
                         or str(type_.id))

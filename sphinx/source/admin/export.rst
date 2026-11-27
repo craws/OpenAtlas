@@ -124,7 +124,8 @@ Tabs
 * **Info**
   Displays the data entered in ``production.py``.
   Provides a button to check ARCHE files.
-  Only files associated with ``typeIds`` (if any are defined) are checked.
+  Only files associated with ``caseStudyIds`` (if any are defined) and not
+  matching ``excludeLicenseIds`` are checked.
   More information on the file checker can be found in
   :doc:`/admin/data_integrity_checks`.
 
@@ -187,8 +188,11 @@ Here is an example configuration:
         'lifeCycleStatus':
             'https://vocabs.acdh.oeaw.ac.at/archelifecyclestatus/completed',
         'url': '',
-        'typeIds': [
-            1234, 4567, 87656, 3252, 234
+        'caseStudyIds': [
+            1234, 4567
+        ],
+        'excludeLicenseIds': [
+            8901
         ],
         'excludeReferenceSystems': [
             'Internal catalogue', 'Inventory numbers'
@@ -232,12 +236,15 @@ Description of fields
 * ``datasetLicense`` *(optional)*: License URI for SQL and RDF dump files
 * ``lifeCycleStatus`` *(optional)*: ACDH life-cycle status URI
 * ``url`` *(optional)*: External project URL for the top collection
-* ``typeIds`` *(optional)*: Restrict exported files to those linked
-  with specific type IDs
+* ``caseStudyIds`` *(optional)*: Restrict exported files to those linked
+  with specific case study IDs. Non-case-study IDs are ignored and reported in
+  ``debug/problematic_files.md``.
+* ``excludeLicenseIds`` *(optional)*: List of license type IDs whose files
+  should be excluded from the ARCHE export and ARCHE file checker.
 * ``excludeReferenceSystems`` *(optional)*: List of reference system
   labels to be excluded from the export
 
 .. note::
 
-   If ``typeIds`` or ``excludeReferenceSystems`` are empty, all files
-   and reference systems are considered.
+   If ``caseStudyIds``, ``excludeLicenseIds``, or ``excludeReferenceSystems``
+   are empty, all files, licenses, and reference systems are considered.

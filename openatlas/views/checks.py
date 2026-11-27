@@ -26,7 +26,9 @@ from openatlas.models import checks
 from openatlas.models.annotation import AnnotationImage, AnnotationText
 from openatlas.models.dates import format_date
 from openatlas.models.entity import Entity
-from openatlas.models.export import find_duplicates
+from openatlas.models.export import (
+    exclude_files_by_license, find_duplicates, validate_case_study_ids,
+    validate_license_ids)
 
 
 @app.route('/check_links')
@@ -271,8 +273,16 @@ def check_files(arche: str | None = None) -> str:
     all_entity_ids = {entity.id for entity in all_entities}
     entities = all_entities
     if arche:
-        if type_ids := app.config['ARCHE_METADATA'].get('typeIds'):
-            entities = filter_by_type(entities, type_ids)
+        case_study_ids, _unused_cs = validate_case_study_ids(
+            app.config['ARCHE_METADATA'].get('caseStudyIds'))
+        if case_study_ids:
+            entities = filter_by_type(entities, case_study_ids)
+        exclude_license_ids, _unused_lic = validate_license_ids(
+            app.config['ARCHE_METADATA'].get('excludeLicenseIds'))
+        if exclude_license_ids:
+            entities = exclude_files_by_license(
+                entities,
+                exclude_license_ids)
     result: dict[str, list[Entity]] = {
         'missing_files': [],
         'not_public': [],

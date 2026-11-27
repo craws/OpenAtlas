@@ -126,7 +126,8 @@ ARCHE_METADATA = {
     'lifeCycleStatus':
         'https://vocabs.acdh.oeaw.ac.at/archelifecyclestatus/completed',
     'url': '',
-    'typeIds': [],
+    'caseStudyIds': [],
+    'excludeLicenseIds': [],
     'excludeReferenceSystems': []}
 
 # Configure map point colors
