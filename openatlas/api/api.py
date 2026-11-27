@@ -1,8 +1,14 @@
-from flask import Blueprint, Response, render_template, send_file
+from http import HTTPStatus
+from uuid import UUID
+
+from flask import Blueprint, Response, redirect, render_template, send_file, \
+    url_for
 from flask_cors import CORS
 from flask_restful import Api
+from werkzeug.wrappers import Response as WerkzeugResponse
 
 from openatlas import app
+from openatlas.api.api_v04.endpoints.entities import GetEntityByUUID
 from openatlas.api.api_v04.routes import routes
 from openatlas.api.api_v1.routes import (
     api_v1_files, api_v1_frontend, api_v1_iiif, api_v1_la, api_v1_lod,
@@ -25,13 +31,29 @@ app.register_api(api_v1_frontend)
 blueprint = Blueprint('api', __name__, url_prefix='/api')
 api = Api(blueprint)
 for route in routes:
+    if route[2] == 'entity_uuid':
+        continue
     api.add_resource(route[0], route[1], endpoint=route[2])
+
+
+@blueprint.route('/entity/<uuid:uuid>', endpoint='entity_uuid')
+@blueprint.route('/uuid/<uuid:uuid>', endpoint='entity_uuid_legacy')
+def redirect_entity_uuid(uuid: UUID) -> WerkzeugResponse:
+    return redirect(
+        url_for('api_v1_lod.get_entity', uuid=uuid, _external=True),
+        code=HTTPStatus.SEE_OTHER)
+
+
 app.register_blueprint(blueprint)
 
 blueprint_04 = Blueprint('api_04', __name__, url_prefix='/api/0.4')
 api_04 = Api(blueprint_04)
 for route in routes:
     api_04.add_resource(route[0], route[1], endpoint=route[2])
+api_04.add_resource(
+    GetEntityByUUID,
+    '/entity/<uuid:uuid>',
+    endpoint='entity_uuid_direct')
 app.register_blueprint(blueprint_04)
 
 

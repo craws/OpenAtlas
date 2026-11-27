@@ -142,6 +142,19 @@ def abort_too_many_requests(
     abort_with_error(429, 'Too Many Requests', message, details)
 
 
+def abort_not_acceptable(
+        message: str = 'Requested media type is not supported.') -> NoReturn:
+    details = {
+        'supported_types': [
+            'application/ld+json',
+            'text/turtle',
+            'application/rdf+xml',
+            'application/n-triples'],
+        'hint': 'Use one of the supported Accept media types or append '
+                '.json, .ttl, .xml, or .nt to the URL.'}
+    abort_with_error(406, 'Not Acceptable', message, details)
+
+
 def abort_georeference_not_found(id_: int) -> NoReturn:
     details = {
         'provided_id': str(id_),

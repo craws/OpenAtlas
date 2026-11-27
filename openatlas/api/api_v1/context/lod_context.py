@@ -217,9 +217,10 @@ def get_lod_context() -> dict[str, Any]:
             '@version': 1.1,
             # Namespaces
             'crm': 'http://www.cidoc-crm.org/cidoc-crm/',
-            'archaeo': 'http://www.cidoc-crm.org/cidoc-crm/CRMarchaeo/',
+            'archaeo': 'http://www.cidoc-crm.org/extensions/crmarchaeo/',
             'geo': 'http://www.opengis.net/ont/geosparql#',
             'rdfs': 'http://www.w3.org/2000/01/rdf-schema#',
+            'skos': 'http://www.w3.org/2004/02/skos/core#',
             'xsd': 'http://www.w3.org/2001/XMLSchema#',
             'oa': 'http://www.w3.org/ns/oa#',
             'as': 'https://www.w3.org/ns/activitystreams#',
@@ -417,6 +418,9 @@ def get_lod_context() -> dict[str, Any]:
             'is_referred_to_by': {
                 '@id': 'crm:P67i_is_referred_to_by',
                 '@type': '@id'},
+            'exact_match': {'@id': 'skos:exactMatch', '@type': '@id'},
+            'close_match': {'@id': 'skos:closeMatch', '@type': '@id'},
+            'see_also': {'@id': 'rdfs:seeAlso', '@type': '@id'},
 
             # OpenAtlas Custom Shortcuts
             'Relationship': 'oax:Relationship',

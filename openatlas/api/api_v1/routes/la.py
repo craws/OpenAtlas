@@ -40,7 +40,10 @@ def get_entity(path: EntityPath) -> dict[str, Any] | Response:
     only contains properties allowed by the Linked Art JSON schemas
     (additionalProperties: false).
     """
-    return get_entity_response(path.uuid, formatter=format_la_entity)
+    return get_entity_response(
+        path.uuid,
+        formatter=format_la_entity,
+        ext_endpoint='api_v1_la.get_entity_ext')
 
 
 @api_v1_la.get(
@@ -57,7 +60,8 @@ def get_entity_ext(path: EntityPathExt) -> dict[str, Any] | Response:
     return get_entity_response(
         path.uuid,
         ext=ext_val,
-        formatter=format_la_entity)
+        formatter=format_la_entity,
+        ext_endpoint='api_v1_la.get_entity_ext')
 
 
 @api_v1_la.get(

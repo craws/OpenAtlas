@@ -6,6 +6,12 @@ from openatlas.api.api_v1.models.lod import \
     LinkedArtCollectionResponse, LinkedArtResponse, LodResponse
 from openatlas.api.api_v1.models.util import ErrorResponse
 
+_not_acceptable_response = {
+    'description': 'Requested media type is not supported.',
+    'content': {
+        'application/json': {
+            'schema': ErrorResponse.model_json_schema()}}}
+
 lod_responses: ResponseDict = {
     HTTPStatus.OK: {
         'description': 'Entity response in different LOD formats',
@@ -19,7 +25,8 @@ lod_responses: ResponseDict = {
         'description': 'Entity not found.',
         'content': {
             'application/json': {
-                'schema': ErrorResponse.model_json_schema()}}}}
+                'schema': ErrorResponse.model_json_schema()}}},
+    HTTPStatus.NOT_ACCEPTABLE: _not_acceptable_response}
 
 la_responses: ResponseDict = {
     200: {
@@ -34,7 +41,8 @@ la_responses: ResponseDict = {
         'description': 'Entity not found.',
         'content': {
             'application/json': {
-                'schema': ErrorResponse.model_json_schema()}}}}
+                'schema': ErrorResponse.model_json_schema()}}},
+    HTTPStatus.NOT_ACCEPTABLE: _not_acceptable_response}
 
 lod_collection_responses: ResponseDict = {
     HTTPStatus.OK: {
@@ -55,7 +63,8 @@ lod_collection_responses: ResponseDict = {
         'description': 'Entity class not found',
         'content': {
             'application/json': {
-                'schema': ErrorResponse.model_json_schema()}}}}
+                'schema': ErrorResponse.model_json_schema()}}},
+    HTTPStatus.NOT_ACCEPTABLE: _not_acceptable_response}
 
 context_responses: ResponseDict = {
     200: {
@@ -71,7 +80,8 @@ ontology_responses: ResponseDict = {
                 'schema': {'anyOf': [{'type': 'array'}, {'type': 'object'}]}},
             'text/turtle': {'schema': {'type': 'string'}},
             'application/n-triples': {'schema': {'type': 'string'}},
-            'application/rdf+xml': {'schema': {'type': 'string'}}}}}
+            'application/rdf+xml': {'schema': {'type': 'string'}}}},
+    HTTPStatus.NOT_ACCEPTABLE: _not_acceptable_response}
 
 dump_responses: ResponseDict = {
     200: {

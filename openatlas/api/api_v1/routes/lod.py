@@ -46,7 +46,10 @@ def get_entity(path: EntityPath) -> dict[str, Any] | Response:
     You can request other formats (like Turtle or RDF/XML) using the `Accept`
     HTTP header.
     """
-    return get_entity_response(path.uuid, formatter=format_lod_entity)
+    return get_entity_response(
+        path.uuid,
+        formatter=format_lod_entity,
+        ext_endpoint='api_v1_lod.get_entity_ext')
 
 
 @api_v1_lod.get(
@@ -64,7 +67,10 @@ def get_entity_ext(path: EntityPathExt) -> dict[str, Any] | Response:
     """
     ext_val = path.ext.value if hasattr(path.ext, 'value') else str(path.ext)
     return get_entity_response(
-        path.uuid, ext=ext_val, formatter=format_lod_entity)
+        path.uuid,
+        ext=ext_val,
+        formatter=format_lod_entity,
+        ext_endpoint='api_v1_lod.get_entity_ext')
 
 
 @api_v1_lod.get(

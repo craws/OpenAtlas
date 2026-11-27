@@ -14,11 +14,16 @@ from openatlas.models.entity import Entity
 def get_entity_response(
         entity_id: UUID,
         formatter: Callable[[Entity], dict[str, Any]],
-        ext: str | None = None) -> dict[str, Any] | Response:
+        ext: str | None = None,
+        ext_endpoint: str | None = None) -> dict[str, Any] | Response:
     entity = get_entity_by_uuid(entity_id, types=True, aliases=True)
     if not entity:
         abort_not_found(entity_id)
-    return make_lod_response(formatter(entity), ext=ext)
+    return make_lod_response(
+        formatter(entity),
+        ext=ext,
+        entity=entity,
+        ext_endpoint=ext_endpoint)
 
 
 def get_entities_response(

@@ -1,6 +1,7 @@
 from typing import Any, Final
 
-from flask import url_for
+import validators
+from flask import g, url_for
 
 from openatlas.api.api_v1.formatters.la_helpers import (
     date_to_utc_iso_str, is_float)
@@ -314,10 +315,28 @@ class LodFormatter:
             lod_append(record, 'current_owner', self._ref(link_.range))
 
     def _p67(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
-        if inverse:
-            lod_append(record, 'is_referred_to_by', self._ref(link_.domain))
-        else:
+        if not inverse:
             lod_append(record, 'refers_to', self._ref(link_.range))
+            return
+        domain = link_.domain
+        if domain.cidoc_class.code == 'E32':
+            system = g.reference_systems.get(domain.id)
+            if system and link_.description:
+                url = f"{system.resolver_url or ''}{link_.description}"
+                if validators.url(url):
+                    is_close = bool(
+                        link_.type
+                        and (match_type := g.types.get(link_.type.id))
+                        and 'close' in match_type.name.lower())
+                    key = 'close_match' if is_close else 'exact_match'
+                    if url not in record.get(key, []):
+                        lod_append(record, key, url)
+                    return
+        if (domain.class_.name == 'external_reference'
+                and validators.url(domain.name)
+                and domain.name not in record.get('see_also', [])):
+            lod_append(record, 'see_also', domain.name)
+        lod_append(record, 'is_referred_to_by', self._ref(domain))
 
     def _p73(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if inverse:
