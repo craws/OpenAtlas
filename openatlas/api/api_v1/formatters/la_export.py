@@ -46,8 +46,11 @@ def stream_la_dump(
         la_data = format_la_entities(entities)
 
         if output_format == 'nt':
+            graph_data = {
+                '@context': LA_CONTEXT,
+                '@graph': la_data['orderedItems']}
             graph = Dataset()
-            graph.parse(data=json.dumps(la_data), format='json-ld')
+            graph.parse(data=json.dumps(graph_data), format='json-ld')
             exported += len(entities)
             yield graph.serialize(format='nt')
         else:

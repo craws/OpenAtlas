@@ -42,7 +42,7 @@ OpenAtlas maps database records to internationally recognized domain ontologies:
    * - ``la``
      - `Linked Art <https://linked.art/>`_
      - Strict application profile of CIDOC CRM for cultural heritage data.
-   * - ``oa``
+   * - ``oax``
      - `OpenAtlas Extension <https://openatlas.eu/ontology/#>`_
      - High-performance shortcuts for frequent property chains.
 
@@ -89,13 +89,13 @@ full CIDOC CRM paths:
    * - OpenAtlas Shortcut
      - Semantics
      - CIDOC CRM Path Resolution
-   * - ``oa:has_relationship_to``
+   * - ``oax:has_relationship_to``
      - Actor relates to Actor (OA7)
      - ``E39 Actor`` -> ``P11i participated in`` -> ``E5 Event`` -> ``P11 had participant`` -> ``E39 Actor``
-   * - ``oa:begins_in``
+   * - ``oax:begins_in``
      - Item origin location (OA8)
      - ``E77 Item`` -> ``P92i brought into existence by`` -> ``E63 Beginning`` -> ``P7 took place at`` -> ``E53 Place``
-   * - ``oa:ends_in``
+   * - ``oax:ends_in``
      - Item demise location (OA9)
      - ``E77 Item`` -> ``P93i taken out of existence by`` -> ``E64 End of Existence`` -> ``P7 took place at`` -> ``E53 Place``
 
@@ -118,9 +118,10 @@ thesaurus exports, to suit different integration requirements:
 * **Audience**: Semantic Web applications, archaeological graph databases, and RDF triple stores.
 * **Status**: **Fully supported in v1 Beta**.
 * **Characteristics**: Represents the complete richness of the OpenAtlas data
-  model, combining CIDOC CRM, CRMarchaeo (e.g. ``A6_Feature``,
-  ``A8_Stratigraphic_Unit``), GeoSPARQL (``geo:asWKT``), and formal OpenAtlas
-  shortcuts (``oa:has_relationship_to``, ``oa:begins_in``, ``oa:ends_in``).
+  model, combining CIDOC CRM (e.g. ``E25_Human-Made_Feature``), CRMarchaeo
+  (e.g. ``A8_Stratigraphic_Unit``), GeoSPARQL (``geo:asWKT``), and formal
+  OpenAtlas shortcuts (``oax:has_relationship_to``, ``oax:begins_in``,
+  ``oax:ends_in``).
 
 .. _linked-art-endpoints:
 

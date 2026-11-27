@@ -44,10 +44,12 @@ def stream_lod_nt(
         last_id = ids[-1]
         entities = Entity.get_by_ids(ids, types=True, aliases=True)
         lod_data = format_lod_entities(entities)
-        lod_data['@context'] = ctx
+        graph_data = {
+            '@context': ctx,
+            '@graph': lod_data['orderedItems']}
 
         rdf_g = Graph()
-        rdf_g.parse(data=json.dumps(lod_data), format='json-ld')
+        rdf_g.parse(data=json.dumps(graph_data), format='json-ld')
         exported += len(entities)
         yield rdf_g.serialize(format='nt')
 

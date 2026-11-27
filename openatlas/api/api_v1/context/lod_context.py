@@ -37,6 +37,40 @@ def get_oa_ontology_graph() -> Graph:
         'CRM specifications.',
         lang='en')))
 
+    # oax:Relationship (reified OA7 relationship node)
+    c_rel = oax.Relationship
+    graph.add((c_rel, RDF.type, OWL.Class))
+    graph.add((c_rel, RDFS.subClassOf, crm.E5_Event))
+    graph.add((c_rel, RDFS.label, Literal('Relationship', lang='en')))
+    graph.add((c_rel, RDFS.comment, Literal(
+        'Reified actor-to-actor relationship event (OA7) linking an actor '
+        'to a target actor with optional relationship type and time-span.',
+        lang='en')))
+
+    # oax:has_relationship (E39 -> oax:Relationship)
+    p_has_rel = oax.has_relationship
+    graph.add((p_has_rel, RDF.type, OWL.ObjectProperty))
+    graph.add((p_has_rel, RDFS.subPropertyOf, crm.P11i_participated_in))
+    graph.add((p_has_rel, RDFS.label, Literal('has relationship', lang='en')))
+    graph.add((p_has_rel, RDFS.comment, Literal(
+        'Links an actor (crm:E39_Actor) to a reified oax:Relationship '
+        'instance.',
+        lang='en')))
+    graph.add((p_has_rel, RDFS.domain, crm.E39_Actor))
+    graph.add((p_has_rel, RDFS.range, oax.Relationship))
+
+    # oax:relates_to (oax:Relationship -> E39)
+    p_relates = oax.relates_to
+    graph.add((p_relates, RDF.type, OWL.ObjectProperty))
+    graph.add((p_relates, RDFS.subPropertyOf, crm.P11_had_participant))
+    graph.add((p_relates, RDFS.label, Literal('relates to', lang='en')))
+    graph.add((p_relates, RDFS.comment, Literal(
+        'Links a reified oax:Relationship instance to the target actor '
+        '(crm:E39_Actor).',
+        lang='en')))
+    graph.add((p_relates, RDFS.domain, oax.Relationship))
+    graph.add((p_relates, RDFS.range, crm.E39_Actor))
+
     # oax:has_relationship_to (OA7: E39 -> E39)
     p_rel = oax.has_relationship_to
     graph.add((p_rel, RDF.type, OWL.ObjectProperty))
@@ -49,6 +83,9 @@ def get_oa_ontology_graph() -> Graph:
         lang='en')))
     graph.add((p_rel, RDFS.domain, crm.E39_Actor))
     graph.add((p_rel, RDFS.range, crm.E39_Actor))
+    chain_rel = BNode()
+    Collection(graph, chain_rel, [p_has_rel, p_relates])
+    graph.add((p_rel, OWL.propertyChainAxiom, chain_rel))
 
     # oax:relation_type (OA7 type label)
     p_rel_type = oax.relation_type
@@ -56,9 +93,10 @@ def get_oa_ontology_graph() -> Graph:
     graph.add((p_rel_type, RDFS.label, Literal('relation type', lang='en')))
     graph.add((p_rel_type, RDFS.comment, Literal(
         'Label of the relationship type (crm:E55_Type) for an OpenAtlas '
-        'actor-to-actor relation shortcut (OA7). Serialized on the embedded '
-        'target actor node in JSON-LD.',
+        'actor-to-actor relation (OA7). Serialized on the reified '
+        'oax:Relationship node.',
         lang='en')))
+    graph.add((p_rel_type, RDFS.domain, oax.Relationship))
     graph.add((p_rel_type, RDFS.range, XSD.string))
 
     # oax:unit (measurement unit label)
@@ -161,8 +199,9 @@ def get_lod_context() -> dict[str, Any]:
 
             # W3C Web Annotation Data Model
             'Annotation': 'oa:Annotation',
+            'SpecificResource': 'oa:SpecificResource',
             'TextPositionSelector': 'oa:TextPositionSelector',
-            'annotations': {'@reverse': 'oa:hasTarget'},
+            'annotations': '@included',
             'target': {'@id': 'oa:hasTarget', '@type': '@id'},
             'source': {'@id': 'oa:hasSource', '@type': '@id'},
             'selector': {'@id': 'oa:hasSelector', '@type': '@id'},
@@ -230,6 +269,10 @@ def get_lod_context() -> dict[str, Any]:
                 '@type': '@id'},
             'forms_part_of': {
                 '@id': 'crm:P46i_forms_part_of',
+                '@type': '@id'},
+            'consists_of': {'@id': 'crm:P9_consists_of', '@type': '@id'},
+            'event_forms_part_of': {
+                '@id': 'crm:P9i_forms_part_of',
                 '@type': '@id'},
 
             # Spatial Location
@@ -342,6 +385,11 @@ def get_lod_context() -> dict[str, Any]:
                 '@type': '@id'},
 
             # OpenAtlas Custom Shortcuts
+            'Relationship': 'oax:Relationship',
+            'relationships': {
+                '@id': 'oax:has_relationship',
+                '@type': '@id'},
+            'relates_to': {'@id': 'oax:relates_to', '@type': '@id'},
             'has_relationship_to': {
                 '@id': 'oax:has_relationship_to',
                 '@type': '@id'},

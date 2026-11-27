@@ -15,6 +15,7 @@ from openatlas.api.api_v1.formatters.lod_util import (
 from openatlas.api.api_v1.models.lod import (
     EntityCollectionPath, EntityCollectionQuery, EntityPath, EntityPathExt,
     ExtensionPath, LodDumpQuery)
+from openatlas.api.api_v1.models.util import OpenAtlasClassEnum
 from openatlas.api.api_v1.openapi_tags import lod_tag
 from openatlas.api.api_v1.responses.lod import (
     context_responses, dump_responses, lod_collection_responses, lod_responses,
@@ -34,7 +35,7 @@ register_error_handlers(api_v1_lod)
     '/entity/<uuid:uuid>',
     summary='Get an LOD entity by UUID',
     tags=[lod_tag],
-    responses=lod_responses)  # type: ignore[arg-type]
+    responses=lod_responses)
 def get_entity(path: EntityPath) -> dict[str, Any] | Response:
     """
     Retrieves a single entity formatted as Linked Open Data
@@ -51,7 +52,7 @@ def get_entity(path: EntityPath) -> dict[str, Any] | Response:
     '/entity/<uuid:uuid>.<ext>',
     summary='Get an LOD entity by UUID with extension',
     tags=[lod_tag],
-    responses=lod_responses)  # type: ignore[arg-type]
+    responses=lod_responses)
 def get_entity_ext(path: EntityPathExt) -> dict[str, Any] | Response:
     """
     Retrieves a single LOD entity with a specific format extension.
@@ -69,7 +70,7 @@ def get_entity_ext(path: EntityPathExt) -> dict[str, Any] | Response:
     '/entities/<string:entity_class>',
     summary='Get a polymorphic collection of entities',
     tags=[lod_tag],
-    responses=lod_collection_responses)  # type: ignore[arg-type]
+    responses=lod_collection_responses)
 def get_entities(
         path: EntityCollectionPath,
         query: EntityCollectionQuery) -> dict[str, Any] | Response:
@@ -148,7 +149,7 @@ def get_lod_dump(query: LodDumpQuery) -> Response:
     require_auth()
     entity_class = (
         query.entity_class.value
-        if hasattr(query.entity_class, 'value')
+        if isinstance(query.entity_class, OpenAtlasClassEnum)
         else query.entity_class)
     filename = 'openatlas_lod_dump.nt'
     if entity_class:

@@ -189,6 +189,7 @@ class LodTextPositionSelector(BaseSchema):
 class LodAnnotationTarget(BaseSchema):
     model_config = ConfigDict(alias_generator=None, populate_by_name=True)
 
+    type: Literal['SpecificResource'] = 'SpecificResource'
     source: str
     selector: LodTextPositionSelector
 

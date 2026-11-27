@@ -12,6 +12,7 @@ from openatlas.api.api_v1.formatters.lod_util import (
 from openatlas.api.api_v1.models.lod import (
     EntityCollectionPath, EntityCollectionQuery, EntityPath, EntityPathExt,
     LaDumpQuery)
+from openatlas.api.api_v1.models.util import OpenAtlasClassEnum
 from openatlas.api.api_v1.openapi_tags import lod_tag
 from openatlas.api.api_v1.responses.lod import (
     la_dump_responses, la_responses, lod_collection_responses)
@@ -29,7 +30,7 @@ register_error_handlers(api_v1_la)
     '/entity/<uuid:uuid>',
     summary='Get a strictly compliant Linked Art entity by UUID',
     tags=[lod_tag],
-    responses=la_responses)  # type: ignore[arg-type]
+    responses=la_responses)
 def get_entity(path: EntityPath) -> dict[str, Any] | Response:
     """
     Retrieves a single entity formatted as Linked Art.
@@ -46,7 +47,7 @@ def get_entity(path: EntityPath) -> dict[str, Any] | Response:
     summary='Get a strictly compliant Linked Art entity by UUID '
             'with extension',
     tags=[lod_tag],
-    responses=la_responses)  # type: ignore[arg-type]
+    responses=la_responses)
 def get_entity_ext(path: EntityPathExt) -> dict[str, Any] | Response:
     """
     Retrieves a single Linked Art entity with a specific format extension.
@@ -62,7 +63,7 @@ def get_entity_ext(path: EntityPathExt) -> dict[str, Any] | Response:
     '/entities/<string:entity_class>',
     summary='Get a polymorphic collection of Linked Art entities',
     tags=[lod_tag],
-    responses=lod_collection_responses)  # type: ignore[arg-type]
+    responses=lod_collection_responses)
 def get_entities(
         path: EntityCollectionPath,
         query: EntityCollectionQuery) -> dict[str, Any] | Response:
@@ -98,7 +99,7 @@ def get_la_dump(query: LaDumpQuery) -> Response:
         else 'application/n-triples')
     entity_class = (
         query.entity_class.value
-        if hasattr(query.entity_class, 'value')
+        if isinstance(query.entity_class, OpenAtlasClassEnum)
         else query.entity_class)
     filename = f'openatlas_linked_art_dump.{ext}'
     if entity_class:

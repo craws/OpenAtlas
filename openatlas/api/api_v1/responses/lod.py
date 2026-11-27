@@ -1,10 +1,12 @@
 from http import HTTPStatus
 
+from flask_openapi3.types import ResponseDict
+
 from openatlas.api.api_v1.models.lod import \
     LinkedArtCollectionResponse, LinkedArtResponse, LodResponse
 from openatlas.api.api_v1.models.util import ErrorResponse
 
-lod_responses = {
+lod_responses: ResponseDict = {
     HTTPStatus.OK: {
         'description': 'Entity response in different LOD formats',
         'content': {
@@ -19,7 +21,7 @@ lod_responses = {
             'application/json': {
                 'schema': ErrorResponse.model_json_schema()}}}}
 
-la_responses = {
+la_responses: ResponseDict = {
     200: {
         'description': 'Entity response in Linked Art formats',
         'content': {
@@ -34,7 +36,7 @@ la_responses = {
             'application/json': {
                 'schema': ErrorResponse.model_json_schema()}}}}
 
-lod_collection_responses = {
+lod_collection_responses: ResponseDict = {
     HTTPStatus.OK: {
         'description': 'Collection response in different LOD '
                        'formats with OrderedCollectionPage pagination',
@@ -55,23 +57,23 @@ lod_collection_responses = {
             'application/json': {
                 'schema': ErrorResponse.model_json_schema()}}}}
 
-context_responses = {
+context_responses: ResponseDict = {
     200: {
         'description': 'OpenAtlas JSON-LD @context definition',
         'content': {
             'application/ld+json': {'schema': {'type': 'object'}}}}}
 
-ontology_responses = {
+ontology_responses: ResponseDict = {
     200: {
         'description': 'OpenAtlas Extension Ontology in RDF formats',
         'content': {
             'application/ld+json': {
-            'schema': {'anyOf': [{'type': 'array'}, {'type': 'object'}]}},
+                'schema': {'anyOf': [{'type': 'array'}, {'type': 'object'}]}},
             'text/turtle': {'schema': {'type': 'string'}},
             'application/n-triples': {'schema': {'type': 'string'}},
             'application/rdf+xml': {'schema': {'type': 'string'}}}}}
 
-dump_responses = {
+dump_responses: ResponseDict = {
     200: {
         'description':
             'Full Linked Open Data dump in N-Triples format (streamed)',
@@ -84,7 +86,7 @@ dump_responses = {
             'application/json': {
                 'schema': ErrorResponse.model_json_schema()}}}}
 
-la_dump_responses = {
+la_dump_responses: ResponseDict = {
     200: {
         'description':
             'Full Linked Art dump (streamed as JSON Lines or N-Triples)',

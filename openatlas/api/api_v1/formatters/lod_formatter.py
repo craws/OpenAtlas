@@ -170,10 +170,12 @@ class LodFormatter:
                 if annotation.entity_id is not None:
                     if body_entity := self.annotation_entities.get(
                             annotation.entity_id):
-                        annotation_data['body_entity'] = entity_uri(body_entity)
+                        annotation_data['body_entity'] = entity_uri(
+                            body_entity)
                 if annotation.text:
                     annotation_data['body_comment'] = annotation.text
                 annotation_data['target'] = {
+                    'type': 'SpecificResource',
                     'source': entity_uri(entity),
                     'selector': {
                         'type': 'TextPositionSelector',
@@ -233,7 +235,7 @@ class LodFormatter:
 
     def _p46(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if inverse:
-            record['forms_part_of'] = self._ref(link_.domain)
+            lod_append(record, 'forms_part_of', self._ref(link_.domain))
         else:
             lod_append(record, 'is_composed_of', self._ref(link_.range))
 
@@ -241,7 +243,7 @@ class LodFormatter:
         if inverse:
             lod_append(record, 'is_location_of', self._ref(link_.domain))
         else:
-            record['has_location'] = self._ref(link_.range)
+            lod_append(record, 'has_location', self._ref(link_.range))
 
     def _p89(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if inverse:
@@ -251,13 +253,16 @@ class LodFormatter:
 
     def _p7(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if not inverse:
-            record['took_place_at'] = self._ref(link_.range)
+            lod_append(record, 'took_place_at', self._ref(link_.range))
 
     def _p9(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if inverse:
-            record['forms_part_of'] = self._ref(link_.domain)
+            lod_append(
+                record,
+                'event_forms_part_of',
+                self._ref(link_.domain))
         else:
-            lod_append(record, 'is_composed_of', self._ref(link_.range))
+            lod_append(record, 'consists_of', self._ref(link_.range))
 
     def _p11(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if inverse:
@@ -284,7 +289,10 @@ class LodFormatter:
 
     def _p24(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if inverse:
-            record['title_transferred_through'] = self._ref(link_.domain)
+            lod_append(
+                record,
+                'title_transferred_through',
+                self._ref(link_.domain))
         else:
             lod_append(record, 'transferred_title_of', self._ref(link_.range))
 
@@ -294,11 +302,11 @@ class LodFormatter:
 
     def _p26(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if not inverse:
-            record['moved_to'] = self._ref(link_.range)
+            lod_append(record, 'moved_to', self._ref(link_.range))
 
     def _p27(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if not inverse:
-            record['moved_from'] = self._ref(link_.range)
+            lod_append(record, 'moved_from', self._ref(link_.range))
 
     def _p31(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if inverse:
@@ -328,7 +336,7 @@ class LodFormatter:
 
     def _p94(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if inverse:
-            record['was_created_by'] = self._ref(link_.domain)
+            lod_append(record, 'was_created_by', self._ref(link_.domain))
         else:
             lod_append(record, 'has_created', self._ref(link_.range))
 
@@ -348,7 +356,7 @@ class LodFormatter:
             record: dict[str, Any],
             inverse: bool) -> None:
         if inverse:
-            record['was_produced_by'] = self._ref(link_.domain)
+            lod_append(record, 'was_produced_by', self._ref(link_.domain))
         else:
             lod_append(record, 'has_produced', self._ref(link_.range))
 
@@ -382,18 +390,28 @@ class LodFormatter:
 
     def _oa7(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         other = link_.domain if inverse else link_.range
-        rel_ref = self._ref(other)
-        if link_.type and link_.type.name:
-            rel_ref['relation_type'] = link_.type.name
-        lod_append(record, 'has_relationship_to', rel_ref)
+        other_ref = self._ref(other)
+        lod_append(record, 'has_relationship_to', other_ref)
+        relationship: dict[str, Any] = {
+            'type': 'Relationship',
+            'relates_to': other_ref}
+        if link_.type:
+            relationship['has_type'] = self._type_ref(link_.type)
+            if link_.type.name:
+                relationship['relation_type'] = link_.type.name
+        if timespan := get_lod_timespan(
+                link_.dates,
+                f'Timespan of relationship with {other.name}'):
+            relationship['has_time_span'] = timespan
+        lod_append(record, 'relationships', relationship)
 
     def _oa8(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if not inverse:
-            record['begins_in'] = self._ref(link_.range)
+            lod_append(record, 'begins_in', self._ref(link_.range))
 
     def _oa9(self, link_: Link, record: dict[str, Any], inverse: bool) -> None:
         if not inverse:
-            record['ends_in'] = self._ref(link_.range)
+            lod_append(record, 'ends_in', self._ref(link_.range))
 
 
 def get_context_url() -> str:
