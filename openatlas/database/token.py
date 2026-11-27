@@ -90,3 +90,26 @@ def check_token_revoked(jti: str) -> dict[str, Any]:
     if row := g.cursor.fetchone():
         token = {'revoked': row[0], 'valid_until': row[1], 'active': row[2]}
     return token
+
+
+def get_token_user_group(jti: str) -> str | None:
+    g.cursor.execute(
+        """
+        SELECT r.name
+        FROM web.user_tokens t
+        JOIN web.user u ON t.user_id = u.id
+        JOIN web.group r ON u.group_id = r.id
+        WHERE t.jti = %(jti)s
+            AND NOT t.revoked
+            AND u.active
+            AND t.valid_until >= %(now)s;
+        """,
+        {'jti': jti, 'now': datetime.now()})
+    row = g.cursor.fetchone()
+    return str(row[0]) if row and row[0] else None
+
+
+def delete_token_by_jti(jti: str) -> None:
+    g.cursor.execute(
+        'DELETE FROM web.user_tokens WHERE jti = %(jti)s;',
+        {'jti': jti})

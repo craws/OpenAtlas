@@ -7,6 +7,7 @@ from openatlas import app
 from openatlas.api.api_v1.context.lod_context import (
     get_lod_context, get_oa_ontology_graph)
 from openatlas.api.api_v1.error_handlers import register_error_handlers
+from openatlas.api.api_v1.formatters.export_util import guard_dump_stream
 from openatlas.api.api_v1.formatters.lod import (
     format_lod_entities, format_lod_entity)
 from openatlas.api.api_v1.formatters.lod_export import stream_lod_nt
@@ -20,7 +21,7 @@ from openatlas.api.api_v1.openapi_tags import lod_tag
 from openatlas.api.api_v1.responses.lod import (
     context_responses, dump_responses, lod_collection_responses, lod_responses,
     ontology_responses)
-from openatlas.api.api_v1.util.auth import require_auth
+from openatlas.api.api_v1.util.auth import require_group
 from openatlas.api.api_v1.util.content_negotiation import make_graph_response
 
 api_v1_lod = APIBlueprint(
@@ -140,13 +141,14 @@ def get_ontology_ext(path: ExtensionPath) -> Response:
 def get_lod_dump(query: LodDumpQuery) -> Response:
     """
     Streams a full Linked Open Data export in N-Triples (.nt) format.
-    Requires user authentication (Flask session cookie or JWT Bearer token).
+    Requires manager (or admin) authentication via Flask session cookie or
+    JWT Bearer token.
 
     Supports keyset streaming with low memory footprint. Optional query
     parameters allow limiting the exported entities or filtering by entity
     class.
     """
-    require_auth()
+    require_group('manager')
     entity_class = (
         query.entity_class.value
         if isinstance(query.entity_class, OpenAtlasClassEnum)
@@ -154,10 +156,9 @@ def get_lod_dump(query: LodDumpQuery) -> Response:
     filename = 'openatlas_lod_dump.nt'
     if entity_class:
         filename = f'openatlas_{entity_class}_lod.nt'
+    stream = guard_dump_stream(
+        stream_lod_nt(class_name=entity_class, limit=query.limit))
     return Response(
-        stream_with_context(
-            stream_lod_nt(
-                class_name=entity_class,
-                limit=query.limit)),
+        stream_with_context(stream),
         mimetype='application/n-triples',
         headers={'Content-Disposition': f'attachment; filename="{filename}"'})

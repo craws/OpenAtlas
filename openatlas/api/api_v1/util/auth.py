@@ -2,11 +2,13 @@ from collections.abc import Callable
 from functools import wraps
 from typing import Any
 
+from flask import g
 from flask_jwt_extended import get_jwt, verify_jwt_in_request
 from flask_login import current_user
 
 from openatlas.api.api_v1.error_handlers import (
     abort_forbidden, abort_unauthorized)
+from openatlas.database.token import get_token_user_group
 
 ROLE_HIERARCHY = ['admin', 'manager', 'editor', 'contributor', 'readonly']
 
@@ -23,11 +25,16 @@ def is_authenticated() -> bool:
 def get_authenticated_role() -> str | None:
     if current_user.is_authenticated and hasattr(current_user, 'group'):
         return str(current_user.group)
+    if hasattr(g, 'api_jwt_role'):
+        cached_role: str | None = g.api_jwt_role
+        return cached_role
     try:
         verify_jwt_in_request(optional=True, locations='headers')
         jwt_claims = get_jwt()
-        if jwt_claims and 'role' in jwt_claims:
-            return str(jwt_claims['role'])
+        if jwt_claims and (jti := jwt_claims.get('jti')):
+            role = get_token_user_group(str(jti))
+            g.api_jwt_role = role
+            return role
     except Exception:  # pragma: no cover
         return None
     return None

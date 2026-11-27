@@ -134,6 +134,14 @@ def abort_forbidden(message: str = 'Insufficient permissions.') -> NoReturn:
     abort_with_error(403, 'Forbidden', message, details)
 
 
+def abort_too_many_requests(
+        message: str = 'Too many concurrent export requests.') -> NoReturn:
+    details = {
+        'hint': 'Another dump export is currently running. '
+                'Please retry later.'}
+    abort_with_error(429, 'Too Many Requests', message, details)
+
+
 def abort_georeference_not_found(id_: int) -> NoReturn:
     details = {
         'provided_id': str(id_),

@@ -84,6 +84,18 @@ dump_responses: ResponseDict = {
             'Authentication required. Provide a valid Bearer token or log in.',
         'content': {
             'application/json': {
+                'schema': ErrorResponse.model_json_schema()}}},
+    403: {
+        'description':
+            'Forbidden. Manager or admin role required for full dump export.',
+        'content': {
+            'application/json': {
+                'schema': ErrorResponse.model_json_schema()}}},
+    429: {
+        'description':
+            'Too many concurrent dump export requests.',
+        'content': {
+            'application/json': {
                 'schema': ErrorResponse.model_json_schema()}}}}
 
 la_dump_responses: ResponseDict = {
@@ -96,6 +108,18 @@ la_dump_responses: ResponseDict = {
     401: {
         'description':
             'Authentication required. Provide a valid Bearer token or log in.',
+        'content': {
+            'application/json': {
+                'schema': ErrorResponse.model_json_schema()}}},
+    403: {
+        'description':
+            'Forbidden. Manager or admin role required for full dump export.',
+        'content': {
+            'application/json': {
+                'schema': ErrorResponse.model_json_schema()}}},
+    429: {
+        'description':
+            'Too many concurrent dump export requests.',
         'content': {
             'application/json': {
                 'schema': ErrorResponse.model_json_schema()}}}}

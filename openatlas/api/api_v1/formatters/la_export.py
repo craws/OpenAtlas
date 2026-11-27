@@ -1,15 +1,22 @@
-import gzip
 import json
 from collections.abc import Iterator
 from pathlib import Path
-from typing import Any
 
 from flask import g
 from rdflib import Dataset
 
+from openatlas.api.api_v1.context.lod_context import get_linked_art_context
+from openatlas.api.api_v1.formatters.export_util import (
+    iter_entity_batches, write_stream_to_file)
 from openatlas.api.api_v1.formatters.la_formatter import (
     LA_CONTEXT, format_la_entities)
-from openatlas.models.entity import Entity
+
+
+def _clear_batch_caches() -> None:
+    if hasattr(g, 'api_file_paths'):
+        g.api_file_paths.clear()
+    if hasattr(g, 'api_rights_holders'):
+        g.api_rights_holders.clear()
 
 
 def stream_la_dump(
@@ -17,47 +24,25 @@ def stream_la_dump(
         limit: int | None = None,
         batch_size: int = 1000,
         output_format: str = 'jsonl') -> Iterator[str]:
-    last_id = 0
-    exported = 0
-
-    while True:
-        cur_limit = batch_size
-        if limit is not None:
-            if exported >= limit:
-                break
-            cur_limit = min(batch_size, limit - exported)
-
-        where_clause = 'WHERE id > %(last_id)s'
-        params: dict[str, Any] = {'last_id': last_id, 'limit': cur_limit}
-        if class_name and class_name.lower() != 'all':
-            where_clause += ' AND openatlas_class_name = %(class)s'
-            params['class'] = class_name.lower()
-
-        g.cursor.execute(
-            f'SELECT id FROM model.entity {where_clause} ORDER BY id '
-            f'LIMIT %(limit)s;',
-            params)
-        if not (rows := g.cursor.fetchall()):
-            break
-
-        ids = [r[0] for r in rows]
-        last_id = ids[-1]
-        entities = Entity.get_by_ids(ids, types=True, aliases=True)
+    la_ctx = get_linked_art_context() if output_format == 'nt' else None
+    for entities in iter_entity_batches(
+            class_name=class_name,
+            limit=limit,
+            batch_size=batch_size):
         la_data = format_la_entities(entities)
+        _clear_batch_caches()
 
         if output_format == 'nt':
             graph_data = {
-                '@context': LA_CONTEXT,
+                '@context': la_ctx,
                 '@graph': la_data['orderedItems']}
             graph = Dataset()
             graph.parse(data=json.dumps(graph_data), format='json-ld')
-            exported += len(entities)
             yield graph.serialize(format='nt')
         else:
             lines = [
                 json.dumps({'@context': LA_CONTEXT, **item})
                 for item in la_data['orderedItems']]
-            exported += len(entities)
             yield '\n'.join(lines) + '\n'
 
 
@@ -69,26 +54,11 @@ def export_la_dump_to_file(
         batch_size: int = 1000,
         output_format: str = 'jsonl',
         compress: bool = True) -> Path:
-    target_path = Path(output_path)
-    target_path.parent.mkdir(parents=True, exist_ok=True)
-
-    if compress:
-        if not str(target_path).endswith('.gz'):
-            target_path = target_path.with_name(f'{target_path.name}.gz')
-        with gzip.open(target_path, 'wt', encoding='utf-8') as f:
-            for chunk in stream_la_dump(
-                    class_name=class_name,
-                    limit=limit,
-                    batch_size=batch_size,
-                    output_format=output_format):
-                f.write(chunk)
-    else:
-        with open(target_path, 'w', encoding='utf-8') as f:
-            for chunk in stream_la_dump(
-                    class_name=class_name,
-                    limit=limit,
-                    batch_size=batch_size,
-                    output_format=output_format):
-                f.write(chunk)
-
-    return target_path
+    return write_stream_to_file(
+        output_path,
+        stream_la_dump(
+            class_name=class_name,
+            limit=limit,
+            batch_size=batch_size,
+            output_format=output_format),
+        compress=compress)

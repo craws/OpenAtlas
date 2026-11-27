@@ -125,4 +125,8 @@ CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
 CREATE INDEX IF NOT EXISTS entity_name_dm_idx ON model.entity USING gin (public.daitch_mokotoff(name));
 CREATE INDEX IF NOT EXISTS entity_name_trgm_idx ON model.entity USING gin (name public.gin_trgm_ops);
 
+-- Add indexes for text annotation batch loading and filtered entity dumps
+CREATE INDEX IF NOT EXISTS annotation_text_source_id_idx ON model.annotation_text USING btree (source_id, link_start);
+CREATE INDEX IF NOT EXISTS entity_class_id_idx ON model.entity USING btree (openatlas_class_name, id);
+
 END;

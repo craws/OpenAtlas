@@ -1,9 +1,39 @@
-from typing import Any
+import json
+from functools import lru_cache
+from pathlib import Path
+from typing import Any, Final
 
 from flask import url_for
 from rdflib import (
     OWL, RDF, RDFS, XSD, BNode, Graph, Literal, Namespace, URIRef)
 from rdflib.collection import Collection
+
+LA_CONTEXT_URL: Final[str] = 'https://linked.art/ns/v1/linked-art.json'
+LA_SEARCH_CONTEXT_URL: Final[str] = 'https://linked.art/ns/v1/search.json'
+LA_SEARCH_CONTEXT_DICT: Final[dict[str, Any]] = {
+    'as': 'https://www.w3.org/ns/activitystreams#',
+    'OrderedCollection': 'as:OrderedCollection',
+    'OrderedCollectionPage': 'as:OrderedCollectionPage',
+    'partOf': {'@id': 'as:partOf', '@type': '@id'},
+    'first': {'@id': 'as:first', '@type': '@id'},
+    'last': {'@id': 'as:last', '@type': '@id'},
+    'prev': {'@id': 'as:prev', '@type': '@id'},
+    'next': {'@id': 'as:next', '@type': '@id'},
+    'startIndex': {
+        '@id': 'as:startIndex',
+        '@type': 'xsd:nonNegativeInteger'},
+    'totalItems': {
+        '@id': 'as:totalItems',
+        '@type': 'xsd:nonNegativeInteger'},
+    'orderedItems': {'@id': 'as:items', '@container': '@list'}}
+
+
+@lru_cache(maxsize=1)
+def get_linked_art_context() -> dict[str, Any]:
+    path = Path(__file__).resolve().parents[2] / 'linked-art.json'
+    data: dict[str, Any] = json.loads(path.read_text(encoding='utf-8'))
+    ctx: dict[str, Any] = data['@context']
+    return ctx
 
 
 def get_oa_ontology_uri() -> str:
@@ -15,9 +45,9 @@ def get_oa_ontology_uri() -> str:
         return 'https://openatlas.eu/ontology/#'
 
 
-def get_oa_ontology_graph() -> Graph:
+@lru_cache(maxsize=4)
+def _build_oa_ontology_graph(oax_base: str) -> Graph:
     graph = Graph()
-    oax_base = get_oa_ontology_uri()
     oax = Namespace(oax_base)
     crm = Namespace('http://www.cidoc-crm.org/cidoc-crm/')
     graph.bind('oax', oax)
@@ -174,6 +204,10 @@ def get_oa_ontology_graph() -> Graph:
     graph.add((p_ec, RDFS.range, XSD.string))
 
     return graph
+
+
+def get_oa_ontology_graph() -> Graph:
+    return _build_oa_ontology_graph(get_oa_ontology_uri())
 
 
 def get_lod_context() -> dict[str, Any]:

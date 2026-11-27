@@ -4,6 +4,7 @@ from flask import Response, stream_with_context
 from flask_openapi3 import APIBlueprint
 
 from openatlas.api.api_v1.error_handlers import register_error_handlers
+from openatlas.api.api_v1.formatters.export_util import guard_dump_stream
 from openatlas.api.api_v1.formatters.la_export import stream_la_dump
 from openatlas.api.api_v1.formatters.la_formatter import (
     format_la_entities, format_la_entity)
@@ -16,7 +17,7 @@ from openatlas.api.api_v1.models.util import OpenAtlasClassEnum
 from openatlas.api.api_v1.openapi_tags import lod_tag
 from openatlas.api.api_v1.responses.lod import (
     la_dump_responses, la_responses, lod_collection_responses)
-from openatlas.api.api_v1.util.auth import require_auth
+from openatlas.api.api_v1.util.auth import require_group
 
 api_v1_la = APIBlueprint(
     'api_v1_la',
@@ -90,9 +91,10 @@ def get_la_dump(query: LaDumpQuery) -> Response:
     line is a complete, valid Linked Art JSON-LD document.
     Can also stream N-Triples (`.nt`) by setting `format=nt`.
 
-    Requires user authentication (Flask session cookie or JWT Bearer token).
+    Requires manager (or admin) authentication via Flask session cookie or
+    JWT Bearer token.
     """
-    require_auth()
+    require_group('manager')
     ext = 'jsonl' if query.format == 'jsonl' else 'nt'
     mimetype = (
         'application/x-ndjson' if query.format == 'jsonl'
@@ -104,11 +106,12 @@ def get_la_dump(query: LaDumpQuery) -> Response:
     filename = f'openatlas_linked_art_dump.{ext}'
     if entity_class:
         filename = f'openatlas_linked_art_{entity_class}.{ext}'
+    stream = guard_dump_stream(
+        stream_la_dump(
+            class_name=entity_class,
+            limit=query.limit,
+            output_format=query.format))
     return Response(
-        stream_with_context(
-            stream_la_dump(
-                class_name=entity_class,
-                limit=query.limit,
-                output_format=query.format)),
+        stream_with_context(stream),
         mimetype=mimetype,
         headers={'Content-Disposition': f'attachment; filename="{filename}"'})

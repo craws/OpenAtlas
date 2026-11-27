@@ -5,7 +5,6 @@ from typing import Any, Final
 import validators
 from flask import g, url_for
 
-from openatlas.api.api_v1.entity import get_entity_by_id
 from openatlas.api.api_v1.formatters.la_helpers import \
     ACTORS, BIBLIOGRAPHY_AAT, CLASS_TYPES, DIMENSION_ROOTS, \
     MIME_CLASSIFICATIONS, UNIT_MAP, aat_type, alias_name, category_aat, \
@@ -151,6 +150,8 @@ class LaFormatter:
             else get_type_references())
         self.entity: Entity
         self.geometries: dict[int, Any] = {}
+        self.annotations: dict[int, list[AnnotationText]] = {}
+        self.annotation_entities: dict[int, Entity] = {}
         self.handlers: dict[str, Any] = {
             'P1': self.p1,
             'P2': self.p2,
@@ -831,13 +832,30 @@ class LaFormatter:
             else:
                 record[key] = event
 
+    def prefetch_annotations(self, entities: list[Entity]) -> None:
+        source_ids = [
+            entity.id for entity in entities
+            if entity.description and entity.class_.name in ('source', 'text')]
+        if not source_ids:
+            return
+        self.annotations = AnnotationText.get_by_source_ids(source_ids)
+        linked_ids = {
+            annotation.entity_id
+            for annotations in self.annotations.values()
+            for annotation in annotations
+            if annotation.entity_id is not None}
+        if linked_ids:
+            self.annotation_entities = {
+                entity.id: entity
+                for entity in Entity.get_by_ids(linked_ids)}
+
     def add_description(self, record: dict[str, Any]) -> None:
         entity = self.entity
         la_append(record, 'referred_to_by', statement(
             entity.description or '',
             'Description',
             [category_aat('300435416', 'description')]))
-        for annotation in AnnotationText.get_by_source_id(entity.id) or []:
+        for annotation in self.annotations.get(entity.id, []):
             la_append(record, 'referred_to_by', self.annotation(annotation))
 
     def annotation(
@@ -853,8 +871,8 @@ class LaFormatter:
                 f'{annotation.link_start}-{annotation.link_end}',
                 'Text position',
                 aat_type('300055590', 'Selectors'))])
-        if annotation.entity_id:
-            linked = get_entity_by_id(annotation.entity_id)
+        if annotation.entity_id and (
+                linked := self.annotation_entities.get(annotation.entity_id)):
             result['identified_by'].append(
                 identifier(entity_uri(linked), f'Annotated: {linked.name}'))
         if annotation.text:
@@ -886,6 +904,7 @@ def format_la_entities(
     links_data = get_links_for_entities(entities) if entities else {}
     prefetch_files(links_data)
     formatter = LaFormatter(type_references=get_type_references())
+    formatter.prefetch_annotations(entities)
     items = [formatter.format_entity(item) for item in links_data.values()]
     if pagination is None:
         return {

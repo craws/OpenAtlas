@@ -1,3 +1,4 @@
+import os
 import sys
 from collections.abc import Iterator
 from functools import cache
@@ -5,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from flask import g
+from flask_jwt_extended import decode_token
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
@@ -19,6 +21,7 @@ from openatlas.api.api_v1.models.util import OpenAtlasClassEnum
 from openatlas.api.api_v1.util.files import (
     get_display_extensions, get_multiple_file_paths, has_file_access,
     iiif_file_exists)
+from openatlas.database.token import delete_token_by_jti
 from openatlas.display.image_processing import (
     check_iiif_activation, is_supported_image, safe_resize_image)
 from openatlas.models.entity import Entity
@@ -27,7 +30,9 @@ from openatlas.models.token import Token
 from openatlas.models.user import User
 
 
-def get_auth_token() -> str:
+def get_auth_token() -> tuple[str, str | None]:
+    if env_token := os.environ.get('SCHEMATHESIS_AUTH_TOKEN'):
+        return env_token, None
     with app.test_request_context():
         app.preprocess_request()
         admin_user = next(
@@ -35,7 +40,15 @@ def get_auth_token() -> str:
         if not admin_user:
             admin_user = User.get_all()[0]
         login_user(admin_user)
-        return Token.generate_token(1, 'schemathesis_test_token', admin_user)
+        token = Token.generate_token(1, 'schemathesis_test_token', admin_user)
+        jti = str(decode_token(token, allow_expired=True)['jti'])
+        return token, jti
+
+
+def cleanup_auth_token(jti: str) -> None:
+    with app.test_request_context():
+        app.preprocess_request()
+        delete_token_by_jti(jti)
 
 
 SCHEMATHESIS_ARGUMENTS = (
@@ -43,8 +56,6 @@ SCHEMATHESIS_ARGUMENTS = (
     'http://localhost:5000/api/1/docs/openapi.json',
     '--url',
     'http://localhost:5000',
-    '-H',
-    f'Authorization: Bearer {get_auth_token()}',
     '--phases',
     'examples,coverage,fuzzing',
     '--checks',
@@ -256,9 +267,14 @@ def map_case(_context: Any, case: Any) -> Any:
 
 
 def main() -> None:
-    schemathesis_cli.main(
-        args=SCHEMATHESIS_ARGUMENTS,
-        prog_name='schemathesis')
+    token, jti = get_auth_token()
+    try:
+        schemathesis_cli.main(
+            args=(*SCHEMATHESIS_ARGUMENTS, '-H', f'Authorization: Bearer {token}'),
+            prog_name='schemathesis')
+    finally:
+        if jti is not None:
+            cleanup_auth_token(jti)
 
 
 if __name__ == '__main__':

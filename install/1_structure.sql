@@ -93,8 +93,10 @@ DROP INDEX IF EXISTS model.link_property_code_idx;
 DROP INDEX IF EXISTS model.link_domain_id_idx;
 DROP INDEX IF EXISTS model.gis_entity_id_idx;
 DROP INDEX IF EXISTS model.entity_openatlas_class_name_idx;
+DROP INDEX IF EXISTS model.entity_class_id_idx;
 DROP INDEX IF EXISTS model.entity_name_trgm_idx;
 DROP INDEX IF EXISTS model.entity_name_dm_idx;
+DROP INDEX IF EXISTS model.annotation_text_source_id_idx;
 DROP INDEX IF EXISTS model.cidoc_class_code_idx;
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_username_key;
 ALTER TABLE IF EXISTS ONLY web.user_tokens DROP CONSTRAINT IF EXISTS user_tokens_pkey;
@@ -2298,6 +2300,20 @@ CREATE INDEX cidoc_class_code_idx ON model.cidoc_class USING btree (code);
 --
 
 CREATE INDEX entity_openatlas_class_name_idx ON model.entity USING btree (openatlas_class_name);
+
+
+--
+-- Name: entity_class_id_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX entity_class_id_idx ON model.entity USING btree (openatlas_class_name, id);
+
+
+--
+-- Name: annotation_text_source_id_idx; Type: INDEX; Schema: model; Owner: openatlas
+--
+
+CREATE INDEX annotation_text_source_id_idx ON model.annotation_text USING btree (source_id, link_start);
 
 
 --

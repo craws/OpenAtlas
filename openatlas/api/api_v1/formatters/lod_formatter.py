@@ -5,7 +5,7 @@ from flask import url_for
 from openatlas.api.api_v1.formatters.la_helpers import (
     date_to_utc_iso_str, is_float)
 from openatlas.api.api_v1.formatters.util import (
-    EntityLinks, entity_uri, get_links_for_entities, get_type_references)
+    EntityLinks, entity_uri, get_links_for_entities)
 from openatlas.models.annotation import AnnotationText
 from openatlas.models.dates import Dates
 from openatlas.models.entity import Entity, Link
@@ -76,12 +76,7 @@ def lod_append(record: dict[str, Any], key: str, value: Any) -> None:
 
 
 class LodFormatter:
-    def __init__(
-            self,
-            type_references: dict[int, list[Link]] | None = None) -> None:
-        self.type_refs = (
-            type_references if type_references is not None
-            else get_type_references())
+    def __init__(self) -> None:
         self.entity: Entity
         self.geometries: dict[int, Any] = {}
         self.annotations: dict[int, list[AnnotationText]] = {}

@@ -60,6 +60,7 @@ class ApiV1(ApiTestCase):
         assert annotation['type'] == 'Annotation'
         assert annotation['body_comment'] == 'Tales of the First Age'
         assert annotation['target'] == {
+            'type': 'SpecificResource',
             'source': source_data['id'],
             'selector': {
                 'type': 'TextPositionSelector',
@@ -71,6 +72,7 @@ class ApiV1(ApiTestCase):
             'type': 'Annotation',
             'body_comment': 'Comment only',
             'target': {
+                'type': 'SpecificResource',
                 'source': source_data['id'],
                 'selector': {
                     'type': 'TextPositionSelector',
@@ -206,8 +208,8 @@ class ApiV1(ApiTestCase):
         assert 'archaeo' in ctx['@context']
         assert 'geo' in ctx['@context']
         assert ctx['@context']['oa'] == 'http://www.w3.org/ns/oa#'
-        assert ctx['@context']['annotations'] == {
-            '@reverse': 'oa:hasTarget'}
+        assert ctx['@context']['annotations'] == '@included'
+        assert ctx['@context']['SpecificResource'] == 'oa:SpecificResource'
         assert ctx['@context']['body_entity'] == {
             '@id': 'oa:hasBody', '@type': '@id'}
         assert ctx['@context']['Feature'] == 'crm:E25_Human-Made_Feature'
