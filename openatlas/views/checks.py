@@ -267,7 +267,12 @@ def orphans() -> str:
 @app.route('/check_files/<arche>')
 @required_group('contributor')
 def check_files(arche: str | None = None) -> str:
-    entities: list[Entity] = Entity.get_by_class('file', types=True)
+    all_entities: list[Entity] = Entity.get_by_class('file', types=True)
+    all_entity_ids = {entity.id for entity in all_entities}
+    entities = all_entities
+    if arche:
+        if type_ids := app.config['ARCHE_METADATA'].get('typeIds'):
+            entities = filter_by_type(entities, type_ids)
     result: dict[str, list[Entity]] = {
         'missing_files': [],
         'not_public': [],
@@ -318,18 +323,13 @@ def check_files(arche: str | None = None) -> str:
             'orphaned_iiif_files',
             _('orphaned iiif files'),
             table=Table(['name', 'size', 'date', 'ext']))}
-    entity_ids = [entity.id for entity in entities]
     tabs['orphaned_files'].table.rows = \
-        get_files_without_entity(entity_ids)
+        get_files_without_entity(all_entity_ids)
     if check_iiif_activation():
         tabs['orphaned_iiif_files'].table.rows = \
-            get_iiif_files_without_entity(entity_ids)
+            get_iiif_files_without_entity(all_entity_ids)
     for tab in tabs.values():
         tab.buttons = [manual('admin/data_integrity_checks')]
-    if arche:
-        type_ids = app.config['ARCHE_METADATA'].get('typeIds')
-        if type_ids:
-            entities = filter_by_type(entities, type_ids)
     duplicates = find_duplicates({e.id for e in entities})
     duplicate_ids = set().union(*duplicates)
     mapping = {e.id: e for e in Entity.get_by_ids(list(duplicate_ids))}
@@ -351,7 +351,7 @@ def check_files(arche: str | None = None) -> str:
         crumbs=[
             [_('admin'), f'{url_for('admin_index')}#tab-data'],
             [f'{_('export')} ARCHE', f'{url_for('export_arche')}']
-            if arche else None,
+            if arche and is_authorized('manager') else None,
             _('check files')])
 
 
@@ -363,7 +363,7 @@ def delete_orphaned_resized_images() -> Response:
     return redirect(f'{url_for('admin_index')}#tab-data')
 
 
-def get_files_without_entity(entity_file_ids: list[int]) -> list[Any]:
+def get_files_without_entity(entity_file_ids: set[int]) -> list[Any]:
     rows = []
     for file in app.config['UPLOAD_PATH'].iterdir():
         if file.name != '.gitignore' \
@@ -385,7 +385,7 @@ def get_files_without_entity(entity_file_ids: list[int]) -> list[Any]:
     return rows
 
 
-def get_iiif_files_without_entity(entity_file_ids: list[int]) -> list[Any]:
+def get_iiif_files_without_entity(entity_file_ids: set[int]) -> list[Any]:
     rows = []
     for file in Path(g.settings['iiif_path']).iterdir():
         confirm = _('delete %(name)s?', name=file.name.replace("'", ''))

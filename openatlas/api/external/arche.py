@@ -1,10 +1,9 @@
 import re
-from re import search
 from typing import Any
 from urllib.parse import quote, urlparse, urlunparse
 
 import requests
-from flask import abort, g
+from flask import g
 from rdflib import Graph, Literal, RDF, URIRef, XSD
 from unidecode import unidecode
 
@@ -16,19 +15,36 @@ from openatlas.models.entity import Entity
 from openatlas.models.rights_holder import RightsHolder
 
 
-def is_arche_likeable_uri(uri: str) -> bool:
-    if not g.arche_uri_rules:
+def compile_arche_uri_rules(raw_rules: Any) -> list[re.Pattern[str]]:
+    if not isinstance(raw_rules, list):  # pragma: no cover
+        raise ValueError('Invalid ARCHE URI rules format')
+    compiled: list[re.Pattern[str]] = []
+    for rule in raw_rules:
+        if not isinstance(rule, dict) or not isinstance(
+                pattern := rule.get('match'), str):
+            continue  # pragma: no cover
         try:
-            g.arche_uri_rules = requests.get(
+            compiled.append(re.compile(pattern))
+        except re.error as e:  # pragma: no cover
+            g.logger.log(
+                'warn',
+                'arche',
+                f'Invalid ARCHE URI regex {pattern!r}: {e}')
+    return compiled
+
+
+def is_arche_likeable_uri(uri: str) -> bool:
+    if getattr(g, 'arche_uri_rules', None) is None:
+        try:
+            response = requests.get(
                 app.config['ARCHE_URI_RULES'],
                 proxies=app.config['PROXIES'],
-                timeout=10).json()
-        except Exception:  # pragma: no cover
-            abort(400, 'ARCHE not reachable')
-    for rule in g.arche_uri_rules:
-        if search(rule['match'], uri):
-            return True
-    return False
+                timeout=10)
+            response.raise_for_status()
+            g.arche_uri_rules = compile_arche_uri_rules(response.json())
+        except Exception as e:  # pragma: no cover
+            raise RuntimeError('ARCHE URI rules not reachable') from e
+    return any(pattern.search(uri) for pattern in g.arche_uri_rules)
 
 
 def is_valid_url(url: str) -> bool:
@@ -226,7 +242,7 @@ def add_publications(
             create_single_uri(str(publication.id))))
 
 
-def _add_common_repo_metadata(
+def add_common_repo_metadata(
         graph: Graph,
         subject_uri: URIRef,
         item: Any,
@@ -270,7 +286,7 @@ def add_arche_top_collection_to_graph(
         emitted: set[str]) -> None:
     subject_uri = URIRef(top.uri)
     graph.add((subject_uri, RDF.type, ACDH.TopCollection))
-    _add_common_repo_metadata(graph, subject_uri, top, emitted)
+    add_common_repo_metadata(graph, subject_uri, top, emitted)
     add_language_literals(
         graph, subject_uri, top.descriptions, ACDH.hasDescription)
     add_language_literals(graph, subject_uri, top.subjects, ACDH.hasSubject)
@@ -310,7 +326,7 @@ def add_arche_collection_to_graph(
     graph.add((subject_uri, RDF.type, ACDH.Collection))
     graph.add((subject_uri, ACDH.isPartOf, URIRef(collection.is_part_of)))
     graph.add((subject_uri, ACDH.hasFilename, Literal(collection.filename)))
-    _add_common_repo_metadata(graph, subject_uri, collection, emitted)
+    add_common_repo_metadata(graph, subject_uri, collection, emitted)
     if collection.license_summary:
         graph.add((
             subject_uri,
@@ -333,7 +349,7 @@ def add_arche_file_metadata_to_graph(
         emitted = set()
     subject_uri = URIRef(metadata.uri)
     graph.add((subject_uri, RDF.type, ACDH.Resource))
-    _add_common_repo_metadata(graph, subject_uri, metadata, emitted)
+    add_common_repo_metadata(graph, subject_uri, metadata, emitted)
     if metadata.is_part_of:
         graph.add((subject_uri, ACDH.isPartOf, URIRef(metadata.is_part_of)))
     if metadata.is_title_image_of:

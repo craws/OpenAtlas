@@ -175,13 +175,10 @@ class Endpoint:
                 'totalPages': len(self.pagination['index'])}}
 
     def filter_by_type(self) -> list[Entity]:
-        result = []
-        for entity in self.entities:
-            if any(
-                    id_ in [type_.id for type_ in entity.types]
-                    for id_ in self.parser.type_id):
-                result.append(entity)
-        return result
+        type_id_set = set(self.parser.type_id)
+        return [
+            entity for entity in self.entities
+            if any(type_.id in type_id_set for type_ in entity.types)]
 
     def export_csv_entities(self) -> Response:
         frames = []

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import hashlib
-import operator
 import os
 import shutil
 import subprocess
@@ -31,6 +30,10 @@ from openatlas.api.external.arche_class import (
     get_arche_top_uri, normalize_extension, slugify_arche_segment)
 from openatlas.display.image_processing import get_binary_path
 from openatlas.models.entity import Entity
+
+ALREADY_COMPRESSED_EXTENSIONS = {
+    'jpeg', 'png', 'gif', 'webp', 'pdf', 'mp3', 'mp4', 'mov', 'avi',
+    'zip', 'gz', 'bz2', 'xz', '7z', 'rar', 'flac', 'ogg', 'webm'}
 
 
 def current_date_for_filename() -> str:
@@ -127,7 +130,7 @@ def arche_export() -> Path:
             failed_files_md,
             encoding='utf-8')
 
-        sql_dump_path = Path(open_tmp_sql_file())
+        sql_dump_path = write_tmp_sql_file(temp_path / sql_filename)
         rdf_dump_path = temp_path / rdf_filename
         rdf_dump = cast(Response, Endpoint(
             ApiEntity.get_by_system_classes(['all']),
@@ -148,27 +151,48 @@ def arche_export() -> Path:
             metadata_ttl,
             encoding='utf-8')
 
+        checksums: dict[str, str] = {}
         with zipfile.ZipFile(
                 tmp_archive_path,
                 'w',
                 compression=zipfile.ZIP_DEFLATED) as archive:
-            archive.write(sql_dump_path, arcname=f'data/{sql_filename}')
-            archive.write(
+            write_file_to_archive(
+                archive,
+                sql_dump_path,
+                f'data/{sql_filename}',
+                checksums)
+            write_file_to_archive(
+                archive,
                 temp_path / 'problematic_files.md',
-                arcname='debug/problematic_files.md')
-            archive.write(
+                'debug/problematic_files.md',
+                checksums)
+            write_file_to_archive(
+                archive,
                 temp_path / metadata_filename,
-                arcname=f'metadata/{metadata_filename}')
-            archive.write(rdf_dump_path, arcname=f'data/{rdf_filename}')
+                f'metadata/{metadata_filename}',
+                checksums)
+            write_file_to_archive(
+                archive,
+                rdf_dump_path,
+                f'data/{rdf_filename}',
+                checksums)
 
             for type_slug, ext_map in files_by_extension.items():
                 for ext, files_set in ext_map.items():
+                    compress_type = (
+                        zipfile.ZIP_STORED
+                        if ext in ALREADY_COMPRESSED_EXTENSIONS
+                        else zipfile.ZIP_DEFLATED)
                     for file_path in files_set:
                         arcname = (
                             f'data/{type_slug}/{ext}/{file_path.name}'
                             if type_slug else f'data/{ext}/{file_path.name}')
-                        with file_path.open('rb') as file:
-                            archive.writestr(arcname, file.read())
+                        write_file_to_archive(
+                            archive,
+                            file_path,
+                            arcname,
+                            checksums,
+                            compress_type=compress_type)
 
             infos = archive.infolist()
             staged_size = sum(info.file_size for info in infos)
@@ -208,10 +232,13 @@ def arche_export() -> Path:
                     break
                 total_size = new_total_size
 
-            archive.writestr('debug/file_statistic.md', stat_md)
+            stat_bytes = stat_md.encode('utf-8')
+            checksums['debug/file_statistic.md'] = hashlib.sha256(
+                stat_bytes).hexdigest()
+            archive.writestr('debug/file_statistic.md', stat_bytes)
             archive.writestr(
                 'checksums.sha256',
-                create_checksum_manifest(archive))
+                format_checksum_manifest(checksums))
 
         shutil.move(str(tmp_archive_path), str(final_archive_path))
     return final_archive_path
@@ -320,31 +347,33 @@ def format_checksum_line(name: str, digest: str) -> str:
     return f'{marker}{digest}\t{escaped_name}\n'
 
 
-def create_checksum_manifest(
+def write_file_to_archive(
         archive: zipfile.ZipFile,
-        manifest_filename: str = 'checksums.sha256',
-        chunk_size: int = 8192) -> str:
-    manifest_lines: list[str] = []
+        source_path: Path,
+        arcname: str,
+        checksums: dict[str, str],
+        *,
+        compress_type: int = zipfile.ZIP_DEFLATED,
+        chunk_size: int = 65536) -> None:
+    if arcname in checksums:  # pragma: no cover
+        raise ValueError(f'Duplicate ZIP member name: {arcname}')
+    zinfo = zipfile.ZipInfo.from_file(source_path, arcname=arcname)
+    zinfo.compress_type = compress_type
+    force_zip64 = source_path.stat().st_size >= zipfile.ZIP64_LIMIT
+    sha256 = hashlib.sha256()
+    with (
+            source_path.open('rb') as src,
+            archive.open(zinfo, 'w', force_zip64=force_zip64) as dst):
+        while chunk := src.read(chunk_size):
+            sha256.update(chunk)
+            dst.write(chunk)
+    checksums[arcname] = sha256.hexdigest()
 
-    infos = sorted(archive.infolist(), key=operator.attrgetter('filename'))
 
-    for a, b in zip(infos, infos[1:], strict=False):
-        if a.filename == b.filename:  # pragma: no cover
-            raise ValueError(f'Duplicate ZIP member name: {a.filename}')
-
-    for info in infos:
-        if info.is_dir() or info.filename == manifest_filename:
-            continue  # pragma: no cover
-
-        sha256 = hashlib.sha256()
-        with archive.open(info, 'r') as member_file:
-            while chunk := member_file.read(chunk_size):
-                sha256.update(chunk)
-
-        digest = sha256.hexdigest()
-        manifest_lines.append(format_checksum_line(info.filename, digest))
-
-    return ''.join(manifest_lines)
+def format_checksum_manifest(checksums: dict[str, str]) -> str:
+    return ''.join(
+        format_checksum_line(name, digest)
+        for name, digest in sorted(checksums.items()))
 
 
 def check_files_for_arche(
@@ -369,12 +398,12 @@ def check_files_for_arche(
     return dict(missing)
 
 
-def _format_extent(counts: dict[str, int]) -> str:
+def format_extent(counts: dict[str, int]) -> str:
     return ', '.join(
         f'{count} {ext.upper()}' for ext, count in sorted(counts.items()))
 
 
-def _build_arche_collections(
+def build_arche_collections(
         type_ids: set[int] | list[int] | None,
         files_by_extension: dict[str, dict[str, set[Path]]],
         type_titles: dict[str, str],
@@ -392,7 +421,7 @@ def _build_arche_collections(
                 is_part_of=top_uri,
                 filename=type_slug,
                 title=type_titles.get(type_slug, type_slug),
-                extent=_format_extent(type_counts),
+                extent=format_extent(type_counts),
                 license_summary=license_summary))
             parent_uri = type_uri
         for ext, paths in sorted(ext_map.items()):
@@ -438,11 +467,11 @@ def get_arche_metadata_turtle(
         if id_ in g.types}
 
     top = ArcheTopCollection.construct(
-        _format_extent(total_counts),
+        format_extent(total_counts),
         license_summary)
     add_arche_top_collection_to_graph(graph, top, emitted)
 
-    for collection in _build_arche_collections(
+    for collection in build_arche_collections(
             type_ids,
             files_by_extension,
             type_titles,
@@ -526,7 +555,14 @@ def find_duplicates(entity_ids: set[int]) -> set[tuple[int, int]]:
     for file_id, path in g.files.items():
         if file_id not in entity_ids:
             continue
-        size = path.stat().st_size
+        try:
+            size = path.stat().st_size
+        except OSError as e:  # pragma: no cover
+            g.logger.log(
+                'info',
+                'hashing',
+                f'failed to stat file {file_id}: {e}')
+            continue
         size_map[size].append((file_id, path))
 
     duplicates = set()
@@ -541,7 +577,7 @@ def find_duplicates(entity_ids: set[int]) -> set[tuple[int, int]]:
                 g.logger.log(
                     'info',
                     'hashing',
-                    f'failed to hash filer{file_id}: {e}')
+                    f'failed to hash file {file_id}: {e}')
                 continue
             if file_hash in hash_map:
                 original_id = hash_map[file_hash]
@@ -551,48 +587,43 @@ def find_duplicates(entity_ids: set[int]) -> set[tuple[int, int]]:
     return duplicates
 
 
-def open_tmp_sql_file() -> str:
+def write_tmp_sql_file(output_path: Path, timeout: int = 3600) -> Path:
     pg_dump_bin = get_binary_path('pg_dump', required=True)
     if not pg_dump_bin:  # pragma: no cover
         raise FileNotFoundError("pg_dump binary not found")
-    Path(app.config['TMP_PATH']).mkdir(parents=True, exist_ok=True)
-    with tempfile.NamedTemporaryFile(
-            mode='w+',
-            suffix='.sql',
-            dir=app.config['TMP_PATH'],
-            delete=False) as tmp_sql:
-
-        tmp_sql.write("CREATE EXTENSION IF NOT EXISTS postgis;\n\n")
-        tmp_sql.flush()
-
-        command = [
-            pg_dump_bin,
-            '-h', app.config['DATABASE_HOST'],
-            '-d', app.config['DATABASE_NAME'],
-            '-U', app.config['DATABASE_USER'],
-            '-p', str(app.config['DATABASE_PORT']),
-            '--schema=model',
-            '--schema=import']
+    command = [
+        pg_dump_bin,
+        '-h', app.config['DATABASE_HOST'],
+        '-d', app.config['DATABASE_NAME'],
+        '-U', app.config['DATABASE_USER'],
+        '-p', str(app.config['DATABASE_PORT']),
+        '--schema=model',
+        '--schema=import']
+    with output_path.open('w', encoding='utf-8') as sql_file:
+        sql_file.write("CREATE EXTENSION IF NOT EXISTS postgis;\n\n")
+        sql_file.flush()
         try:
             subprocess.run(
                 command,
-                stdout=tmp_sql,
+                stdout=sql_file,
+                stderr=subprocess.PIPE,
                 env={
                     'PGPASSWORD': app.config['DATABASE_PASS'],
                     'SYSTEMROOT': os.environ.get('SYSTEMROOT', '')},
                 check=True,
-                capture_output=False,
-                text=True)
-        except subprocess.CalledProcessError as e:  # pragma: no cover
+                text=True,
+                timeout=timeout)
+        except (
+                subprocess.CalledProcessError,
+                subprocess.TimeoutExpired) as e:  # pragma: no cover
+            stderr = (e.stderr or '').strip() if isinstance(
+                e.stderr, str) else ''
             g.logger.log(
                 'error',
                 'database',
-                f'pg_dump for temporary SQL file failed ({e.returncode})')
-            if os.path.exists(tmp_sql.name):
-                os.unlink(tmp_sql.name)
-            raise e
-
-        return tmp_sql.name
+                f'pg_dump for ARCHE SQL file failed: {stderr or e}')
+            raise
+    return output_path
 
 def rdf_export() -> str:
     return rdf_export_to_file(

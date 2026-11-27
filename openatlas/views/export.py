@@ -1,8 +1,11 @@
 import os
 from pathlib import Path
 
-from flask import flash, g, render_template, send_from_directory, url_for
+from flask import (
+    abort, flash, g, render_template, send_from_directory, url_for)
 from flask_babel import gettext as _
+from flask_wtf.csrf import generate_csrf
+from markupsafe import escape
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
@@ -10,36 +13,71 @@ from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import button, display_info, link, required_group
-from openatlas.display.util2 import convert_size, is_authorized, manual
+from openatlas.display.util2 import (
+    convert_size, is_authorized, manual, uc_first)
 from openatlas.models.export import arche_export, rdf_export, sql_export
 
 
+def post_button(
+        label: str,
+        url: str,
+        variant: str = 'primary') -> str:
+    token = escape(generate_csrf())
+    css = app.config['CSS']['button'][variant]
+    return (
+        f'<form method="post" action="{escape(url)}" class="d-inline">'
+        f'<input type="hidden" name="csrf_token" value="{token}">'
+        f'<button type="submit" class="{css}">'
+        f'{escape(uc_first(label))}</button></form>')
+
+
+def delete_post_form(url: str, confirm_text: str) -> str:
+    token = escape(generate_csrf())
+    return (
+        f'<form method="post" action="{escape(url)}" class="d-inline" '
+        f'onsubmit="return confirm(this.dataset.confirm)" '
+        f'data-confirm="{escape(confirm_text)}">'
+        f'<input type="hidden" name="csrf_token" value="{token}">'
+        f'<button type="submit" class="btn btn-link p-0 align-baseline">'
+        f'{escape(uc_first(_("delete")))}</button></form>')
+
+
+def escape_optional(value: object) -> str:
+    return str(escape(value)) if value else ''
+
+
 def get_export_path(view: str) -> Path:
-    path = app.config['EXPORT_PATH']
     match view:
         case 'arche':
-            path = app.config['ARCHE_PATH']
+            return app.config['ARCHE_PATH']
         case 'rdf':
-            path = app.config['RDF_PATH']
+            return app.config['RDF_PATH']
         case 'sql':
-            path = app.config['SQL_PATH']
-    return path
+            return app.config['SQL_PATH']
+        case _:
+            abort(404)
 
 
 @app.route('/download/export/<view>/<filename>')
 @required_group('manager')
 def download_export(view: str, filename: str) -> Response:
+    if filename == '.gitignore':
+        abort(404)
     return send_from_directory(
         get_export_path(view),
         filename,
         as_attachment=True)
 
 
-@app.route('/delete_export/<view>/<filename>')
+@app.route('/delete_export/<view>/<filename>', methods=['POST'])
 @required_group('admin')
 def delete_export(view: str, filename: str) -> Response:
+    base_path = get_export_path(view).resolve()
     try:
-        (get_export_path(view) / filename).unlink()
+        target = (base_path / filename).resolve()
+        if filename == '.gitignore' or target.parent != base_path:
+            raise ValueError(f'Invalid export filename: {filename}')
+        target.unlink()
         g.logger.log('info', 'file', f'{view.upper()} file deleted')
         flash(_('file deleted'))
     except Exception as e:
@@ -52,7 +90,7 @@ def delete_export(view: str, filename: str) -> Response:
     return redirect(f'{url_for('export_'+view)}#tab-export')
 
 
-@app.route('/export/execute/<format_>')
+@app.route('/export/execute/<format_>', methods=['POST'])
 @required_group('manager')
 def export_execute(format_: str) -> Response:
     if os.access(app.config['SQL_PATH'], os.W_OK):
@@ -77,10 +115,10 @@ def export_sql() -> str:
                 content=build_export_table('sql').display(),
                 buttons=[
                     manual('admin/export'),
-                    button(
+                    post_button(
                         _('export SQL'),
                         url_for('export_execute', format_='sql')),
-                    button(
+                    post_button(
                         _('export database dump'),
                         url_for('export_execute', format_='dump'))])},
         title=_('export SQL'),
@@ -94,32 +132,34 @@ def export_sql() -> str:
 def export_arche() -> str:
     metadata = app.config['ARCHE_METADATA']
     info_content = {
-        'projectAcronym': metadata.get('projectAcronym'),
-        'topCollection': metadata.get('topCollection'),
-        'description': metadata.get('description'),
-        'language': metadata.get('language'),
-        'depositor': ', '.join(metadata.get('depositor', [])),
-        'acceptedDate': metadata.get('acceptedDate'),
-        'submissionDate': metadata.get('submissionDate'),
-        'curator': ', '.join(metadata.get('curator', [])),
-        'editor': ', '.join(metadata.get('editor', [])),
-        'contact': ', '.join(metadata.get('contact', [])),
-        'owner': ', '.join(metadata.get('owner', [])),
-        'rightsHolder': ', '.join(metadata.get('rightsHolder', [])),
-        'licensor': ', '.join(metadata.get('licensor', [])),
-        'principalInvestigator':
-            ', '.join(metadata.get('principalInvestigator', [])),
-        'hasMetadataCreator':
-            ', '.join(metadata.get('hasMetadataCreator', [])),
-        'relatedDiscipline': ', '.join(
-            metadata.get('relatedDiscipline', [])),
-        'subject': ', '.join(metadata.get('subject', [])),
-        'licenseSummary': metadata.get('licenseSummary'),
-        'datasetLicense': metadata.get('datasetLicense'),
-        'lifeCycleStatus': metadata.get('lifeCycleStatus'),
-        'url': metadata.get('url'),
-        'excludeReferenceSystems':
-            ', '.join(metadata.get('excludeReferenceSystems', [])),
+        'projectAcronym': escape_optional(metadata.get('projectAcronym')),
+        'topCollection': escape_optional(metadata.get('topCollection')),
+        'description': escape_optional(metadata.get('description')),
+        'language': escape_optional(metadata.get('language')),
+        'depositor': escape_optional(
+            ', '.join(metadata.get('depositor', []))),
+        'acceptedDate': escape_optional(metadata.get('acceptedDate')),
+        'submissionDate': escape_optional(metadata.get('submissionDate')),
+        'curator': escape_optional(', '.join(metadata.get('curator', []))),
+        'editor': escape_optional(', '.join(metadata.get('editor', []))),
+        'contact': escape_optional(', '.join(metadata.get('contact', []))),
+        'owner': escape_optional(', '.join(metadata.get('owner', []))),
+        'rightsHolder':
+            escape_optional(', '.join(metadata.get('rightsHolder', []))),
+        'licensor': escape_optional(', '.join(metadata.get('licensor', []))),
+        'principalInvestigator': escape_optional(
+            ', '.join(metadata.get('principalInvestigator', []))),
+        'hasMetadataCreator': escape_optional(
+            ', '.join(metadata.get('hasMetadataCreator', []))),
+        'relatedDiscipline': escape_optional(
+            ', '.join(metadata.get('relatedDiscipline', []))),
+        'subject': escape_optional(', '.join(metadata.get('subject', []))),
+        'licenseSummary': escape_optional(metadata.get('licenseSummary')),
+        'datasetLicense': escape_optional(metadata.get('datasetLicense')),
+        'lifeCycleStatus': escape_optional(metadata.get('lifeCycleStatus')),
+        'url': escape_optional(metadata.get('url')),
+        'excludeReferenceSystems': escape_optional(
+            ', '.join(metadata.get('excludeReferenceSystems', []))),
         'typeIds':
             ', '.join([
                 link(str(type_id), url_for('view', id_=type_id))
@@ -141,7 +181,9 @@ def export_arche() -> str:
                 content=build_export_table('arche').display(),
                 buttons=[
                     manual('admin/export'),
-                    button(f'{_('export')} ARCHE', url_for('arche_execute'))
+                    post_button(
+                        f'{_('export')} ARCHE',
+                        url_for('arche_execute'))
                     if is_authorized('admin') else ''])},
         title=f'{_('export')} ARCHE',
         crumbs=[
@@ -149,16 +191,24 @@ def export_arche() -> str:
             f'{_('export')} ARCHE'])
 
 
-@app.route('/export/arche/execute')
+@app.route('/export/arche/execute', methods=['POST'])
 @required_group('admin')
 def arche_execute() -> Response:
-    if os.access(app.config['ARCHE_PATH'], os.W_OK):
-        if arche_export():
-            g.logger.log('info', 'database', 'ARCHE export')
-            flash(_('data was exported'))
-        else:  # pragma: no cover
-            g.logger.log('error', 'database', 'ARCHE export failed')
-            flash(_('export failed'), 'error')
+    arche_path = app.config['ARCHE_PATH']
+    if not os.access(arche_path, os.W_OK):  # pragma: no cover
+        g.logger.log(
+            'error',
+            'database',
+            f'ARCHE directory not writable: {arche_path}')
+        flash(_('directory not writable'), 'error')
+        return redirect(f"{url_for('export_arche')}#tab-export")
+    try:
+        arche_export()
+        g.logger.log('info', 'database', 'ARCHE export')
+        flash(_('data was exported'))
+    except Exception as e:  # pragma: no cover
+        g.logger.log('error', 'database', 'ARCHE export failed', e)
+        flash(_('export failed'), 'error')
     return redirect(f"{url_for('export_arche')}#tab-export")
 
 
@@ -174,14 +224,16 @@ def export_rdf() -> str:
                 content=build_export_table('rdf').display(),
                 buttons=[
                     manual('admin/export'),
-                    button(f'{_('export')} RDF/NT', url_for('rdf_execute'))])},
+                    post_button(
+                        f'{_('export')} RDF/NT',
+                        url_for('rdf_execute'))])},
         title=f'{_('export')} RDF',
         crumbs=[
             [_('admin'), f'{url_for('admin_index')}#tab-data'],
             f'{_('export')} RDF'])
 
 
-@app.route('/export/rdf/execute')
+@app.route('/export/rdf/execute', methods=['POST'])
 @required_group('manager')
 def rdf_execute() -> Response:
     if os.access(app.config['RDF_PATH'], os.W_OK):
@@ -197,21 +249,21 @@ def rdf_execute() -> Response:
 def build_export_table(view: str) -> Table:
     path = get_export_path(view)
     table = Table(['name', 'size'], order=[[0, 'desc']])
+    if not path.is_dir():  # pragma: no cover
+        return table
     for file in path.iterdir():
         if not file.is_file() or file.name == '.gitignore':
             continue
         data = [
-            file.name,
+            str(escape(file.name)),
             convert_size(file.stat().st_size),
             link(
                 _('download'),
                 url_for('download_export', view=view, filename=file.name))]
         if is_authorized('admin') and os.access(path, os.W_OK):
-            confirm = _('delete %(name)s?', name=file.name.replace("'", ''))
             data.append(
-                link(
-                    _('delete'),
+                delete_post_form(
                     url_for('delete_export', view=view, filename=file.name),
-                    js=f"return confirm('{confirm}')"))
+                    _('delete %(name)s?', name=file.name)))
         table.rows.append(data)
     return table

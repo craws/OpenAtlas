@@ -284,13 +284,10 @@ def get_value_for_types(type_: Entity, links: list[Link]) -> dict[str, str]:
 def filter_by_type(
         entities: list[Entity],
         type_ids: list[int]) -> list[Entity]:
-    result = []
-    for entity in entities:
-        if any(
-                id_ in [type_.id for type_ in entity.types]
-                for id_ in type_ids):
-            result.append(entity)
-    return result
+    type_id_set = set(type_ids)
+    return [
+        entity for entity in entities
+        if any(type_.id in type_id_set for type_ in entity.types)]
 
 
 def is_float(value: str) -> bool:

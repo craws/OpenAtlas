@@ -65,7 +65,7 @@ def normalize_language_uri(lang: str | None) -> str | None:
     return None
 
 
-def _get_literal_lang(metadata: dict[str, Any]) -> str:
+def get_literal_lang(metadata: dict[str, Any]) -> str:
     lang = str(metadata.get('language') or '').strip().lower()
     if lang.isalpha() and len(lang) in ISO_LANG_VOCABS:
         return lang
@@ -143,7 +143,7 @@ class ArcheTopCollection:
             or g.settings.get('site_name')
             or slug
             or 'OpenAtlas')
-        lang = _get_literal_lang(metadata)
+        lang = get_literal_lang(metadata)
         desc = metadata.get('description')
         subjects = [
             (str(item), 'und')

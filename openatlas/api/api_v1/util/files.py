@@ -32,15 +32,19 @@ SAFE_FILE_EXTENSIONS = {
 
 def get_license_url_mapping() -> dict[int, list[str]]:
     if not hasattr(g, 'license_url_mapping'):
+        valid_ids = list(get_valid_license_ids())
+        if not valid_ids:  # pragma: no cover
+            g.license_url_mapping = {}
+            return g.license_url_mapping
         links = Entity.get_links_of_entities(
-            list(get_valid_license_ids()),
+            valid_ids,
             'P67',
             ['external_reference', 'reference_system'],
             inverse=True)
         license_mapping: dict[int, list[str]] = defaultdict(list)
         sorted_links = sorted(
             links,
-            key=lambda l: l.domain.class_.name != 'external_reference')
+            key=lambda link_: link_.domain.class_.name != 'external_reference')
         for link_ in sorted_links:
             url = None
             if link_.domain.class_.name == 'reference_system':
