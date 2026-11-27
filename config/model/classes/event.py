@@ -113,7 +113,8 @@ acquisition['relations'] = acquisition['relations'] | {
 
 creation: dict[str, Any] = copy.deepcopy(class_)
 creation['label'] = _('creation')
-creation['display']['tooltip'] = _('creation of conceptual items')
+creation['display']['tooltip'] =  \
+    f'{_('creation of conceptual items')} ({_('source')})'
 creation['relations'] = creation['relations'] | {
     'created_source': {
         'label': _('created source'),

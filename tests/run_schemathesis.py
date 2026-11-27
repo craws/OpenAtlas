@@ -230,11 +230,11 @@ def before_add_examples(context: Any, examples: list[Any]) -> None:
             kwargs['query'] = {'limit': 5, 'page': 1}
         elif path.endswith('/export/dump'):
             kwargs['query'] = {'limit': 1}
-        elif (path in (
-                '/api/1/vocabulary/standard/{openatlas_class}',
-                '/api/1/system/count/entities')
-                and case_studies):
+        elif (path == '/api/1/vocabulary/standard/{openatlas_class}'
+              and case_studies):
             kwargs['query'] = {'caseStudy': case_studies[0]}
+        elif (path == '/api/1/system/count/entities' and case_studies):
+            kwargs['query'] = {'caseStudy': case_studies[:2]}
         examples.append(context.operation.Case(**kwargs))
 
 
