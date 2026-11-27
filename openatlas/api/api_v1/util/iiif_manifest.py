@@ -1,4 +1,3 @@
-import ast
 from dataclasses import dataclass, field
 from functools import cached_property
 from html import escape
@@ -21,12 +20,10 @@ from openatlas.api.api_v1.responses.iiif import (
 from openatlas.api.api_v1.util.files import (
     get_cached_file_path, get_iiif_redirect_url, get_license_item,
     get_license_type, has_file_access, iiif_file_exists,
-    resolve_rights_holders)
-from openatlas.database import overlay as db_overlay
+    resolve_overlay_bounds, resolve_rights_holders)
 from openatlas.display.image_processing import get_actual_mime
 from openatlas.models.annotation import AnnotationImage
 from openatlas.models.entity import Entity
-from openatlas.models.overlay import Overlay
 
 
 @dataclass
@@ -89,28 +86,6 @@ def format_html_link(url: str, text: str) -> str:
     return (
         f'<a href="{escape(url)}" target="_blank" '
         f'rel="noopener noreferrer">{safe_text}</a>')
-
-
-def get_overlay_corners(bounding_box: Any) -> list[list[float]] | None:
-    # Overlays are stored as [latitude, longitude], GeoJSON needs [lon, lat]
-    try:
-        coordinates = (
-            ast.literal_eval(bounding_box)
-            if isinstance(bounding_box, str) else bounding_box)
-        points = [(float(lat), float(lon)) for lat, lon in coordinates]
-    except (SyntaxError, TypeError, ValueError):
-        return None
-    corners: list[list[float]] | None = None
-    match points:
-        case [(lat_a, lon_a), (lat_b, lon_b)]:  # Legacy bounds, any order
-            north, south = max(lat_a, lat_b), min(lat_a, lat_b)
-            west, east = min(lon_a, lon_b), max(lon_a, lon_b)
-            corners = [[west, north], [east, north], [west, south]]
-        case [_, _, _]:  # Top left, top right, bottom left
-            corners = [[lon, lat] for lat, lon in points]
-    if corners and Overlay.is_valid_corners(corners):
-        return corners
-    return None
 
 
 def _is_positive_int(value: Any) -> bool:
@@ -203,10 +178,9 @@ class IIIFBuilder:
 
     @cached_property
     def overlay_corners(self) -> list[list[float]] | None:
-        overlays = db_overlay.get_by_object([self.entity.id])
-        if not overlays:
-            return None
-        return get_overlay_corners(overlays[0]['bounding_box'])
+        return resolve_overlay_bounds(
+            [self.entity.id],
+            lon_lat=True)[self.entity.id]
 
     @cached_property
     def common_meta(self) -> ManifestMetadata:

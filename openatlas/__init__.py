@@ -142,6 +142,7 @@ def setup_files() -> None:
         g.file_info = {}
         g.api_file_paths = {}
         g.api_rights_holders = {}
+        g.api_overlay_bounds = {}
         return
     from openatlas.models.rights_holder import RightsHolder
     g.files = {}

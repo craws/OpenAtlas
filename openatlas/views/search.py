@@ -73,18 +73,18 @@ class SearchForm(FlaskForm):
                 continue
             if year.data is None:
                 if month.data is not None or day.data is not None:
-                    year.errors.append(_('not a valid date'))
+                    year.errors.append(_('not a valid date'))  # type: ignore
                     valid = False
                 continue
             if day.data and not month.data:
-                month.errors.append(_('not a valid date'))
+                month.errors.append(_('not a valid date'))  # type: ignore
                 valid = False
                 continue
             if date := form_to_datetime64(
                     year.data, month.data, day.data, to_date=to_date):
                 dates.append(date)
             else:
-                day.errors.append(_('not a valid date'))
+                day.errors.append(_('not a valid date'))  # type: ignore
                 valid = False
         if len(dates) == 2 and dates[0] > dates[1]:
             self.begin_year.errors.append(  # type: ignore
