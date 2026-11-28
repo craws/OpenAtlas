@@ -48,8 +48,7 @@ class RightsHolderTests(TestBaseCase):
         assert rh_name.encode() in rv.data
 
         rv = c.get(url_for('rights_holder_view', id_=9999))
-        assert rv.status_code == \
-               HTTPStatus.IM_A_TEAPOT
+        assert rv.status_code == HTTPStatus.IM_A_TEAPOT
 
         rv = c.post(
             url_for(

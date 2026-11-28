@@ -162,13 +162,16 @@ def form_to_datetime64(
         day = '01'
 
     hour = (
-        f'{int(hour):02}' if hour not in (None, '')
+        f'{int(hour):02}' if isinstance(hour, int)
+        or (isinstance(hour, str) and hour.isdigit())
         else ('23' if to_date else '00'))
     minute = (
-        f'{int(minute):02}' if minute not in (None, '')
+        f'{int(minute):02}' if isinstance(minute, int)
+        or (isinstance(minute, str) and minute.isdigit())
         else ('59' if to_date else '00'))
     second = (
-        f'{int(second):02}' if second not in (None, '')
+        f'{int(second):02}' if isinstance(second, int)
+        or (isinstance(second, str) and second.isdigit())
         else ('59' if to_date else '00'))
     try:
         date_time = numpy.datetime64(
